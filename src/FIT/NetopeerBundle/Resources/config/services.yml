@@ -1,0 +1,18 @@
+parameters:
+    netopeer.data.class: FIT\NetopeerBundle\Models\Data
+
+
+services:
+    data_logger:
+        class: Symfony\Bridge\Monolog\Logger
+        arguments: [app]
+        calls:
+             - [pushHandler, [@data_handler]]
+
+    data_handler:
+        class: Monolog\Handler\StreamHandler       
+        arguments: [%kernel.logs_dir%/%kernel.environment%.data.log]
+
+    DataModel:
+        class: %netopeer.data.class%
+        arguments: [@service_container, @data_logger]

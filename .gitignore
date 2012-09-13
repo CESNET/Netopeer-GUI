@@ -1,0 +1,4 @@
+/src/Acme/*
+/app/logs/*
+/app/logs/dev.log
+/src/FIT/NetopeerBundle/Resources/public/.sass-cache/

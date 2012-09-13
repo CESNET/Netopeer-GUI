@@ -1,0 +1,23 @@
+{% if element|length %}
+	<div class="level-{{ level }} {{key}}">
+		
+		{% if key == 'container' %}
+			{% set useLevel = true %}
+		{% else %}
+			{% set useLevel = false %}
+		{% endif %}
+
+		{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element, 'key': key, 'level': level, 'addLevel': useLevel} %}
+
+		{% for key, el in element %}				
+				{% if element.hasChildren() %}
+					{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': element.getChildren(), 'level': level + 1} %}
+				{% else %}
+					{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element.current(), 'key': key, 'level': level + 1, 'addLevel': true} %}
+				{% endif %}
+		{% endfor %}
+
+	</div>
+{% else %}
+	{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element, 'key': key, 'level': level, 'addLevel': true} %}
+{% endif %}
