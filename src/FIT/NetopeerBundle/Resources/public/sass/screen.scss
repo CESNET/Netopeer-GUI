@@ -1,0 +1,197 @@
+@import "compass/reset";
+@import "compass/css3";
+@import "compass/typography/links/link-colors";
+
+
+
+// basic colors - http://kuler.adobe.com/index.cfm#themeID/2007406
+$cBase:					#004F80;
+$cComp1Light: 			#1486CD;
+$cComp1Dark: 			#002034;
+$cComp2Light: 			#804B00;
+$cComp2Dark: 			#341E00;
+
+$cFont: 				#333;
+
+// basic sizes
+$hNavTop:				40px;
+$sContentPadding:		15px;
+
+// fonts
+$fBody: 		Arial, Trebuchet, Verdana, sans-serif;
+$fHeadings:		Arial, Trebuchet, Verdana, sans-serif;
+
+$img:			'../images/';
+
+html { min-height: 100%; height: 100%; width: 100%; min-width: 800px; }
+body { background: #f0f0f0; font-family: $fBody; font-size: 0.625em; color: $cFont; position: relative; min-height: 100%; height: 100%; overflow: scroll;
+	> * { @include box-sizing(border-box); }
+}
+a { @include link-colors($cBase, #000); 
+	&:hover { text-decoration: none; }
+}
+strong, b { font-weight: bold; }
+
+.button { @include background( linear-gradient(lighten($cBase, 10%), darken($cBase, 4%)) ); @include border-radius(5px); padding: 8px 20px; color: #fff; @include text-shadow(1px, 1px, 2px, #333); font-size: 1em; font-weight: normal; border: 1px solid darken($cBase, 4%); cursor: pointer; @include single-box-shadow(#aaa, 0px, 0px, 8px); margin: 15px 0px; position: relative; z-index: 1;
+	&:before { position: absolute; z-index: -1; content: ""; top: 1px; left: 0px; right: 0px; bottom: 0px; border-top: 1px solid rgba(255,255,255,0.2); }
+	&:active { @include single-box-shadow(rgba(255,255,255,0.25), 0px, 2px, 5px, false, true);  }
+	&:hover { @include background( linear-gradient($cBase, darken($cBase, 14%)) ); }
+
+}
+
+/* navigation */
+nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), darken($cBase, 10%))); height: $hNavTop; line-height: $hNavTop; color: #fff; border-bottom: 1px solid #000; @include box-shadow( 0px 0px 7px rgba(0,0,0,0.9)); position: absolute; z-index: 100; top: 0px; width: 100%;
+	> a { color: #fff; text-decoration: none; @include text-shadow(1px 1px 2px #000); padding: 0px 20px; border-left: 1px solid $cBase; float: left; font-size: 1.3em;
+		&:first-child + a { border-left: 1px solid #000; }
+		&:hover, &.active { background: darken($cBase, 20%); }
+	}
+
+	#ico-home { float: left; border-right: 1px solid desaturate($cComp1Light, 50%); border-left: 0px; width: 50px; height: 40px; padding: 0px; background: url($img + 'ico/16_home.png') center center no-repeat lighten($cBase, 0%); @include opacity(0.5);
+		&:hover { @include opacity(1); } // background: url($img + 'ico/24_home.png') center center no-repeat darken($cBase, 20%); }
+	}
+
+	#userpane { float: right; height: $hNavTop; padding: 0px $sContentPadding 0px $sContentPadding + 16px + 10px; color: #ccc; background: url($img + 'ico/16_users-o50.png') 50% 5px no-repeat $cComp1Dark; background: url($img + 'ico/16_users-o50.png') 10px (40px - 16px)/2 - 1px no-repeat rgba($cComp1Dark, 0.8); border-left: 1px solid #000; margin-left: 20px; font-size: 1.2em;
+		.log-out { border-left: 1px solid lighten($cFont, 10%); padding-left: 7px; @include link-colors(#ccc, $cComp1Light); margin-left: 5px;
+			&:hover { text-decoration: none; }
+		}
+	}
+}
+
+nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop + $sContentPadding 0px 0px 0px; font-size: 1.3em;
+	a { display: block; padding: 9px $sContentPadding; @include link-colors($cFont, #000); text-decoration: none;
+		&:hover, &.active { padding-left: $sContentPadding - 5px; margin-left: 5px; }
+		&:hover { background: #bbb;  }
+		&.active { background: #f5f5f5; color: $cComp2Dark; margin-right: -1px; padding: 9px $sContentPadding + 1px 8px $sContentPadding - 6px; border: 1px solid #bababa; border-right: 0px none; }
+	}
+}
+
+body > section { float: left; width: 50%; min-height: 100%; padding: $hNavTop + $sContentPadding $sContentPadding $sContentPadding $sContentPadding; font-size: 1.4em; overflow-y: scroll; background: #f5f5f5; 
+	&.left-nav-defined { width: 45%; }
+	&#state { border-right: 1px solid #bababa; @include single-box-shadow(darken(#f5f5f5, 5%), -5px, 0px, 5px, false, true); padding-right: 2 * $sContentPadding; }
+	&#config { padding-left: 2 * $sContentPadding; }
+
+	*[class*='level'] { overflow: hidden; position: relative;
+		.dots { background: url($img + 'dot.png') left top repeat #f5f5f5; @include inline-block; height: 150px; position: absolute; left: 0px; top: 1px; }
+	}
+	@for $i from 0 through 15 {
+	  .level-#{$i} { 
+	  	.dots { width: 8px * $i; }
+	  	.label { padding-left: 6px + (8px * $i); }
+	  }
+	}
+	.level-0:not(.container):not(.list) { margin: 0px; border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f0f0f0;
+		&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
+			.dots { background-color: #fff; }
+		}
+	}
+	.leaf-line { padding: 7px 1.5% 7px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; overflow: hidden; margin-top: -1px;
+		.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
+		.value { width: 62%; float: right; color: #000; }
+		input.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; }
+		textarea.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; padding: 0px 3px; font-size: 0.9em; }
+
+		.edit-bar { width: 10%; margin: -4px 0px -4px 2%; float: right; text-align: right; display: none;
+			img { @include opacity(0.4); cursor: pointer;
+				&:hover { @include opacity(1); }
+			}
+		}
+		+ .leaf { }
+
+		&.active { position: relative; z-index: 25; background: #fff; }
+	}	
+	.container, .list { margin: 25px 0px; 
+		> *:not(.container):not(.list) { border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f0f0f0;
+			&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333; 
+				.dots { background-color: #fff; }
+			}
+		}
+		.container, .list { border-top: 1px solid #ddd; }
+
+		+ * > .leaf-line:first-child { margin-top: 0px; }
+	}
+}
+
+body > section, #content {
+	h1, h2, h3, h4, legend { font-family: $fHeadings; color: $cBase; }
+	h1 { font-size: 1.9em; margin: 20px 0px 15px 0px; }
+	h2 { font-size: 1.7em; margin: 15px 0px 10px 0px; }
+	h3 { font-size: 1.5em; margin: 10px 0px 5px 0px; }
+	h4 { font-size: 1.3em; margin: 5px 0px 5px 0px; }
+
+	legend { font-size: 1.9em; margin-bottom: 15px; }
+
+	.alert { padding: 15px 20px; border: 1px solid #ccc; background: #fff; @include border-radius(5px); @include single-box-shadow(#d5d5d5, 0px, 0px, 8px); clear: both; margin: 15px 0px;
+		&.info { background: url($img + 'ico/info.png'); }
+		&.success { background: url($img + 'ico/ok.png'); color: #007711; }
+		&.error { background: url($img + 'ico/error.png'); color: #820101; }
+
+		&.info, &.success, &.error { padding-left: 40px; background-position: 10px 12px; background-repeat: no-repeat; background-color: #fff; }
+	}
+}
+
+#content { min-height: 100%; padding: $hNavTop + $sContentPadding $sContentPadding $sContentPadding $sContentPadding; font-size: 1.4em; 
+	&.max-width-column { max-width: 800px; width: 100%; }
+}
+
+/* formulare */
+$hInput: 			30px;
+form { margin: 15px 0px;
+	&.login, &#login-form { border: 1px solid #ccc; @include background( linear-gradient(#fafafa, #eaeaea) ); @include border-radius(5px); padding: 20px; @include single-box-shadow(#ccc, 0px, 0px, 8px); }
+	&.login { 
+		label { width: 25%; padding-right: 2%; float: left; @include box-sizing(border-box); text-align: right; }
+		input { 
+			&[type="text"], &[type="password"] { width: 60%; float: left; }	
+			&[type="submit"] { margin-left: 25%; }
+		}
+	}
+	&#login-form { width: 400px; margin: 0px auto;
+		.desc { font-size: 0.95em; margin-bottom: 25px; }
+
+		label { width: 20%; margin-right: 5%; float: left; }
+		input { 
+			&[type="text"], &[type="password"] { width: 70%; float: left; }	
+			&[type="submit"] { margin-left: 25%; }
+		}		
+	}
+
+	label { @include inline-block; width: 90px; height: $hInput; line-height: $hInput; margin-top: 10px;
+		&.required {
+			&:after { content: " *"; }
+		}
+	}
+	input { @include box-sizing(border-box);
+		&[type="text"], &[type="password"] { width: 200px; height: $hInput; line-height: $hInput; padding: 0px 5px; border: 1px solid #ccc; @include background( linear-gradient(#fff, #f0f0f0) ); margin-top: 10px; @include inline-block; @include border-radius(3px); font-size: 1em; }
+		&[type="submit"] { @extend .button; }
+	} 
+	textarea { @include box-sizing(border-box); @extend input[type="text"]; @include background( linear-gradient(#fff, #fafafa) ); height: 80px; line-height: 1.2em; }
+		
+}
+
+.form-underlay { width: 100%; height: 100%; @include background(rgba(0,0,0,0.4)); position: relative; top: 0px; right: 0px; z-index: 20; }
+.form-cover { width: 100%; height: 100%; position: absolute; top: 0px; right: 0px; z-index: 21; display: none; }
+form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 0px 0px 15px 0px; float: left; width: 100%; @include single-box-shadow(rgba(0,0,0,0.7), 0px, 0px, 10px);
+
+	.leaf-line {
+		input {
+			&.label, &.value { margin-top: 0px; height: 22px; line-height: 22px; }
+		}
+	}	
+	input[type="submit"] { float: right; margin-right: 15px; }
+}
+
+#login-hp { padding: 100px 0px 0px 0px; }
+
+table { width: 100%; margin: 15px 0px; 
+	th, td { border: 1px solid #ccc; padding: 8px 15px; }
+	tr:nth-child(even) {
+		th, td { background: #eaeaea; }
+	}
+}
+
+/* media queries */
+@media screen and (max-width: 1280px) {
+	nav#left { width: 14%; }
+	body > section { 
+		&.left-nav-defined { width: (100% - 14%)/2; }
+	}
+}

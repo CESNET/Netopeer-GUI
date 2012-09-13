@@ -1,0 +1,34 @@
+{% extends 'FITNetopeerBundle::layout.html.twig' %}
+{% block title %}Connection management{% endblock title %}
+
+{% block singleContentClass %}
+	max-width-column
+{% endblock singleContentClass %}
+
+{% block state %}
+	<form action="{{ path('_home') }}" method="post" {{ form_enctype(form) }} class="login">
+		<legend>Connect to server</legend>
+	    {{ form_widget(form) }}
+	    <input type="submit" value="Connect" />
+	</form>
+{% endblock state %}
+
+{% block config %}
+	<h2>Active connection list</h2>
+	{% set hosts = app.session.get('hosts') %}
+	{% if sessionKeys is empty or hosts is empty %}
+		<div class="alert info">
+			You are not connected to any server.
+		</div>
+	{% else %}
+		<table>
+			{% for key in sessionKeys %}
+				<tr>
+					<td>{{ hosts[loop.index - 1] }}</td>
+					<td><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }} '>get (state) &amp; get-config (config)</a></td>
+					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }} '>disconnect</a></td>
+				</tr>
+			{% endfor %}
+		</table>
+	{% endif %}
+{% endblock config %}

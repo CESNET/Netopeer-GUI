@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta name="description" content="" />
+	<meta name="keywords" content="" />
+	<meta name="author" content="David Alexa - alexadav@fit.cvut.cz" />
+	<meta name="robots" content="noindex, nofollow" /> 
+
+	<link href="{{ asset('bundles/netopeer/style/pie.css') }}" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="{{ asset('bundles/netopeer/style/screen.css') }}" type="text/css" media="all" />
+	{% block stylesheet %}{% endblock stylesheet %}
+
+	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/jquery-1.7.2.min.js')}} "></script>
+	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/modernizr.custom.43627.js')}} "></script>
+	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/selectivizr-min.js')}} "></script>
+	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/default.js')}} "></script>
+	{% block javascripts %}{% endblock javascripts %}
+
+	<title>{% block title %}{% endblock title %} {% block additionalTitle %}| Project Netopeer{% endblock additionalTitle %}</title>
+</head>
+<body>
+
+	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+		<nav id="top">
+			<a href="{{ path('_home') }}" title="Home" id="ico-home"></a>
+			{% if topmenu %}
+				{% for section in topmenu %}
+					<a href="{{ path(section.path, section.params) }}" title="{{section.title}}" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %}">{{section.name}}</a>
+				{% endfor %}
+			{% endif %}
+
+			<div id="userpane">
+				Logged user: <strong>{{ app.user.username }}</strong> 
+				{% if is_granted('IS_AUTHENTICATED_FULLY') %}<a href="{{ path('_logout') }}" class="log-out">Log out</a>{% endif %}
+			</div>
+		</nav>
+
+		{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
+		{% if submenu is defined and submenu %}
+			<nav id="left">
+				{% for subsection in submenu %}
+					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="{% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
+				{% endfor %}
+			</nav>
+			{% set addToColumnClass = ' left-nav-defined' %}
+		{% endif %}
+
+		{% if singleColumnLayout is not defined or singleColumnLayout == false %}
+			<section id="state" class="column{{addToColumnClass}}">
+				{% for type, message in stateFlashes %}
+				    <div class='alert {{type}}'>{{message|raw}}</div>
+				{% endfor %}
+
+				{% block state %}
+				{% endblock state %}
+			</section>
+
+			<section id="config" class="column{{addToColumnClass}}">
+				{% for type, message in configFlashes %}
+				    <div class='alert {{type}}'>{{message|raw}}</div>
+				{% endfor %}				
+
+				{% block config %}
+				{% endblock config %}
+			</section>
+		{% else %}
+			<article id="content" class="{% block singleContentClass %}{% endblock singleContentClass %}">
+
+				{% for type, message in singleFlashes %}
+				    <div class='alert {{type}}'>{{message|raw}}</div>
+				{% endfor %}
+
+				{% block singleContent %}
+				{% endblock singleContent %}
+			</article>
+		{% endif %}
+
+	{% else %}
+		<nav id="top">
+			<a href="{{ path('_home') }}" title="Home" id="ico-home"></a>
+		</nav>
+
+		<article id="content">
+			{% block flashes %}
+				{% for type, message in singleFlashes %}
+				    <div class='alert {{type}}'>{{message|raw}}</div>
+				{% endfor %}
+			{% endblock flashes %}	
+
+			{% block content %}
+			{% endblock content %}
+		</article>
+	{% endif %}	
+
+	
+</body>
+</html>

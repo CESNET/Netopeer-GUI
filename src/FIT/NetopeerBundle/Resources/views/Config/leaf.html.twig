@@ -1,0 +1,39 @@
+<div class="leaf-line{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %}">
+	{% if element.attributes is empty %}
+		<span class="label">
+			<span class="dots"></span>
+			<strong>{{key}}</strong>
+			{% if key != element.name %}
+				{{element.name}}
+			{% endif %}
+		</span>
+		<span class="edit-bar">
+			<img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}" />
+			{#
+			<img src="{{ asset('bundles/netopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" class="sibling" />
+			#}
+		</span>
+		{% if element.0 is empty %}
+			{% if element.name == 'text' %}
+				<textarea class="value" name="configDataForm[{{element.name}}_{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}]">{{element.0|trim}}</textarea>
+			{% else %}
+				<input type="text" class="value" value="{{element.0}}" name="configDataForm[{{element.name}}_{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}]" />
+			{% endif %}
+		{% endif %}		
+	{% else %}
+		<span class="label">
+			<span class="dots"></span>
+			<strong>{{key}}</strong>
+			{% if key != element.attributes.key %}
+				{{element.attributes.key}}	
+			{% endif %}
+		</span>
+		<span class="edit-bar">
+			<img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}"/>
+			{#
+			<img src="{{ asset('bundles/netopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" class="sibling" />
+			#}
+		</span>
+		<input type="text" class="value" value="{{element.attributes}}" name="configDataForm[at-{{element.attributes.key}}_{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}]" />
+	{% endif %}	
+</div>

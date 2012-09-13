@@ -1,0 +1,23 @@
+<div class="leaf-line{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %}">
+	{% if element.attributes is empty %}
+		<span class="label">
+			<span class="dots"></span>
+			<strong>{{key}}</strong>
+			{% if key != element.name %}
+				{{element.name}}	
+			{% endif %}
+		</span>
+		{% if element.0 is defined %}
+			<span class="value">{{element.0}}</span>
+		{% endif %}		
+	{% else %}
+		<span class="label">
+			<span class="dots"></span>
+			<strong>{{key}}</strong>
+			{% if key != element.attributes.key %}
+				{{element.attributes.key}}	
+			{% endif %}
+		</span>
+		<span class="value">{{element.attributes}}</span>
+	{% endif %}	
+</div>
