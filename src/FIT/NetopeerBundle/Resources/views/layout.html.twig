@@ -24,7 +24,7 @@
 
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="top">
-			<a href="{{ path('_home') }}" title="Home"><span id="ico-home"></span>Connections</a>
+			<a href="{{ path('_home') }}" title="Home" id="ico-home"><span></span>Connections</a>
 			{% if topmenu %}
 				{% for section in topmenu %}
 					<a href="{{ path(section.path, section.params) }}" title="{{section.title}}" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %}">{{section.name}}</a>
