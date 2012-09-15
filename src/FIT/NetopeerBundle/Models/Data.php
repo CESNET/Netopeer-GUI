@@ -411,9 +411,9 @@ class Data {
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
 		if ( isset($res) ) {
-			if ($merged) {
+			if ($merge) {
 				// load model
-				$model = array();
+				$model = simplexml_load_file(__DIR__ . '/../Data/models/comet-tester/wrapped.wyin');
 				$res = $this->mergeWithModel($model, $res);
 			}
 			return $res;
@@ -422,12 +422,68 @@ class Data {
 	}
 
 	/**
-	\param[in] $model - data configuration model
+	Find corresponding $el in configuration model $model
+	and complete attributes from $model.
+	\param[in] $model - SimpleXMLElement with data model
+	\param[in] $el - SimpleXMLElement with element of response
+	*/
+	private function find_and_complete(&$model, $el)
+	{
+		$modelns = $model->getNamespaces();
+		$model->registerXPathNamespace("c", $modelns[""]);
+		$found = $model->xpath("//c:". $el->getName());
+		if (sizeof($found) == 1) {
+			$found_el = $found[0];
+			if ($found_el->attributes()) {
+				$attrs = $found_el->attributes();
+				if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
+					foreach ($found[0]->attributes() as $key => $val) {
+						$el->addAttribute($key, $val);
+					}
+				}
+			}
+		} else {
+			//echo "Not found unique<br>";
+			// TODO handle deep search if there are more results
+		}
+	}
+
+	/**
+	Go through $root_el tree that represents
+	the response from Netconf server.
+	\param[in] $model - SimpleXMLElement with data model
+	\param[in] $root_el - SimpleXMLElement with element of response
+	*/
+	private function mergeRecursive(&$model, $root_el)
+	{
+		//echo "Rootel";
+		foreach ($root_el as $ch) {
+			$this->find_and_complete($model, $ch);
+			$this->mergeRecursive($model, $ch);
+		}
+		//echo "children";
+		foreach ($root_el->children as $ch) {
+			$this->find_and_complete($model, $ch);
+			$this->mergeRecursive($model, $ch);
+		}
+	}
+
+	/**
+	Add attributes from configuration model to response
+	such as config, mandatory, type.
+	\param[in] $model - data configuration model SimpleXMLElement
 	\param[in,out] $result - data from netconf server, the result of merge
 	*/
 	private function mergeWithModel($model, $result) {
-		/* TODO */
-		return $result;
+		if ($result) {
+			$resxml = simplexml_load_string($result);
+
+			$this->mergeRecursive($model, $resxml);
+
+			return $resxml->asXML();
+		} else {
+			return $result;
+		}
 	}
 
 	public function setFlashState($state) {
@@ -456,7 +512,7 @@ class Data {
 
 		try {
 			// nacteme si get z pripojeneho serveru
-			if ( ($xml = $this->handle('get', $params)) != 1 ) {    		
+			if ( ($xml = $this->handle('get', $params, false)) != 1 ) {
 				preg_match("/xmlns=[\"]([^\"]*)[\"]/", $xml, $xmlNameSpaces);
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 
