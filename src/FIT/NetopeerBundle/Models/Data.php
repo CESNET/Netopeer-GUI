@@ -412,9 +412,32 @@ class Data {
 
 		if ( isset($res) ) {
 			if ($merge) {
+				$path = $notEditedPath = __DIR__ . '/../Data/models/';
+
+				// add module directory if is set in route
+				if ( $this->container->get('request')->get('module') != null ) {
+					$path .= $this->container->get('request')->get('module').'/';
+				}
+				// add subsection directory if is set in route and wrapped file in subsection directory exists
+				if ( $this->container->get('request')->get('subsection') != null 
+					&& file_exists($path . $this->container->get('request')->get('subsection').'/wrapped.wyin')) {
+					$path .= $this->container->get('request')->get('subsection').'/';
+				}
+
 				// load model
-				$model = simplexml_load_file(__DIR__ . '/../Data/models/comet-tester/wrapped.wyin');
-				$res = $this->mergeWithModel($model, $res);
+				$modelFile = $path . 'wrapped.wyin';
+
+				if ( file_exists($modelFile) ) {
+					if ( $path != $notEditedPath ) {
+						$model = simplexml_load_file($modelFile);
+						$res = $this->mergeWithModel($model, $res);	
+					} else {
+						// TODO: if is not set module direcotory, we have to set model to merge with
+						// problem: we have to load all models (for example combo, comet-tester...)
+					}	
+				} else {
+					$this->logger->warn("Could not find model on ", array('pathToFile' => $modelFile));
+				}
 			}
 			return $res;
 		}
