@@ -200,12 +200,11 @@ nav#top > a:hover, nav#top > a.active, div#top > a:hover, div#top > a.active {
 /* line 49, ../sass/screen.scss */
 nav#top #ico-home, div#top #ico-home {
   float: left;
-  border-right: 1px solid #4c7995;
   border-left: 0px;
   width: 50px;
   height: 40px;
   padding: 0px;
-  background: url("../images/ico/16_home.png") center center no-repeat #004f80;
+  background: url("../images/ico/16_home.png") center center no-repeat;
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=50);
   opacity: 0.5;
 }

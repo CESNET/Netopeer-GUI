@@ -24,7 +24,7 @@
 
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="top">
-			<a href="{{ path('_home') }}" title="Home" id="ico-home"></a>
+			<a href="{{ path('_home') }}" title="Home"><span id="ico-home"></span>Connections</a>
 			{% if topmenu %}
 				{% for section in topmenu %}
 					<a href="{{ path(section.path, section.params) }}" title="{{section.title}}" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %}">{{section.name}}</a>
@@ -38,14 +38,14 @@
 		</nav>
 
 		{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
-		{% if submenu is defined and submenu %}
+		{# if submenu is defined and submenu #}
 			<nav id="left">
 				{% for subsection in submenu %}
 					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="{% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 				{% endfor %}
 			</nav>
 			{% set addToColumnClass = ' left-nav-defined' %}
-		{% endif %}
+		{# endif #}
 
 		{% if singleColumnLayout is not defined or singleColumnLayout == false %}
 			<section id="state" class="column{{addToColumnClass}}">
