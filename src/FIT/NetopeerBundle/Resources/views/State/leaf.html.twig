@@ -5,6 +5,9 @@
 	{% else %}
 		type-undefined
 	{% endif %}
+	{% if element.attributes.config is defined and element.attributes.config == "true" %}
+		config
+	{% endif %}
 ">
 	<span class="label">
 		<span class="dots"></span>

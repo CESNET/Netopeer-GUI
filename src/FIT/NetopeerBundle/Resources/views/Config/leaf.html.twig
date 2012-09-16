@@ -1,39 +1,65 @@
-<div class="leaf-line{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %}">
-	{% if element.attributes is empty %}
-		<span class="label">
-			<span class="dots"></span>
-			<strong>{{key}}</strong>
-			{% if key != element.name %}
-				{{element.name}}
-			{% endif %}
-		</span>
-		<span class="edit-bar">
-			<img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}" />
-			{#
-			<img src="{{ asset('bundles/netopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" class="sibling" />
-			#}
-		</span>
-		{% if element.0 is empty %}
-			{% if element.name == 'text' %}
-				<textarea class="value" name="configDataForm[{{element.name}}_{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}]">{{element.0|trim}}</textarea>
-			{% else %}
-				<input type="text" class="value" value="{{element.0}}" name="configDataForm[{{element.name}}_{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}]" />
-			{% endif %}
-		{% endif %}		
+<div class="leaf-line
+	{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %}
+	{% if element.attributes.eltype is defined %}
+		type-{{element.attributes.eltype}}
 	{% else %}
-		<span class="label">
-			<span class="dots"></span>
+		type-undefined
+	{% endif %}
+">
+	<span class="label">
+		<span class="dots"></span>
+		{% if element.attributes.description is defined %}
+			<span class="tooltip help">
+				<span class="icon-help">?</span>
+				<span class="tooltip-description">{{element.attributes.description}}</span>
+			</span>
+		{% endif %}
+		<span class="label-cover {% if element.attributes.description is defined %}has-tooltip{% endif %}">
 			<strong>{{key}}</strong>
-			{% if key != element.attributes.key %}
-				{{element.attributes.key}}	
+			{% if element.attributes.mandatory is defined %}
+				<span class="mandatory">*</span>
 			{% endif %}
 		</span>
-		<span class="edit-bar">
-			<img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}"/>
-			{#
-			<img src="{{ asset('bundles/netopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" class="sibling" />
-			#}
-		</span>
-		<input type="text" class="value" value="{{element.attributes}}" name="configDataForm[at-{{element.attributes.key}}_{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}]" />
-	{% endif %}	
+	</span>
+	<span class="edit-bar">
+		<img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}"/>
+		{#
+		<img src="{{ asset('bundles/netopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" class="sibling" />
+		#}
+	</span>
+	{% if element.0 is defined and element.0|length == 0 %}
+
+		{% set currentInputName = "configDataForm[at-" ~ key ~ "_" ~ xpath|replace({'/': '-', '[': '?', ']': '!'}) ~ "]" %}
+		{% if element.attributes.type is defined and element.attributes.type == 'boolean' %}
+			<span class="config-value-cover">
+				<label>
+					<input type="radio" value="true" name="{{currentInputName}}" {% if element.0 == "true" %}checked="checked"{% endif %} />
+					true
+				</label>
+				<label>
+					<input type="radio" value="false" name="{{currentInputName}}" {% if element.0 == "false" %}checked="checked"{% endif %} />
+					false
+				</label>
+			</span>
+		{% else %}
+			{% set inputType = "text" %}
+
+			{% if element.attributes.type is defined %}
+				{% if isNumberType(element.attributes.type) %}
+					{% set inputType = "number" %}
+				{% elseif isUrlType(element.attributes.type) %}
+					{% set inputType = "url" %}
+				{% endif %}
+			{% endif %}
+
+			<input type="{{inputType}}" class="text value" value="{{element.0}}" name="{{currentInputName}}" />
+		{% endif %}
+
+	{% else %}
+		<span class="value"></span>
+	{% endif %}
+
+	{% if 0 and element.attributes.type is defined %}
+		{{element.attributes.type}}
+	{% endif %}
 </div>

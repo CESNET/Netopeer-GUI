@@ -16,3 +16,8 @@ services:
     DataModel:
         class: %netopeer.data.class%
         arguments: [@service_container, @data_logger]
+
+    netopeer.twig.netopeer_twig_extension:
+        class: FIT\NetopeerBundle\Twig\NetopeerTwigExtension
+        tags:
+            - { name: twig.extension }

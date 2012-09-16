@@ -351,6 +351,11 @@ body > section .level-0 .dots {
 body > section .level-0 .label {
   padding-left: 6px;
 }
+/* line 83, ../sass/screen.scss */
+body > section .level-0 input.label {
+  margin-left: 6px;
+  padding-left: 0px;
+}
 /* line 81, ../sass/screen.scss */
 body > section .level-1 .dots {
   width: 8px;
@@ -358,6 +363,11 @@ body > section .level-1 .dots {
 /* line 82, ../sass/screen.scss */
 body > section .level-1 .label {
   padding-left: 14px;
+}
+/* line 83, ../sass/screen.scss */
+body > section .level-1 input.label {
+  margin-left: 14px;
+  padding-left: 0px;
 }
 /* line 81, ../sass/screen.scss */
 body > section .level-2 .dots {
@@ -367,6 +377,11 @@ body > section .level-2 .dots {
 body > section .level-2 .label {
   padding-left: 22px;
 }
+/* line 83, ../sass/screen.scss */
+body > section .level-2 input.label {
+  margin-left: 22px;
+  padding-left: 0px;
+}
 /* line 81, ../sass/screen.scss */
 body > section .level-3 .dots {
   width: 24px;
@@ -374,6 +389,11 @@ body > section .level-3 .dots {
 /* line 82, ../sass/screen.scss */
 body > section .level-3 .label {
   padding-left: 30px;
+}
+/* line 83, ../sass/screen.scss */
+body > section .level-3 input.label {
+  margin-left: 30px;
+  padding-left: 0px;
 }
 /* line 81, ../sass/screen.scss */
 body > section .level-4 .dots {
@@ -383,6 +403,11 @@ body > section .level-4 .dots {
 body > section .level-4 .label {
   padding-left: 38px;
 }
+/* line 83, ../sass/screen.scss */
+body > section .level-4 input.label {
+  margin-left: 38px;
+  padding-left: 0px;
+}
 /* line 81, ../sass/screen.scss */
 body > section .level-5 .dots {
   width: 40px;
@@ -390,6 +415,11 @@ body > section .level-5 .dots {
 /* line 82, ../sass/screen.scss */
 body > section .level-5 .label {
   padding-left: 46px;
+}
+/* line 83, ../sass/screen.scss */
+body > section .level-5 input.label {
+  margin-left: 46px;
+  padding-left: 0px;
 }
 /* line 81, ../sass/screen.scss */
 body > section .level-6 .dots {
@@ -399,6 +429,11 @@ body > section .level-6 .dots {
 body > section .level-6 .label {
   padding-left: 54px;
 }
+/* line 83, ../sass/screen.scss */
+body > section .level-6 input.label {
+  margin-left: 54px;
+  padding-left: 0px;
+}
 /* line 81, ../sass/screen.scss */
 body > section .level-7 .dots {
   width: 56px;
@@ -406,6 +441,11 @@ body > section .level-7 .dots {
 /* line 82, ../sass/screen.scss */
 body > section .level-7 .label {
   padding-left: 62px;
+}
+/* line 83, ../sass/screen.scss */
+body > section .level-7 input.label {
+  margin-left: 62px;
+  padding-left: 0px;
 }
 /* line 81, ../sass/screen.scss */
 body > section .level-8 .dots {
@@ -415,6 +455,11 @@ body > section .level-8 .dots {
 body > section .level-8 .label {
   padding-left: 70px;
 }
+/* line 83, ../sass/screen.scss */
+body > section .level-8 input.label {
+  margin-left: 70px;
+  padding-left: 0px;
+}
 /* line 81, ../sass/screen.scss */
 body > section .level-9 .dots {
   width: 72px;
@@ -422,6 +467,11 @@ body > section .level-9 .dots {
 /* line 82, ../sass/screen.scss */
 body > section .level-9 .label {
   padding-left: 78px;
+}
+/* line 83, ../sass/screen.scss */
+body > section .level-9 input.label {
+  margin-left: 78px;
+  padding-left: 0px;
 }
 /* line 81, ../sass/screen.scss */
 body > section .level-10 .dots {
@@ -431,6 +481,11 @@ body > section .level-10 .dots {
 body > section .level-10 .label {
   padding-left: 86px;
 }
+/* line 83, ../sass/screen.scss */
+body > section .level-10 input.label {
+  margin-left: 86px;
+  padding-left: 0px;
+}
 /* line 81, ../sass/screen.scss */
 body > section .level-11 .dots {
   width: 88px;
@@ -438,6 +493,11 @@ body > section .level-11 .dots {
 /* line 82, ../sass/screen.scss */
 body > section .level-11 .label {
   padding-left: 94px;
+}
+/* line 83, ../sass/screen.scss */
+body > section .level-11 input.label {
+  margin-left: 94px;
+  padding-left: 0px;
 }
 /* line 81, ../sass/screen.scss */
 body > section .level-12 .dots {
@@ -447,6 +507,11 @@ body > section .level-12 .dots {
 body > section .level-12 .label {
   padding-left: 102px;
 }
+/* line 83, ../sass/screen.scss */
+body > section .level-12 input.label {
+  margin-left: 102px;
+  padding-left: 0px;
+}
 /* line 81, ../sass/screen.scss */
 body > section .level-13 .dots {
   width: 104px;
@@ -454,6 +519,11 @@ body > section .level-13 .dots {
 /* line 82, ../sass/screen.scss */
 body > section .level-13 .label {
   padding-left: 110px;
+}
+/* line 83, ../sass/screen.scss */
+body > section .level-13 input.label {
+  margin-left: 110px;
+  padding-left: 0px;
 }
 /* line 81, ../sass/screen.scss */
 body > section .level-14 .dots {
@@ -463,6 +533,11 @@ body > section .level-14 .dots {
 body > section .level-14 .label {
   padding-left: 118px;
 }
+/* line 83, ../sass/screen.scss */
+body > section .level-14 input.label {
+  margin-left: 118px;
+  padding-left: 0px;
+}
 /* line 81, ../sass/screen.scss */
 body > section .level-15 .dots {
   width: 120px;
@@ -471,36 +546,41 @@ body > section .level-15 .dots {
 body > section .level-15 .label {
   padding-left: 126px;
 }
-/* line 85, ../sass/screen.scss */
+/* line 83, ../sass/screen.scss */
+body > section .level-15 input.label {
+  margin-left: 126px;
+  padding-left: 0px;
+}
+/* line 86, ../sass/screen.scss */
 body > section .level-0:not(.container):not(.list) {
   margin: 0px;
   border-left: 2px solid #aaa;
   border-right: 2px solid #aaa;
   background: #f0f0f0;
 }
-/* line 86, ../sass/screen.scss */
+/* line 87, ../sass/screen.scss */
 body > section .level-0:not(.container):not(.list):nth-child(even) {
   background: #fff;
   border-left: 2px solid #333;
   border-right: 2px solid #333;
 }
-/* line 87, ../sass/screen.scss */
+/* line 88, ../sass/screen.scss */
 body > section .level-0:not(.container):not(.list):nth-child(even) .even {
   background: #f8f8f8;
 }
-/* line 88, ../sass/screen.scss */
+/* line 89, ../sass/screen.scss */
 body > section .level-0:not(.container):not(.list):nth-child(even) > .leaf-line:first-child {
   border-top: 1px solid #666;
 }
-/* line 91, ../sass/screen.scss */
+/* line 92, ../sass/screen.scss */
 body > section .level-0:not(.container):not(.list):nth-child(odd) .even {
   background: #f8f8f8;
 }
-/* line 92, ../sass/screen.scss */
+/* line 93, ../sass/screen.scss */
 body > section .level-0:not(.container):not(.list):nth-child(odd) > .leaf-line:first-child {
   border-top: 1px solid #aaa;
 }
-/* line 95, ../sass/screen.scss */
+/* line 96, ../sass/screen.scss */
 body > section .leaf-line {
   padding: 7px 1.5% 7px 0px;
   border-top: 1px solid #ddd;
@@ -513,7 +593,7 @@ body > section .leaf-line {
   width: 100%;
   position: relative;
 }
-/* line 96, ../sass/screen.scss */
+/* line 97, ../sass/screen.scss */
 body > section .leaf-line .label {
   width: 35%;
   float: left;
@@ -522,14 +602,29 @@ body > section .leaf-line .label {
   box-sizing: border-box;
   color: #333;
 }
-/* line 97, ../sass/screen.scss */
+/* line 98, ../sass/screen.scss */
 body > section .leaf-line .value {
   width: 62%;
   float: right;
   color: #000;
 }
-/* line 98, ../sass/screen.scss */
-body > section .leaf-line input.value {
+/* line 99, ../sass/screen.scss */
+body > section .leaf-line .config-value-cover {
+  width: 50%;
+  float: right;
+  margin-top: -3px;
+}
+/* line 100, ../sass/screen.scss */
+body > section .leaf-line .config-value-cover label {
+  margin: 0px;
+  padding: 0px;
+  width: auto;
+  padding-right: 10px;
+  line-height: 18px;
+  height: 18px;
+}
+/* line 102, ../sass/screen.scss */
+body > section .leaf-line input.value.text {
   width: 50%;
   margin: -4px 0px;
   border: 1px solid #ccc;
@@ -538,7 +633,7 @@ body > section .leaf-line input.value {
   padding: 0px 3px;
   font-size: 0.9em;
 }
-/* line 99, ../sass/screen.scss */
+/* line 103, ../sass/screen.scss */
 body > section .leaf-line textarea.value {
   width: 50%;
   margin: -4px 0px;
@@ -546,7 +641,7 @@ body > section .leaf-line textarea.value {
   padding: 0px 3px;
   font-size: 0.9em;
 }
-/* line 101, ../sass/screen.scss */
+/* line 105, ../sass/screen.scss */
 body > section .leaf-line .edit-bar {
   width: 10%;
   margin: -5px 0px -5px 2%;
@@ -554,92 +649,92 @@ body > section .leaf-line .edit-bar {
   text-align: right;
   display: none;
 }
-/* line 102, ../sass/screen.scss */
+/* line 106, ../sass/screen.scss */
 body > section .leaf-line .edit-bar img {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
   opacity: 0.4;
   cursor: pointer;
 }
-/* line 103, ../sass/screen.scss */
+/* line 107, ../sass/screen.scss */
 body > section .leaf-line .edit-bar img:hover {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
-/* line 108, ../sass/screen.scss */
+/* line 112, ../sass/screen.scss */
 body > section .leaf-line.active {
   position: relative;
   z-index: 25;
   background: #fff;
 }
-/* line 110, ../sass/screen.scss */
+/* line 115, ../sass/screen.scss */
 body > section .container, body > section .list {
   margin: 25px 0px;
 }
-/* line 111, ../sass/screen.scss */
+/* line 116, ../sass/screen.scss */
 body > section .container > *:not(.container):not(.list), body > section .list > *:not(.container):not(.list) {
   border-left: 2px solid #aaa;
   border-right: 2px solid #aaa;
   background: #f0f0f0;
 }
-/* line 112, ../sass/screen.scss */
+/* line 117, ../sass/screen.scss */
 body > section .container > *:not(.container):not(.list):nth-child(even), body > section .list > *:not(.container):not(.list):nth-child(even) {
   background: #fff;
   border-left: 2px solid #333;
   border-right: 2px solid #333;
 }
-/* line 113, ../sass/screen.scss */
+/* line 118, ../sass/screen.scss */
 body > section .container > *:not(.container):not(.list):nth-child(even) .dots, body > section .list > *:not(.container):not(.list):nth-child(even) .dots {
   background-color: #fff;
 }
-/* line 116, ../sass/screen.scss */
+/* line 121, ../sass/screen.scss */
 body > section .container .container, body > section .container .list, body > section .list .container, body > section .list .list {
   border-top: 1px solid #ddd;
 }
-/* line 118, ../sass/screen.scss */
+/* line 123, ../sass/screen.scss */
 body > section .container + * > .leaf-line:first-child, body > section .list + * > .leaf-line:first-child {
   margin-top: 0px;
 }
-/* line 120, ../sass/screen.scss */
+/* line 125, ../sass/screen.scss */
 body > section .mandatory {
   color: #888;
 }
-/* line 121, ../sass/screen.scss */
+/* line 126, ../sass/screen.scss */
 body > section .tooltip {
   float: right;
   margin: 0px 0px 0px 4px;
 }
 
-/* line 128, ../sass/screen.scss */
+/* line 133, ../sass/screen.scss */
 body > section h1, body > section h2, body > section h3, body > section h4, body > section legend, #content h1, #content h2, #content h3, #content h4, #content legend {
   font-family: Arial, Trebuchet, Verdana, sans-serif;
   color: #004f80;
 }
-/* line 129, ../sass/screen.scss */
+/* line 134, ../sass/screen.scss */
 body > section h1, #content h1 {
   font-size: 1.9em;
   margin: 20px 0px 15px 0px;
 }
-/* line 130, ../sass/screen.scss */
+/* line 135, ../sass/screen.scss */
 body > section h2, #content h2 {
   font-size: 1.7em;
   margin: 15px 0px 10px 0px;
 }
-/* line 131, ../sass/screen.scss */
+/* line 136, ../sass/screen.scss */
 body > section h3, #content h3 {
   font-size: 1.5em;
   margin: 10px 0px 5px 0px;
 }
-/* line 132, ../sass/screen.scss */
+/* line 137, ../sass/screen.scss */
 body > section h4, #content h4 {
   font-size: 1.3em;
   margin: 5px 0px 5px 0px;
 }
-/* line 134, ../sass/screen.scss */
+/* line 139, ../sass/screen.scss */
 body > section legend, #content legend {
   font-size: 1.9em;
   margin-bottom: 15px;
 }
-/* line 136, ../sass/screen.scss */
+/* line 141, ../sass/screen.scss */
 body > section .alert, #content .alert {
   padding: 15px 20px;
   border: 1px solid #ccc;
@@ -655,21 +750,21 @@ body > section .alert, #content .alert {
   clear: both;
   margin: 15px 0px;
 }
-/* line 137, ../sass/screen.scss */
+/* line 142, ../sass/screen.scss */
 body > section .alert.info, #content .alert.info {
   background: url("../images/ico/info.png");
 }
-/* line 138, ../sass/screen.scss */
+/* line 143, ../sass/screen.scss */
 body > section .alert.success, #content .alert.success {
   background: url("../images/ico/ok.png");
   color: #007711;
 }
-/* line 139, ../sass/screen.scss */
+/* line 144, ../sass/screen.scss */
 body > section .alert.error, #content .alert.error {
   background: url("../images/ico/error.png");
   color: #820101;
 }
-/* line 141, ../sass/screen.scss */
+/* line 146, ../sass/screen.scss */
 body > section .alert.info, body > section .alert.success, body > section .alert.error, #content .alert.info, #content .alert.success, #content .alert.error {
   padding-left: 40px;
   background-position: 10px 12px;
@@ -677,24 +772,24 @@ body > section .alert.info, body > section .alert.success, body > section .alert
   background-color: #fff;
 }
 
-/* line 145, ../sass/screen.scss */
+/* line 150, ../sass/screen.scss */
 #content {
   min-height: 100%;
   padding: 55px 15px 15px 15px;
   font-size: 1.4em;
 }
-/* line 146, ../sass/screen.scss */
+/* line 151, ../sass/screen.scss */
 #content.max-width-column {
   max-width: 800px;
   width: 100%;
 }
 
 /* formulare */
-/* line 151, ../sass/screen.scss */
+/* line 156, ../sass/screen.scss */
 form {
   margin: 15px 0px;
 }
-/* line 152, ../sass/screen.scss */
+/* line 157, ../sass/screen.scss */
 form.login, form#login-form {
   border: 1px solid #ccc;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #fafafa), color-stop(100%, #eaeaea));
@@ -712,7 +807,7 @@ form.login, form#login-form {
   -moz-box-shadow: 0px 0px 8px #cccccc;
   box-shadow: 0px 0px 8px #cccccc;
 }
-/* line 154, ../sass/screen.scss */
+/* line 159, ../sass/screen.scss */
 form.login label {
   width: 25%;
   padding-right: 2%;
@@ -722,41 +817,41 @@ form.login label {
   box-sizing: border-box;
   text-align: right;
 }
-/* line 156, ../sass/screen.scss */
+/* line 161, ../sass/screen.scss */
 form.login input[type="text"], form.login textarea, form.login input[type="password"] {
   width: 60%;
   float: left;
 }
-/* line 157, ../sass/screen.scss */
+/* line 162, ../sass/screen.scss */
 form.login input[type="submit"] {
   margin-left: 25%;
 }
-/* line 160, ../sass/screen.scss */
+/* line 165, ../sass/screen.scss */
 form#login-form {
   width: 400px;
   margin: 0px auto;
 }
-/* line 161, ../sass/screen.scss */
+/* line 166, ../sass/screen.scss */
 form#login-form .desc {
   font-size: 0.95em;
   margin-bottom: 25px;
 }
-/* line 163, ../sass/screen.scss */
+/* line 168, ../sass/screen.scss */
 form#login-form label {
   width: 20%;
   margin-right: 5%;
   float: left;
 }
-/* line 165, ../sass/screen.scss */
+/* line 170, ../sass/screen.scss */
 form#login-form input[type="text"], form#login-form textarea, form#login-form input[type="password"] {
   width: 70%;
   float: left;
 }
-/* line 166, ../sass/screen.scss */
+/* line 171, ../sass/screen.scss */
 form#login-form input[type="submit"] {
   margin-left: 25%;
 }
-/* line 170, ../sass/screen.scss */
+/* line 175, ../sass/screen.scss */
 form label {
   display: -moz-inline-stack;
   display: inline-block;
@@ -769,28 +864,28 @@ form label {
   line-height: 30px;
   margin-top: 10px;
 }
-/* line 172, ../sass/screen.scss */
+/* line 177, ../sass/screen.scss */
 form label.required:after {
   content: " *";
 }
-/* line 175, ../sass/screen.scss */
+/* line 180, ../sass/screen.scss */
 form input {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-/* line 176, ../sass/screen.scss */
-form input[type="text"], form textarea, form input[type="password"] {
+/* line 181, ../sass/screen.scss */
+form input[type="text"], form textarea, form input[type="password"], form input.text {
   width: 200px;
   height: 30px;
   line-height: 30px;
   padding: 0px 5px;
   border: 1px solid #ccc;
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #f0f0f0));
-  background: -webkit-linear-gradient(#ffffff, #f0f0f0);
-  background: -moz-linear-gradient(#ffffff, #f0f0f0);
-  background: -o-linear-gradient(#ffffff, #f0f0f0);
-  background: linear-gradient(#ffffff, #f0f0f0);
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #f4f4f4));
+  background: -webkit-linear-gradient(#ffffff, #f4f4f4);
+  background: -moz-linear-gradient(#ffffff, #f4f4f4);
+  background: -o-linear-gradient(#ffffff, #f4f4f4);
+  background: linear-gradient(#ffffff, #f4f4f4);
   margin-top: 10px;
   display: -moz-inline-stack;
   display: inline-block;
@@ -805,7 +900,7 @@ form input[type="text"], form textarea, form input[type="password"] {
   border-radius: 3px;
   font-size: 1em;
 }
-/* line 179, ../sass/screen.scss */
+/* line 184, ../sass/screen.scss */
 form textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -819,7 +914,7 @@ form textarea {
   line-height: 1.2em;
 }
 
-/* line 183, ../sass/screen.scss */
+/* line 188, ../sass/screen.scss */
 .form-underlay {
   width: 100%;
   height: 100%;
@@ -830,7 +925,7 @@ form textarea {
   z-index: 20;
 }
 
-/* line 184, ../sass/screen.scss */
+/* line 189, ../sass/screen.scss */
 .form-cover {
   width: 100%;
   height: 100%;
@@ -841,7 +936,7 @@ form textarea {
   display: none;
 }
 
-/* line 185, ../sass/screen.scss */
+/* line 190, ../sass/screen.scss */
 form.generatedForm {
   position: relative;
   z-index: 25;
@@ -853,44 +948,44 @@ form.generatedForm {
   -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
 }
-/* line 189, ../sass/screen.scss */
+/* line 194, ../sass/screen.scss */
 form.generatedForm .leaf-line input.label, form.generatedForm .leaf-line input.value {
   margin-top: 0px;
   height: 22px;
   line-height: 22px;
 }
-/* line 192, ../sass/screen.scss */
+/* line 197, ../sass/screen.scss */
 form.generatedForm input[type="submit"] {
   float: right;
   margin-right: 15px;
 }
 
-/* line 195, ../sass/screen.scss */
+/* line 200, ../sass/screen.scss */
 #login-hp {
   padding: 100px 0px 0px 0px;
 }
 
-/* line 197, ../sass/screen.scss */
+/* line 202, ../sass/screen.scss */
 table {
   width: 100%;
   margin: 15px 0px;
 }
-/* line 198, ../sass/screen.scss */
+/* line 203, ../sass/screen.scss */
 table th, table td {
   border: 1px solid #ccc;
   padding: 8px 15px;
 }
-/* line 200, ../sass/screen.scss */
+/* line 205, ../sass/screen.scss */
 table tr:nth-child(even) th, table tr:nth-child(even) td {
   background: #eaeaea;
 }
 
 /* tooltip */
-/* line 205, ../sass/screen.scss */
+/* line 210, ../sass/screen.scss */
 .tooltip {
   cursor: help;
 }
-/* line 206, ../sass/screen.scss */
+/* line 211, ../sass/screen.scss */
 .tooltip .icon-help {
   background: rgba(255, 255, 255, 0.3);
   border: 1px solid #ddd;
@@ -914,17 +1009,17 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   font-size: 13px;
   margin: -6px 0px -2px 0px;
 }
-/* line 207, ../sass/screen.scss */
+/* line 212, ../sass/screen.scss */
 .tooltip .icon-help:hover {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid #bbb;
 }
-/* line 209, ../sass/screen.scss */
+/* line 214, ../sass/screen.scss */
 .tooltip .tooltip-description {
   display: none;
 }
 
-/* line 211, ../sass/screen.scss */
+/* line 216, ../sass/screen.scss */
 .gips-container {
   max-width: 252px;
   position: absolute;
@@ -933,9 +1028,14 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   -webkit-box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.4);
   -moz-box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.4);
   box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.4);
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
 }
 
-/* line 212, ../sass/screen.scss */
+/* line 217, ../sass/screen.scss */
 .gips-body {
   color: #fff;
   font-size: 13px;
@@ -950,12 +1050,12 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   -o-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 213, ../sass/screen.scss */
+/* line 218, ../sass/screen.scss */
 .gips-body.blue {
   background-color: #004f80;
 }
 
-/* line 215, ../sass/screen.scss */
+/* line 220, ../sass/screen.scss */
 .gips-icon {
   width: 0;
   height: 0;
@@ -969,12 +1069,12 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
 
 /* media queries */
 @media screen and (max-width: 1280px) {
-  /* line 219, ../sass/screen.scss */
+  /* line 224, ../sass/screen.scss */
   nav#left {
     width: 14%;
   }
 
-  /* line 221, ../sass/screen.scss */
+  /* line 226, ../sass/screen.scss */
   body > section.left-nav-defined {
     width: 43%;
   }
