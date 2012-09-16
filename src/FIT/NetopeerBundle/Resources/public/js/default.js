@@ -14,6 +14,9 @@ $(document).ready(function() {
 	$('.tooltip .icon-help').each(function() {
 		$(this).gips({ 'theme': 'blue', placement: 'top', animationSpeed: 100, bottom: $(this).parent().parent().parent().outerHeight(), text: $(this).siblings('.tooltip-description').text() });
 	});
+
+	// zebra style on XML
+	// $(".level-0:not(.container):not(.list)").find('*[class*=level]:even, .leaf-line:even').addClass('even');
 });
 
 function createNode($elem) {
