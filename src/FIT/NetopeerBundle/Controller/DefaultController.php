@@ -137,7 +137,7 @@ class DefaultController extends BaseController
 			// provedeme getconfig
 			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$res = $this->setSectionForms($key, $xml);
+				$res = $this->setSectionForms($key);
 				if ( $res == 1 ) {
 					return $this->redirect($this->generateUrl('section', array(
 						'key' => $key
@@ -193,7 +193,7 @@ class DefaultController extends BaseController
 			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 				$this->assign("configArr", $xml);	
-				$res = $this->setSectionForms($key, $xml);
+				$res = $this->setSectionForms($key);
 				if ( $res == 1 ) {
 					return $this->redirect($this->generateUrl('module', array(
 						'key' => $key,
@@ -249,7 +249,7 @@ class DefaultController extends BaseController
 			// ziskame config cast
 			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$res = $this->setSectionForms($key, $xml);
+				$res = $this->setSectionForms($key);
 				if ( $res == 1 ) {
 					return $this->redirect($this->generateUrl('subsection', array(
 						'key' => $key,
@@ -307,7 +307,7 @@ class DefaultController extends BaseController
 	 * @param $key     								key of connected server
 	 * @param {SimpleXMLIterator} 	&$configXml 	config XML file
 	 */
-	private function setSectionForms($key, \SimpleXMLIterator &$configXml = null) {
+	private function setSectionForms($key) {
 		$dataClass = $this->get('DataModel');
 		$res = 0;
 		
@@ -380,24 +380,21 @@ class DefaultController extends BaseController
 				$dataClass->setFlashState('config');
 						
 				try {
-					$this->setSectionFormsParams($key, "", "");
-					// nacteme originalni (nezmeneny) getconfig
-					if ( ($originalXml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
-						$originalXml = simplexml_load_string($originalXml, 'SimpleXMLIterator');
+
+					if ( ($configXml = $dataClass->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
+						$configXml = simplexml_load_string($configXml, 'SimpleXMLIterator');
+
 						// vlozime do souboru - ladici ucely
-						file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $originalXml->asXml());
+						file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $configXml->asXml());
 
 						// z originalniho getconfigu zjistime namespaces a nastavime je k simpleXml objektu, aby bylo mozne pouzivat xPath dotazy
-						preg_match("/xmlns=[\"]([^\"]*)[\"]/", $originalXml->asXml(), $xmlNameSpaces);
+						preg_match("/xmlns=[\"]([^\"]*)[\"]/", $configXml->asXml(), $xmlNameSpaces);
 						if ( isset($xmlNameSpaces[1]) ) {
-							$originalXml->registerXPathNamespace("xmlns", $xmlNameSpaces[1]);	
+							$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[1]);	
 						} elseif ( isset($xmlNameSpaces[0]) ) {
-							$originalXml->registerXPathNamespace("xmlns", $xmlNameSpaces[0]);	
+							$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[0]);	
 						}
-					}
 
-					// pokud mame konfiguracni XML
-					if (isset($configXml)) {
 						// nastavime mu namespaces zjistene z originalniho getConfigu
 						if ( isset($xmlNameSpaces[1]) ) {
 							$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[1]);	
@@ -462,10 +459,13 @@ class DefaultController extends BaseController
 							$this->get('logger')->error('In executing EditConfig.', $editConfigParams);
 							throw new \ErrorException('Error in executing EditConfig.');
 						}
+
+						$this->getRequest()->getSession()->setFlash('config success', "Config has been saved correctly.");
+						$res = 1;
+					} else {
+						throw new \ErrorException("Could not load config.");
 					}
 
-					$this->getRequest()->getSession()->setFlash('config success', "Config has been saved correctly.");	
-					$res = 1;
 				} catch (\ErrorException $e) {
 					$this->get('logger')->warn('Could not save config correctly.', array('error' => $e->getMessage()));
 					$this->getRequest()->getSession()->setFlash('config error', "Could not save config correctly. Error: ".$e->getMessage());

@@ -3,7 +3,7 @@ $(document).ready(function() {
 
 	if ( $(".edit-bar").length ) {
 		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
-		$(".edit-bar").show();
+		$(".edit-bar .child").show();
 
 		$('.edit-bar .child').click(function() {
 			createNode($(this));
