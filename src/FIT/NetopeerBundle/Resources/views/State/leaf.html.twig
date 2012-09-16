@@ -1,23 +1,34 @@
-<div class="leaf-line{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %}">
-	{% if element.attributes is empty %}
-		<span class="label">
-			<span class="dots"></span>
-			<strong>{{key}}</strong>
-			{% if key != element.name %}
-				{{element.name}}	
-			{% endif %}
-		</span>
-		{% if element.0 is defined %}
-			<span class="value">{{element.0}}</span>
-		{% endif %}		
+<div class="leaf-line
+	{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %} 
+	{% if element.attributes.eltype is defined %}
+		type-{{element.attributes.eltype}}
 	{% else %}
-		<span class="label">
-			<span class="dots"></span>
-			<strong>{{key}}</strong>
-			{% if key != element.attributes.key %}
-				{{element.attributes.key}}	
-			{% endif %}
-		</span>
-		<span class="value">{{element.attributes}}</span>
-	{% endif %}	
+		type-undefined
+	{% endif %}
+">
+	<span class="label">
+		<span class="dots"></span>
+		<strong>{{key}}</strong>
+		{% if key != element.name %}
+			{{element.name}}	
+		{% endif %}
+		{% if element.attributes.mandatory is defined %}
+			<span class="mandatory">*</span>
+		{% endif %}
+		{% if element.attributes.description is defined %}
+			<span class="tooltip help">
+				<span class="icon-help">?</span>
+				<span class="tooltip-description">{{element.attributes.description}}</span>
+			</span>
+		{% endif %}
+	</span>
+	{% if element.0 is defined %}
+		<span class="value">{{element.0}}</span>
+	{% else %}
+		<span class="value"></span>
+	{% endif %}
+	{#
+	<br/>
+	{{dump(element.attributes)}}
+	#}
 </div>

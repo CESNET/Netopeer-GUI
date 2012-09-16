@@ -324,22 +324,24 @@ body > section#config {
 }
 /* line 76, ../sass/screen.scss */
 body > section *[class*='level'] {
-  overflow: hidden;
   position: relative;
+  float: left;
+  width: 100%;
 }
 /* line 77, ../sass/screen.scss */
 body > section *[class*='level'] .dots {
-  background: url("../images/dot.png") left top repeat #f5f5f5;
+  background: url("../images/dot.png") left top repeat transparent;
   display: -moz-inline-stack;
   display: inline-block;
   vertical-align: middle;
   *vertical-align: auto;
   zoom: 1;
   *display: inline;
-  height: 150px;
   position: absolute;
   left: 0px;
-  top: 1px;
+  top: 0px;
+  min-height: 28px;
+  height: 100%;
 }
 /* line 81, ../sass/screen.scss */
 body > section .level-0 .dots {
@@ -491,8 +493,13 @@ body > section .leaf-line {
   padding: 7px 1.5% 7px 0px;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
-  overflow: hidden;
   margin-top: -1px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  float: left;
+  width: 100%;
+  position: relative;
 }
 /* line 91, ../sass/screen.scss */
 body > section .leaf-line .label {
@@ -580,38 +587,42 @@ body > section .container .container, body > section .container .list, body > se
 body > section .container + * > .leaf-line:first-child, body > section .list + * > .leaf-line:first-child {
   margin-top: 0px;
 }
+/* line 115, ../sass/screen.scss */
+body > section .mandatory {
+  color: #888;
+}
 
-/* line 118, ../sass/screen.scss */
+/* line 119, ../sass/screen.scss */
 body > section h1, body > section h2, body > section h3, body > section h4, body > section legend, #content h1, #content h2, #content h3, #content h4, #content legend {
   font-family: Arial, Trebuchet, Verdana, sans-serif;
   color: #004f80;
 }
-/* line 119, ../sass/screen.scss */
+/* line 120, ../sass/screen.scss */
 body > section h1, #content h1 {
   font-size: 1.9em;
   margin: 20px 0px 15px 0px;
 }
-/* line 120, ../sass/screen.scss */
+/* line 121, ../sass/screen.scss */
 body > section h2, #content h2 {
   font-size: 1.7em;
   margin: 15px 0px 10px 0px;
 }
-/* line 121, ../sass/screen.scss */
+/* line 122, ../sass/screen.scss */
 body > section h3, #content h3 {
   font-size: 1.5em;
   margin: 10px 0px 5px 0px;
 }
-/* line 122, ../sass/screen.scss */
+/* line 123, ../sass/screen.scss */
 body > section h4, #content h4 {
   font-size: 1.3em;
   margin: 5px 0px 5px 0px;
 }
-/* line 124, ../sass/screen.scss */
+/* line 125, ../sass/screen.scss */
 body > section legend, #content legend {
   font-size: 1.9em;
   margin-bottom: 15px;
 }
-/* line 126, ../sass/screen.scss */
+/* line 127, ../sass/screen.scss */
 body > section .alert, #content .alert {
   padding: 15px 20px;
   border: 1px solid #ccc;
@@ -627,21 +638,21 @@ body > section .alert, #content .alert {
   clear: both;
   margin: 15px 0px;
 }
-/* line 127, ../sass/screen.scss */
+/* line 128, ../sass/screen.scss */
 body > section .alert.info, #content .alert.info {
   background: url("../images/ico/info.png");
 }
-/* line 128, ../sass/screen.scss */
+/* line 129, ../sass/screen.scss */
 body > section .alert.success, #content .alert.success {
   background: url("../images/ico/ok.png");
   color: #007711;
 }
-/* line 129, ../sass/screen.scss */
+/* line 130, ../sass/screen.scss */
 body > section .alert.error, #content .alert.error {
   background: url("../images/ico/error.png");
   color: #820101;
 }
-/* line 131, ../sass/screen.scss */
+/* line 132, ../sass/screen.scss */
 body > section .alert.info, body > section .alert.success, body > section .alert.error, #content .alert.info, #content .alert.success, #content .alert.error {
   padding-left: 40px;
   background-position: 10px 12px;
@@ -649,24 +660,24 @@ body > section .alert.info, body > section .alert.success, body > section .alert
   background-color: #fff;
 }
 
-/* line 135, ../sass/screen.scss */
+/* line 136, ../sass/screen.scss */
 #content {
   min-height: 100%;
   padding: 55px 15px 15px 15px;
   font-size: 1.4em;
 }
-/* line 136, ../sass/screen.scss */
+/* line 137, ../sass/screen.scss */
 #content.max-width-column {
   max-width: 800px;
   width: 100%;
 }
 
 /* formulare */
-/* line 141, ../sass/screen.scss */
+/* line 142, ../sass/screen.scss */
 form {
   margin: 15px 0px;
 }
-/* line 142, ../sass/screen.scss */
+/* line 143, ../sass/screen.scss */
 form.login, form#login-form {
   border: 1px solid #ccc;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #fafafa), color-stop(100%, #eaeaea));
@@ -684,7 +695,7 @@ form.login, form#login-form {
   -moz-box-shadow: 0px 0px 8px #cccccc;
   box-shadow: 0px 0px 8px #cccccc;
 }
-/* line 144, ../sass/screen.scss */
+/* line 145, ../sass/screen.scss */
 form.login label {
   width: 25%;
   padding-right: 2%;
@@ -694,41 +705,41 @@ form.login label {
   box-sizing: border-box;
   text-align: right;
 }
-/* line 146, ../sass/screen.scss */
+/* line 147, ../sass/screen.scss */
 form.login input[type="text"], form.login textarea, form.login input[type="password"] {
   width: 60%;
   float: left;
 }
-/* line 147, ../sass/screen.scss */
+/* line 148, ../sass/screen.scss */
 form.login input[type="submit"] {
   margin-left: 25%;
 }
-/* line 150, ../sass/screen.scss */
+/* line 151, ../sass/screen.scss */
 form#login-form {
   width: 400px;
   margin: 0px auto;
 }
-/* line 151, ../sass/screen.scss */
+/* line 152, ../sass/screen.scss */
 form#login-form .desc {
   font-size: 0.95em;
   margin-bottom: 25px;
 }
-/* line 153, ../sass/screen.scss */
+/* line 154, ../sass/screen.scss */
 form#login-form label {
   width: 20%;
   margin-right: 5%;
   float: left;
 }
-/* line 155, ../sass/screen.scss */
+/* line 156, ../sass/screen.scss */
 form#login-form input[type="text"], form#login-form textarea, form#login-form input[type="password"] {
   width: 70%;
   float: left;
 }
-/* line 156, ../sass/screen.scss */
+/* line 157, ../sass/screen.scss */
 form#login-form input[type="submit"] {
   margin-left: 25%;
 }
-/* line 160, ../sass/screen.scss */
+/* line 161, ../sass/screen.scss */
 form label {
   display: -moz-inline-stack;
   display: inline-block;
@@ -741,17 +752,17 @@ form label {
   line-height: 30px;
   margin-top: 10px;
 }
-/* line 162, ../sass/screen.scss */
+/* line 163, ../sass/screen.scss */
 form label.required:after {
   content: " *";
 }
-/* line 165, ../sass/screen.scss */
+/* line 166, ../sass/screen.scss */
 form input {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-/* line 166, ../sass/screen.scss */
+/* line 167, ../sass/screen.scss */
 form input[type="text"], form textarea, form input[type="password"] {
   width: 200px;
   height: 30px;
@@ -777,7 +788,7 @@ form input[type="text"], form textarea, form input[type="password"] {
   border-radius: 3px;
   font-size: 1em;
 }
-/* line 169, ../sass/screen.scss */
+/* line 170, ../sass/screen.scss */
 form textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -791,7 +802,7 @@ form textarea {
   line-height: 1.2em;
 }
 
-/* line 173, ../sass/screen.scss */
+/* line 174, ../sass/screen.scss */
 .form-underlay {
   width: 100%;
   height: 100%;
@@ -802,7 +813,7 @@ form textarea {
   z-index: 20;
 }
 
-/* line 174, ../sass/screen.scss */
+/* line 175, ../sass/screen.scss */
 .form-cover {
   width: 100%;
   height: 100%;
@@ -813,7 +824,7 @@ form textarea {
   display: none;
 }
 
-/* line 175, ../sass/screen.scss */
+/* line 176, ../sass/screen.scss */
 form.generatedForm {
   position: relative;
   z-index: 25;
@@ -825,46 +836,129 @@ form.generatedForm {
   -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
 }
-/* line 179, ../sass/screen.scss */
+/* line 180, ../sass/screen.scss */
 form.generatedForm .leaf-line input.label, form.generatedForm .leaf-line input.value {
   margin-top: 0px;
   height: 22px;
   line-height: 22px;
 }
-/* line 182, ../sass/screen.scss */
+/* line 183, ../sass/screen.scss */
 form.generatedForm input[type="submit"] {
   float: right;
   margin-right: 15px;
 }
 
-/* line 185, ../sass/screen.scss */
+/* line 186, ../sass/screen.scss */
 #login-hp {
   padding: 100px 0px 0px 0px;
 }
 
-/* line 187, ../sass/screen.scss */
+/* line 188, ../sass/screen.scss */
 table {
   width: 100%;
   margin: 15px 0px;
 }
-/* line 188, ../sass/screen.scss */
+/* line 189, ../sass/screen.scss */
 table th, table td {
   border: 1px solid #ccc;
   padding: 8px 15px;
 }
-/* line 190, ../sass/screen.scss */
+/* line 191, ../sass/screen.scss */
 table tr:nth-child(even) th, table tr:nth-child(even) td {
   background: #eaeaea;
 }
 
+/* tooltip */
+/* line 196, ../sass/screen.scss */
+.tooltip {
+  cursor: help;
+}
+/* line 197, ../sass/screen.scss */
+.tooltip .icon-help {
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid #ddd;
+  color: #888;
+  text-shadow: 1px 1px 2px #ccc;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  zoom: 1;
+  *display: inline;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  font-size: 13px;
+  margin: -2px 0px 0px 5px;
+}
+/* line 198, ../sass/screen.scss */
+.tooltip .icon-help:hover {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid #bbb;
+}
+/* line 200, ../sass/screen.scss */
+.tooltip .tooltip-description {
+  display: none;
+}
+
+/* line 202, ../sass/screen.scss */
+.gips-container {
+  max-width: 252px;
+  position: absolute;
+  z-index: 10;
+  margin-left: 8px;
+  -webkit-box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.4);
+  box-shadow: 0px 0px 7px rgba(0, 0, 0, 0.4);
+}
+
+/* line 203, ../sass/screen.scss */
+.gips-body {
+  color: #fff;
+  font-size: 13px;
+  line-height: 1.55em;
+  padding: 10px;
+  padding-right: 20px;
+  position: relative;
+  float: left;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
+  border-radius: 4px;
+}
+/* line 204, ../sass/screen.scss */
+.gips-body.blue {
+  background-color: #004f80;
+}
+
+/* line 206, ../sass/screen.scss */
+.gips-icon {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 6px;
+  position: absolute;
+  bottom: -6px;
+  border-color: #004f80 transparent transparent transparent;
+  margin-left: 20px;
+  cursor: help;
+}
+
 /* media queries */
 @media screen and (max-width: 1280px) {
-  /* line 196, ../sass/screen.scss */
+  /* line 210, ../sass/screen.scss */
   nav#left {
     width: 14%;
   }
 
-  /* line 198, ../sass/screen.scss */
+  /* line 212, ../sass/screen.scss */
   body > section.left-nav-defined {
     width: 43%;
   }

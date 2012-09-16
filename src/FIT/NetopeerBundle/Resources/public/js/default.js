@@ -9,6 +9,11 @@ $(document).ready(function() {
 			createNode($(this));
 		});
 	}
+
+	// tooltip
+	$('.tooltip .icon-help').each(function() {
+		$(this).gips({ 'theme': 'blue', placement: 'top', animationSpeed: 100, bottom: $(this).parent().parent().parent().outerHeight(), text: $(this).siblings('.tooltip-description').text() });
+	});
 });
 
 function createNode($elem) {
