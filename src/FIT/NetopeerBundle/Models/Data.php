@@ -410,7 +410,7 @@ class Data {
 
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
-		if ( isset($res) ) {
+		if ( isset($res) && $res !== 1 ) {
 			if ($merge) {
 				$path = $notEditedPath = __DIR__ . '/../Data/models/';
 
@@ -440,6 +440,8 @@ class Data {
 				}
 			}
 			return $res;
+		} else {
+			return 1;
 		}
 		return 0;
 	}
