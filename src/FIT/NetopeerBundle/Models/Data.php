@@ -536,16 +536,16 @@ class Data {
 		try {
 			// nacteme si get z pripojeneho serveru
 			if ( ($xml = $this->handle('get', $params, false)) != 1 ) {
-				preg_match("/xmlns=[\"]([^\"]*)[\"]/", $xml, $xmlNameSpaces);
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+				$xmlNameSpaces = $xml->getNamespaces();
 
-				if ( isset($xmlNameSpaces[1]) ) {
-					$xml->registerXPathNamespace("xmlns", $xmlNameSpaces[1]);	
-				} elseif ( isset($xmlNameSpaces[0]) ) {
-					$xml->registerXPathNamespace("xmlns", $xmlNameSpaces[0]);	
+				if ( isset($xmlNameSpaces[""]) ) {
+					$xml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+					$nodes = $xml->xpath('/xmlns:*');
+				} else {
+					$node = $xml->xpath('/*');
 				}
-				
-				$nodes = $xml->xpath('/xmlns:*');	    		
+
 				// ziskame nejvyssi uzly (bez rootu) pro vytvoreni horniho menu
 				foreach ($nodes as $node) {
 					foreach ($node as $nodeKey => $submenu) {

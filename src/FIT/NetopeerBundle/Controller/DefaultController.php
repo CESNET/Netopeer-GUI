@@ -388,18 +388,10 @@ class DefaultController extends BaseController
 						file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $configXml->asXml());
 
 						// z originalniho getconfigu zjistime namespaces a nastavime je k simpleXml objektu, aby bylo mozne pouzivat xPath dotazy
-						preg_match("/xmlns=[\"]([^\"]*)[\"]/", $configXml->asXml(), $xmlNameSpaces);
-						if ( isset($xmlNameSpaces[1]) ) {
-							$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[1]);	
-						} elseif ( isset($xmlNameSpaces[0]) ) {
-							$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[0]);	
-						}
+						$xmlNameSpaces = $configXml->getNamespaces();
 
-						// nastavime mu namespaces zjistene z originalniho getConfigu
-						if ( isset($xmlNameSpaces[1]) ) {
-							$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[1]);	
-						} elseif ( isset($xmlNameSpaces[0]) ) {
-							$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[0]);	
+						if ( isset($xmlNameSpaces[""]) ) {
+							$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 						}
 
 						// projdeme vsechny odeslane hodnoty formulare
@@ -484,21 +476,18 @@ class DefaultController extends BaseController
 						file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $originalXml->asXml());
 
 						// z originalniho getconfigu zjistime namespaces a nastavime je k simpleXml objektu, aby bylo mozne pouzivat xPath dotazy
-						preg_match("/xmlns=[\"]([^\"]*)[\"]/", $originalXml->asXml(), $xmlNameSpaces);
-						if ( isset($xmlNameSpaces[1]) ) {
-							$originalXml->registerXPathNamespace("xmlns", $xmlNameSpaces[1]);	
-						} elseif ( isset($xmlNameSpaces[0]) ) {
-							$originalXml->registerXPathNamespace("xmlns", $xmlNameSpaces[0]);	
+						$xmlNameSpaces = $originalXml->getNamespaces();
+
+						if ( isset($xmlNameSpaces[""]) ) {
+							$originalXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 						}
 					}
 
 					// pokud mame konfiguracni XML
 					if (isset($tmpConfigXml)) {
 						// nastavime mu namespaces zjistene z originalniho getConfigu
-						if ( isset($xmlNameSpaces[1]) ) {
-							$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[1]);	
-						} elseif ( isset($xmlNameSpaces[0]) ) {
-							$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[0]);	
+						if ( isset($xmlNameSpaces[""]) ) {
+							$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 						}
 
 						// projdeme vsechny odeslane hodnoty formulare
