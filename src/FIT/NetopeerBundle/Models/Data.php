@@ -176,6 +176,8 @@ class Data {
 
 		if ($decoded["type"] == self::REPLY_OK) {
 			$sessionkey = $decoded["session"];
+			$newtime = new \DateTime();
+			$newtime = $newtime->format("d.m.Y H:i:s");
 			if ( !$sessionKeys = $session->get("session-keys") ) {
 				$session->set("session-keys", array($sessionkey));
 			} else {				
@@ -185,6 +187,11 @@ class Data {
 				$session->set("hosts", array( $params['host'] ));
 			} else {
 				$session->set("hosts", array_merge($sessionHosts, array( $params['host'] )));
+			}
+			if ( !$sessionTime = $session->get('times') ) {
+				$session->set("times", array( $newtime ));
+			} else {
+				$session->set("times", array_merge($sessionTime, array( $newtime )));
 			}
 			$session->setFlash($this->flashState .' success', "Successfully connected.");
 			return 0;
@@ -271,6 +278,7 @@ class Data {
 		$session = $this->container->get('request')->getSession();
 		$sessionKeysArr = $session->get('session-keys');
 		$sessionHostsArr = $session->get('hosts');
+		$sessionTimesArr = $session->get('times');
 		$requestKey = $params['key'];
 		$sessionKey = $sessionKeysArr[ $requestKey ];
 
@@ -288,8 +296,10 @@ class Data {
 
 		unset( $sessionKeysArr[ $requestKey] );
 		unset( $sessionHostsArr[ $requestKey ] );
+		unset( $sessionTimesArr[ $requestKey ] );
 		$session->set("session-keys", array_values( $sessionKeysArr ));
 		$session->set("hosts", array_values( $sessionHostsArr ));
+		$session->set("times", array_values( $sessionTimesArr ));
 	}
 
 	/**

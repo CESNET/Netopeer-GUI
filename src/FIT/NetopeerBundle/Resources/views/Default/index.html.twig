@@ -24,9 +24,10 @@
 		<table>
 			{% for key in sessionKeys %}
 				<tr>
+					<td> {% if sessionTime[loop.index - 1] is defined and not (sessionTime[loop.index - 1] is empty)  %}{{ sessionTime[loop.index - 1] }} {% endif %} </td>
 					<td>{{ hosts[loop.index - 1] }}</td>
-					<td><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }} '>get (state) &amp; get-config (config)</a></td>
-					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }} '>disconnect</a></td>
+					<td><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}'><span id="ico-conf"></span>Configure device</a></td>
+					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}'>disconnect</a></td>
 				</tr>
 			{% endfor %}
 		</table>

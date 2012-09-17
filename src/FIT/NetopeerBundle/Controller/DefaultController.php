@@ -73,6 +73,7 @@ class DefaultController extends BaseController
 			}
 		}
 		$this->assign('sessionKeys', $this->getRequest()->getSession()->get('session-keys'));
+		$this->assign('sessionTime', $this->getRequest()->getSession()->get('times'));
 		$this->assign('singleColumnLayout', false);
 		return $this->getTwigArr($this);
 	}
@@ -97,7 +98,7 @@ class DefaultController extends BaseController
 		}
 
 		$res = $dataClass->handle($command, $params);
-		if ( !$res < 1 ) {
+		if ( $res != 1 ) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 
@@ -469,7 +470,7 @@ class DefaultController extends BaseController
 				try {
 					$this->setSectionFormsParams($key, "", "");
 					// nacteme originalni (nezmeneny) getconfig
-					if ( ($originalXml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
+					if ( ($originalXml = $dataClass->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
 						$tmpConfigXml = simplexml_load_string($originalXml);
 						$originalXml = simplexml_load_string($originalXml, 'SimpleXMLIterator');
 						// vlozime do souboru - ladici ucely
