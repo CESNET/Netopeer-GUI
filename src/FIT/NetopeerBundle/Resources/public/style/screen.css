@@ -604,7 +604,7 @@ body > section .leaf-line .label {
 }
 /* line 98, ../sass/screen.scss */
 body > section .leaf-line .value {
-  width: 62%;
+  width: 60.5%;
   float: right;
   color: #000;
 }
@@ -778,22 +778,28 @@ body > section .alert.info, body > section .alert.success, body > section .alert
 
 /* line 151, ../sass/screen.scss */
 #content {
+  width: 100%;
   min-height: 100%;
-  padding: 55px 15px 15px 15px;
   font-size: 1.4em;
+  padding: 0px;
 }
 /* line 152, ../sass/screen.scss */
+#content.left-nav-defined {
+  width: 86%;
+}
+/* line 153, ../sass/screen.scss */
 #content.max-width-column {
   max-width: 800px;
   width: 100%;
+  float: none;
 }
 
 /* formulare */
-/* line 157, ../sass/screen.scss */
+/* line 158, ../sass/screen.scss */
 form {
   margin: 15px 0px;
 }
-/* line 158, ../sass/screen.scss */
+/* line 159, ../sass/screen.scss */
 form.login, form#login-form {
   border: 1px solid #ccc;
   background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #fafafa), color-stop(100%, #eaeaea));
@@ -811,7 +817,7 @@ form.login, form#login-form {
   -moz-box-shadow: 0px 0px 8px #cccccc;
   box-shadow: 0px 0px 8px #cccccc;
 }
-/* line 160, ../sass/screen.scss */
+/* line 161, ../sass/screen.scss */
 form.login label {
   width: 25%;
   padding-right: 2%;
@@ -821,41 +827,41 @@ form.login label {
   box-sizing: border-box;
   text-align: right;
 }
-/* line 162, ../sass/screen.scss */
+/* line 163, ../sass/screen.scss */
 form.login input[type="text"], form.login textarea, form.login input[type="password"] {
   width: 60%;
   float: left;
 }
-/* line 163, ../sass/screen.scss */
+/* line 164, ../sass/screen.scss */
 form.login input[type="submit"] {
   margin-left: 25%;
 }
-/* line 166, ../sass/screen.scss */
+/* line 167, ../sass/screen.scss */
 form#login-form {
   width: 400px;
   margin: 0px auto;
 }
-/* line 167, ../sass/screen.scss */
+/* line 168, ../sass/screen.scss */
 form#login-form .desc {
   font-size: 0.95em;
   margin-bottom: 25px;
 }
-/* line 169, ../sass/screen.scss */
+/* line 170, ../sass/screen.scss */
 form#login-form label {
   width: 20%;
   margin-right: 5%;
   float: left;
 }
-/* line 171, ../sass/screen.scss */
+/* line 172, ../sass/screen.scss */
 form#login-form input[type="text"], form#login-form textarea, form#login-form input[type="password"] {
   width: 70%;
   float: left;
 }
-/* line 172, ../sass/screen.scss */
+/* line 173, ../sass/screen.scss */
 form#login-form input[type="submit"] {
   margin-left: 25%;
 }
-/* line 176, ../sass/screen.scss */
+/* line 177, ../sass/screen.scss */
 form label {
   display: -moz-inline-stack;
   display: inline-block;
@@ -868,17 +874,17 @@ form label {
   line-height: 30px;
   margin-top: 10px;
 }
-/* line 178, ../sass/screen.scss */
+/* line 179, ../sass/screen.scss */
 form label.required:after {
   content: " *";
 }
-/* line 181, ../sass/screen.scss */
+/* line 182, ../sass/screen.scss */
 form input {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-/* line 182, ../sass/screen.scss */
+/* line 183, ../sass/screen.scss */
 form input[type="text"], form textarea, form input[type="password"], form input.text {
   width: 200px;
   height: 30px;
@@ -904,7 +910,7 @@ form input[type="text"], form textarea, form input[type="password"], form input.
   border-radius: 3px;
   font-size: 1em;
 }
-/* line 185, ../sass/screen.scss */
+/* line 186, ../sass/screen.scss */
 form textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -918,7 +924,7 @@ form textarea {
   line-height: 1.2em;
 }
 
-/* line 189, ../sass/screen.scss */
+/* line 190, ../sass/screen.scss */
 .form-underlay {
   width: 100%;
   height: 100%;
@@ -929,7 +935,7 @@ form textarea {
   z-index: 20;
 }
 
-/* line 190, ../sass/screen.scss */
+/* line 191, ../sass/screen.scss */
 .form-cover {
   width: 100%;
   height: 100%;
@@ -940,7 +946,7 @@ form textarea {
   display: none;
 }
 
-/* line 191, ../sass/screen.scss */
+/* line 192, ../sass/screen.scss */
 form.generatedForm {
   position: relative;
   z-index: 25;
@@ -952,44 +958,44 @@ form.generatedForm {
   -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.7);
 }
-/* line 195, ../sass/screen.scss */
+/* line 196, ../sass/screen.scss */
 form.generatedForm .leaf-line input.label, form.generatedForm .leaf-line input.value {
   margin-top: 0px;
   height: 22px;
   line-height: 22px;
 }
-/* line 198, ../sass/screen.scss */
+/* line 199, ../sass/screen.scss */
 form.generatedForm input[type="submit"] {
   float: right;
   margin-right: 15px;
 }
 
-/* line 201, ../sass/screen.scss */
+/* line 202, ../sass/screen.scss */
 #login-hp {
   padding: 100px 0px 0px 0px;
 }
 
-/* line 203, ../sass/screen.scss */
+/* line 204, ../sass/screen.scss */
 table {
   width: 100%;
   margin: 15px 0px;
 }
-/* line 204, ../sass/screen.scss */
+/* line 205, ../sass/screen.scss */
 table th, table td {
   border: 1px solid #ccc;
   padding: 8px 15px;
 }
-/* line 206, ../sass/screen.scss */
+/* line 207, ../sass/screen.scss */
 table tr:nth-child(even) th, table tr:nth-child(even) td {
   background: #eaeaea;
 }
 
 /* tooltip */
-/* line 211, ../sass/screen.scss */
+/* line 212, ../sass/screen.scss */
 .tooltip {
   cursor: help;
 }
-/* line 212, ../sass/screen.scss */
+/* line 213, ../sass/screen.scss */
 .tooltip .icon-help {
   background: rgba(255, 255, 255, 0.3);
   border: 1px solid #ddd;
@@ -1013,17 +1019,17 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   font-size: 13px;
   margin: -6px 0px -2px 0px;
 }
-/* line 213, ../sass/screen.scss */
+/* line 214, ../sass/screen.scss */
 .tooltip .icon-help:hover {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid #bbb;
 }
-/* line 215, ../sass/screen.scss */
+/* line 216, ../sass/screen.scss */
 .tooltip .tooltip-description {
   display: none;
 }
 
-/* line 217, ../sass/screen.scss */
+/* line 218, ../sass/screen.scss */
 .gips-container {
   max-width: 252px;
   position: absolute;
@@ -1039,7 +1045,7 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   border-radius: 4px;
 }
 
-/* line 218, ../sass/screen.scss */
+/* line 219, ../sass/screen.scss */
 .gips-body {
   color: #fff;
   font-size: 13px;
@@ -1054,12 +1060,12 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   -o-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 219, ../sass/screen.scss */
+/* line 220, ../sass/screen.scss */
 .gips-body.blue {
   background-color: #004f80;
 }
 
-/* line 221, ../sass/screen.scss */
+/* line 222, ../sass/screen.scss */
 .gips-icon {
   width: 0;
   height: 0;
@@ -1073,12 +1079,12 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
 
 /* media queries */
 @media screen and (max-width: 1280px) {
-  /* line 225, ../sass/screen.scss */
+  /* line 226, ../sass/screen.scss */
   nav#left {
     width: 14%;
   }
 
-  /* line 227, ../sass/screen.scss */
+  /* line 228, ../sass/screen.scss */
   body > section.left-nav-defined {
     width: 43%;
   }

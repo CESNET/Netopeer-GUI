@@ -48,7 +48,7 @@
 			{% set addToColumnClass = ' left-nav-defined' %}
 		{# endif #}
 
-		{% if singleColumnLayout is not defined or singleColumnLayout == false %}
+		{% if singleColumnLayout is defined and singleColumnLayout == false %}
 			<section id="state" class="column{{addToColumnClass}}">
 				{% for type, message in stateFlashes %}
 				    <div class='alert {{type}}'>{{message|raw}}</div>
@@ -67,15 +67,15 @@
 				{% endblock config %}
 			</section>
 		{% else %}
-			<article id="content" class="{% block singleContentClass %}{% endblock singleContentClass %}">
+			<section id="content" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %}">
 
 				{% for type, message in singleFlashes %}
-				    <div class='alert {{type}}'>{{message|raw}}</div>
+					<div class='alert {{type}}'>{{message|raw}}</div>
 				{% endfor %}
 
 				{% block singleContent %}
 				{% endblock singleContent %}
-			</article>
+			</section>
 		{% endif %}
 
 	{% else %}

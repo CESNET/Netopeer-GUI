@@ -95,7 +95,7 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $hNavTop + 
 	}
 	.leaf-line { padding: 7px 1.5% 7px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
 		.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
-		.value { width: 62%; float: right; color: #000; }
+		.value { width: 60.5%; float: right; color: #000; }
 		.config-value-cover { width: 50%; float: right; margin-top: -3px;
 			label { margin: 0px; padding: 0px; width: auto; padding-right: 10px; line-height: 18px; height: 18px; }
 		}
@@ -148,8 +148,9 @@ body > section, #content {
 	}
 }
 
-#content { min-height: 100%; padding: $hNavTop + $sContentPadding $sContentPadding $sContentPadding $sContentPadding; font-size: 1.4em; 
-	&.max-width-column { max-width: 800px; width: 100%; }
+#content { width: 100%; min-height: 100%; font-size: 1.4em; padding: 0px;
+	&.left-nav-defined { width: 86%; }
+	&.max-width-column { max-width: 800px; width: 100%; float: none; }
 }
 
 /* formulare */

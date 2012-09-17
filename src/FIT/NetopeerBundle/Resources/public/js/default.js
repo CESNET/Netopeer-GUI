@@ -157,13 +157,13 @@ function createNode($elem) {
 	if (newIndex < 1) newIndex = 1;
 
 	$originalInput.each(function(i,e) {
-		newXpath = $(e).attr('name').replace(']', '') + '-*?' + newIndex + '!]';
+		newXpath = $(e).attr('name') + '[' + newIndex + ']';
 		$(e).attr('name', newXpath);
 	});
 
 	// nesmime zapomenout pridat pozmeneny xPath take k ikonkam pro pridani dalsi node
 	$newRel = $cover.children('.edit-bar').children('img');
-	$newRel.attr('rel', $newRel.attr('rel') + '-*?' + newIndex + "!");
+	$newRel.attr('rel', $newRel.attr('rel') + '][' + newIndex);
 
 	// nakonec vytvorime submit - pokud existuje, smazeme jej
 	if ( $form.children("input[type=submit]").length ) {

@@ -1,8 +1,8 @@
 {% extends 'FITNetopeerBundle::layout.html.twig' %}
 {% block title %}Section - {{sectionName}}{% endblock title %}
 
-{% block state %}
-	<h1>State data</h1>
+{% block singleContent %}
+	<h1>Config &amp; State data</h1>
 	{% if stateArr is defined and not(stateArr is empty) %}
 		{#
 		<form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
@@ -11,8 +11,10 @@
 		</form>
 		#}
 		<div class="root">
+			{% set iterator = 1 %}
 			{% for key, element in stateArr %}
-				{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0} %}
+				{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
+				{% set iterator = iterator + 1 %}
 			{% endfor %}
 		</div>
 	{% else %}
@@ -20,31 +22,4 @@
 			No results found.
 		</div>
 	{% endif %}
-{% endblock state %}
-
-{% block config %}
-	<h1>Config data</h1>
-	{#
-	<form action="" method="post" {{ form_enctype(formConfig) }} class="filter"  name="formConfig">
-		{{ form_widget(formConfig) }}
-	    <input type="submit" value="Get config" />
-	</form>
-	#}
-	{% if configArr is defined and not(configArr is empty) %}
-		<form action="#" method="post" name="formConfigData">
-			<div class="root">
-				{% set iterator = 1 %}
-				{% for key, element in configArr %}
-					{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
-					{% set iterator = iterator + 1 %}
-				{% endfor %}
-
-				<input type="submit" value="Save config" />
-			</div>
-		</form>
-	{% else %}
-		<div class="alert info">
-			No results found.
-		</div>
-	{% endif %}
-{% endblock config %}
+{% endblock singleContent %}

@@ -493,6 +493,10 @@ class DefaultController extends BaseController
 
 						// projdeme vsechny odeslane hodnoty formulare
 						$newLeafs = array();
+
+						var_dump($post_vals);
+						exit;
+
 						foreach ( $post_vals as $postKey => $val ) {
 							$values = explode('_', $postKey);
 							// values[0] - label/value
