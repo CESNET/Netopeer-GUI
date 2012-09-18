@@ -32,8 +32,18 @@ class BaseController extends Controller
 	 */
 	protected function getTwigArr($THIS = null) {
 		if ($THIS != null ) {
+
+			// if singleColumnLayout is not set, we will set default value
+			if ( !array_key_exists('singleColumnLayout', $this->twigArr) ) {
+				if ( $this->getRequest()->getSession()->get('singleColumnLayout') != null ) {
+					$this->getRequest()->getSession()->set('singleColumnLayout', false);	
+				}
+				$this->assign('singleColumnLayout', $this->getRequest()->getSession()->get('singleColumnLayout'));
+			}
+			var_dump($this->getRequest()->getSession()->get('singleColumnLayout'));
+
 			$flashes = $this->getRequest()->getSession()->getFlashes();
-			$stateFlashes = $configFlashes = $singleFlashes = array();
+			$stateFlashes = $configFlashes = $singleFlashes = $allFlashes = array();
 
 			// rozdelime flash messages dle klice do danych kategorii
 			foreach ($flashes as $key => $message) {
@@ -46,11 +56,13 @@ class BaseController extends Controller
 					$singleFlashes[$key] = $message;
 				} 
 
+				$allFlashes[$key] = $message;
 			}
 
 			$this->assign("stateFlashes", $stateFlashes);
 			$this->assign("configFlashes", $configFlashes);
 			$this->assign("singleFlashes", $singleFlashes);
+			$this->assign("allFlashes", $allFlashes);
 
 			$dataClass = $this->get('DataModel');
 			$dataClass->buildMenuStructure($this->activeSectionKey); // vytvorime strukturu menu

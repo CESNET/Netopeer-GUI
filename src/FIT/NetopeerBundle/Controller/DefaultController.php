@@ -4,6 +4,7 @@ namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
 use FIT\NetopeerBundle\Models\XMLoperations;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -75,7 +76,22 @@ class DefaultController extends BaseController
 		$this->assign('sessionKeys', $this->getRequest()->getSession()->get('session-keys'));
 		$this->assign('sessionTime', $this->getRequest()->getSession()->get('times'));
 		$this->assign('singleColumnLayout', false);
+		$this->assign('hideColumnControl', true);
 		return $this->getTwigArr($this);
+	}
+
+	/**
+	 * @Route("/changeColumnLayout/{newValue}/", name="changeColumnLayout")
+	 *
+	 * Change session value for showing single column layout
+	 */
+	public function changeColumnLayoutAction($newValue)
+	{
+		$this->get('session')->set('singleColumnLayout', $newValue);
+
+		//reconstructs a routing path and gets a routing array called $route_params
+        $url = $this->get('request')->headers->get('referer');
+        return new RedirectResponse($url);
 	}
 
 	/**

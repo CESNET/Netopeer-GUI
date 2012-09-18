@@ -1,5 +1,10 @@
-{% set outIterator = 0 %}
-{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
+{% if outIterator is not defined %}
+	{% set outIterator = 0 %}
+{% endif %}
+{% if outXpath is not defined %}
+	{% set outXpath = xpath %}
+{% endif %}
+
 {% if element|length %}	
 	<div class="level-{{ level }} {{key}}">
 		
@@ -10,6 +15,8 @@
 		{% endif %}
 
 		{% if element.attributes.config is defined and element.attributes.config == "true" %}
+			{% set outIterator = 0 %}
+			{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
 			{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': useLevel, 'iterator': iterator} %}
 		{% else %}
 			{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element, 'key': key, 'level': level, 'addLevel': useLevel} %}
