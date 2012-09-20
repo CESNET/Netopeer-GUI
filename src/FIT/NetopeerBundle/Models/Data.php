@@ -303,6 +303,60 @@ class Data {
 	}
 
 	/**
+	 \param[in,out] $sock socket descriptor
+	 \return 0 on success
+	*/
+	private function handle_lock(&$sock, &$params) {
+		if ($this->check_logged_keys() != 0) {
+			return 1;
+		}
+		$requestKey = $params['key'];
+		$session = $this->container->get('request')->getSession();
+		$sessionKeysArr = $session->get('session-keys');
+		$sessionKey = $sessionKeysArr[ $requestKey ];
+
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_LOCK,
+			"target"	=> "running", /*TODO let user decide */
+			"session" 	=> $sessionKey
+		));
+
+		if ($decoded["type"] === self::REPLY_OK) {
+			$session->setFlash($this->flashState .' success', "Successfully locked.");
+		} else {
+			$this->logger->err("Could not lock.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not lock datastore. ");
+		}
+	}
+
+	/**
+	 \param[in,out] $sock socket descriptor
+	 \return 0 on success
+	*/
+	private function handle_unlock(&$sock, &$params) {
+		if ($this->check_logged_keys() != 0) {
+			return 1;
+		}
+		$requestKey = $params['key'];
+		$session = $this->container->get('request')->getSession();
+		$sessionKeysArr = $session->get('session-keys');
+		$sessionKey = $sessionKeysArr[ $requestKey ];
+
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_UNLOCK,
+			"target"	=> "running", /*TODO let user decide */
+			"session" 	=> $sessionKey
+		));
+
+		if ($decoded["type"] === self::REPLY_OK) {
+			$session->setFlash($this->flashState .' success', "Successfully unlocked.");
+		} else {
+			$this->logger->err("Could not unlock.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not unlock datastore. ");
+		}
+	}
+
+	/**
 	 \return 0 on success
 	 */
 	private function check_logged_keys() {
@@ -411,6 +465,12 @@ class Data {
 				break;
 			case "disconnect":
 				$res = $this->handle_disconnect($sock, $params);
+				break;
+			case "lock":
+				$res = $this->handle_lock($sock, $params);
+				break;
+			case "unlock":
+				$res = $this->handle_unlock($sock, $params);
 				break;
 			default:
 				$this->container->get('request')->getSession()->setFlash($this->flashState .' info', printf("Command not implemented yet. (%s)", $command));
