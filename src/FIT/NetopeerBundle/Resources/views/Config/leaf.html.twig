@@ -55,8 +55,13 @@
 					{% set inputType = "url" %}
 				{% endif %}
 			{% endif %}
+			{% if element.attributes.iskey is defined and element.attributes.iskey == "true" %}
+				{% set disabledInput = 'disabled="true"' %}
+			{% else %}
+				{% set disabledInput = "" %}
+			{% endif %}
 
-			<input type="{{inputType}}" class="text value" value="{{element.0}}" name="{{currentInputName}}" />
+			<input type="{{inputType}}" class="text value" value="{{element.0}}" name="{{currentInputName}}" {{disabledInput}}/>
 		{% endif %}
 
 	{% else %}
