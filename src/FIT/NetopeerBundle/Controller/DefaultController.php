@@ -8,6 +8,7 @@ use FIT\NetopeerBundle\Models\XMLoperations;
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DefaultController extends BaseController
 {
@@ -102,7 +103,12 @@ class DefaultController extends BaseController
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 
-		return $this->redirect($this->generateUrl('_home'));
+		if ( in_array($command, array("connect", "disconnect")) ) {
+			return $this->redirect($this->generateUrl('_home'));
+		} else {
+			$url = $this->get('request')->headers->get('referer');
+			return new RedirectResponse($url);
+		}
 	}
 
 	/**
@@ -449,7 +455,7 @@ class DefaultController extends BaseController
 							// pro ladici ucely vlozime upravene XML do souboru
 							file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
 						} else {
-							$this->get('logger')->error('In executing EditConfig.', $editConfigParams);
+							$this->get('logger')->err('In executing EditConfig.', array('params', $editConfigParams));
 							throw new \ErrorException('Error in executing EditConfig.');
 						}
 
