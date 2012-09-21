@@ -26,8 +26,10 @@
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="top">
 			<a href="{{ path('_home') }}" title="Home" id="ico-home"><span></span>Connections</a>
+			{% if app.request.get('key') is defined and not (app.request.get('key') is empty) %}
 			<a href="{{ path("handleConnection", {"command": "lock", "key": app.request.get('key')} ) }}" title="Lock" id="ico-lock"><span></span>Lock</a>
 			<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" id="ico-unlock">Unlock</a>
+			{% endif %}
 			{% if topmenu %}
 				{% for section in topmenu %}
 					<a href="{{ path(section.path, section.params) }}" title="{{section.title}}" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %}">{{section.name}}</a>
