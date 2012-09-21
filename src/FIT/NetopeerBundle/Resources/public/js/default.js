@@ -1,13 +1,18 @@
+
 $(document).ready(function() {
 	$("body > section").height(	$(window).height() - $("nav#top").height());
 
 	if ( $(".edit-bar").length ) {
 		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
-		$(".edit-bar .child").show();
+		$(".edit-bar .sibling").show();
 
-		$('.edit-bar .child').click(function() {
-			createNode($(this));
+		$('.edit-bar .sibling').click(function() {
+			duplicateNode($(this));
 		});
+
+		// $('.edit-bar .child').click(function() {
+		//	createNode($(this));
+		// });
 	}
 
 	// tooltip
@@ -18,6 +23,98 @@ $(document).ready(function() {
 	// zebra style on XML
 	// $(".level-0:not(.container):not(.list)").find('*[class*=level]:even, .leaf-line:even').addClass('even');
 });
+
+function duplicateNode($elem) {
+	$cover = $("#config").length ? $("#config") : $("#content");
+	if ( $(".form-underlay").length === 0 ) {
+		$cover.append($("<div>").addClass('form-underlay'));
+		$cover.append($("<div>").addClass('form-cover'));
+	}
+
+	// pro novy form-underlay budeme muset vypocitat rozmery
+	// a natahnout ho pres celou konfiguracni cast. Nelze zde
+	// pouzit position absolute, protoze to zamezuje scrollovani
+	// v konfiguracni casti
+	var nWidth = $cover.outerWidth(),
+		nHeight = $("form[name='formConfigData']").outerHeight() + parseInt($cover.css('padding-top'), 10) + parseInt($cover.css('padding-bottom'), 10) + 200;
+	$(".form-underlay").width(nWidth).height(nHeight).css({
+		'margin-top': 0 - nHeight,
+		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
+	});
+
+	var xPath = $elem.attr('rel'),	// zjistime xPath rodice - udavame v atributu rel u odkazu
+		$currentParent = $elem.parent().parent(),
+		$currentParentLevel = $currentParent.parent();
+
+	l($currentParent);
+	l($currentParentLevel);
+	
+	// objekt formulare, pokud existuje, pouzijeme stavajici, jinak vytvorime novy
+	if ( $(".generatedForm").length ) {
+		$form = $('.generatedForm');
+	} else {
+		// vytvorime formular
+		$form = $("<form>")
+			.attr({
+				action: "#",
+				method: "POST",
+				name: "duplicatedNodeForm",
+				'class': 'generatedForm'
+			});
+	}
+
+	// naklonujeme si aktualni element
+	$newClone = $elem.parent().parent().clone();
+	$form.html($newClone);
+
+	$newClone.children().each(function(i, el) {
+		modifyInputAttributes(el, i, xPath);
+	});
+
+	// nakonec vytvorime submit - pokud existuje, smazeme jej
+	if ( $form.children("input[type=submit]").length ) {
+		$form.children("input[type=submit]").remove();
+	}
+	$elementSubmit = $("<input>")
+		.attr({
+			type: 'submit',
+			value: 'Save changes'
+		});
+	$form.append($elementSubmit);
+	$form.append("<a href='#' title='Close' class='close'>Close</a>");
+	$currentParentLevel.append($form);
+}
+
+function modifyInputAttributes(el, newIndex, xPath) {
+	uniqueId = String(getUniqueId());
+
+	// vyprazdnime pripadny edit-bar
+	$(el).find('.edit-bar').html('');
+
+	newXpath = xPath + '][' + newIndex;
+	$(el).find('input').each(function(i, e) {
+		$(e).attr('name', 'duplicatedNodeForm[value_' + uniqueId + '_' + newXpath + ']');
+		if ( $(e).attr('default').length ) {
+			if ( $(e).attr('type') == 'checkbox' ) {
+				if ( $(e).attr('value') == $(e).attr('default') ) {
+					$(e).attr('checked', 'checked');
+				} else {
+					$(e).removeAttr('checked');
+				}
+			} else {
+				if ( $(e).attr('value') != $(e).attr('default') ) {
+					$(e).attr('value', $(e).attr('default'));
+				}
+			}
+		}
+	});
+
+	if ( $(el).children('.leaf-line').length ) {
+		$(el).children('.leaf-line').each(function(i, el) {
+			modifyInputAttributes(el, i, newXpath);
+		});
+	}
+}
 
 function createNode($elem) {
 	if ( $(".form-underlay").length === 0 ) {

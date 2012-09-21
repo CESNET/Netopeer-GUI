@@ -575,7 +575,7 @@ class Data {
 			}    
 		} catch (\ErrorException $e) {
 			$this->logger->err("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
-			throw new \ErrorException($e->getMessage());
+			// throw new \ErrorException($e->getMessage());
 			// nothing
 		}
 

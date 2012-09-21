@@ -89,6 +89,12 @@ class DefaultController extends BaseController
 	{
 		$this->get('session')->set('singleColumnLayout', $newValue);
 
+		try {
+			parent::clearCache();
+		} catch (\ErrorException $e) {
+			$this->getRequest()->getSession()->setFlash('single error', "Could not change number of columns.");
+		}
+
 		//reconstructs a routing path and gets a routing array called $route_params
         $url = $this->get('request')->headers->get('referer');
         return new RedirectResponse($url);

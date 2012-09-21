@@ -607,14 +607,12 @@ body > section .leaf-line .value {
   width: 59%;
   float: right;
   color: #000;
-  padding-right: 4px;
 }
 /* line 99, ../sass/screen.scss */
 body > section .leaf-line .config-value-cover {
   width: 50%;
   float: right;
   margin-top: -3px;
-  padding-right: 8px;
 }
 /* line 100, ../sass/screen.scss */
 body > section .leaf-line .config-value-cover label {
@@ -718,7 +716,7 @@ body > section#content {
 }
 /* line 133, ../sass/screen.scss */
 body > section#content.left-nav-defined {
-  width: 86%;
+  width: 90%;
 }
 /* line 134, ../sass/screen.scss */
 body > section#content.max-width-column {
@@ -1119,5 +1117,9 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   /* line 235, ../sass/screen.scss */
   body > section.left-nav-defined {
     width: 43%;
+  }
+  /* line 237, ../sass/screen.scss */
+  body > section#content.left-nav-defined {
+    width: 86%;
   }
 }

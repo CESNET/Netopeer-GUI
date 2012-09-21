@@ -33,14 +33,16 @@ class BaseController extends Controller
 	protected function getTwigArr($THIS = null) {
 		if ($THIS != null ) {
 
+			if ( $this->getRequest()->getSession()->get('singleColumnLayout') == null ) {
+				$this->getRequest()->getSession()->set('singleColumnLayout', false);	
+			}
+
 			// if singleColumnLayout is not set, we will set default value
 			if ( !array_key_exists('singleColumnLayout', $this->twigArr) ) {
-				if ( $this->getRequest()->getSession()->get('singleColumnLayout') != null ) {
-					$this->getRequest()->getSession()->set('singleColumnLayout', false);	
-				}
 				$this->assign('singleColumnLayout', $this->getRequest()->getSession()->get('singleColumnLayout'));
 			}
-			var_dump($this->getRequest()->getSession()->get('singleColumnLayout'));
+			// var_dump(array_key_exists('singleColumnLayout', $this->twigArr), $this->twigArr, $this->getRequest()->getSession()->get('singleColumnLayout'));
+			// exit;
 
 			$flashes = $this->getRequest()->getSession()->getFlashes();
 			$stateFlashes = $configFlashes = $singleFlashes = $allFlashes = array();
@@ -88,5 +90,18 @@ class BaseController extends Controller
 	public function setSubmenuUrl($submenuUrl) {
 		$this->submenuUrl = $submenuUrl;
 	}
+
+	protected function clearCache($type) {
+    	$command = "cache:clear";
+    	$process = new Process($command);
+		$process->setTimeout(3600);
+		$process->run();
+		
+		if (!$process->isSuccessful()) {
+			$this->get('data_logger')->err("Could not clean cache.");
+		    throw new \ErrorException("Could not clean cache.");
+		} 
+		return 0;
+    }
 
 }

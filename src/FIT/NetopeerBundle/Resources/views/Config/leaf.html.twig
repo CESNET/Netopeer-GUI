@@ -23,12 +23,10 @@
 	</span>
 
 	<span class="edit-bar">
-		{% if element.attributes.eltype is defined and element.attributes.eltype == "list" %}
-			<img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}"/>
-			{#
-			<img src="{{ asset('bundles/netopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" class="sibling" />
-			#}
-		{% endif %}
+		{# if element.attributes.eltype is defined and element.attributes.eltype == "list" #}
+			{# <img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}"/>#}			
+			<img src="{{ asset('bundles/netopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}" class="sibling" />
+		{# endif #}
 	</span>
 
 	{% if element.0 is defined and element.0|length == 0 %}
@@ -37,11 +35,23 @@
 		{% if element.attributes.type is defined and element.attributes.type == 'boolean' %}
 			<span class="config-value-cover">
 				<label>
-					<input type="radio" value="true" name="{{currentInputName}}" {% if element.0 == "true" %}checked="checked"{% endif %} />
+					<input 
+						type="radio" 
+						value="true" 
+						name="{{currentInputName}}" 
+						{% if element.0 == "true" %}checked="checked"{% endif %} 
+						{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
+					/>
 					true
 				</label>
 				<label>
-					<input type="radio" value="false" name="{{currentInputName}}" {% if element.0 == "false" %}checked="checked"{% endif %} />
+					<input 
+						type="radio" 
+						value="false" 
+						name="{{currentInputName}}" 
+						{% if element.0 == "false" %}checked="checked"{% endif %} 
+						{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
+					/>
 					false
 				</label>
 			</span>
@@ -56,7 +66,13 @@
 				{% endif %}
 			{% endif %}
 
-			<input type="{{inputType}}" class="text value" value="{{element.0}}" name="{{currentInputName}}" />
+			<input 
+				type="{{inputType}}" 
+				class="text value" 
+				value="{{element.0}}" 
+				name="{{currentInputName}}" 
+				{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
+			/>
 		{% endif %}
 
 	{% else %}

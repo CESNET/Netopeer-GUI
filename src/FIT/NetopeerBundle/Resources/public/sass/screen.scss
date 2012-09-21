@@ -95,8 +95,8 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $hNavTop + 
 	}
 	.leaf-line { padding: 7px 1.5% 7px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
 		.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
-		.value { width: 59%; float: right; color: #000; padding-right: 4px; }
-		.config-value-cover { width: 50%; float: right; margin-top: -3px; padding-right: 8px; // na vyrovnani sirky inputu (border + padding)
+		.value { width: 59%; float: right; color: #000; }
+		.config-value-cover { width: 50%; float: right; margin-top: -3px; 
 			label { margin: 0px; padding: 0px; width: auto; padding-right: 10px; line-height: 18px; height: 18px; }
 		}
 		input.value.text { width: 50%; margin: -4px 0px; border: 1px solid #ccc; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; }
@@ -130,7 +130,7 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $hNavTop + 
 	}
 
 	&#content { width: 100%; min-height: 100%; font-size: 1.4em; padding: $hNavTop 2 * $sContentPadding 2 * $sContentPadding 2 * $sContentPadding;
-		&.left-nav-defined { width: 86%; }
+		&.left-nav-defined { width: 90%; }
 		&.max-width-column { max-width: 800px; width: 100%; float: none; }
 	}
 }
@@ -233,5 +233,8 @@ table { width: 100%; margin: 15px 0px;
 	nav#left { width: 14%; }
 	body > section { 
 		&.left-nav-defined { width: (100% - 14%)/2; }
+		&#content { 
+			&.left-nav-defined { width: 86%; }
+		}
 	}
 }

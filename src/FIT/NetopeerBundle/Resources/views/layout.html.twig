@@ -51,9 +51,6 @@
 		{% block topPart %}
 		{% endblock topPart %}
 
-		<br/><br/><br/><br/><br/><br/><br/><br/><br/>
-		{{dump(singleColumnLayout)}}
-
 		{% if singleColumnLayout == false %}
 			<section id="state" class="column{{addToColumnClass}}">
 				{% for type, message in stateFlashes %}

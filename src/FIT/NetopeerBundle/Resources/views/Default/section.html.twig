@@ -2,7 +2,7 @@
 {% block title %}Section - {{sectionName}}{% endblock title %}
 
 {% block topPart %}
-	{% if hideColumnControl is not defined %}
+	{% if (hideColumnControl is not defined) or (hideColumnControl is defined and hideColumnControl != true) %}
 		<div class="top-part">
 			<strong>Show as:</strong>
 			<a href="{{ path('changeColumnLayout', {"newValue": "true"}) }}">Single column</a> |
