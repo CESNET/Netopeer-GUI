@@ -299,7 +299,7 @@ class DefaultController extends BaseController
 	 * @param $filterConfig 	config filter
 	 * @param $sourceConfig 	source param of config 
 	 */
-	private function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = 'startup') {
+	private function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = 'running') {
 
 		$this->setStateParams('key', $key);
 		$this->setStateParams('filter', $filterState);
