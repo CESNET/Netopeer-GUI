@@ -73,8 +73,14 @@ class DefaultController extends BaseController
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
 			}
 		}
-		$this->assign('sessionKeys', $this->getRequest()->getSession()->get('session-keys'));
-		$this->assign('sessionTime', $this->getRequest()->getSession()->get('times'));
+		$connArray = $this->getRequest()->getSession()->get('session-connections');
+		$connections = array();
+		if (sizeof($connArray) > 0) {
+			foreach ($connArray as $c) {
+				$connections[] = unserialize($c);
+			}
+		}
+		$this->assign('sessionConnections', $connections);
 		$this->assign('singleColumnLayout', false);
 		return $this->getTwigArr($this);
 	}
@@ -122,8 +128,9 @@ class DefaultController extends BaseController
 		$dataClass = $this->get('DataModel');
 
 		parent::setActiveSectionKey($key);
-		$hosts = $this->getRequest()->getSession()->get('hosts');
-		$this->assign('sectionName', $hosts[$key]);
+		$connArray = $this->getRequest()->getSession()->get('session-connections');
+		$host = unserialize($connArray[$key]);
+		$this->assign('sectionName', $host->host);
 
 		// nastavime si parametry pro state a config cast
 		$this->setSectionFormsParams($key);
