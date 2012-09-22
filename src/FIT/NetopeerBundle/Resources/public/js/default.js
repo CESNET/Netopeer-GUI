@@ -8,6 +8,9 @@ $(document).ready(function() {
 		$('.edit-bar .child').click(function() {
 			createNode($(this));
 		});
+		$('.edit-bar .remove-child').click(function() {
+			removeNode($(this));
+		});
 	}
 
 	// tooltip
@@ -175,6 +178,10 @@ function createNode($elem) {
 			value: 'Save changes'
 		});
 	$form.append($elementSubmit);
+}
+
+function removeNode($elem) {
+	alert("Remove node ");
 }
 
 function getUniqueId() {
