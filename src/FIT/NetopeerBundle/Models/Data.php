@@ -8,6 +8,37 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 
+class ConnectionSession {
+	/**
+	 * @var time of connection start
+	 */
+	public $time;
+
+	/**
+	 * @var identification key of connection
+	 */
+	public $hash;
+
+	/**
+	 * @var target hostname
+	 */
+	public $host;
+
+	/**
+	 * @var locked by us
+	 */
+	public $locked = false;
+
+	function __construct($hash, $host)
+	{
+		$this->hash = $hash;
+		$this->host = $host;
+		$newtime = new \DateTime();
+		$this->time = $newtime->format("d.m.Y H:i:s");
+		$this->locked = false;
+	}
+}
+
 class Data {
 
 	/* Enumeration of Message type (taken from mod_netconf.c) */
@@ -98,6 +129,40 @@ class Data {
 		return $response;
 	}
 
+	private function getHashFromKey($key) {
+		$conn = $this->getConnFromKey($key);
+
+		if (isset($conn->hash)) {
+			return $conn->hash;
+		}
+		return "";
+	}
+
+	private function getConnFromKey($key) {
+		$session = $this->container->get('request')->getSession();
+		$sessionConnections = $session->get('session-connections');
+		if (isset($sessionConnections[$key]) && $key != '') {
+			return unserialize($sessionConnections[$key]);
+		}
+		return false;
+	}
+	
+	private function updateConnLock($key) {
+		$conn = $this->getConnFromKey($key);
+
+		if ($conn == false) {
+			return;
+		}
+
+		$session = $this->container->get('request')->getSession();
+		$sessionConnections = $session->get('session-connections');
+
+		$conn->locked = !$conn->locked;
+
+		$sessionConnections[$key] = serialize($conn);
+		$session->set('session-connections', $sessionConnections);
+	}
+
 	/**
 	  \brief Read response from socket
 	  \param[in,out] $sock socket descriptor
@@ -175,23 +240,13 @@ class Data {
 		$decoded = json_decode($response, true);
 
 		if ($decoded["type"] == self::REPLY_OK) {
-			$sessionkey = $decoded["session"];
-			$newtime = new \DateTime();
-			$newtime = $newtime->format("d.m.Y H:i:s");
-			if ( !$sessionKeys = $session->get("session-keys") ) {
-				$session->set("session-keys", array($sessionkey));
+			$newconnection = new ConnectionSession($decoded["session"], $params["host"]);
+			$newconnection = array(serialize($newconnection));
+
+			if ( !$sessionConnections = $session->get("session-connections") ) {
+				$session->set("session-connections", $newconnection);
 			} else {				
-				$session->set("session-keys", array_merge($sessionKeys, array($sessionkey)));
-			}
-			if ( !$sessionHosts = $session->get('hosts') ) {
-				$session->set("hosts", array( $params['host'] ));
-			} else {
-				$session->set("hosts", array_merge($sessionHosts, array( $params['host'] )));
-			}
-			if ( !$sessionTime = $session->get('times') ) {
-				$session->set("times", array( $newtime ));
-			} else {
-				$session->set("times", array_merge($sessionTime, array( $newtime )));
+				$session->set("session-connections", array_merge($sessionConnections, $newconnection));
 			}
 			$session->setFlash($this->flashState .' success', "Successfully connected.");
 			return 0;
@@ -210,9 +265,7 @@ class Data {
 		if ( $this->check_logged_keys() != 0) {
 			return 1;
 		}
-		$session = $this->container->get('request')->getSession();
-		$sessionKeysArr = $session->get('session-keys');
-		$sessionKey = $sessionKeysArr[ $params['key'] ];
+		$sessionKey = $this->getHashFromKey($params['key']);
 
 		$decoded = $this->execute_operation($sock, array(
 			"type" 		=> self::MSG_GET,
@@ -232,8 +285,7 @@ class Data {
 		if ( $this->check_logged_keys() != 0) {
 			return 1;
 		}
-		$sessionKeysArr = $this->container->get('request')->getSession()->get('session-keys');
-		$sessionKey = $sessionKeysArr[ $params['key'] ];
+		$sessionKey = $this->getHashFromKey($params['key']);
 
 		$decoded = $this->execute_operation($sock, array(
 			"type" 		=> self::MSG_GETCONFIG,
@@ -253,8 +305,7 @@ class Data {
 		if ( $this->check_logged_keys() != 0) {
 			return 1;
 		}
-		$sessionKeysArr = $this->container->get('request')->getSession()->get('session-keys');
-		$sessionKey = $sessionKeysArr[ $params['key'] ];
+		$sessionKey = $this->getHashFromKey($params['key']);
 		
 		/* copy-config to store new values */
 		$decoded = $this->execute_operation($sock, array(
@@ -276,11 +327,9 @@ class Data {
 			return 1;
 		}
 		$session = $this->container->get('request')->getSession();
-		$sessionKeysArr = $session->get('session-keys');
-		$sessionHostsArr = $session->get('hosts');
-		$sessionTimesArr = $session->get('times');
+		$sessionConnections = $session->get('session-connections');
 		$requestKey = $params['key'];
-		$sessionKey = $sessionKeysArr[ $requestKey ];
+		$sessionKey = $this->getHashFromKey($params['key']);
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_DISCONNECT,
@@ -294,12 +343,60 @@ class Data {
 			$session->setFlash($this->flashState .' error', "Could not disconnect from server. ");
 		}
 
-		unset( $sessionKeysArr[ $requestKey] );
-		unset( $sessionHostsArr[ $requestKey ] );
-		unset( $sessionTimesArr[ $requestKey ] );
-		$session->set("session-keys", array_values( $sessionKeysArr ));
-		$session->set("hosts", array_values( $sessionHostsArr ));
-		$session->set("times", array_values( $sessionTimesArr ));
+		unset( $sessionConnections[ $requestKey] );
+		$session->set("session-connections", array_values( $sessionConnections ));
+	}
+
+	/**
+	 \param[in,out] $sock socket descriptor
+	 \return 0 on success
+	*/
+	private function handle_lock(&$sock, &$params) {
+		if ($this->check_logged_keys() != 0) {
+			return 1;
+		}
+		$session = $this->container->get('request')->getSession();
+		$sessionKey = $this->getHashFromKey($params['key']);
+
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_LOCK,
+			"target"	=> "running", /*TODO let user decide */
+			"session" 	=> $sessionKey
+		));
+
+		if ($decoded["type"] === self::REPLY_OK) {
+			$session->setFlash($this->flashState .' success', "Successfully locked.");
+			$this->updateConnLock($params['key']);
+		} else {
+			$this->logger->err("Could not lock.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not lock datastore. ");
+		}
+	}
+
+	/**
+	 \param[in,out] $sock socket descriptor
+	 \return 0 on success
+	*/
+	private function handle_unlock(&$sock, &$params) {
+		if ($this->check_logged_keys() != 0) {
+			return 1;
+		}
+		$session = $this->container->get('request')->getSession();
+		$sessionKey = $this->getHashFromKey($params['key']);
+
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_UNLOCK,
+			"target"	=> "running", /*TODO let user decide */
+			"session" 	=> $sessionKey
+		));
+
+		if ($decoded["type"] === self::REPLY_OK) {
+			$session->setFlash($this->flashState .' success', "Successfully unlocked.");
+			$this->updateConnLock($params['key']);
+		} else {
+			$this->logger->err("Could not unlock.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not unlock datastore. ");
+		}
 	}
 
 	/**
@@ -307,7 +404,7 @@ class Data {
 	 */
 	private function check_logged_keys() {
 		$session = $this->container->get('request')->getSession();
-		if ( !count($session->get("session-keys")) ) {
+		if ( !count($session->get("session-connections")) ) {
 			$session->setFlash($this->flashState .' error', "Not logged in.");
 			return 1;
 		}
@@ -315,7 +412,7 @@ class Data {
 			$session->setFlash($this->flashState .' error', "You are not allow to see this connection. No index of key.");
 			return 1;
 		}
-		if ( !in_array( $this->container->get('request')->get('key'), array_keys($session->get("session-keys")) ) ) {
+		if ( !in_array( $this->container->get('request')->get('key'), array_keys($session->get("session-connections")) ) ) {
 			$session->setFlash($this->flashState .' error', "You are not allow to see this connection. Bad Index of key.");
 			return 1;
 		}
@@ -411,6 +508,12 @@ class Data {
 				break;
 			case "disconnect":
 				$res = $this->handle_disconnect($sock, $params);
+				break;
+			case "lock":
+				$res = $this->handle_lock($sock, $params);
+				break;
+			case "unlock":
+				$res = $this->handle_unlock($sock, $params);
 				break;
 			default:
 				$this->container->get('request')->getSession()->setFlash($this->flashState .' info', printf("Command not implemented yet. (%s)", $command));

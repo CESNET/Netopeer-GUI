@@ -32,7 +32,6 @@ class BaseController extends Controller
 	 */
 	protected function getTwigArr($THIS = null) {
 		if ($THIS != null ) {
-
 			if ( $this->getRequest()->getSession()->get('singleColumnLayout') == null ) {
 				$this->getRequest()->getSession()->set('singleColumnLayout', false);	
 			}
@@ -44,7 +43,8 @@ class BaseController extends Controller
 			// var_dump(array_key_exists('singleColumnLayout', $this->twigArr), $this->twigArr, $this->getRequest()->getSession()->get('singleColumnLayout'));
 			// exit;
 
-			$flashes = $this->getRequest()->getSession()->getFlashes();
+			$session = $this->getRequest()->getSession();
+			$flashes = $session->getFlashes();
 			$stateFlashes = $configFlashes = $singleFlashes = $allFlashes = array();
 
 			// rozdelime flash messages dle klice do danych kategorii
@@ -70,6 +70,14 @@ class BaseController extends Controller
 			$dataClass->buildMenuStructure($this->activeSectionKey); // vytvorime strukturu menu
 			$this->assign('topmenu', $dataClass->getModels());
 			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl));
+
+			if ($this->getRequest()->get('key') != "") {
+				$conn = $session->get('session-connections');
+				$conn = unserialize($conn[$this->getRequest()->get('key')]);
+				if ($conn !== false) {
+					$this->assign('lockedConn', $conn->locked);
+				}
+			}
 		}
 		return $this->twigArr;
 	}

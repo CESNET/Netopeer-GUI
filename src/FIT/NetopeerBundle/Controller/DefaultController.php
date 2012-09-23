@@ -4,11 +4,11 @@ namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
 use FIT\NetopeerBundle\Models\XMLoperations;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class DefaultController extends BaseController
 {
@@ -73,8 +73,14 @@ class DefaultController extends BaseController
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
 			}
 		}
-		$this->assign('sessionKeys', $this->getRequest()->getSession()->get('session-keys'));
-		$this->assign('sessionTime', $this->getRequest()->getSession()->get('times'));
+		$connArray = $this->getRequest()->getSession()->get('session-connections');
+		$connections = array();
+		if (sizeof($connArray) > 0) {
+			foreach ($connArray as $c) {
+				$connections[] = unserialize($c);
+			}
+		}
+		$this->assign('sessionConnections', $connections);
 		$this->assign('singleColumnLayout', false);
 		$this->assign('hideColumnControl', true);
 		return $this->getTwigArr($this);
@@ -124,7 +130,12 @@ class DefaultController extends BaseController
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 
-		return $this->redirect($this->generateUrl('_home'));
+		if ( in_array($command, array("connect", "disconnect")) ) {
+			return $this->redirect($this->generateUrl('_home'));
+		} else {
+			$url = $this->get('request')->headers->get('referer');
+			return new RedirectResponse($url);
+		}
 	}
 
 	/**
@@ -138,8 +149,9 @@ class DefaultController extends BaseController
 		$dataClass = $this->get('DataModel');
 
 		parent::setActiveSectionKey($key);
-		$hosts = $this->getRequest()->getSession()->get('hosts');
-		$this->assign('sectionName', $hosts[$key]);
+		$connArray = $this->getRequest()->getSession()->get('session-connections');
+		$host = unserialize($connArray[$key]);
+		$this->assign('sectionName', $host->host);
 
 		// nastavime si parametry pro state a config cast
 		$this->setSectionFormsParams($key);
@@ -315,7 +327,7 @@ class DefaultController extends BaseController
 	 * @param $filterConfig 	config filter
 	 * @param $sourceConfig 	source param of config 
 	 */
-	private function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = 'startup') {
+	private function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = 'running') {
 
 		$this->setStateParams('key', $key);
 		$this->setStateParams('filter', $filterState);
@@ -471,7 +483,7 @@ class DefaultController extends BaseController
 							// pro ladici ucely vlozime upravene XML do souboru
 							file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
 						} else {
-							$this->get('logger')->error('In executing EditConfig.', $editConfigParams);
+							$this->get('logger')->err('In executing EditConfig.', array('params', $editConfigParams));
 							throw new \ErrorException('Error in executing EditConfig.');
 						}
 

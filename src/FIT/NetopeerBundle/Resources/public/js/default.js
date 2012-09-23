@@ -304,6 +304,10 @@ function createNode($elem) {
 	$form.append($elementSubmit);
 }
 
+function removeNode($elem) {
+	alert("Remove node ");
+}
+
 function getUniqueId() {
 	return Math.floor( Math.random()*99999 );
 }

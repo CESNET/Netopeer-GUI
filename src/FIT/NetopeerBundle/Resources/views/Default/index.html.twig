@@ -15,17 +15,16 @@
 
 {% block config %}
 	<h2>Active connection list</h2>
-	{% set hosts = app.session.get('hosts') %}
-	{% if sessionKeys is empty or hosts is empty %}
+	{% if sessionConnections is empty %}
 		<div class="alert info">
 			You are not connected to any server.
 		</div>
 	{% else %}
 		<table>
-			{% for key in sessionKeys %}
+			{% for key in sessionConnections %}
 				<tr>
-					<td> {% if sessionTime[loop.index - 1] is defined and not (sessionTime[loop.index - 1] is empty)  %}{{ sessionTime[loop.index - 1] }} {% endif %} </td>
-					<td>{{ hosts[loop.index - 1] }}</td>
+					<td> {{ key.time }} </td>
+					<td>{{ key.host }}</td>
 					<td><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}'><span id="ico-conf"></span>Configure device</a></td>
 					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}'>disconnect</a></td>
 				</tr>
