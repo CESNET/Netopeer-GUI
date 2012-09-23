@@ -26,6 +26,9 @@ $(document).ready(function() {
 
 function duplicateNode($elem) {
 	$cover = $("#config").length ? $("#config") : $("#content");
+	if ($elem.parents('#state')) {
+		$cover = $("#state");
+	}
 	if ( $(".form-underlay").length === 0 ) {
 		$cover.append($("<div>").addClass('form-underlay'));
 		$cover.append($("<div>").addClass('form-cover'));
@@ -43,10 +46,32 @@ function duplicateNode($elem) {
 	});
 
 	var xPath = $elem.attr('rel'),	// zjistime xPath rodice - udavame v atributu rel u odkazu
-		$currentParent = $elem.parent().parent(),
-		$currentParentLevel = $currentParent.parent();
+		levelRegex = /level-(\d+)/,	// regularni vyraz pro zjisteni cisla levelu
+		level = $elem.parents('.leaf-line').attr('class');	// trida rodice pro zjisteni levelu
 
-	l($currentParent);
+	if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
+
+		// level nemusi byt u prvniho rodice uveden, muze se stat, ze se nachazi az o jednu uroven vyse
+		if ( $elem.parents('.leaf-line').parent().length ) {
+			level = $elem.parents('.leaf-line').parent().attr('class');
+			if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
+				level = 0;
+			} else {
+				level = level.match(levelRegex)[1];
+			}
+		} else {
+			level = 0;
+		}
+		
+	} else {
+		level = level.match(levelRegex)[1];
+	}
+
+	// pokud se jedna o vygenerovanou cast, pridame potomka k rodici (obalujici div)
+	// level = level - 1;
+	$currentParent = $elem.parent().parent();
+	$currentParentLevel = $elem.parents('.level-' + level);
+
 	l($currentParentLevel);
 	
 	// objekt formulare, pokud existuje, pouzijeme stavajici, jinak vytvorime novy
@@ -66,8 +91,13 @@ function duplicateNode($elem) {
 	// naklonujeme si aktualni element
 	$newClone = $elem.parent().parent().clone();
 	$form.html($newClone);
+	if ($elem.parent().parent().is(':first-child')) {
+		$elem.parent().parent().nextAll("*").each(function(i, el) {
+			$form.append(el);
+		});
+	}
 
-	$newClone.children().each(function(i, el) {
+	$form.children().each(function(i, el) {
 		modifyInputAttributes(el, i, xPath);
 	});
 
@@ -93,13 +123,13 @@ function modifyInputAttributes(el, newIndex, xPath) {
 
 	newXpath = xPath + '][' + newIndex;
 	$(el).find('input').each(function(i, e) {
-		$(e).attr('name', 'duplicatedNodeForm[value_' + uniqueId + '_' + newXpath + ']');
-		if ( $(e).attr('default').length ) {
-			if ( $(e).attr('type') == 'checkbox' ) {
+		elName = $(e).attr('name').split('_')[0].split('[')[1];
+		$(e).attr('name', 'duplicatedNodeForm[value_' + elName + '_' + newXpath + ']');
+		if ( $(e).attr('default') != "" ) {
+			if ( $(e).attr('type') == 'radio' ) {
 				if ( $(e).attr('value') == $(e).attr('default') ) {
+					$(e).parent().parent().find('input[checked=checked]').removeAttr('checked');
 					$(e).attr('checked', 'checked');
-				} else {
-					$(e).removeAttr('checked');
 				}
 			} else {
 				if ( $(e).attr('value') != $(e).attr('default') ) {

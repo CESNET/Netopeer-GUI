@@ -485,8 +485,8 @@ class DefaultController extends BaseController
 					$this->get('logger')->warn('Could not save config correctly.', array('error' => $e->getMessage()));
 					$this->getRequest()->getSession()->setFlash('config error', "Could not save config correctly. Error: ".$e->getMessage());
 				}
-			} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
-				$post_vals = $this->getRequest()->get('newNodeForm');
+			} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
+				$post_vals = $this->getRequest()->get('duplicatedNodeForm');
 				$dataClass->setFlashState('config');
 						
 				try {
