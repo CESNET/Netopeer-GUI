@@ -5,8 +5,8 @@
 	{% else %}
 		type-undefined
 	{% endif %}
-	{% if element.attributes.config is defined and element.attributes.config == "true" %}
-		config
+	{% if not(element.attributes.config is defined and element.attributes.config == "true") %}
+		state
 	{% endif %}
 ">
 	<span class="label">

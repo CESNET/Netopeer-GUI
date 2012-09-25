@@ -500,13 +500,14 @@ class DefaultController extends BaseController
 			} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
 				$post_vals = $this->getRequest()->get('duplicatedNodeForm');
 				$dataClass->setFlashState('config');
-						
+
 				try {
-					$this->setSectionFormsParams($key, "", "");
+					// $this->setSectionFormsParams($key);
 					// nacteme originalni (nezmeneny) getconfig
 					if ( ($originalXml = $dataClass->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
 						$tmpConfigXml = simplexml_load_string($originalXml);
 						$originalXml = simplexml_load_string($originalXml, 'SimpleXMLIterator');
+
 						// vlozime do souboru - ladici ucely
 						file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $originalXml->asXml());
 
@@ -528,49 +529,66 @@ class DefaultController extends BaseController
 						// projdeme vsechny odeslane hodnoty formulare
 						$newLeafs = array();
 
-						var_dump($post_vals);
-						exit;
-
+						$i = 0;
 						foreach ( $post_vals as $postKey => $val ) {
 							$values = explode('_', $postKey);
-							// values[0] - label/value
-							// values[1] - uniqueId (for one label and one value)
-							// values[2] - encoded xPath
+							// values[0] - label
+							// values[1] - encoded xPath
 
-							if ( count($values) != 3 ) {
-								throw new \ErrorException("newNodeForm must contain exactly 3 params, example label_UNIQUEID_-*-*?1!-*?2!-*?1!");
+							if ($postKey == 'parent') {
+								try {
+									// ziskame originalni xPath = dekodujeme
+									$xpath = str_replace(
+										array('-', '?', '!'), 
+										array('/', '[', ']'),
+										$val
+									);
+									$xpath = substr($xpath, 1);
+									$duplicatedNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
+									$xpath = substr($xpath, 0, strripos($xpath, "/"));
+									$coverNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
+									// $coverNode->addChild($duplicatedNode->asXml());
+								} catch (\ErrorException $e) {
+									$this->get('logger')->err('Could not find node for duplicate.', array('exception' => $e));
+									throw new \ErrorException("Could not find node for duplicate.");
+								}
+
+							} else if ( count($values) != 2 ) {
+								$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
+								throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!");
+							} else {	// ziskame originalni xPath = dekodujeme
+								$xpath = str_replace(
+									array('-', '?', '!'), 
+									array('/', '[', ']'),
+									$values[1]
+								);
+
+								$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
+								$newLeafs[$i++] = array(
+									'xPath' => $xpath,
+									'val' => $val
+								);
 							}
-							// ziskame originalni xPath = dekodujeme
-							$xpath = str_replace(
-								array('-', '?', '!'), 
-								array('/', '[', ']'),
-								$values[2]
-							);
-							$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
-							$newLeafs[$values[1]][$values[0]] = array(
-								'xPath' => $xpath,
-								'val' => $val
-							);
 						}
 
 						if ( count($newLeafs) ) {
+							$i = 0;
 							foreach ($newLeafs as $key => $values) {
-								var_dump($values);
 								// ziskame uzel stromu pomoci xPath
-								$node = $tmpConfigXml->xpath('/xmlns:'.$values['label']['xPath']);
-								
+								$node = $tmpConfigXml->xpath('/xmlns:'.$values['xPath']);
+
 								if ( isset($node[0]) ) {
 									$elem = $node[0];
 								} else { 
 									$elem = $node;
 								}
-								$elem->addChild($values['label']['val'], $values['value']['val']); 
+
+								$elem[0] = str_replace("\r", '', $values['val']);
 							}
 						}
 
 						// pro ladici ucely vlozime upravena data do souboru
 						file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $tmpConfigXml->asXml());
-						exit;
 
 						$this->getRequest()->getSession()->setFlash('config success', "New node has been saved correctly.");	
 						$res = 1;

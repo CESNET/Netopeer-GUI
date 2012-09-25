@@ -4,9 +4,9 @@ $(document).ready(function() {
 
 	if ( $(".edit-bar").length ) {
 		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
-		$(".edit-bar .sibling").show();
+		$(".type-list .edit-bar .sibling").show();
 
-		$('.edit-bar .sibling').click(function() {
+		$('.type-list .edit-bar .sibling').click(function() {
 			duplicateNode($(this));
 		});
 
@@ -25,10 +25,14 @@ $(document).ready(function() {
 });
 
 function duplicateNode($elem) {
-	$cover = $("#config").length ? $("#config") : $("#content");
-	if ($elem.parents('#state')) {
+	if ($elem.parents('#state').length) {
 		$cover = $("#state");
+	} else if ($elem.parents('#config').length) {
+		$cover = $("#config");
+	} else {
+		$cover = $("#content");
 	}
+
 	if ( $(".form-underlay").length === 0 ) {
 		$cover.append($("<div>").addClass('form-underlay'));
 		$cover.append($("<div>").addClass('form-cover'));
@@ -41,8 +45,8 @@ function duplicateNode($elem) {
 	var nWidth = $cover.outerWidth(),
 		nHeight = $("form[name='formConfigData']").outerHeight() + parseInt($cover.css('padding-top'), 10) + parseInt($cover.css('padding-bottom'), 10) + 200;
 	$(".form-underlay").width(nWidth).height(nHeight).css({
-		'margin-top': 0 - nHeight,
-		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
+		'margin-top': 0 - nHeight
+		// 'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
 	});
 
 	var xPath = $elem.attr('rel'),	// zjistime xPath rodice - udavame v atributu rel u odkazu
@@ -72,8 +76,6 @@ function duplicateNode($elem) {
 	$currentParent = $elem.parent().parent();
 	$currentParentLevel = $elem.parents('.level-' + level);
 
-	l($currentParentLevel);
-	
 	// objekt formulare, pokud existuje, pouzijeme stavajici, jinak vytvorime novy
 	if ( $(".generatedForm").length ) {
 		$form = $('.generatedForm');
@@ -93,9 +95,19 @@ function duplicateNode($elem) {
 	$form.html($newClone);
 	if ($elem.parent().parent().is(':first-child')) {
 		$elem.parent().parent().nextAll("*").each(function(i, el) {
-			$form.append(el);
+			$form.append($(el).clone());
 		});
 	}
+	$form.find('.state').remove();
+
+	// vlozime skryty input s cestou k duplikovanemu elementu
+	$elementWithParentXpath = $("<input>")
+		.attr({
+			type: 'hidden',
+			name: "duplicatedNodeForm[parent]",
+			value: xPath
+		});
+	$form.prepend($elementWithParentXpath);
 
 	$form.children().each(function(i, el) {
 		modifyInputAttributes(el, i, xPath);
@@ -111,8 +123,16 @@ function duplicateNode($elem) {
 			value: 'Save changes'
 		});
 	$form.append($elementSubmit);
+	$elementSubmit.bind('click', function() {
+	  $form.submit();
+	});
+
 	$form.append("<a href='#' title='Close' class='close'>Close</a>");
 	$currentParentLevel.append($form);
+	$oldForm = $currentParentLevel.parents('form').clone();
+	$oldForm.html('');
+	$cover.prepend($oldForm);
+	$currentParentLevel.parents('form').children('.root').unwrap();
 }
 
 function modifyInputAttributes(el, newIndex, xPath) {
@@ -121,10 +141,11 @@ function modifyInputAttributes(el, newIndex, xPath) {
 	// vyprazdnime pripadny edit-bar
 	$(el).find('.edit-bar').html('');
 
-	newXpath = xPath + '][' + newIndex;
-	$(el).find('input').each(function(i, e) {
-		elName = $(e).attr('name').split('_')[0].split('[')[1];
-		$(e).attr('name', 'duplicatedNodeForm[value_' + elName + '_' + newXpath + ']');
+	newXpath = xPath + '*?' + newIndex + '!';
+	inputArr = $.merge( $(el).children('input'), $(el).children('.config-value-cover').find('input') );
+	inputArr.each(function(i, e) {
+		elName = $(e).attr('name').replace('configDataForm', 'duplicatedNodeForm');
+		$(e).attr('name', elName);
 		if ( $(e).attr('default') != "" ) {
 			if ( $(e).attr('type') == 'radio' ) {
 				if ( $(e).attr('value') == $(e).attr('default') ) {
@@ -137,11 +158,12 @@ function modifyInputAttributes(el, newIndex, xPath) {
 				}
 			}
 		}
+		$(e).removeAttr('disabled');
 	});
 
-	if ( $(el).children('.leaf-line').length ) {
-		$(el).children('.leaf-line').each(function(i, el) {
-			modifyInputAttributes(el, i, newXpath);
+	if ( $(el).children('.leaf-line, div[class*=level]').length ) {
+		$(el).children('.leaf-line, div[class*=level]').each(function(j, elem) {
+			modifyInputAttributes(elem, j, newXpath);
 		});
 	}
 }

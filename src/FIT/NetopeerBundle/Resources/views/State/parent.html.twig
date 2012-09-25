@@ -13,7 +13,7 @@
 		{% else %}
 			{% set useLevel = false %}
 		{% endif %}
-
+		
 		{% if element.attributes.config is defined and element.attributes.config == "true" %}
 			{% set outIterator = 0 %}
 			{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
