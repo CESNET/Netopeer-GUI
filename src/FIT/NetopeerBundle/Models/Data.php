@@ -504,6 +504,7 @@ class Data {
 				$res = $this->handle_getconfig($sock, $params);
 				break;
 			case "editconfig":
+				$this->logger->info("Handle editConfig: ", array('configToSend' => $params['config']));
 				$res = $this->handle_editconfig($sock, $params);
 				break;
 			case "disconnect":
