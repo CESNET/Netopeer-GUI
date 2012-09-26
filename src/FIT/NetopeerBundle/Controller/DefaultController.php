@@ -140,73 +140,38 @@ class DefaultController extends BaseController
 
 	/**
 	 * @Route("/sections/{key}/", name="section")
-	 * @Template()
-	 *
-	 * Prepares section = whole get&get-config part of server
-	 */
-	public function sectionAction($key)
-	{
-		$dataClass = $this->get('DataModel');
-
-		parent::setActiveSectionKey($key);
-		$connArray = $this->getRequest()->getSession()->get('session-connections');
-		$host = unserialize($connArray[$key]);
-		$this->assign('sectionName', $host->host);
-
-		// nastavime si parametry pro state a config cast
-		$this->setSectionFormsParams($key);
-		try {
-			$dataClass->setFlashState('state');
-			// provedeme get
-			if ( ($xml = $dataClass->handle('get', $this->paramsState)) != 1 ) {
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$this->assign("stateArr", $xml);
-			}
-		} catch (\ErrorException $e) {
-			$this->get('data_logger')->err("State: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('state error', "Could not parse XML file correctly. ");
-		}
-
-		try {
-			$dataClass->setFlashState('config');
-			// provedeme getconfig
-			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$res = $this->setSectionForms($key);
-				if ( $res == 1 ) {
-					return $this->redirect($this->generateUrl('section', array(
-						'key' => $key
-					)));
-				}
-				$this->assign("configArr", $xml);	
-			}    
-		} catch (\ErrorException $e) {
-			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
-		}
-
-		return $this->getTwigArr($this);
-	}
-
-	/**
 	 * @Route("/sections/{key}/{module}/", name="module")
+	 * @Route("/sections/{key}/{module}/{subsection}/", name="subsection")
 	 * @Template("FITNetopeerBundle:Default:section.html.twig")
 	 *
+	 * Prepares section = whole get&get-config part of server
 	 * Shows module part = first level of connected server (except of root)
+	 * Prepares subsection = second level of connected server tree
 	 */
-	public function moduleAction($key, $module)
+	public function moduleAction($key, $module = null, $subsection = null)
 	{
 		$dataClass = $this->get('DataModel');
 
 		parent::setActiveSectionKey($key);
-		parent::setSubmenuUrl($module);
-		$this->assign('sectionName', $dataClass->getSectionName($module));
+		if ( $module ) {
+			parent::setSubmenuUrl($module);
+			$this->assign('sectionName', $dataClass->getSectionName($module));
+			if ( $subsection ) $this->assign('subsectionName', $dataClass->getSubsectionName($subsection)); 
+		} else {
+			$connArray = $this->getRequest()->getSession()->get('session-connections');
+			$host = unserialize($connArray[$key]);
+			$this->assign('sectionName', $host->host);
+		}
 		
-		// pokud existuje filtr v modelech, pouzijeme jej
-		$filterState = $filterConfig = "";
-		$file = __DIR__.'/../Data/models/'.$module.'/filter.txt';
-		if ( file_exists($file) ) {
-			$filterState = $filterConfig = file_get_contents($file);
+		if ( $module ) {
+			// pokud existuje filtr v modelech, pouzijeme jej
+			$filterState = $filterConfig = "";
+			$add2path = $module;
+			if ( $subsection ) $add2path .= '/'.$subsection;
+			$file = __DIR__.'/../Data/models/'.$add2path.'/filter.txt';
+			if ( file_exists($file) ) {
+				$filterState = $filterConfig = file_get_contents($file);
+			}
 		}
 
 		$this->setSectionFormsParams($key, $filterState, $filterConfig);
@@ -227,70 +192,19 @@ class DefaultController extends BaseController
 			// ziskame getcofig cast
 			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$this->assign("configArr", $xml);	
 				$res = $this->setSectionForms($key);
 				if ( $res == 1 ) {
-					return $this->redirect($this->generateUrl('module', array(
-						'key' => $key,
-						'module' => $module
-					)));
-				}
-			}    
-		} catch (\ErrorException $e) {
-			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
-		}
-
-		return $this->getTwigArr($this);
-	}
-
-	/**
-	 * @Route("/sections/{key}/{module}/{subsection}/", name="subsection")
-	 * @Template()
-	 *
-	 * Prepares second level of connected server tree
-	 */
-	public function subsectionAction($key, $module, $subsection)
-	{
-		$dataClass = $this->get('DataModel');
-
-		parent::setActiveSectionKey($key);
-		parent::setSubmenuUrl($module);
-		$this->assign('sectionName', $dataClass->getSectionName($module));
-		$this->assign('subsectionName', $dataClass->getSubsectionName($subsection));
-
-		// pokud je k dispozici filtr, pouzijejem jej
-		$filterState = $filterConfig = "";
-		$file = __DIR__.'/../Data/models/'.$module.'/'.$subsection.'/filter.txt';
-		if ( file_exists($file) ) {
-			$filterState = $filterConfig = file_get_contents($file);
-		}
-
-		$res = $this->setSectionFormsParams($key, $filterState, $filterConfig);
-		try {
-			$dataClass->setFlashState('state');
-			// ziskame state cast
-			if ( ($xml = $dataClass->handle('get', $this->paramsState)) != 1 ) {
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$this->assign("stateArr", $xml);
-			}
-		} catch (\ErrorException $e) {
-			$this->get('data_logger')->err("State: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('state error', "Could not parse XML file correctly. ");
-		}
-
-		try {
-			$dataClass->setFlashState('config');
-			// ziskame config cast
-			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$res = $this->setSectionForms($key);
-				if ( $res == 1 ) {
-					return $this->redirect($this->generateUrl('subsection', array(
-						'key' => $key,
-						'module' => $module,
-						'subsection' => $subsection
-					)));
+					$retArr['key'] = $key;
+					$routeName = 'section';
+					if ( $module ) {
+						$retArr['module'] = $module;
+						$routeName = 'module';
+					}
+					if ( $subsection ) {
+						$retArr['subsection'] = $subsection;
+						$routeName = 'subsection';
+					}
+					return $this->redirect($this->generateUrl($routeName, $retArr));
 				}
 				$this->assign("configArr", $xml);
 			}    
