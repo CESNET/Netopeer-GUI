@@ -506,25 +506,20 @@ class DefaultController extends BaseController
 					// nacteme originalni (nezmeneny) getconfig
 					if ( ($originalXml = $dataClass->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
 						$tmpConfigXml = simplexml_load_string($originalXml);
-						$originalXml = simplexml_load_string($originalXml, 'SimpleXMLIterator');
 
 						// vlozime do souboru - ladici ucely
-						file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $originalXml->asXml());
+						file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $tmpConfigXml->asXml());
 
 						// z originalniho getconfigu zjistime namespaces a nastavime je k simpleXml objektu, aby bylo mozne pouzivat xPath dotazy
-						$xmlNameSpaces = $originalXml->getNamespaces();
+						$xmlNameSpaces = $tmpConfigXml->getNamespaces();
 
 						if ( isset($xmlNameSpaces[""]) ) {
-							$originalXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+							$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 						}
 					}
 
 					// pokud mame konfiguracni XML
 					if (isset($tmpConfigXml)) {
-						// nastavime mu namespaces zjistene z originalniho getConfigu
-						if ( isset($xmlNameSpaces[""]) ) {
-							$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-						}
 
 						// projdeme vsechny odeslane hodnoty formulare
 						$newLeafs = array();
@@ -544,10 +539,18 @@ class DefaultController extends BaseController
 										$val
 									);
 									$xpath = substr($xpath, 1);
-									$duplicatedNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
 									$xpath = substr($xpath, 0, strripos($xpath, "/"));
 									$coverNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
-									// $coverNode->addChild($duplicatedNode->asXml());
+
+									// duplicating of node, which we were duplicating using JS. Because we
+									// have to use xPath for original node, we will modify original node, 
+									// not duplicated!
+									$duplicatedNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
+									$dom_thing = dom_import_simplexml($duplicatedNode);
+									$dom_node  = dom_import_simplexml($coverNode);
+									$dom_new   = $dom_thing->appendChild($dom_node->cloneNode(true));
+
+									$tmpConfigXml  = simplexml_import_dom($dom_new);
 								} catch (\ErrorException $e) {
 									$this->get('logger')->err('Could not find node for duplicate.', array('exception' => $e));
 									throw new \ErrorException("Could not find node for duplicate.");
@@ -562,20 +565,10 @@ class DefaultController extends BaseController
 									array('/', '[', ']'),
 									$values[1]
 								);
-
 								$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
-								$newLeafs[$i++] = array(
-									'xPath' => $xpath,
-									'val' => $val
-								);
-							}
-						}
 
-						if ( count($newLeafs) ) {
-							$i = 0;
-							foreach ($newLeafs as $key => $values) {
 								// ziskame uzel stromu pomoci xPath
-								$node = $tmpConfigXml->xpath('/xmlns:'.$values['xPath']);
+								$node = $tmpConfigXml->xpath('/xmlns:'.$xpath);
 
 								if ( isset($node[0]) ) {
 									$elem = $node[0];
@@ -583,9 +576,9 @@ class DefaultController extends BaseController
 									$elem = $node;
 								}
 
-								$elem[0] = str_replace("\r", '', $values['val']);
+								$elem[0] = str_replace("\r", '', $val);
 							}
-						}
+						} 
 
 						// pro ladici ucely vlozime upravena data do souboru
 						file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $tmpConfigXml->asXml());
