@@ -33,7 +33,7 @@ function duplicateNode($elem) {
 		$cover = $("#content");
 	}
 
-	if ( $(".form-underlay").length === 0 ) {
+	if ( $cover.find(".form-underlay").length === 0 ) {
 		$cover.append($("<div>").addClass('form-underlay'));
 		$cover.append($("<div>").addClass('form-cover'));
 	}
@@ -42,11 +42,13 @@ function duplicateNode($elem) {
 	// a natahnout ho pres celou konfiguracni cast. Nelze zde
 	// pouzit position absolute, protoze to zamezuje scrollovani
 	// v konfiguracni casti
+	l($cover.children('form').outerHeight());
+	l($cover);
 	var nWidth = $cover.outerWidth(),
-		nHeight = $("form[name='formConfigData']").outerHeight() + parseInt($cover.css('padding-top'), 10) + parseInt($cover.css('padding-bottom'), 10) + 200;
-	$(".form-underlay").width(nWidth).height(nHeight).css({
-		'margin-top': 0 - nHeight
-		// 'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
+		nHeight = $cover.children('form').outerHeight() + parseInt($cover.css('padding-top'), 10) + parseInt($cover.css('padding-bottom'), 10) + 200 + $elem.parent().parent().parent().outerHeight();
+	$cover.find(".form-underlay").width(nWidth).height(nHeight * 2).css({
+		'margin-top': 0 - nHeight,
+		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
 	});
 
 	var xPath = $elem.attr('rel'),	// zjistime xPath rodice - udavame v atributu rel u odkazu
@@ -124,10 +126,16 @@ function duplicateNode($elem) {
 		});
 	$form.append($elementSubmit);
 	$elementSubmit.bind('click', function() {
-	  $form.submit();
+		$form.submit();
 	});
 
-	$form.append("<a href='#' title='Close' class='close'>Close</a>");
+	$closeButton = $("<a href='#' title='Close' class='close'>Close</a>");
+	$form.append($closeButton);
+	$closeButton.bind('click', function() {
+		$originalForm = $cover.children('form');
+		$cover.find('.root').wrap($originalForm);
+		$form.remove();
+	});
 	$currentParentLevel.append($form);
 	$oldForm = $currentParentLevel.parents('form').clone();
 	$oldForm.html('');
@@ -146,7 +154,7 @@ function modifyInputAttributes(el, newIndex, xPath) {
 	inputArr.each(function(i, e) {
 		elName = $(e).attr('name').replace('configDataForm', 'duplicatedNodeForm');
 		$(e).attr('name', elName);
-		if ( $(e).attr('default') != "" ) {
+		if ( $(e).attr('default') !== "" ) {
 			if ( $(e).attr('type') == 'radio' ) {
 				if ( $(e).attr('value') == $(e).attr('default') ) {
 					$(e).parent().parent().find('input[checked=checked]').removeAttr('checked');

@@ -194,7 +194,7 @@ form { margin: 15px 0px;
 		
 }
 
-.form-underlay { width: 100%; height: 100%; @include background(rgba(0,0,0,0.4)); position: relative; top: 0px; right: 0px; z-index: 20; }
+.form-underlay { width: 100%; height: 100%; @include background(rgba(0,0,0,0.4)); position: absolute; top: 0px; right: 0px; z-index: 20; }
 .form-cover { width: 100%; height: 100%; position: absolute; top: 0px; right: 0px; z-index: 21; display: none; }
 form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 0px 0px 15px 0px; float: left; width: 100%; @include single-box-shadow(rgba(0,0,0,0.7), 0px, 0px, 10px);
 
