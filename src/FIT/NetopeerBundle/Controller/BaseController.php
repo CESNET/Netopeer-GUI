@@ -71,12 +71,17 @@ class BaseController extends Controller
 			$this->assign('topmenu', $dataClass->getModels());
 			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl));
 
-			if ($this->getRequest()->get('key') != "") {
-				$conn = $session->get('session-connections');
-				$conn = unserialize($conn[$this->getRequest()->get('key')]);
-				if ($conn !== false) {
-					$this->assign('lockedConn', $conn->locked);
+			try {
+				if ($this->getRequest()->get('key') != "") {
+					$conn = $session->get('session-connections');
+					$conn = unserialize($conn[$this->getRequest()->get('key')]);
+					if ($conn !== false) {
+						$this->assign('lockedConn', $conn->locked);
+					}
 				}
+			} catch (\ErrorException $e) {
+				$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
+				$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
 			}
 		}
 		return $this->twigArr;
