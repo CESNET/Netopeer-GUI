@@ -314,6 +314,7 @@ class Data {
 			return 1;
 		}
 		$sessionKey = $this->getHashFromKey($params['key']);
+		$params['config'] = str_replace('<?xml version="1.0"?>', '', $params['config']);
 		
 		/* copy-config to store new values */
 		$decoded = $this->execute_operation($sock, array(
