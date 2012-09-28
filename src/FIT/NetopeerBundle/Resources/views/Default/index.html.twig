@@ -24,7 +24,7 @@
 			{% for key in sessionConnections %}
 				<tr>
 					<td> {{ key.time }} </td>
-					<td>{{ key.host }}</td>
+					<td>{{ key.host }}<!--{{ key.hash }}--></td>
 					<td><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}'><span id="ico-conf"></span>Configure device</a></td>
 					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}'>disconnect</a></td>
 				</tr>
