@@ -527,6 +527,12 @@ class DefaultController extends BaseController
 						$i = 0;
 						foreach ( $post_vals as $postKey => $val ) {
 							$values = explode('_', $postKey);
+							$cnt = count($values);
+							if ($cnt > 2) {
+								$last = $values[$cnt-1];
+								$values = array(implode("_", array_slice($values, 0, $cnt-1)), $last);
+							}
+							//var_dump($values);
 							// values[0] - label
 							// values[1] - encoded xPath
 
@@ -538,6 +544,7 @@ class DefaultController extends BaseController
 										array('/', '[', ']'),
 										$val
 									);
+									$this->get('logger')->err('Duplicate: '.$xpath);
 									$xpath = substr($xpath, 1);
 									$xpath = substr($xpath, 0, strripos($xpath, "/"));
 									$coverNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
@@ -546,19 +553,21 @@ class DefaultController extends BaseController
 									// have to use xPath for original node, we will modify original node, 
 									// not duplicated!
 									$duplicatedNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
-									$dom_thing = dom_import_simplexml($duplicatedNode);
-									$dom_node  = dom_import_simplexml($coverNode);
+									//$this->get('logger')->err('Duplicated: '.var_dump($duplicatedNode));
+									/* TODO xpath returns array - [0] */
+									$dom_thing = dom_import_simplexml($duplicatedNode[0]);
+									$dom_node  = dom_import_simplexml($coverNode[0]);
 									$dom_new   = $dom_thing->appendChild($dom_node->cloneNode(true));
 
 									$tmpConfigXml  = simplexml_import_dom($dom_new);
 								} catch (\ErrorException $e) {
 									$this->get('logger')->err('Could not find node for duplicate.', array('exception' => $e));
-									throw new \ErrorException("Could not find node for duplicate.");
+									throw new \ErrorException("Could not find node for duplicate.". $e);
 								}
 
 							} else if ( count($values) != 2 ) {
 								$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
-								throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!");
+								throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!". var_dump(array('values' => $values, 'postKey' => $postKey)));
 							} else {	// ziskame originalni xPath = dekodujeme
 								$xpath = str_replace(
 									array('-', '?', '!'), 
@@ -568,6 +577,7 @@ class DefaultController extends BaseController
 								$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
 
 								// ziskame uzel stromu pomoci xPath
+								$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 								$node = $tmpConfigXml->xpath('/xmlns:'.$xpath);
 
 								if ( isset($node[0]) ) {
@@ -582,6 +592,20 @@ class DefaultController extends BaseController
 
 						// pro ladici ucely vlozime upravena data do souboru
 						file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $tmpConfigXml->asXml());
+						$editConfigParams = array(
+							'key' 	 => $key,
+							'target' => 'running',
+							'config' => $tmpConfigXml->asXml()
+							);
+
+						// provedeme edit-cofig
+						if ( ($merged = $dataClass->handle('editconfig', $editConfigParams)) != 1 ) {
+							// pro ladici ucely vlozime upravene XML do souboru
+							file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
+						} else {
+							$this->get('logger')->err('In executing EditConfig.', array('params', $editConfigParams));
+							throw new \ErrorException('Error in executing EditConfig.');
+						}
 
 						$this->getRequest()->getSession()->setFlash('config success', "New node has been saved correctly.");	
 						$res = 1;
