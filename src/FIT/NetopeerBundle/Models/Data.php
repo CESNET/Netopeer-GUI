@@ -29,9 +29,9 @@ class ConnectionSession {
 	 */
 	public $locked = false;
 
-	function __construct($hash, $host)
+	function __construct($session_hash, $host)
 	{
-		$this->hash = $hash;
+		$this->hash = $session_hash;
 		$this->host = $host;
 		$newtime = new \DateTime();
 		$this->time = $newtime->format("d.m.Y H:i:s");
@@ -135,7 +135,8 @@ class Data {
 		if (isset($conn->hash)) {
 			return $conn->hash;
 		}
-		return "";
+		//throw new \ErrorException("No identification key was found.");
+		return "NOHASH";
 	}
 
 	private function getConnFromKey($key) {
@@ -241,14 +242,21 @@ class Data {
 
 		if ($decoded["type"] == self::REPLY_OK) {
 			$newconnection = new ConnectionSession($decoded["session"], $params["host"]);
-			$newconnection = array(serialize($newconnection));
+			$newconnection = serialize($newconnection);
 
 			if ( !$sessionConnections = $session->get("session-connections") ) {
-				$session->set("session-connections", $newconnection);
+				$session->set("session-connections", array($newconnection));
 			} else {				
-				$session->set("session-connections", array_merge($sessionConnections, $newconnection));
+				$sessionConnections[] = $newconnection;
+				$session->set("session-connections", $sessionConnections);
 			}
 			$session->setFlash($this->flashState .' success', "Successfully connected.");
+			/*
+			$session->setFlash($this->flashState .' success', "Successfully connected.".
+			"--".var_export($decoded).
+			"--".var_export($newconnection, true).
+			"--".var_export($sessionConnections, true));
+			*/
 			return 0;
 		} else {
 			$this->logger->err("Could not connect.", array("error" => var_export($this->getJsonError(), true)));
