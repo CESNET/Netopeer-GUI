@@ -569,6 +569,41 @@ class Data {
 		return 0;
 	}
 
+	private function get_element_parent($element)
+	{
+		$parents = $element->xpath("parent::*");
+		if ($parents) {
+			return $parents[0];
+		}
+		return false;
+	}
+
+	private function check_elem_match($model_el, $possible_el)
+	{
+		$mel = $this->get_element_parent($model_el);
+		$pel = $this->get_element_parent($possible_el);
+		while ($pel && $mel) {
+			if ($pel->getName() !== $mel->getName()) {
+				return false;
+			}
+			$pel = $this->get_element_parent($pel);
+			$mel = $this->get_element_parent($mel);
+		}
+		return true;
+	}
+
+	private function complete_attributes(&$source, &$target)
+	{
+		if ($source->attributes()) {
+			$attrs = $source->attributes();
+			if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
+				foreach ($source->attributes() as $key => $val) {
+					$target->addAttribute($key, $val);
+				}
+			}
+		}
+	}
+
 	/**
 	Find corresponding $el in configuration model $model
 	and complete attributes from $model.
@@ -581,18 +616,15 @@ class Data {
 		$model->registerXPathNamespace("c", $modelns[""]);
 		$found = $model->xpath("//c:". $el->getName());
 		if (sizeof($found) == 1) {
-			$found_el = $found[0];
-			if ($found_el->attributes()) {
-				$attrs = $found_el->attributes();
-				if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
-					foreach ($found[0]->attributes() as $key => $val) {
-						$el->addAttribute($key, $val);
-					}
-				}
-			}
+			$this->complete_attributes($found[0], $el);
 		} else {
 			//echo "Not found unique<br>";
-			// TODO handle deep search if there are more results
+			foreach ($found as $found_el) {
+				if ($this->check_elem_match($el, $found_el)) {
+					$this->complete_attributes($found_el, $el);
+					break;
+				}
+			}
 		}
 	}
 
