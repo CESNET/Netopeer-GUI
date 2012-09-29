@@ -32,7 +32,7 @@ a { @include link-colors($cBase, #000);
 }
 strong, b { font-weight: bold; }
 
-.button { @include background( linear-gradient(lighten($cBase, 10%), darken($cBase, 4%)) ); @include border-radius(5px); padding: 8px 20px; color: #fff; @include text-shadow(1px, 1px, 2px, #333); font-size: 1em; font-weight: normal; border: 1px solid darken($cBase, 4%); cursor: pointer; @include single-box-shadow(#aaa, 0px, 0px, 8px); margin: 15px 0px; position: relative; z-index: 1;
+.button { @include background( linear-gradient(lighten($cBase, 10%), darken($cBase, 4%)) ); @include border-radius(5px); padding: 8px 20px; color: #fff; @include text-shadow(1px, 1px, 2px, #333); font-size: 1em; font-weight: normal; border: 1px solid darken($cBase, 4%); cursor: pointer; @include single-box-shadow(#aaa, 0px, 0px, 8px); margin: 15px 0px; position: relative; z-index: 1; text-decoration: none;
 	&:before { position: absolute; z-index: -1; content: ""; top: 1px; left: 0px; right: 0px; bottom: 0px; border-top: 1px solid rgba(255,255,255,0.2); }
 	&:active { @include single-box-shadow(rgba(255,255,255,0.25), 0px, 2px, 5px, false, true);  }
 	&:hover { @include background( linear-gradient($cBase, darken($cBase, 14%)) ); }

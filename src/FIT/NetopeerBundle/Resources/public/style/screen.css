@@ -132,7 +132,9 @@ strong, b {
   margin: 15px 0px;
   position: relative;
   z-index: 1;
+  text-decoration: none;
 }
+
 /* line 36, ../sass/screen.scss */
 .button:before, form input[type="submit"]:before {
   position: absolute;

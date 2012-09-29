@@ -22,6 +22,11 @@ $(document).ready(function() {
 
 	// zebra style on XML
 	// $(".level-0:not(.container):not(.list)").find('*[class*=level]:even, .leaf-line:even').addClass('even');
+
+	/* hide alerts after some time */
+	setTimeout(function() {
+		$('.alert').fadeOut();
+	}, 10000); /* 10s */
 });
 
 function duplicateNode($elem) {
@@ -129,7 +134,7 @@ function duplicateNode($elem) {
 		$form.submit();
 	});
 
-	$closeButton = $("<a href='#' title='Close' class='close'>Close</a>");
+	$closeButton = $("<a href='#' title='Close' class='close button'>Close</a>");
 	$form.append($closeButton);
 	$closeButton.bind('click', function() {
 		$originalForm = $cover.children('form');
