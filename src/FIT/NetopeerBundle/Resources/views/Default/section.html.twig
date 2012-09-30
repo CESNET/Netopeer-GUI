@@ -1,5 +1,5 @@
 {% extends 'FITNetopeerBundle::layout.html.twig' %}
-{% block title %}Section - {{sectionName}}{% endblock title %}
+{% block title %}Section {% if sectionName is defined and not(sectionName is empty) %}- {{sectionName}}{% endif %}{% endblock title %}
 
 {% block topPart %}
 	{% if (hideColumnControl is not defined) or (hideColumnControl is defined and hideColumnControl != true) %}
