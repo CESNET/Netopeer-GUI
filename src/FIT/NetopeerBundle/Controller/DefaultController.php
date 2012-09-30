@@ -25,7 +25,7 @@ class DefaultController extends BaseController
 	public function indexAction()
 	{
 		$dataClass = $this->get('DataModel');
-		
+
 		// formular pro pripojeni k serveru
 		$form = $this->createFormBuilder()
 			->add('host', 'text')
@@ -120,9 +120,9 @@ class DefaultController extends BaseController
 		);
 
 		if ( $command === "get" ) {
-			$dataClass->setFlashState('state'); 
+			$dataClass->setFlashState('state');
 		} else {
-			$dataClass->setFlashState('config');    		   		
+			$dataClass->setFlashState('config');
 		}
 
 		$res = $dataClass->handle($command, $params);
@@ -170,7 +170,7 @@ class DefaultController extends BaseController
 		try {
 			$dataClass->setFlashState('config');
 			// provedeme getconfig
-			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
+			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 				$res = $this->setSectionForms($key);
 				if ( $res == 1 ) {
@@ -178,8 +178,8 @@ class DefaultController extends BaseController
 						'key' => $key
 					)));
 				}
-				$this->assign("configArr", $xml);	
-			}    
+				$this->assign("configArr", $xml);
+			}
 		} catch (\ErrorException $e) {
 			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
 			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
@@ -201,12 +201,15 @@ class DefaultController extends BaseController
 		parent::setActiveSectionKey($key);
 		parent::setSubmenuUrl($module);
 		$this->assign('sectionName', $dataClass->getSectionName($module));
-		
+
 		// pokud existuje filtr v modelech, pouzijeme jej
 		$filterState = $filterConfig = "";
-		$file = __DIR__.'/../Data/models/'.$module.'/filter.txt';
+		//$file = __DIR__.'/../Data/models/'.$module.'/filter.txt';
+		$file = $dataClass->getPathToModels() . 'filter.txt';
 		if ( file_exists($file) ) {
 			$filterState = $filterConfig = file_get_contents($file);
+		} else {
+			//$this->getRequest()->getSession()->setFlash('state info', "No filter is used. ");
 		}
 
 		$this->setSectionFormsParams($key, $filterState, $filterConfig);
@@ -218,16 +221,16 @@ class DefaultController extends BaseController
 				$this->assign("stateArr", $xml);
 			}
 		} catch (\ErrorException $e) {
-			$this->get('data_logger')->err("State: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('state error', "Could not parse XML file correctly. ");
+			$this->get('data_logger')->err("State: Could not parse filter correctly.", array("message" => $e->getMessage()));
+			$this->getRequest()->getSession()->setFlash('state error', "Could not parse filter correctly. ");
 		}
 
 		try {
 			$dataClass->setFlashState('config');
 			// ziskame getcofig cast
-			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
+			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$this->assign("configArr", $xml);	
+				$this->assign("configArr", $xml);
 				$res = $this->setSectionForms($key);
 				if ( $res == 1 ) {
 					return $this->redirect($this->generateUrl('module', array(
@@ -235,10 +238,11 @@ class DefaultController extends BaseController
 						'module' => $module
 					)));
 				}
-			}    
+			}
 		} catch (\ErrorException $e) {
-			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
+			$this->get('data_logger')->err("Config: Could not parse get-config data correctly.", array("message" => $e->getMessage()));
+			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ".
+			$e->getMessage());
 		}
 
 		return $this->getTwigArr($this);
@@ -282,7 +286,7 @@ class DefaultController extends BaseController
 		try {
 			$dataClass->setFlashState('config');
 			// ziskame config cast
-			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {    		
+			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 				$res = $this->setSectionForms($key);
 				if ( $res == 1 ) {
@@ -293,7 +297,7 @@ class DefaultController extends BaseController
 					)));
 				}
 				$this->assign("configArr", $xml);
-			}    
+			}
 		} catch (\ErrorException $e) {
 			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
 			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
@@ -325,7 +329,7 @@ class DefaultController extends BaseController
 	 * @param {int} $key     	key of connected server
 	 * @param $filterState		state filter
 	 * @param $filterConfig 	config filter
-	 * @param $sourceConfig 	source param of config 
+	 * @param $sourceConfig 	source param of config
 	 */
 	private function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = 'running') {
 
@@ -337,6 +341,191 @@ class DefaultController extends BaseController
 		$this->setConfigParams('filter', $filterState);
 	}
 
+	private function divide_input_name($postKey)
+	{
+		$values = explode('_', $postKey);
+		$cnt = count($values);
+		if ($cnt > 2) {
+			$last = $values[$cnt-1];
+			$values = array(implode("_", array_slice($values, 0, $cnt-1)), $last);
+		}
+		return $values;
+	}
+
+	private function handleDuplicateNodeForm(&$dataClass, &$key)
+	{
+		$post_vals = $this->getRequest()->get('duplicatedNodeForm');
+		$dataClass->setFlashState('config');
+
+		try {
+			// $this->setSectionFormsParams($key);
+			// nacteme originalni (nezmeneny) getconfig
+			if ( ($originalXml = $dataClass->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
+				$tmpConfigXml = simplexml_load_string($originalXml);
+
+				// vlozime do souboru - ladici ucely
+				file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $tmpConfigXml->asXml());
+
+				// z originalniho getconfigu zjistime namespaces a nastavime je k simpleXml objektu, aby bylo mozne pouzivat xPath dotazy
+				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
+
+				if ( isset($xmlNameSpaces[""]) ) {
+					$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+				}
+			}
+
+			// pokud mame konfiguracni XML
+			if (isset($tmpConfigXml)) {
+
+				// projdeme vsechny odeslane hodnoty formulare
+				$newLeafs = array();
+
+				$subroot = simplexml_load_file($dataClass->getPathToModels() . 'wrapped.wyin');
+				$xmlNameSpaces = $subroot->getNamespaces();
+
+				if ( isset($xmlNameSpaces[""]) ) {
+					$subroot->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+				}
+				$ns = $subroot->xpath("//xmlns:namespace");
+				$namespace = "";
+				if (sizeof($ns)>0) {
+					$namespace = $ns[0]->attributes()->uri;
+				}
+				$pos_subroot = $subroot->xpath('//xmlns:'.$tmpConfigXml->getName().'/ancestor::*');
+				$config = $tmpConfigXml->asXml();
+				for ($i=sizeof($pos_subroot)-1; $i>0; $i--) {
+					//if ($pos_subroot[$i]->
+					$config .= "</".$pos_subroot[$i]->getName().">\n";
+
+					if ($i == 1) {
+						$config = "<".$pos_subroot[$i]->getName().
+							($namespace!==""?" xmlns=\"$namespace\"":"").
+							">\n".$config;
+					} else {
+						$config = "<".$pos_subroot[$i]->getName().
+							">\n".$config;
+					}
+				}
+				$tmpConfigXml = simplexml_load_string($config);
+				$tmpConfigXml->registerXPathNamespace('xmlns', $namespace);
+
+				/* fill values */
+				$i = 0;
+				foreach ( $post_vals as $postKey => $val ) {
+					$values = $this->divide_input_name($postKey);
+					// values[0] - label
+					// values[1] - encoded xPath
+
+					if ($postKey == 'parent') {
+						//try {
+						//	// ziskame originalni xPath = dekodujeme
+						//	$xpath = str_replace(
+						//			array('-', '?', '!'),
+						//			array('/', '[', ']'),
+						//			$val
+						//			);
+						//	$this->get('logger')->err('Duplicate: '.$xpath);
+						//	$xpath = substr($xpath, 1);
+						//	$xpath = substr($xpath, 0, strripos($xpath, "/"));
+						//	$coverNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
+
+						//	// duplicating of node, which we were duplicating using JS. Because we
+						//	// have to use xPath for original node, we will modify original node,
+						//	// not duplicated!
+						//	$duplicatedNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
+						//	//$this->get('logger')->err('Duplicated: '.var_dump($duplicatedNode));
+						//	/* TODO xpath returns array - [0] */
+						//	$dom_thing = dom_import_simplexml($duplicatedNode[0]);
+						//	$dom_node  = dom_import_simplexml($coverNode[0]);
+						//	$dom_new   = $dom_thing->appendChild($dom_node->cloneNode(true));
+
+						//	$tmpConfigXml  = simplexml_import_dom($dom_new);
+						//} catch (\ErrorException $e) {
+						//	$this->get('logger')->err('Could not find node for duplicate.', array('exception' => $e));
+						//	throw new \ErrorException("Could not find node for duplicate.". $e);
+						//}
+
+					} else if ( count($values) != 2 ) {
+						$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
+						throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!". var_dump(array('values' => $values, 'postKey' => $postKey)));
+					} else {	// ziskame originalni xPath = dekodujeme
+						$xpath = str_replace(
+								array('-', '?', '!'),
+								array('/', '[', ']'),
+								$values[1]
+								);
+						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
+						$this->elementValReplace($tmpConfigXml, $values[0], $xpath, $val);
+					}
+				}
+
+				// pro ladici ucely vlozime upravena data do souboru
+				file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $tmpConfigXml->asXml());
+				$editConfigParams = array(
+						'key' 	 => $key,
+						'target' => 'running',
+						'config' => str_replace('<?xml version="1.0"?'.'>', '', $tmpConfigXml->asXml())
+						);
+
+
+				// provedeme edit-cofig
+				if ( ($merged = $dataClass->handle('editconfig', $editConfigParams)) != 1 ) {
+					// pro ladici ucely vlozime upravene XML do souboru
+					file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
+				} else {
+					$this->get('logger')->err('In executing EditConfig.', array('params', $editConfigParams));
+					throw new \ErrorException('Error in executing EditConfig.');
+				}
+
+				$this->getRequest()->getSession()->setFlash('config success', "New node has been saved correctly.");
+				$res = 1;
+			}
+
+			$res = 0;
+
+		} catch (\ErrorException $e) {
+			$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
+			$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. ".$e->getMessage());
+		}
+	}
+
+	private function elementValReplace($configXml, $elementName, $xpath, $val)
+	{
+		$isAttribute = false;
+
+		// zjistime, jestli se jedna o atribut
+		if ( strrpos($elementName, 'at-') === 0 ) {
+			$elementName = substr($elementName, 3);
+			$isAttribute = true;
+		}
+
+		// ziskame uzel stromu pomoci xPath
+		$node = $configXml->xpath('/xmlns:'.$xpath);
+
+		if (isset($node[0])) {
+			$node = $node[0];
+		}
+		// nastavime mu novou hodnotu
+		if ( $isAttribute === true ) {
+			$elem = $node[0];
+			$elem[$elementName] = $val;
+		} else {
+			if (isset($node[0])) {
+				$elem = $node[0];
+			} else {
+				$elem = $node;
+			}
+
+			if (isset($elem->$elementName) &&
+					(sizeof($elem->$elementName) > 0)) {
+				$e = $elem->$elementName;
+				$e[0] = str_replace("\r", '', $val);
+			} else {
+				$elem[0] = str_replace("\r", '', $val);
+			}
+		}
+	}
+
 	/**
 	 * Prepares state and config forms
 	 * @param $key     								key of connected server
@@ -345,7 +534,7 @@ class DefaultController extends BaseController
 	private function setSectionForms($key) {
 		$dataClass = $this->get('DataModel');
 		$res = 0;
-		
+
 		// state part
 		$formState = $this->createFormBuilder()
 			->add('formType', 'hidden', array(
@@ -356,7 +545,7 @@ class DefaultController extends BaseController
 				'required' => false
 			))
 			->getForm();
-		
+
 		// config part
 		$formConfig = $this->createFormBuilder()
 			->add('formType', 'hidden', array(
@@ -391,7 +580,7 @@ class DefaultController extends BaseController
 					$res = 1;
 				} else {
 					$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
-				}	
+				}
 			// zpracovani filtru u config casti
 			} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formConfig" ) {
 				$dataClass->setFlashState('config');
@@ -409,11 +598,11 @@ class DefaultController extends BaseController
 					$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
 				}
 			// zpracovani formulare (nastaveni) konfiguracni casti
-			} elseif ( is_array($this->getRequest()->get('configDataForm')) ) {	
+			} elseif ( is_array($this->getRequest()->get('configDataForm')) ) {
 				$post_vals = $this->getRequest()->get('configDataForm');
-				
+
 				$dataClass->setFlashState('config');
-						
+
 				try {
 
 					if ( ($configXml = $dataClass->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
@@ -431,63 +620,42 @@ class DefaultController extends BaseController
 
 						// projdeme vsechny odeslane hodnoty formulare
 						foreach ( $post_vals as $postKey => $val ) {
-							$values = explode('_', $postKey);
+							$values = $this->divide_input_name($postKey);
 
-							$isAttribute = false;
 							$elementName = $values[0];
-
-							// zjistime, jestli se jedna o atribut
-							if ( strrpos($elementName, 'at-') === 0 ) {
-								$elementName = substr($elementName, 3);
-								$isAttribute = true;
-							}
 
 							// ziskame originalni xPath = dekodujeme
 							$xpath = str_replace(
-								array('-', '?', '!'), 
+								array('-', '?', '!'),
 								array('/', '[', ']'),
 								$values[1]
 							);
 							$xpath = substr($xpath, 1);
 
-							// ziskame uzel stromu pomoci xPath
-							$node = $configXml->xpath('/xmlns:'.$xpath);
-							
-							// nastavime mu novou hodnotu
-							if ( $isAttribute === true ) {
-								$elem = $node[0];
-								$elem[$elementName] = $val;
-							} else {
-								if ( isset($node[0]) ) {
-									$elem = $node[0];
-								} else { 
-									$elem = $node;
-								}
-								
-								$elem[0] = str_replace("\r", '', $val);
-							}
+							$this->elementValReplace($configXml, $elementName, $xpath, $val);
 						}
 
 						// pro ladici ucely vlozime upravena data do souboru
 						file_put_contents(__DIR__.'/../Data/models/tmp/edited.yin', $configXml->asXml());
-						
+
 						// nastavime si parametry pro edit-config
 						$editConfigParams = array(
 							'key' 	 => $key,
 							'target' => 'running',
-							'config' => $configXml->asXml()
+							'config' => str_replace('<?xml version="1.0"?'.'>', '', $configXml->asXml())
 							);
 
 						// provedeme edit-cofig
 						if ( ($merged = $dataClass->handle('editconfig', $editConfigParams)) != 1 ) {
 							// pro ladici ucely vlozime upravene XML do souboru
 							file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
+							$this->getRequest()->getSession()->setFlash('config success', "Config has been saved correctly.");
 						} else {
-							$this->get('logger')->err('In executing EditConfig.', array('params', $editConfigParams));
-							throw new \ErrorException('Error in executing EditConfig.');
+							$this->get('logger')->err('In executing EditConfig.'. var_export($editConfigParams, true));
+							//throw new \ErrorException('Error in executing EditConfig.');
+							$res = 0;
 						}
 
-						$this->getRequest()->getSession()->setFlash('config success', "Config has been saved correctly.");
 						$res = 1;
 					} else {
 						throw new \ErrorException("Could not load config.");
@@ -498,128 +666,12 @@ class DefaultController extends BaseController
 					$this->getRequest()->getSession()->setFlash('config error', "Could not save config correctly. Error: ".$e->getMessage());
 				}
 			} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
-				$post_vals = $this->getRequest()->get('duplicatedNodeForm');
-				$dataClass->setFlashState('config');
-
-				try {
-					// $this->setSectionFormsParams($key);
-					// nacteme originalni (nezmeneny) getconfig
-					if ( ($originalXml = $dataClass->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
-						$tmpConfigXml = simplexml_load_string($originalXml);
-
-						// vlozime do souboru - ladici ucely
-						file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $tmpConfigXml->asXml());
-
-						// z originalniho getconfigu zjistime namespaces a nastavime je k simpleXml objektu, aby bylo mozne pouzivat xPath dotazy
-						$xmlNameSpaces = $tmpConfigXml->getNamespaces();
-
-						if ( isset($xmlNameSpaces[""]) ) {
-							$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-						}
-					}
-
-					// pokud mame konfiguracni XML
-					if (isset($tmpConfigXml)) {
-
-						// projdeme vsechny odeslane hodnoty formulare
-						$newLeafs = array();
-
-						$i = 0;
-						foreach ( $post_vals as $postKey => $val ) {
-							$values = explode('_', $postKey);
-							$cnt = count($values);
-							if ($cnt > 2) {
-								$last = $values[$cnt-1];
-								$values = array(implode("_", array_slice($values, 0, $cnt-1)), $last);
-							}
-							//var_dump($values);
-							// values[0] - label
-							// values[1] - encoded xPath
-
-							if ($postKey == 'parent') {
-								try {
-									// ziskame originalni xPath = dekodujeme
-									$xpath = str_replace(
-										array('-', '?', '!'), 
-										array('/', '[', ']'),
-										$val
-									);
-									$this->get('logger')->err('Duplicate: '.$xpath);
-									$xpath = substr($xpath, 1);
-									$xpath = substr($xpath, 0, strripos($xpath, "/"));
-									$coverNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
-
-									// duplicating of node, which we were duplicating using JS. Because we
-									// have to use xPath for original node, we will modify original node, 
-									// not duplicated!
-									$duplicatedNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
-									//$this->get('logger')->err('Duplicated: '.var_dump($duplicatedNode));
-									/* TODO xpath returns array - [0] */
-									$dom_thing = dom_import_simplexml($duplicatedNode[0]);
-									$dom_node  = dom_import_simplexml($coverNode[0]);
-									$dom_new   = $dom_thing->appendChild($dom_node->cloneNode(true));
-
-									$tmpConfigXml  = simplexml_import_dom($dom_new);
-								} catch (\ErrorException $e) {
-									$this->get('logger')->err('Could not find node for duplicate.', array('exception' => $e));
-									throw new \ErrorException("Could not find node for duplicate.". $e);
-								}
-
-							} else if ( count($values) != 2 ) {
-								$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
-								throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!". var_dump(array('values' => $values, 'postKey' => $postKey)));
-							} else {	// ziskame originalni xPath = dekodujeme
-								$xpath = str_replace(
-									array('-', '?', '!'), 
-									array('/', '[', ']'),
-									$values[1]
-								);
-								$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
-
-								// ziskame uzel stromu pomoci xPath
-								$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-								$node = $tmpConfigXml->xpath('/xmlns:'.$xpath);
-
-								if ( isset($node[0]) ) {
-									$elem = $node[0];
-								} else { 
-									$elem = $node;
-								}
-
-								$elem[0] = str_replace("\r", '', $val);
-							}
-						} 
-
-						// pro ladici ucely vlozime upravena data do souboru
-						file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $tmpConfigXml->asXml());
-						$editConfigParams = array(
-							'key' 	 => $key,
-							'target' => 'running',
-							'config' => $tmpConfigXml->asXml()
-							);
-
-						// provedeme edit-cofig
-						if ( ($merged = $dataClass->handle('editconfig', $editConfigParams)) != 1 ) {
-							// pro ladici ucely vlozime upravene XML do souboru
-							file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
-						} else {
-							$this->get('logger')->err('In executing EditConfig.', array('params', $editConfigParams));
-							throw new \ErrorException('Error in executing EditConfig.');
-						}
-
-						$this->getRequest()->getSession()->setFlash('config success', "New node has been saved correctly.");	
-						$res = 1;
-					}
-
-					$res = 0;
-					
-				} catch (\ErrorException $e) {
-					$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
-					$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. ".$e->getMessage());
-				}
+				$this->handleDuplicateNodeForm($dataClass, $key);
+				$url = $this->get('request')->headers->get('referer');
+				return new RedirectResponse($url);
 			}
-		} 
-		
+		}
+
 		// priradime si vytvorene formulare do sablony
 		$this->assign('formState', $formState->createView());
 		$this->assign('formConfig', $formConfig->createView());
