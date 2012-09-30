@@ -289,7 +289,10 @@ class DefaultController extends BaseController
 			if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 				$res = $this->setSectionForms($key);
-				if ( $res == 1 ) {
+				if ($res == 2) {
+					$url = $this->get('request')->headers->get('referer');
+					return new RedirectResponse($url);
+				} else if ( $res == 1 ) {
 					return $this->redirect($this->generateUrl('subsection', array(
 						'key' => $key,
 						'module' => $module,
@@ -352,6 +355,97 @@ class DefaultController extends BaseController
 		return $values;
 	}
 
+	private function executeEditConfig(&$dataClass, $key, $config, $target = "running")
+	{
+		$editConfigParams = array(
+				'key' 	 => $key,
+				'target' => $target,
+				'config' => str_replace('<?xml version="1.0"?'.'>', '', $config)
+				);
+		// edit-cofig
+		if ( ($merged = $dataClass->handle('editconfig', $editConfigParams)) != 1 ) {
+			// pro ladici ucely vlozime upravene XML do souboru
+			file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
+		} else {
+			$this->get('logger')->err('Edit-config failed.', array('params', $editConfigParams));
+			throw new \ErrorException('Edit-config failed.');
+		}
+		return 2; /* redirect to referer */
+	}
+
+	private function handleRemoveNodeForm(&$dataClass, &$key)
+	{
+		$post_vals = $this->getRequest()->get('removeNodeForm');
+		var_dump($post_vals);
+		var_dump($key);
+		if ( ($originalXml = $dataClass->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
+			$tmpConfigXml = simplexml_load_string($originalXml);
+
+			// vlozime do souboru - ladici ucely
+			file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $tmpConfigXml->asXml());
+
+			// z originalniho getconfigu zjistime namespaces a nastavime je k simpleXml objektu, aby bylo mozne pouzivat xPath dotazy
+			$xmlNameSpaces = $tmpConfigXml->getNamespaces();
+
+			if ( isset($xmlNameSpaces[""]) ) {
+				$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+			}
+			$xpath = str_replace(
+					array('-', '?', '!'),
+					array('/', '[', ']'),
+					$post_vals["parent"]
+					);
+			$toDelete = $tmpConfigXml->xpath($xpath);
+			$deletestring = "";
+			foreach ($toDelete as $td) {
+				//$td->registerXPathNamespace("xc", "urn:ietf:params:xml:ns:netconf:base:1.0");
+				$td->addAttribute("xc:operation", "remove", "urn:ietf:params:xml:ns:netconf:base:1.0");
+				$deletestring .= "\n".str_replace('<?xml version="1.0"?'.'>', '', $td->asXml());
+			}
+			$deleteTree = $this->completeRequestTree($toDelete[0], $deletestring, $dataClass);
+			var_dump($deleteTree->asXml());
+
+			$this->executeEditConfig($dataClass, $key, $tmpConfigXml->asXml());
+
+			$this->getRequest()->getSession()->setFlash('config success', "Record was removed.");
+		}
+
+	}
+
+	private function completeRequestTree($tmpConfigXml, $config_string, $dataClass)
+	{
+		$subroot = simplexml_load_file($dataClass->getPathToModels() . 'wrapped.wyin');
+		$xmlNameSpaces = $subroot->getNamespaces();
+
+		if ( isset($xmlNameSpaces[""]) ) {
+			$subroot->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+		}
+		$ns = $subroot->xpath("//xmlns:namespace");
+		$namespace = "";
+		if (sizeof($ns)>0) {
+			$namespace = $ns[0]->attributes()->uri;
+		}
+		$pos_subroot = $subroot->xpath('//xmlns:'.$tmpConfigXml->getName().'/ancestor::*');
+		$config = $config_string;
+		for ($i=sizeof($pos_subroot)-1; $i>0; $i--) {
+			//if ($pos_subroot[$i]->
+			$config .= "</".$pos_subroot[$i]->getName().">\n";
+
+			if ($i == 1) {
+				$config = "<".$pos_subroot[$i]->getName().
+					($namespace!==""?" xmlns=\"$namespace\"":"").
+					">\n".$config;
+			} else {
+				$config = "<".$pos_subroot[$i]->getName().
+					">\n".$config;
+			}
+		}
+		$result = simplexml_load_string($config);
+		$result->registerXPathNamespace('xmlns', $namespace);
+
+		return $result;
+	}
+
 	private function handleDuplicateNodeForm(&$dataClass, &$key)
 	{
 		$post_vals = $this->getRequest()->get('duplicatedNodeForm');
@@ -380,35 +474,7 @@ class DefaultController extends BaseController
 				// projdeme vsechny odeslane hodnoty formulare
 				$newLeafs = array();
 
-				$subroot = simplexml_load_file($dataClass->getPathToModels() . 'wrapped.wyin');
-				$xmlNameSpaces = $subroot->getNamespaces();
-
-				if ( isset($xmlNameSpaces[""]) ) {
-					$subroot->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-				}
-				$ns = $subroot->xpath("//xmlns:namespace");
-				$namespace = "";
-				if (sizeof($ns)>0) {
-					$namespace = $ns[0]->attributes()->uri;
-				}
-				$pos_subroot = $subroot->xpath('//xmlns:'.$tmpConfigXml->getName().'/ancestor::*');
-				$config = $tmpConfigXml->asXml();
-				for ($i=sizeof($pos_subroot)-1; $i>0; $i--) {
-					//if ($pos_subroot[$i]->
-					$config .= "</".$pos_subroot[$i]->getName().">\n";
-
-					if ($i == 1) {
-						$config = "<".$pos_subroot[$i]->getName().
-							($namespace!==""?" xmlns=\"$namespace\"":"").
-							">\n".$config;
-					} else {
-						$config = "<".$pos_subroot[$i]->getName().
-							">\n".$config;
-					}
-				}
-				$tmpConfigXml = simplexml_load_string($config);
-				$tmpConfigXml->registerXPathNamespace('xmlns', $namespace);
-
+				$tmpConfigXml = $this->completeRequestTree($tmpConfigXml, $tmpConfigXml->asXml(), $dataClass);
 				/* fill values */
 				$i = 0;
 				foreach ( $post_vals as $postKey => $val ) {
@@ -416,38 +482,10 @@ class DefaultController extends BaseController
 					// values[0] - label
 					// values[1] - encoded xPath
 
-					if ($postKey == 'parent') {
-						//try {
-						//	// ziskame originalni xPath = dekodujeme
-						//	$xpath = str_replace(
-						//			array('-', '?', '!'),
-						//			array('/', '[', ']'),
-						//			$val
-						//			);
-						//	$this->get('logger')->err('Duplicate: '.$xpath);
-						//	$xpath = substr($xpath, 1);
-						//	$xpath = substr($xpath, 0, strripos($xpath, "/"));
-						//	$coverNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
-
-						//	// duplicating of node, which we were duplicating using JS. Because we
-						//	// have to use xPath for original node, we will modify original node,
-						//	// not duplicated!
-						//	$duplicatedNode = $tmpConfigXml->xpath('/xmlns:'.$xpath);
-						//	//$this->get('logger')->err('Duplicated: '.var_dump($duplicatedNode));
-						//	/* TODO xpath returns array - [0] */
-						//	$dom_thing = dom_import_simplexml($duplicatedNode[0]);
-						//	$dom_node  = dom_import_simplexml($coverNode[0]);
-						//	$dom_new   = $dom_thing->appendChild($dom_node->cloneNode(true));
-
-						//	$tmpConfigXml  = simplexml_import_dom($dom_new);
-						//} catch (\ErrorException $e) {
-						//	$this->get('logger')->err('Could not find node for duplicate.', array('exception' => $e));
-						//	throw new \ErrorException("Could not find node for duplicate.". $e);
-						//}
-
+					if ($postKey == "parent") {
 					} else if ( count($values) != 2 ) {
 						$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
-						throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!". var_dump(array('values' => $values, 'postKey' => $postKey)));
+						throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1! ". var_export(array('values' => $values, 'postKey' => $postKey), true));
 					} else {	// ziskame originalni xPath = dekodujeme
 						$xpath = str_replace(
 								array('-', '?', '!'),
@@ -461,27 +499,10 @@ class DefaultController extends BaseController
 
 				// pro ladici ucely vlozime upravena data do souboru
 				file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $tmpConfigXml->asXml());
-				$editConfigParams = array(
-						'key' 	 => $key,
-						'target' => 'running',
-						'config' => str_replace('<?xml version="1.0"?'.'>', '', $tmpConfigXml->asXml())
-						);
+				$this->executeEditConfig($dataClass, $key, $tmpConfigXml->asXml());
 
-
-				// provedeme edit-cofig
-				if ( ($merged = $dataClass->handle('editconfig', $editConfigParams)) != 1 ) {
-					// pro ladici ucely vlozime upravene XML do souboru
-					file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
-				} else {
-					$this->get('logger')->err('In executing EditConfig.', array('params', $editConfigParams));
-					throw new \ErrorException('Error in executing EditConfig.');
-				}
-
-				$this->getRequest()->getSession()->setFlash('config success', "New node has been saved correctly.");
-				$res = 1;
+				$this->getRequest()->getSession()->setFlash('config success', "Record was added.");
 			}
-
-			$res = 0;
 
 		} catch (\ErrorException $e) {
 			$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
@@ -638,23 +659,7 @@ class DefaultController extends BaseController
 						// pro ladici ucely vlozime upravena data do souboru
 						file_put_contents(__DIR__.'/../Data/models/tmp/edited.yin', $configXml->asXml());
 
-						// nastavime si parametry pro edit-config
-						$editConfigParams = array(
-							'key' 	 => $key,
-							'target' => 'running',
-							'config' => str_replace('<?xml version="1.0"?'.'>', '', $configXml->asXml())
-							);
-
-						// provedeme edit-cofig
-						if ( ($merged = $dataClass->handle('editconfig', $editConfigParams)) != 1 ) {
-							// pro ladici ucely vlozime upravene XML do souboru
-							file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
-							$this->getRequest()->getSession()->setFlash('config success', "Config has been saved correctly.");
-						} else {
-							$this->get('logger')->err('In executing EditConfig.'. var_export($editConfigParams, true));
-							//throw new \ErrorException('Error in executing EditConfig.');
-							$res = 0;
-						}
+						$this->executeEditConfig($dataClass, $key, $configXml->asXml());
 
 						$res = 1;
 					} else {
@@ -667,8 +672,10 @@ class DefaultController extends BaseController
 				}
 			} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
 				$this->handleDuplicateNodeForm($dataClass, $key);
-				$url = $this->get('request')->headers->get('referer');
-				return new RedirectResponse($url);
+				return 2;
+			} elseif ( is_array($this->getRequest()->get('removeNodeForm')) ) {
+				$this->handleRemoveNodeForm($dataClass, $key);
+				return 2;
 			}
 		}
 

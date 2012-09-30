@@ -9,6 +9,9 @@ $(document).ready(function() {
 		$('.type-list .edit-bar .sibling').click(function() {
 			duplicateNode($(this));
 		});
+		$(".edit-bar .remove-child").click(function() {
+			removeNode($(this));
+		});
 
 		// $('.edit-bar .child').click(function() {
 		//	createNode($(this));
@@ -140,6 +143,8 @@ function duplicateNode($elem) {
 		$originalForm = $cover.children('form');
 		$cover.find('.root').wrap($originalForm);
 		$form.remove();
+		$('.form-underlay').remove();
+		$('.form-cover').remove();
 	});
 	$currentParentLevel.append($form);
 	$oldForm = $currentParentLevel.parents('form').clone();
@@ -262,7 +267,7 @@ function createNode($elem) {
 	// upravime si naklonovany editBar - pridame tridu pro odliseni vygenerovaneho baru
 	$editBar.children("img").addClass('generated');
 	// delegujeme click akci na nove vytvoreny element editBar
-	$editBar.children("img").on('click', function() {
+	$editBar.children("img.sibling").on('click', function() {
 		createNode($(this));
 	});
 
@@ -340,7 +345,117 @@ function createNode($elem) {
 }
 
 function removeNode($elem) {
-	alert("Remove node ");
+	if ($elem.parents('#state').length) {
+		$cover = $("#state");
+	} else if ($elem.parents('#config').length) {
+		$cover = $("#config");
+	} else {
+		$cover = $("#content");
+	}
+
+	if ( $cover.find(".form-underlay").length === 0 ) {
+		$cover.append($("<div>").addClass('form-underlay'));
+		$cover.append($("<div>").addClass('form-cover'));
+	}
+
+	// pro novy form-underlay budeme muset vypocitat rozmery
+	// a natahnout ho pres celou konfiguracni cast. Nelze zde
+	// pouzit position absolute, protoze to zamezuje scrollovani
+	// v konfiguracni casti
+	l($cover.children('form').outerHeight());
+	l($cover);
+	var nWidth = $cover.outerWidth(),
+		nHeight = $cover.children('form').outerHeight() + parseInt($cover.css('padding-top'), 10) + parseInt($cover.css('padding-bottom'), 10) + 200 + $elem.parent().parent().parent().outerHeight();
+	$cover.find(".form-underlay").width(nWidth).height(nHeight * 2).css({
+		'margin-top': 0 - nHeight,
+		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
+	});
+
+	var xPath = $elem.attr('rel'),	// zjistime xPath rodice - udavame v atributu rel u odkazu
+		levelRegex = /level-(\d+)/,	// regularni vyraz pro zjisteni cisla levelu
+		level = $elem.parents('.leaf-line').attr('class');	// trida rodice pro zjisteni levelu
+	
+
+	if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
+
+		// level nemusi byt u prvniho rodice uveden, muze se stat, ze se nachazi az o jednu uroven vyse
+		if ( $elem.parents('.leaf-line').parent().length ) {
+			level = $elem.parents('.leaf-line').parent().attr('class');
+			if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
+				level = 0;
+			} else {
+				level = level.match(levelRegex)[1];
+			}
+		} else {
+			level = 0;
+		}
+		
+	} else {
+		level = level.match(levelRegex)[1];
+	}
+
+	// pokud se jedna o vygenerovanou cast, pridame potomka k rodici (obalujici div)
+	// level = level - 1;
+	$currentParent = $elem.parent().parent();
+	$currentParentLevel = $elem.parents('.level-' + level);
+
+	// objekt formulare, pokud existuje, pouzijeme stavajici, jinak vytvorime novy
+	if ( $(".generatedForm").length ) {
+		$form = $('.generatedForm');
+	} else {
+		// vytvorime formular
+		$form = $("<form>")
+			.attr({
+				action: "#",
+				method: "POST",
+				name: "removeNodeForm",
+				'class': 'generatedForm'
+			});
+	}
+
+	$form.find('.state').remove();
+
+	// vlozime skryty input s cestou k duplikovanemu elementu
+	$elementWithParentXpath = $("<input>")
+		.attr({
+			type: 'hidden',
+			name: "removeNodeForm[parent]",
+			value: xPath
+		});
+	$form.prepend($elementWithParentXpath);
+
+	$form.children().each(function(i, el) {
+		modifyInputAttributes(el, i, xPath);
+	});
+
+	// nakonec vytvorime submit - pokud existuje, smazeme jej
+	if ( $form.children("input[type=submit]").length ) {
+		$form.children("input[type=submit]").remove();
+	}
+	$elementSubmit = $("<input>")
+		.attr({
+			type: 'submit',
+			value: 'Delete record'
+		});
+	$form.append($elementSubmit);
+	$elementSubmit.bind('click', function() {
+		$form.submit();
+	});
+
+	$closeButton = $("<a href='#' title='Cancel' class='close button'>Cancel</a>");
+	$form.append($closeButton);
+	$closeButton.bind('click', function() {
+		$originalForm = $cover.children('form');
+		$cover.find('.root').wrap($originalForm);
+		$form.remove();
+		$('.form-underlay').remove();
+		$('.form-cover').remove();
+	});
+	$currentParentLevel.append($form);
+	$oldForm = $currentParentLevel.parents('form').clone();
+	$oldForm.html('');
+	$cover.prepend($oldForm);
+	$currentParentLevel.parents('form').children('.root').unwrap();
 }
 
 function getUniqueId() {
