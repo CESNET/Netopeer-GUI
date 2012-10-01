@@ -151,6 +151,17 @@ function duplicateNode($elem) {
 		$('.form-underlay').remove();
 		$('.form-cover').remove();
 	});
+	$(document).bind('keydown', function(event) {
+		if ( event.which != 27 ) {
+			event.preventDefault();
+		} else {
+			$originalForm = $cover.children('form');
+			$cover.find('.root').wrap($originalForm);
+			$form.remove();
+			$('.form-underlay').remove();
+			$('.form-cover').remove();
+		}
+	});
 	$currentParentLevel.append($form);
 	$oldForm = $currentParentLevel.parents('form').clone();
 	$oldForm.html('');
@@ -424,21 +435,6 @@ function removeNode($elem) {
 			});
 	}
 
-	$form.find('.state').remove();
-
-	// vlozime skryty input s cestou k duplikovanemu elementu
-	$elementWithParentXpath = $("<input>")
-		.attr({
-			type: 'hidden',
-			name: "removeNodeForm[parent]",
-			value: xPath
-		});
-	$form.prepend($elementWithParentXpath);
-
-	$form.children().each(function(i, el) {
-		modifyInputAttributes(el, i, xPath);
-	});
-
 	// nakonec vytvorime submit - pokud existuje, smazeme jej
 	if ( $form.children("input[type=submit]").length ) {
 		$form.children("input[type=submit]").remove();
@@ -462,7 +458,18 @@ function removeNode($elem) {
 		$('.form-underlay').remove();
 		$('.form-cover').remove();
 	});
-	$currentParentLevel.append($form);
+	$(document).bind('keydown', function(event) {
+		if ( event.which != 27 ) {
+			event.preventDefault();
+		} else {
+			$originalForm = $cover.children('form');
+			$cover.find('.root').wrap($originalForm);
+			$form.remove();
+			$('.form-underlay').remove();
+			$('.form-cover').remove();
+		}
+	});
+	$currentParentLevel.children(':first-child').after($form);
 	$oldForm = $currentParentLevel.parents('form').clone();
 	$oldForm.html('');
 	$cover.prepend($oldForm);

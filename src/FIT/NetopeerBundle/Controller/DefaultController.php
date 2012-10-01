@@ -245,6 +245,7 @@ class DefaultController extends BaseController
 			$e->getMessage());
 		}
 
+		$this->assign('singleColumnLayout', true);
 		return $this->getTwigArr($this);
 	}
 
@@ -306,6 +307,7 @@ class DefaultController extends BaseController
 			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
 		}
 
+		$this->assign('singleColumnLayout', true);
 		return $this->getTwigArr($this);
 	}
 
