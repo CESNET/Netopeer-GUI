@@ -46,18 +46,19 @@ function duplicateNode($elem) {
 	}
 
 	if ( $cover.find(".form-underlay").length === 0 ) {
-		$cover.append($("<div>").addClass('form-underlay'));
-		$cover.append($("<div>").addClass('form-cover'));
+		$cover.find('.form-underlay').remove();
 	}
+
+	$cover.append($("<div>").addClass('form-underlay'));
+	$cover.append($("<div>").addClass('form-cover'));
 
 	// pro novy form-underlay budeme muset vypocitat rozmery
 	// a natahnout ho pres celou konfiguracni cast. Nelze zde
 	// pouzit position absolute, protoze to zamezuje scrollovani
 	// v konfiguracni casti
-	l($cover.children('form').outerHeight());
-	l($cover);
+	l($elem.parent().parent().parent());
 	var nWidth = $cover.outerWidth(),
-		nHeight = $cover.children('form').outerHeight() + parseInt($cover.css('padding-top'), 10) + parseInt($cover.css('padding-bottom'), 10) + 200 + $elem.parent().parent().parent().outerHeight();
+		nHeight = $cover.children('form').outerHeight() + parseInt($cover.css('padding-top'), 10) + parseInt($cover.css('padding-bottom'), 10) + 200 + ($elem.parent().parent().parent().outerHeight() * 2);
 	$cover.find(".form-underlay").width(nWidth).height(nHeight * 2).css({
 		'margin-top': 0 - nHeight,
 		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
