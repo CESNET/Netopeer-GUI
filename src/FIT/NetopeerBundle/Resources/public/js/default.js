@@ -20,7 +20,7 @@ $(document).ready(function() {
 
 	// tooltip
 	$('.tooltip .icon-help').each(function() {
-		$(this).gips({ 'theme': 'blue', placement: 'top', animationSpeed: 100, bottom: $(this).parent().parent().parent().outerHeight(), text: $(this).siblings('.tooltip-description').text() });
+		initDefaultTooltip($(this));
 	});
 
 	// zebra style on XML
@@ -31,6 +31,10 @@ $(document).ready(function() {
 		$('.alert').fadeOut();
 	}, 10000); /* 10s */
 });
+
+function initDefaultTooltip($el) {
+	$el.gips({ 'theme': 'blue', placement: 'top', animationSpeed: 100, bottom: $el.parent().parent().parent().outerHeight(), text: $el.siblings('.tooltip-description').text() });
+}
 
 function duplicateNode($elem) {
 	if ($elem.parents('#state').length) {
@@ -137,7 +141,7 @@ function duplicateNode($elem) {
 		$form.submit();
 	});
 
-	$closeButton = $("<a href='#' title='Close' class='close button'>Close</a>");
+	$closeButton = $("<a href='#' title='Close' class='close red button'>Close</a>");
 	$form.append($closeButton);
 	$closeButton.bind('click', function() {
 		$originalForm = $cover.children('form');
@@ -151,6 +155,12 @@ function duplicateNode($elem) {
 	$oldForm.html('');
 	$cover.prepend($oldForm);
 	$currentParentLevel.parents('form').children('.root').unwrap();
+
+	// finally, initialization of Tooltip on cloned elements
+	// must be after showing form
+	$form.find('.tooltip .icon-help').each(function() {
+		initDefaultTooltip($(this));
+	});
 }
 
 function modifyInputAttributes(el, newIndex, xPath) {
@@ -442,7 +452,7 @@ function removeNode($elem) {
 		$form.submit();
 	});
 
-	$closeButton = $("<a href='#' title='Cancel' class='close button'>Cancel</a>");
+	$closeButton = $("<a href='#' title='Cancel' class='close button red'>Cancel</a>");
 	$form.append($closeButton);
 	$closeButton.bind('click', function() {
 		$originalForm = $cover.children('form');
