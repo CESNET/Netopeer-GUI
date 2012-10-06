@@ -44,14 +44,14 @@ class BaseController extends Controller
 		$flashes = $session->getFlashes();
 		$stateFlashes = $configFlashes = $singleFlashes = $allFlashes = array();
 
-		// rozdelime flash messages dle klice do danych kategorii
+		// devide flash messages according to key into categories
 		foreach ($flashes as $key => $message) {
-			// maly tricek - pokud klic obsahuje slovo state, bude podminka splnena
-			if ( strpos($key, 'tate') ) { // klic obsahuje slovo state
+			// a little bit tricky - if key contains word state, condition will be pass
+			if ( strpos($key, 'tate') ) { // key contains word state
 				$stateFlashes[$key] = $message;
-			} elseif ( strpos($key, 'onfig') ) { // klic obsahuje slovo config
+			} elseif ( strpos($key, 'onfig') ) { // key contains word config
 				$configFlashes[$key] = $message;
-			} else { // klic obsahuje slovo single
+			} else { // key contains word single
 				$singleFlashes[$key] = $message;
 			}
 
@@ -64,7 +64,7 @@ class BaseController extends Controller
 		$this->assign("allFlashes", $allFlashes);
 
 		$dataClass = $this->get('DataModel');
-		$dataClass->buildMenuStructure($this->activeSectionKey); // vytvorime strukturu menu
+		$dataClass->buildMenuStructure($this->activeSectionKey);
 		$this->assign('topmenu', $dataClass->getModels());
 		$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl));
 
