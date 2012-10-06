@@ -437,13 +437,14 @@ class DefaultController extends BaseController
 			file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
 		} else {
 			$this->get('logger')->err('Edit-config failed.', array('params', $editConfigParams));
-			throw new \ErrorException('Edit-config failed.');
+			// throw new \ErrorException('Edit-config failed.');
 			$res = 1;
 		}
 		return $res;
 	}
 
-	private function completeRequestTree($tmpConfigXml, $config_string)	{
+	private function completeRequestTree(&$tmpConfigXml, $config_string) {
+
 		$subroot = simplexml_load_file($this->get('DataModel')->getPathToModels() . 'wrapped.wyin');
 		$xmlNameSpaces = $subroot->getNamespaces();
 
@@ -482,6 +483,7 @@ class DefaultController extends BaseController
 	 * @param  {string} $elementName name of the element
 	 * @param  {string} $xpath       XPath to the element
 	 * @param  {string} $val         new value
+	 * @return {SimpleXMLElement} 	 modiefied node
 	 */
 	private function elementValReplace(&$configXml, $elementName, $xpath, $val)
 	{
@@ -515,9 +517,11 @@ class DefaultController extends BaseController
 				$e = $elem->$elementName;
 				$e[0] = str_replace("\r", '', $val); // removes \r from value
 			} else {
-				$elem[0] = str_replace("\r", '', $val);
+				$elem->addChild($elementName, str_replace("\r", '', $val));
 			}
 		}
+
+		return $elem;
 	}
 
 	/**
@@ -600,6 +604,7 @@ class DefaultController extends BaseController
 				file_put_contents(__DIR__.'/../Data/models/tmp/edited.yin', $configXml->asXml());
 
 				$res = $this->executeEditConfig($key, $configXml->asXml());
+				$this->get('session')->setFlash('config success', "Config has been edited successfully.");
 			} else {
 				throw new \ErrorException("Could not load config.");
 			}
@@ -647,25 +652,38 @@ class DefaultController extends BaseController
 				$tmpConfigXml = $this->completeRequestTree($tmpConfigXml, $tmpConfigXml->asXml());
 				/* fill values */
 				$i = 0;
+				$createString = "";
+
 				foreach ( $post_vals as $postKey => $val ) {
 					$values = $this->divideInputName($postKey);
 					// values[0] - label
 					// values[1] - encoded xPath
-
+					
 					if ($postKey == "parent") {
+						$xpath = $this->decodeXPath($val);
+						// get node according to xPath query
+						$parentNode = $tmpConfigXml->xpath($xpath);
 					} else if ( count($values) != 2 ) {
 						$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
 						throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1! ". var_export(array('values' => $values, 'postKey' => $postKey), true));
 					} else {
 						$xpath = $this->decodeXPath($values[1]);
 						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
-						$this->elementValReplace($tmpConfigXml, $values[0], $xpath, $val);
+
+						$node = $this->elementValReplace($tmpConfigXml, $values[0], $xpath, $val);
+						try {
+							$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");	
+						} catch (\ErrorException $e) {
+							// nothing
+						}
+						$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node->asXml());
 					}
 				}
+				$createTree = $this->completeRequestTree($parentNode[0], $createString);
 
 				// for debuggind, edited configXml will be saved into temp file
-				file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $tmpConfigXml->asXml());
-				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml());
+				file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $createTree->asXml());
+				$res = $this->executeEditConfig($key, $createTree->asXml());
 
 				$this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
 			} else {
@@ -711,7 +729,7 @@ class DefaultController extends BaseController
 					$td->addAttribute("xc:operation", "remove", "urn:ietf:params:xml:ns:netconf:base:1.0");
 					$deletestring .= "\n".str_replace('<?xml version="1.0"?'.'>', '', $td->asXml());
 				}
-
+				
 				$deleteTree = $this->completeRequestTree($toDelete[0], $deletestring);
 
 				// for debuggind, edited configXml will be saved into temp file
