@@ -1,7 +1,7 @@
 <?php
- 
+
 namespace FIT\NetopeerBundle\Models;
- 
+
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -29,9 +29,9 @@ class ConnectionSession {
 	 */
 	public $locked = false;
 
-	function __construct($hash, $host)
+	function __construct($session_hash, $host)
 	{
-		$this->hash = $hash;
+		$this->hash = $session_hash;
 		$this->host = $host;
 		$newtime = new \DateTime();
 		$this->time = $newtime->format("d.m.Y H:i:s");
@@ -135,7 +135,8 @@ class Data {
 		if (isset($conn->hash)) {
 			return $conn->hash;
 		}
-		return "";
+		//throw new \ErrorException("No identification key was found.");
+		return "NOHASH";
 	}
 
 	private function getConnFromKey($key) {
@@ -146,7 +147,7 @@ class Data {
 		}
 		return false;
 	}
-	
+
 	private function updateConnLock($key) {
 		$conn = $this->getConnFromKey($key);
 
@@ -241,14 +242,21 @@ class Data {
 
 		if ($decoded["type"] == self::REPLY_OK) {
 			$newconnection = new ConnectionSession($decoded["session"], $params["host"]);
-			$newconnection = array(serialize($newconnection));
+			$newconnection = serialize($newconnection);
 
 			if ( !$sessionConnections = $session->get("session-connections") ) {
-				$session->set("session-connections", $newconnection);
-			} else {				
-				$session->set("session-connections", array_merge($sessionConnections, $newconnection));
+				$session->set("session-connections", array($newconnection));
+			} else {
+				$sessionConnections[] = $newconnection;
+				$session->set("session-connections", $sessionConnections);
 			}
 			$session->setFlash($this->flashState .' success', "Successfully connected.");
+			/*
+			$session->setFlash($this->flashState .' success', "Successfully connected.".
+			"--".var_export($decoded).
+			"--".var_export($newconnection, true).
+			"--".var_export($sessionConnections, true));
+			*/
 			return 0;
 		} else {
 			$this->logger->err("Could not connect.", array("error" => var_export($this->getJsonError(), true)));
@@ -273,7 +281,7 @@ class Data {
 			"source" 	=> "running",
 			"filter" 	=> $params['filter']
 		));
-		
+
 		return $this->checkDecodedData($decoded);
 	}
 
@@ -306,14 +314,18 @@ class Data {
 			return 1;
 		}
 		$sessionKey = $this->getHashFromKey($params['key']);
-		
-		/* copy-config to store new values */
-		$decoded = $this->execute_operation($sock, array(
+		/* syntax highlighting problem if XML def. is in one string */
+		$params['config'] = str_replace('<?xml version="1.0"?'.'>', '', $params['config']);
+
+		/* edit-config to store new values */
+		$params = array(
 			"type" => self::MSG_EDITCONFIG,
 			"session" => $sessionKey,
 			"target" => $params['target'],
 			"config" => $params['config']
-		));
+		);
+		//var_dump($params);
+		$decoded = $this->execute_operation($sock, $params);
 
 		return $this->checkDecodedData($decoded);
 	}
@@ -430,15 +442,16 @@ class Data {
 			$this->logger->warn('Checking decoded data:', array('error' => $status['message']));
 			$session->setFlash($this->flashState .' error', $status['message']);
 			return 1;
-		} elseif ( $decoded == null ) {
-			$this->logger->err('Could not decode response from socket', array('error' => "Empty response."));
-			$session->setFlash($this->flashState .' error', "Could not decode response from socket. Error: Empty response.");
-			return 1;
+		//} elseif ( $decoded == null ) {
+		//	$this->logger->err('Could not decode response from socket', array('error' => "Empty response."));
+		//	$session->setFlash($this->flashState .' error', "Could not decode response from socket. Error: Empty response.");
+		//	return 1;
 		} elseif (($decoded['type'] != self::REPLY_OK) && ($decoded['type'] != self::REPLY_DATA)) {
-			$this->logger->warn('Could not decode response from socket', array('error' => $decoded['error-message']));
-			$session->setFlash($this->flashState .' error', "Could not decode response from socket. Error: " . $decoded['error-message']);
+			$this->logger->warn('Error: ', array('error' => $decoded['error-message']));
+			$session->setFlash($this->flashState .' error', "Error: " . $decoded['error-message']);
+			//throw new \ErrorException($decoded['error-message']);
 			return 1;
-		} 
+		}
 		return isset($decoded["data"]) ? $decoded["data"] : 0;
 	}
 
@@ -467,6 +480,27 @@ class Data {
 		return json_decode($response, true);
 	}
 
+	public function getModelsDir()
+	{
+		return __DIR__ . '/../Data/models/';
+	}
+
+	public function getPathToModels()
+	{
+		$path = $this->getModelsDir();
+
+		// add module directory if is set in route
+		if ( $this->container->get('request')->get('module') != null ) {
+			$path .= $this->container->get('request')->get('module').'/';
+		}
+		// add subsection directory if is set in route and wrapped file in subsection directory exists
+		if ( $this->container->get('request')->get('subsection') != null
+				&& file_exists($path . $this->container->get('request')->get('subsection').'/wrapped.wyin')) {
+			$path .= $this->container->get('request')->get('subsection').'/';
+		}
+		return $path;
+	}
+
 	public function handle($command, $params = array(), $merge = true) {
 		$errno = 0;
 		$errstr = "";
@@ -479,7 +513,7 @@ class Data {
 		$this->logger->info('Handle: '.$command.' with params', $logParams);
 
 		try {
-			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);	
+			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);
 		} catch (\ErrorException $e) {
 			$this->logger->err('Could not connect to socket.', array($errstr));
 			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not connect to socket. Error: $errstr");
@@ -493,7 +527,7 @@ class Data {
 		}
 		stream_set_timeout($sock, 1, 100);
 
-		switch ($command) {			
+		switch ($command) {
 			case "connect":
 				$res = $this->handle_connect($sock, $params);
 				break;
@@ -526,29 +560,20 @@ class Data {
 
 		if ( isset($res) && $res !== 1 ) {
 			if ($merge) {
-				$path = $notEditedPath = __DIR__ . '/../Data/models/';
-
-				// add module directory if is set in route
-				if ( $this->container->get('request')->get('module') != null ) {
-					$path .= $this->container->get('request')->get('module').'/';
-				}
-				// add subsection directory if is set in route and wrapped file in subsection directory exists
-				if ( $this->container->get('request')->get('subsection') != null 
-					&& file_exists($path . $this->container->get('request')->get('subsection').'/wrapped.wyin')) {
-					$path .= $this->container->get('request')->get('subsection').'/';
-				}
 
 				// load model
+				$notEditedPath = $this->getModelsDir();
+				$path = $this->getPathToModels();
 				$modelFile = $path . 'wrapped.wyin';
 
 				if ( file_exists($modelFile) ) {
 					if ( $path != $notEditedPath ) {
 						$model = simplexml_load_file($modelFile);
-						$res = $this->mergeWithModel($model, $res);	
+						$res = $this->mergeWithModel($model, $res);
 					} else {
 						// TODO: if is not set module direcotory, we have to set model to merge with
 						// problem: we have to load all models (for example combo, comet-tester...)
-					}	
+					}
 				} else {
 					$this->logger->warn("Could not find model on ", array('pathToFile' => $modelFile));
 				}
@@ -558,6 +583,41 @@ class Data {
 			return 1;
 		}
 		return 0;
+	}
+
+	private function get_element_parent($element)
+	{
+		$parents = $element->xpath("parent::*");
+		if ($parents) {
+			return $parents[0];
+		}
+		return false;
+	}
+
+	private function check_elem_match($model_el, $possible_el)
+	{
+		$mel = $this->get_element_parent($model_el);
+		$pel = $this->get_element_parent($possible_el);
+		while ($pel && $mel) {
+			if ($pel->getName() !== $mel->getName()) {
+				return false;
+			}
+			$pel = $this->get_element_parent($pel);
+			$mel = $this->get_element_parent($mel);
+		}
+		return true;
+	}
+
+	private function complete_attributes(&$source, &$target)
+	{
+		if ($source->attributes()) {
+			$attrs = $source->attributes();
+			if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
+				foreach ($source->attributes() as $key => $val) {
+					$target->addAttribute($key, $val);
+				}
+			}
+		}
 	}
 
 	/**
@@ -572,18 +632,15 @@ class Data {
 		$model->registerXPathNamespace("c", $modelns[""]);
 		$found = $model->xpath("//c:". $el->getName());
 		if (sizeof($found) == 1) {
-			$found_el = $found[0];
-			if ($found_el->attributes()) {
-				$attrs = $found_el->attributes();
-				if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
-					foreach ($found[0]->attributes() as $key => $val) {
-						$el->addAttribute($key, $val);
-					}
-				}
-			}
+			$this->complete_attributes($found[0], $el);
 		} else {
 			//echo "Not found unique<br>";
-			// TODO handle deep search if there are more results
+			foreach ($found as $found_el) {
+				if ($this->check_elem_match($el, $found_el)) {
+					$this->complete_attributes($found_el, $el);
+					break;
+				}
+			}
 		}
 	}
 
@@ -666,17 +723,17 @@ class Data {
 				foreach ($nodes as $node) {
 					foreach ($node as $nodeKey => $submenu) {
 						if ( !in_array($nodeKey, $allowedModels) ) {
-							$allowedModels[] = $nodeKey;	
-						}	    				
+							$allowedModels[] = $nodeKey;
+						}
 
 						foreach ($submenu as $subKey => $tmp) {
 							if ( !in_array($key, $allowedSubmenu) ) {
 								$allowedSubmenu[] = $subKey;
 							}
-						}	    				
+						}
 					}
-				}	    		
-			}    
+				}
+			}
 		} catch (\ErrorException $e) {
 			$this->logger->err("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
 			// throw new \ErrorException($e->getMessage());
@@ -700,12 +757,12 @@ class Data {
 
 				if ( in_array($model, $allowedModels) ) {
 					$folders[] = array(
-						'path' => "module", 
+						'path' => "module",
 						"params" => array(
 							'key' => $key,
 							'module' => $model,
-						), 
-						"title" => "detail of ".$this->getSectionName($model), 
+						),
+						"title" => "detail of ".$this->getSectionName($model),
 						"name" => $this->getSectionName($model),
 						"children" => $this->buildSubmenu($key, $model, $allowedSubmenu),
 					);
@@ -716,7 +773,7 @@ class Data {
 	}
 
 	// prepares left submenu
-	private function buildSubmenu($key, $module, $allowedSubmenu, $path = "") { 
+	private function buildSubmenu($key, $module, $allowedSubmenu, $path = "") {
 		$finder = new Finder();
 
 		if ( $path != "" ) {
@@ -742,13 +799,13 @@ class Data {
 
 				if ( in_array($subsection, $allowedSubmenu) ) {
 					$folders[] = array(
-						'path' => "subsection", 
+						'path' => "subsection",
 						"params" => array(
 							'key' => $key,
 							'module' => $module,
 							'subsection' => $subsection,
-						), 
-						"title" => "detail of ".$this->getSubsectionName($subsection), 
+						),
+						"title" => "detail of ".$this->getSubsectionName($subsection),
 						"name" => $this->getSubsectionName($subsection),
 						// "children" => $this->getSubmenu($key, $completePath),
 					);

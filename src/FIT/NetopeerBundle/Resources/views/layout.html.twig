@@ -33,7 +33,7 @@
 					<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" id="ico-unlock">Unlock</a>
 				{% endif %}
 			{% endif %}
-			{% if topmenu %}
+			{% if topmenu is defined %}
 				{% for section in topmenu %}
 					<a href="{{ path(section.path, section.params) }}" title="{{section.title}}" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %}">{{section.name}}</a>
 				{% endfor %}
