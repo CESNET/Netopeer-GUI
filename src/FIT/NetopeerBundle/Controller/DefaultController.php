@@ -172,9 +172,11 @@ class DefaultController extends BaseController
 			if ( file_exists($file) ) {
 				$filterState = $filterConfig = file_get_contents($file);
 			}
+			$this->setSectionFormsParams($key, $filterState, $filterConfig);
+		} else {
+			$this->setSectionFormsParams($key);
 		}
-
-		$this->setSectionFormsParams($key, $filterState, $filterConfig);
+		
 		try {
 			$dataClass->setFlashState('state');
 			// ziskame state cast
@@ -213,7 +215,12 @@ class DefaultController extends BaseController
 			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
 		}
 
-		$this->assign('singleColumnLayout', true);
+		if ( $module != null ) {
+			$this->assign('singleColumnLayout', true);	
+		} else {
+			$this->assign('singleColumnLayout', false);
+		}
+		
 		return $this->getTwigArr($this);
 	}
 
