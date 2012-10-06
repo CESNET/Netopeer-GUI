@@ -8,36 +8,7 @@ use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 
-class ConnectionSession {
-	/**
-	 * @var time of connection start
-	 */
-	public $time;
-
-	/**
-	 * @var identification key of connection
-	 */
-	public $hash;
-
-	/**
-	 * @var target hostname
-	 */
-	public $host;
-
-	/**
-	 * @var locked by us
-	 */
-	public $locked = false;
-
-	function __construct($session_hash, $host)
-	{
-		$this->hash = $session_hash;
-		$this->host = $host;
-		$newtime = new \DateTime();
-		$this->time = $newtime->format("d.m.Y H:i:s");
-		$this->locked = false;
-	}
-}
+use FIT\NetopeerBundle\Models\ConnectionSession;
 
 class Data {
 
@@ -69,20 +40,18 @@ class Data {
 	private $models;
 	private $submenu;
 
-	public function __construct(ContainerInterface $container, $logger)
-	{
+	public function __construct(ContainerInterface $container, $logger)	{
 		$this->container = $container;
 		$this->logger = $logger;
 		$this->setFlashState('single');
 	}
+
 	/**
-	  Parse $message formatted by Chunked Framing Mechanism
-	  (RFC6242)
-	  \param[in] $message - input message text
-	  \return string - unwrapped message
+	 * Parse $message formatted by Chunked Framing Mechanism (RFC6242)
+	 * @param  {string} $message input message text
+	 * @return {string}          unwrapped message
 	 */
-	private function unwrap_rfc6242($message)
-	{
+	private function unwrap_rfc6242($message) {
 		$response = "";
 		if ($message == "") {
 			return $response;
@@ -165,9 +134,9 @@ class Data {
 	}
 
 	/**
-	  \brief Read response from socket
-	  \param[in,out] $sock socket descriptor
-	  \return trimmed string that was read
+	 * Read response from socket
+	 * @param  &$sock 		socket descriptor
+	 * @return {string}     trimmed string that was read
 	 */
 	private function readnetconf(&$sock) {
 		$response = "";
@@ -222,10 +191,12 @@ class Data {
 	}
 
 	/**
-	  \param[in,out] $sock socket descriptor
-	  \return 0 on success
+	 * Handles connection to the socket
+	 * @param  &$sock   		socket descriptor
+	 * @param  {array} &$params connection params for mod_netconf
+	 * @return {int}    		0 on success
 	 */
-	private function handle_connect(&$sock, &$params)	{
+	private function handle_connect(&$sock, &$params) {
 		$session = $this->container->get('request')->getSession();
 
 		$connect = json_encode(array(
@@ -266,10 +237,12 @@ class Data {
 	}
 
 	/**
-	 \param[in,out] $sock socket descriptor
-	 \return decoded data on success
-	*/
-	public function handle_get(&$sock, &$params){
+	 * handle get action
+	 * @param  &$sock   			socket descriptor
+	 * @param  {array} &$params 	array of values for mod_netconf (type, params...)
+	 * @return 						decoded data on success
+	 */
+	public function handle_get(&$sock, &$params) {
 		if ( $this->check_logged_keys() != 0) {
 			return 1;
 		}
@@ -286,9 +259,11 @@ class Data {
 	}
 
 	/**
-	 \param[in,out] $sock socket descriptor
-	 \return decoded data on success
-	*/
+	 * handle get config action
+	 * @param  &$sock   		socket descriptor
+	 * @param  {array} &$params array of values for mod_netconf (type, params...)
+	 * @return           		decoded data on success
+	 */
 	public function handle_getconfig(&$sock, &$params)	{
 		if ( $this->check_logged_keys() != 0) {
 			return 1;
@@ -305,11 +280,12 @@ class Data {
 	}
 
 	/**
-	 \param[in,out] $sock socket descriptor
-	 \return 0 on success
-	*/
-	function handle_editconfig(&$sock, &$params)
-	{
+	 * handle edit config action
+	 * @param  &$sock   		socket descriptor
+	 * @param  {array} &$params array of values for mod_netconf (type, params...)
+	 * @return           		decoded data on success
+	 */
+	function handle_editconfig(&$sock, &$params) {
 		if ( $this->check_logged_keys() != 0) {
 			return 1;
 		}
@@ -331,9 +307,11 @@ class Data {
 	}
 
 	/**
-	 \param[in,out] $sock socket descriptor
-	 \return 0 on success
-	*/
+	 * handle get config action
+	 * @param  &$sock   		socket descriptor
+	 * @param  {array} &$params array of values for mod_netconf (type, params...)
+	 * @return {int}       		0 on success
+	 */
 	private function handle_disconnect(&$sock, &$params) {
 		if ($this->check_logged_keys() != 0) {
 			return 1;
@@ -360,9 +338,11 @@ class Data {
 	}
 
 	/**
-	 \param[in,out] $sock socket descriptor
-	 \return 0 on success
-	*/
+	 * handle lock action
+	 * @param  &$sock   		socket descriptor
+	 * @param  {array} &$params array of values for mod_netconf (type, params...)
+	 * @return {int}       		0 on success
+	 */
 	private function handle_lock(&$sock, &$params) {
 		if ($this->check_logged_keys() != 0) {
 			return 1;
@@ -386,9 +366,11 @@ class Data {
 	}
 
 	/**
-	 \param[in,out] $sock socket descriptor
-	 \return 0 on success
-	*/
+	 * handle unlock action
+	 * @param  &$sock   		socket descriptor
+	 * @param  {array} &$params array of values for mod_netconf (type, params...)
+	 * @return {int}       		0 on success
+	 */
 	private function handle_unlock(&$sock, &$params) {
 		if ($this->check_logged_keys() != 0) {
 			return 1;
@@ -412,7 +394,8 @@ class Data {
 	}
 
 	/**
-	 \return 0 on success
+	 * checks, if logged keys are valid
+	 * @return {int}       		0 on success
 	 */
 	private function check_logged_keys() {
 		$session = $this->container->get('request')->getSession();
@@ -432,7 +415,9 @@ class Data {
 	}
 
 	/**
-	 * \return decoded data on success
+	 * checks decoded data, if there an error occures
+	 * @param  &$decoded 	decoded data
+	 * @return 				decoded data on success
 	 */
 	private function checkDecodedData(&$decoded) {
 		$session = $this->container->get('request')->getSession();
@@ -456,37 +441,39 @@ class Data {
 	}
 
 	/**
-	  Wrap message for Chunked Framing Mechanism (RFC6242)
-	  and write it into the socket.
-	  \param[in,out] $sock socket descriptor
-	  \param[in] $message message text
+	 * Wrap message for Chunked Framing Mechanism (RFC6242) and write it into the socket.
+	 * @param  &$sock   			socket descriptor
+	 * @param  {string} $message 	message text
 	 */
-	private function write2socket(&$sock, $message)
-	{
+	private function write2socket(&$sock, $message)	{
 		$final_message = sprintf("\n#%d\n%s\n##\n", strlen($message), $message);
 		fwrite($sock, $final_message);
 	}
 
 	/**
-	  \param[in,out] $sock socket descriptor
-	  \param[in] $params array of values for mod_netconf (type, params...)
-	  \return array - response from mod_netconf
+	 * executes operation - sends message into the socket
+	 * @param  &$sock  			socket descriptor
+	 * @param  {array} $params 	array of values for mod_netconf (type, params...)
+	 * @return {array}         	response from mod_netconf
 	 */
-	private function execute_operation(&$sock, $params)
-	{
+	private function execute_operation(&$sock, $params)	{
 		$operation = json_encode($params);
 		$this->write2socket($sock, $operation);
 		$response = $this->readnetconf($sock);
 		return json_decode($response, true);
 	}
 
-	public function getModelsDir()
-	{
+	/**
+	 * @return {string} path to models folder
+	 */
+	public function getModelsDir() {
 		return __DIR__ . '/../Data/models/';
 	}
 
-	public function getPathToModels()
-	{
+	/**
+	 * @return {string} path to wrapped model file
+	 */
+	public function getPathToModels() {
 		$path = $this->getModelsDir();
 
 		// add module directory if is set in route
@@ -501,6 +488,13 @@ class Data {
 		return $path;
 	}
 
+	/**
+	 * handles all actions, which are allowed on socket
+	 * @param  {string} $command 			kind of action (command)
+	 * @param  {array} $params = array() 	parameters for mod_netconf
+	 * @param  {bool} $merge = true 		should be action handle with merge with model
+	 * @return {int}						0 on success
+	 */
 	public function handle($command, $params = array(), $merge = true) {
 		$errno = 0;
 		$errstr = "";
@@ -585,8 +579,7 @@ class Data {
 		return 0;
 	}
 
-	private function get_element_parent($element)
-	{
+	private function get_element_parent($element) {
 		$parents = $element->xpath("parent::*");
 		if ($parents) {
 			return $parents[0];
@@ -594,8 +587,7 @@ class Data {
 		return false;
 	}
 
-	private function check_elem_match($model_el, $possible_el)
-	{
+	private function check_elem_match($model_el, $possible_el) {
 		$mel = $this->get_element_parent($model_el);
 		$pel = $this->get_element_parent($possible_el);
 		while ($pel && $mel) {
@@ -608,8 +600,7 @@ class Data {
 		return true;
 	}
 
-	private function complete_attributes(&$source, &$target)
-	{
+	private function complete_attributes(&$source, &$target) {
 		if ($source->attributes()) {
 			$attrs = $source->attributes();
 			if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
@@ -621,13 +612,11 @@ class Data {
 	}
 
 	/**
-	Find corresponding $el in configuration model $model
-	and complete attributes from $model.
-	\param[in] $model - SimpleXMLElement with data model
-	\param[in] $el - SimpleXMLElement with element of response
-	*/
-	private function find_and_complete(&$model, $el)
-	{
+	 * Find corresponding $el in configuration model $model and complete attributes from $model.
+	 * @param  {SimpleXMLElement} &$model with data model
+	 * @param  {SimpleXMLElement} $el     with element of response
+	 */
+	private function find_and_complete(&$model, $el) {
 		$modelns = $model->getNamespaces();
 		$model->registerXPathNamespace("c", $modelns[""]);
 		$found = $model->xpath("//c:". $el->getName());
@@ -645,13 +634,11 @@ class Data {
 	}
 
 	/**
-	Go through $root_el tree that represents
-	the response from Netconf server.
-	\param[in] $model - SimpleXMLElement with data model
-	\param[in] $root_el - SimpleXMLElement with element of response
-	*/
-	private function mergeRecursive(&$model, $root_el)
-	{
+	 * Go through $root_el tree that represents the response from Netconf server.
+	 * @param  {SimpleXMLElement} &$model  with data model
+	 * @param  {SimpleXMLElement} $root_el with element of response
+	 */
+	private function mergeRecursive(&$model, $root_el) {
 		//echo "Rootel";
 		foreach ($root_el as $ch) {
 			$this->find_and_complete($model, $ch);
@@ -665,11 +652,11 @@ class Data {
 	}
 
 	/**
-	Add attributes from configuration model to response
-	such as config, mandatory, type.
-	\param[in] $model - data configuration model SimpleXMLElement
-	\param[in,out] $result - data from netconf server, the result of merge
-	*/
+	 * Add attributes from configuration model to response such as config, mandatory, type.
+	 * @param  {SimpleXMLElement} &$model 	data configuration model
+	 * @param  $result 						data from netconf server
+	 * @return 								the result of mege
+	 */
 	private function mergeWithModel($model, $result) {
 		if ($result) {
 			$resxml = simplexml_load_string($result);
@@ -682,6 +669,10 @@ class Data {
 		}
 	}
 
+	/**
+	 * Sets current flash state - but only for allowed kinds
+	 * @param {string} $state kind of flash state
+	 */
 	public function setFlashState($state) {
 		$allowedState = array("config", "state", "single");
 
@@ -693,7 +684,9 @@ class Data {
 		return 0;
 	}
 
-	// prepares top menu
+	/**
+	 * Prepares top menu - gets items from server response
+	 */
 	public function buildMenuStructure($key, $path = "") {
 		$finder = new Finder();
 
@@ -707,7 +700,7 @@ class Data {
 		$allowedSubmenu = array();
 
 		try {
-			// nacteme si get z pripojeneho serveru
+			// load GET XML from server
 			if ( ($xml = $this->handle('get', $params, false)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 				$xmlNameSpaces = $xml->getNamespaces();
@@ -719,7 +712,7 @@ class Data {
 					$node = $xml->xpath('/*');
 				}
 
-				// ziskame nejvyssi uzly (bez rootu) pro vytvoreni horniho menu
+				// get first level nodes (so without root) as items for top menu
 				foreach ($nodes as $node) {
 					foreach ($node as $nodeKey => $submenu) {
 						if ( !in_array($nodeKey, $allowedModels) ) {
@@ -736,12 +729,12 @@ class Data {
 			}
 		} catch (\ErrorException $e) {
 			$this->logger->err("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
-			// throw new \ErrorException($e->getMessage());
 			// nothing
 		}
 
-		// nyni zkontrolujeme, zda uzly z get souhlasi se strukturou v modelech. Pokud ne, nevypiseme je
-		$dir = __DIR__."/../Data/models/";
+		// we will check, if nodes from GET are same as models structure
+		// if not, they won't be displayed
+		$dir = $this->getModelsDir();
 		if ( !file_exists($dir) ) {
 			$this->models = array();
 		} else {
@@ -772,7 +765,9 @@ class Data {
 		}
 	}
 
-	// prepares left submenu
+	/**
+	 * prepares left submenu - modules of current top menu item
+	 */
 	private function buildSubmenu($key, $module, $allowedSubmenu, $path = "") {
 		$finder = new Finder();
 
@@ -782,8 +777,9 @@ class Data {
 			$completePath = $module;
 		}
 
-		// zjistime, zda uzly z get jsou obsazeny i v modelech. Pokud ne, nezobrazime je v levem menu
-		$dir = __DIR__."/../Data/models/".$completePath;
+		// we will check, if nodes from GET are same as models structure
+		// if not, they won't be displayed
+		$dir = $this->getModelsDir().$completePath;
 		if ( !file_exists($dir) ) {
 			$folders = array();
 		} else {
