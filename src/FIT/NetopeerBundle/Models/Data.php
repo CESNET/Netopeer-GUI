@@ -510,7 +510,7 @@ class Data {
 			// nebudeme do logu vkladat heslo
 			unset($logParams['pass']);
 		}
-		$this->logger->info('Handle: '.$command.' with params', $logParams);
+		$this->logger->info('Handle: '.$command.' with params', array('params' => $logParams));
 
 		try {
 			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);

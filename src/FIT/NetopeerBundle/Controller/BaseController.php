@@ -27,63 +27,60 @@ class BaseController extends Controller
 
 	/**
 	 * Prepares variables to template, sort flashes and prepare menu
-	 * @param  $THIS = null 	instance of called by controller
 	 * @return 					array of assigned variables to template
 	 */
-	protected function getTwigArr($THIS = null) {
-		if ($THIS != null ) {
-			if ( $this->getRequest()->getSession()->get('singleColumnLayout') == null ) {
-				$this->getRequest()->getSession()->set('singleColumnLayout', false);	
-			}
+	protected function getTwigArr() {
 
-			// if singleColumnLayout is not set, we will set default value
-			if ( !array_key_exists('singleColumnLayout', $this->twigArr) ) {
-				$this->assign('singleColumnLayout', $this->getRequest()->getSession()->get('singleColumnLayout'));
-			}
-			// var_dump(array_key_exists('singleColumnLayout', $this->twigArr), $this->twigArr, $this->getRequest()->getSession()->get('singleColumnLayout'));
-			// exit;
-
-			$session = $this->getRequest()->getSession();
-			$flashes = $session->getFlashes();
-			$stateFlashes = $configFlashes = $singleFlashes = $allFlashes = array();
-
-			// rozdelime flash messages dle klice do danych kategorii
-			foreach ($flashes as $key => $message) {
-				// maly tricek - pokud klic obsahuje slovo state, bude podminka splnena
-				if ( strpos($key, 'tate') ) { // klic obsahuje slovo state
-					$stateFlashes[$key] = $message;
-				} elseif ( strpos($key, 'onfig') ) { // klic obsahuje slovo config
-					$configFlashes[$key] = $message;
-				} else { // klic obsahuje slovo single
-					$singleFlashes[$key] = $message;
-				} 
-
-				$allFlashes[$key] = $message;
-			}
-
-			$this->assign("stateFlashes", $stateFlashes);
-			$this->assign("configFlashes", $configFlashes);
-			$this->assign("singleFlashes", $singleFlashes);
-			$this->assign("allFlashes", $allFlashes);
-
-			$dataClass = $this->get('DataModel');
-			$dataClass->buildMenuStructure($this->activeSectionKey); // vytvorime strukturu menu
-			$this->assign('topmenu', $dataClass->getModels());
-			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl));
-
-			try {
-				if ($this->getRequest()->get('key') != "") {
-					$conn = $session->get('session-connections');
-					$conn = unserialize($conn[$this->getRequest()->get('key')]);
-					if ($conn !== false) {
-						$this->assign('lockedConn', $conn->locked);
-					}
-				}
-			} catch (\ErrorException $e) {
-				$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
-				$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
-			}
+		if ( $this->getRequest()->getSession()->get('singleColumnLayout') == null ) {
+			$this->getRequest()->getSession()->set('singleColumnLayout', true);
 		}
+
+		// if singleColumnLayout is not set, we will set default value
+		if ( !array_key_exists('singleColumnLayout', $this->twigArr) ) {
+			$this->assign('singleColumnLayout', $this->getRequest()->getSession()->get('singleColumnLayout'));
+		}
+
+		$session = $this->getRequest()->getSession();
+		$flashes = $session->getFlashes();
+		$stateFlashes = $configFlashes = $singleFlashes = $allFlashes = array();
+
+		// rozdelime flash messages dle klice do danych kategorii
+		foreach ($flashes as $key => $message) {
+			// maly tricek - pokud klic obsahuje slovo state, bude podminka splnena
+			if ( strpos($key, 'tate') ) { // klic obsahuje slovo state
+				$stateFlashes[$key] = $message;
+			} elseif ( strpos($key, 'onfig') ) { // klic obsahuje slovo config
+				$configFlashes[$key] = $message;
+			} else { // klic obsahuje slovo single
+				$singleFlashes[$key] = $message;
+			}
+
+			$allFlashes[$key] = $message;
+		}
+
+		$this->assign("stateFlashes", $stateFlashes);
+		$this->assign("configFlashes", $configFlashes);
+		$this->assign("singleFlashes", $singleFlashes);
+		$this->assign("allFlashes", $allFlashes);
+
+		$dataClass = $this->get('DataModel');
+		$dataClass->buildMenuStructure($this->activeSectionKey); // vytvorime strukturu menu
+		$this->assign('topmenu', $dataClass->getModels());
+		$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl));
+
+		try {
+			if ($this->getRequest()->get('key') != "") {
+				$conn = $session->get('session-connections');
+				$conn = unserialize($conn[$this->getRequest()->get('key')]);
+				if ($conn !== false) {
+					$this->assign('lockedConn', $conn->locked);
+				}
+			}
+		} catch (\ErrorException $e) {
+			$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
+			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
+		}
+
 		return $this->twigArr;
 	}
 
@@ -103,18 +100,5 @@ class BaseController extends Controller
 	public function setSubmenuUrl($submenuUrl) {
 		$this->submenuUrl = $submenuUrl;
 	}
-
-	protected function clearCache($type) {
-    	$command = "cache:clear";
-    	$process = new Process($command);
-		$process->setTimeout(3600);
-		$process->run();
-		
-		if (!$process->isSuccessful()) {
-			$this->get('data_logger')->err("Could not clean cache.");
-		    throw new \ErrorException("Could not clean cache.");
-		} 
-		return 0;
-    }
 
 }
