@@ -434,7 +434,7 @@ class Data {
 		} elseif (($decoded['type'] != self::REPLY_OK) && ($decoded['type'] != self::REPLY_DATA)) {
 			$this->logger->warn('Error: ', array('error' => $decoded['error-message']));
 			$session->setFlash($this->flashState .' error', "Error: " . $decoded['error-message']);
-			//throw new \ErrorException($decoded['error-message']);
+			throw new \ErrorException($decoded['error-message']);
 			return 1;
 		}
 		return isset($decoded["data"]) ? $decoded["data"] : 0;

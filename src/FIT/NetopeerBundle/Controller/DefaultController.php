@@ -517,7 +517,9 @@ class DefaultController extends BaseController
 				$e = $elem->$elementName;
 				$e[0] = str_replace("\r", '', $val); // removes \r from value
 			} else {
-				$elem->addChild($elementName, str_replace("\r", '', $val));
+				if ( !is_array($elem) ) {
+					$elem[0] = str_replace("\r", '', $val);
+				}
 			}
 		}
 
@@ -672,11 +674,13 @@ class DefaultController extends BaseController
 
 						$node = $this->elementValReplace($tmpConfigXml, $values[0], $xpath, $val);
 						try {
-							$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");	
+							if ( is_object($node) ) {
+								$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
+								$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node->asXml());
+							}
 						} catch (\ErrorException $e) {
 							// nothing
 						}
-						$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node->asXml());
 					}
 				}
 				$createTree = $this->completeRequestTree($parentNode[0], $createString);
@@ -692,7 +696,7 @@ class DefaultController extends BaseController
 
 		} catch (\ErrorException $e) {
 			$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. ".$e->getMessage());
+			$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. Error: ".$e->getMessage());
 		}
 
 		return $res;
