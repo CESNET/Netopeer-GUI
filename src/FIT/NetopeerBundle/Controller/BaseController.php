@@ -56,6 +56,7 @@ class BaseController extends Controller
 			}
 
 			$allFlashes[$key] = $message;
+			$session->removeFlash($key);
 		}
 
 		$this->assign("stateFlashes", $stateFlashes);
