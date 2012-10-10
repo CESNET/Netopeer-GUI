@@ -23,10 +23,10 @@ $(document).ready(function() {
 		initDefaultTooltip($(this));
 	});
 
-	/* hide alerts after some time */
+	/* hide alerts after some time - only successfull */
 	setTimeout(function() {
-		$('.alert').fadeOut();
-	}, 10000); /* 10s */
+		$('.alert.success').fadeOut();
+	}, 5000); /* 5s */
 });
 
 function initDefaultTooltip($el) {
@@ -145,13 +145,12 @@ function createFormUnderlay($elem) {
 
 	// we have to count new dimensions for new form-underlay
 	// and fill it over whole cover part
-	l($elem.parent().parent().parent());
 	var nWidth = $cover.outerWidth(),
-		nHeight = $cover.children('form').outerHeight() + parseInt($cover.css('padding-top'), 10) + parseInt($cover.css('padding-bottom'), 10) + 200 + ($elem.parent().parent().parent().outerHeight() * 2);
+		nHeight = $cover[0].scrollHeight + $elem.parent().parent().parent().outerHeight() + 150; // 150 px for buttons
 
 	// we have to set form to fill cover (from top)
-	$cover.find(".form-underlay").width(nWidth).height(nHeight * 2).css({
-		'margin-top': 0 - nHeight,
+	$cover.find(".form-underlay").width(nWidth).height(nHeight).css({
+		'margin-top': 0,
 		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
 	});
 
@@ -272,9 +271,8 @@ function createCloseButton($cover, $form) {
 		wrapCoverForm($cover, $form);
 	});
 	$(document).bind('keydown', function(event) {
-		if ( event.which != 27 ) {
-			event.preventDefault();
-		} else {
+		if ( event.which == 27 ) {
+			//event.preventDefault();
 			wrapCoverForm($cover, $form);
 		}
 	});
