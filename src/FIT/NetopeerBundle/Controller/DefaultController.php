@@ -221,6 +221,8 @@ class DefaultController extends BaseController
 			$this->assign('singleColumnLayout', true);
 		}
 
+		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
+		$this->assign('routeParams', $routeParams);
 		return $this->getTwigArr();
 	}
 
@@ -365,6 +367,10 @@ class DefaultController extends BaseController
 		// processing duplicate node form
 		} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
 			$res = $this->handleDuplicateNodeForm($key);
+
+		// processing generate node form
+		} elseif ( is_array($this->getRequest()->get('generateNodeForm')) ) {
+			$res = $this->handleGenerateNodeForm($key, $moduel, $subsection);
 
 		// processing remove node form
 		} elseif ( is_array($this->getRequest()->get('removeNodeForm')) ) {
@@ -698,6 +704,28 @@ class DefaultController extends BaseController
 			$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
 			$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. Error: ".$e->getMessage());
 		}
+
+		return $res;
+	}
+
+	/**
+	 * create new node in config - according to the values in XML model
+	 * could be changed by user
+	 * @param  {int} &$key 				session key of current connection
+	 * @param  {strign} $module 		module name
+	 * @param  {string} $subsection  	subsection name
+	 * @return {int}       result code
+	 */
+	private function handleGenerateNodeForm(&$key, &$module, &$subsection)	{
+		$post_vals = $this->getRequest()->get('generatedNodeForm');
+		$res = 0;
+		$this->get('DataModel')->setFlashState('config');
+
+		// TODO: load XML file - https://sauvignon.liberouter.org/symfony/generate/2/-%252A-%252A%253F1%2521-%252A%253F2%2521-%252A%253F1%2521/0/hanic-probe/exporters/model.xml
+		// this URL should be generated from route (path = generateFromModel, params: '2' = level (whatever, not used in this case); 'xPath' = url_encode($xPath), 'key' = $key, 'module' = $module, 'subsection' = subsection, '_format' = 'xml')
+		//
+		// change values to $_POST ones if XML file has been loaded correctly
+		// generate (completeTree) output XML for edit-config
 
 		return $res;
 	}

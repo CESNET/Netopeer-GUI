@@ -4,13 +4,18 @@ $(document).ready(function() {
 
 	if ( $(".edit-bar").length ) {
 		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
-		$(".type-list .edit-bar .sibling").show();
+		$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
 
 		$('.type-list .edit-bar .sibling').click(function() {
 			duplicateNode($(this));
 		});
+
 		$(".edit-bar .remove-child").click(function() {
 			removeNode($(this));
+		});
+
+		$(".edit-bar .create-child").click(function() {
+			generateNode($(this));
 		});
 
 		// $('.edit-bar .child').click(function() {
@@ -68,7 +73,7 @@ function duplicateNode($elem) {
 
 	// we have to modify inputs for all children
 	$form.children().each(function(i, el) {
-		modifyInputAttributes(el, i, xPath);
+		modifyInputAttributes(el, i, 'duplicatedNodeForm');
 	});
 
 	// create submit and close button
@@ -112,12 +117,53 @@ function removeNode($elem) {
 	createSubmitButton($form, "Delete record");
 	createCloseButton($cover, $form);
 
+	// append created form into the parent
+	$currentParentLevel.append($form);
 
-	$currentParentLevel.children(':first-child').after($form);
-	$oldForm = $currentParentLevel.parents('form').clone();
-	$oldForm.html('');
-	$cover.prepend($oldForm);
-	$currentParentLevel.parents('form').children('.root').unwrap();
+	unwrapCoverForm($currentParentLevel, $cover);
+}
+
+function generateNode($elem) {
+	createFormUnderlay($elem);
+
+	var rel = $elem.attr('rel').split('_');	// rel[0] - xPath, rel[1] - serialized route params
+	level = findLevelValue($elem);
+
+	$currentParent = $elem.parent().parent();
+	$currentParentLevel = $elem.parents('.level-' + level);
+
+	xPath = rel[0];
+	loadUrl = rel[1];
+
+	// generate new form
+	$form = generateFormObject('generateNodeForm');
+
+	// create hidden input with path to the duplicated node
+	$elementWithParentXpath = $("<input>")
+		.attr({
+			type: 'hidden',
+			name: "generateNodeForm[parent]",
+			value: xPath
+		});
+		$form.prepend($elementWithParentXpath);
+
+	// load URL with HTML form
+	$tmpDiv = $("<div>").addClass('root');
+	$tmpDiv.load(document.location.protocol + "//" + document.location.host + loadUrl, function() {
+		// we have to modify inputs for all children
+		$tmpDiv.children().each(function(i, el) {
+			modifyInputAttributes(el, i, 'generatedNodeForm');
+		});
+	});
+	$form.append($tmpDiv);
+
+	// create submit and close button
+	createSubmitButton($form, "Add new list");
+	createCloseButton($cover, $form);
+
+	// append created form into the parent
+	$currentParentLevel.append($form);
+	unwrapCoverForm($currentParentLevel, $cover);
 }
 
 function createFormUnderlay($elem) {
@@ -200,20 +246,19 @@ function generateFormObject(formName) {
 	return $form;
 }
 
-function modifyInputAttributes(el, newIndex, xPath) {
+function modifyInputAttributes(el, newIndex, newInputName) {
 	uniqueId = String(getUniqueId());
 
 	// clean edit-bar html
 	$(el).find('.edit-bar').html('');
 
-	newXpath = xPath + '*?' + newIndex + '!';
 	// find all input in this level
 	inputArr = $.merge( $(el).children('input'), $(el).children('.config-value-cover').find('input') );
 
 	// modify every input
 	inputArr.each(function(i, e) {
 		// rewrite name to duplicatedNodeForm
-		elName = $(e).attr('name').replace('configDataForm', 'duplicatedNodeForm');
+		elName = $(e).attr('name').replace('configDataForm', newInputName);
 		$(e).attr('name', elName);
 
 		// check, if default attribute is defined
@@ -237,7 +282,7 @@ function modifyInputAttributes(el, newIndex, xPath) {
 	// recursively find next level of input
 	if ( $(el).children('.leaf-line, div[class*=level]').length ) {
 		$(el).children('.leaf-line, div[class*=level]').each(function(j, elem) {
-			modifyInputAttributes(elem, j, newXpath);
+			modifyInputAttributes(elem, j, newInputName);
 		});
 	}
 }

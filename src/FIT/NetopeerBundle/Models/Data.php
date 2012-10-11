@@ -669,6 +669,30 @@ class Data {
 		}
 	}
 
+	public function getXMLFromModel($xPath, $key, $module, $subsection) {
+		$xml = <<<XML
+<?xml version="1.0"?>
+<root>
+	<exporter eltype="list" config="true" key="id host port" iskey="false">
+	  <id eltype="leaf" config="true" type="uint8" description="Exporter identification sent to the collector." iskey="true">0</id>
+	  <host eltype="leaf" config="true" type="string" description="Hostname (or IPv4/6 address) of the collector where to send data." iskey="true">collector-test.ipv4.liberouter.org</host>
+	  <port eltype="leaf" config="true" type="uint16" description="Port of the collector where to send data." iskey="true">3010</port>
+	  <timeout_active eltype="leaf" config="true" type="uint16" default="180" iskey="false">300</timeout_active>
+	  <timeout_inactive eltype="leaf" config="true" type="uint8" default="10" iskey="false">30</timeout_inactive>
+	  <cpu_mask eltype="leaf" config="true" type="uint8" default="1" description="Mask of allowed CPUs." iskey="false">12</cpu_mask>
+	  <flowcache_size eltype="leaf" config="true" type="uint8" default="19" description="Queue (flowcache) size in power of 2." iskey="false">25</flowcache_size>
+	  <protocol_export eltype="leaf" config="true" type="enumeration" default="NetFlow v9" description="Flow information export protocol." iskey="false">NetFlow v9</protocol_export>
+	  <protocol_ip eltype="leaf" config="true" type="enumeration" default="IPv4" description="Force IP protocol when connecting to the collector." iskey="false">IPv4</protocol_ip>
+	  <protocol_transport eltype="leaf" config="true" type="enumeration" default="TCP" description="Transport protocol for the IPFIX protocol." iskey="false">UDP</protocol_transport>
+	</exporter>
+</root>
+XML;
+
+		// TODO: load XML from model
+
+		return $xml;
+	}
+
 	/**
 	 * Sets current flash state - but only for allowed kinds
 	 * @param {string} $state kind of flash state

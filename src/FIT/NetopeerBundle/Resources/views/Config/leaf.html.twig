@@ -24,10 +24,11 @@
 	</span>
 
 	<span class="edit-bar">
-		{% if element.attributes.eltype is defined and element.attributes.eltype == "list" %}
-			{# <img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}"/>#}			
+		{% if element.attributes.eltype is defined and element.attributes.eltype == "list" and ((hideEditBar is defined and hideEditBar != true) or hideEditBar is not defined) %}
+			<img src="{{ asset('bundles/netopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="create-child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}_{{ path("generateFromModel", {"level": level, "xPath": xpath|replace({'/': '-', '[': '?', ']': '!'})|url_encode, "key": routeParams.key, "module": routeParams.module, "subsection": routeParams.subsection} ) }}"/>
+
 			<img src="{{ asset('bundles/netopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}" class="sibling" />
-			<img src="{{ asset('bundles/netopeer/images/ico/remove_child.png')}}" alt="Remove child" title="Remove child" class="remove-child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}" class="sibling" />
+			<img src="{{ asset('bundles/netopeer/images/ico/remove_child.png')}}" alt="Remove child" title="Remove child" class="remove-child" rel="{{ xpath|replace({'/': '-', '[': '?', ']': '!'}) }}" />
 		{% endif %}
 	</span>
 

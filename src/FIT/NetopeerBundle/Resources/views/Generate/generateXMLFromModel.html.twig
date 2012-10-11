@@ -1,0 +1,5 @@
+{% set iterator = 1 %}
+{% for key, element in xmlArr %}
+	{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': element, 'level': level, 'xpath': '/*', 'iterator': iterator, 'hideEditBar': true} %}
+	{% set iterator = iterator + 1 %}
+{% endfor %}
