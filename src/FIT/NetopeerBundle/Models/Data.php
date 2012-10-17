@@ -43,6 +43,7 @@ class Data {
 	public function __construct(ContainerInterface $container, $logger)	{
 		$this->container = $container;
 		$this->logger = $logger;
+		$this->models = null;
 		$this->setFlashState('single');
 	}
 
@@ -234,6 +235,11 @@ class Data {
 			$session->setFlash($this->flashState .' error', "Could not connect.".(isset($decoded["error-message"])?" Error: ".$decoded["error-message"]:""));
 			return 1;
 		}
+	}
+
+	public function remove_xml_header(&$text)
+	{
+		return preg_replace("/<\?xml .*\?".">/i", "n", $text);
 	}
 
 	/**
@@ -434,10 +440,10 @@ class Data {
 		} elseif (($decoded['type'] != self::REPLY_OK) && ($decoded['type'] != self::REPLY_DATA)) {
 			$this->logger->warn('Error: ', array('error' => $decoded['error-message']));
 			$session->setFlash($this->flashState .' error', "Error: " . $decoded['error-message']);
-			throw new \ErrorException($decoded['error-message']);
+			// throw new \ErrorException($decoded['error-message']);
 			return 1;
 		}
-		return isset($decoded["data"]) ? $decoded["data"] : 0;
+		return isset($decoded["data"]) ? $decoded["data"] : -1;
 	}
 
 	/**
@@ -552,7 +558,13 @@ class Data {
 
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
-		if ( isset($res) && $res !== 1 ) {
+		if ( isset($res) && $res !== 1 && $res !== -1) {
+			if (!$this->isResponseValid($res)) {
+				$this->container->get('request')->getSession()->setFlash($this->flashState . ' error', "Requested XML from server is not valid.");
+				return 0;
+			}
+			// echo $this->remove_xml_header($a);
+			//die();
 			if ($merge) {
 
 				// load model
@@ -563,7 +575,11 @@ class Data {
 				if ( file_exists($modelFile) ) {
 					if ( $path != $notEditedPath ) {
 						$model = simplexml_load_file($modelFile);
-						$res = $this->mergeWithModel($model, $res);
+						try {
+							$res = $this->mergeWithModel($model, $res);
+						} catch (\ErrorException $e) {
+							// TODO
+						}
 					} else {
 						// TODO: if is not set module direcotory, we have to set model to merge with
 						// problem: we have to load all models (for example combo, comet-tester...)
@@ -577,6 +593,24 @@ class Data {
 			return 1;
 		}
 		return 0;
+	}
+
+	// check, if XML is valid
+	private function isResponseValid(&$res) {
+		try {
+			$xml = simplexml_load_string($res);
+		} catch (\ErrorException $e) {
+			// sometimes is exactly one root node missing
+			// we will check, if is not XML valid with root node
+			$res = "<root>".$res."</root>";
+			try {
+				$xml = simplexml_load_string($res);
+			} catch (\ErrorException $e) {
+				return 0;
+			}
+			return 1;
+		}
+		return 1;
 	}
 
 	private function get_element_parent($element) {
@@ -712,80 +746,83 @@ XML;
 	 * Prepares top menu - gets items from server response
 	 */
 	public function buildMenuStructure($key, $path = "") {
-		$finder = new Finder();
+		// we will build menu structure only if we have not build it before
+		if ( !isset($this->models) || !count($this->models) ) {
+			$finder = new Finder();
 
-		$params = array(
-			'key' => $key,
-			'source' => 'running',
-			'filter' => "",
-		);
+			$params = array(
+				'key' => $key,
+				'source' => 'running',
+				'filter' => "",
+			);
 
-		$allowedModels = array();
-		$allowedSubmenu = array();
+			$allowedModels = array();
+			$allowedSubmenu = array();
 
-		try {
-			// load GET XML from server
-			if ( ($xml = $this->handle('get', $params, false)) != 1 ) {
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$xmlNameSpaces = $xml->getNamespaces();
+			try {
+				// load GET XML from server
+				if ( ($xml = $this->handle('get', $params, false)) != 1 ) {
+					$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+					$xmlNameSpaces = $xml->getNamespaces();
 
-				if ( isset($xmlNameSpaces[""]) ) {
-					$xml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-					$nodes = $xml->xpath('/xmlns:*');
-				} else {
-					$node = $xml->xpath('/*');
-				}
+					if ( isset($xmlNameSpaces[""]) ) {
+						$xml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+						$nodes = $xml->xpath('/xmlns:*');
+					} else {
+						$nodes = $xml->xpath('/*');
+					}
 
-				// get first level nodes (so without root) as items for top menu
-				foreach ($nodes as $node) {
-					foreach ($node as $nodeKey => $submenu) {
-						if ( !in_array($nodeKey, $allowedModels) ) {
-							$allowedModels[] = $nodeKey;
-						}
+					// get first level nodes (so without root) as items for top menu
+					foreach ($nodes as $node) {
+						foreach ($node as $nodeKey => $submenu) {
+							if ( !in_array($nodeKey, $allowedModels) ) {
+								$allowedModels[] = $nodeKey;
+							}
 
-						foreach ($submenu as $subKey => $tmp) {
-							if ( !in_array($key, $allowedSubmenu) ) {
-								$allowedSubmenu[] = $subKey;
+							foreach ($submenu as $subKey => $tmp) {
+								if ( !in_array($key, $allowedSubmenu) ) {
+									$allowedSubmenu[] = $subKey;
+								}
 							}
 						}
 					}
 				}
+			} catch (\ErrorException $e) {
+				$this->logger->err("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
+				// nothing
 			}
-		} catch (\ErrorException $e) {
-			$this->logger->err("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
-			// nothing
-		}
 
-		// we will check, if nodes from GET are same as models structure
-		// if not, they won't be displayed
-		$dir = $this->getModelsDir();
-		if ( !file_exists($dir) ) {
-			$this->models = array();
-		} else {
-			$iterator = $finder
-			  ->directories()
-			  ->depth(0)
-			  ->sortByName()
-			  ->in($dir);
+			// we will check, if nodes from GET are same as models structure
+			// if not, they won't be displayed
+			$dir = $this->getModelsDir();
+			if ( !file_exists($dir) ) {
+				$this->models = array();
+			} else {
+				$iterator = $finder
+				  ->directories()
+				  ->depth(0)
+				  ->sortByName()
+				  ->in($dir);
 
-			$folders = array();
-			foreach ($iterator as $folder) {
-				$model = $folder->getFileName();
+				$folders = array();
+				foreach ($iterator as $folder) {
+					$model = $folder->getFileName();
 
-				if ( in_array($model, $allowedModels) ) {
-					$folders[] = array(
-						'path' => "module",
-						"params" => array(
-							'key' => $key,
-							'module' => $model,
-						),
-						"title" => "detail of ".$this->getSectionName($model),
-						"name" => $this->getSectionName($model),
-						"children" => $this->buildSubmenu($key, $model, $allowedSubmenu),
-					);
+					if ( in_array($model, $allowedModels) ) {
+						$folders[] = array(
+							'path' => "module",
+							"params" => array(
+								'key' => $key,
+								'module' => $model,
+							),
+							"title" => "detail of ".$this->getSectionName($model),
+							"name" => $this->getSectionName($model),
+							"children" => $this->buildSubmenu($key, $model, $allowedSubmenu),
+						);
+					}
 				}
+				$this->models = $folders;
 			}
-			$this->models = $folders;
 		}
 	}
 
