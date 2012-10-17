@@ -12,6 +12,7 @@ class NetopeerTwigExtension extends Twig_Extension
         return array(
             'isNumberType' => new Twig_Function_Method($this, 'isNumberType'),
             'isUrlType' => new Twig_Function_Method($this, 'isUrlType'),
+            'explode' => new Twig_Function_Method($this, 'explodeString')
         );
     }
 
@@ -28,6 +29,10 @@ class NetopeerTwigExtension extends Twig_Extension
     {
         if ( $string == "inet:uri" ) return true;
         return false;
+    }
+
+    public function explodeString($delimiter, $string) {
+        return explode($delimiter, $string);
     }
 
     public function getName()

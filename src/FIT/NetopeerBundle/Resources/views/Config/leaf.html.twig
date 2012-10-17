@@ -58,12 +58,32 @@
 					false
 				</label>
 			</span>
+		{% elseif element.attributes.type is defined and element.attributes.type == 'enumeration' %}
+			<span class="value-cover">
+				<select name="{{currentInputName}}">
+					{% for val in explode('|', element.attributes.enumval) %}
+						<option value="{{val}}">{{val}}</option>
+					{% endfor %}
+				</select>
+			</span>
 		{% else %}
 			{% set inputType = "text" %}
+			{% set inputClass = "text" %}
+			{% set min = "" %}
+			{% set max = "" %}
 
 			{% if element.attributes.type is defined %}
 				{% if isNumberType(element.attributes.type) %}
 					{% set inputType = "number" %}
+					{% if element.attributes.range is defined %}
+						{% set minMax = explode("..", element.attributes.range) %}
+						{% if minMax|length == 2 %}
+							{% set min = 'min=' ~ minMax[0] %}
+							{% set max = 'max=' ~ minMax[1] %}
+							{% set inputType = "range" %}
+							{% set inputClass = "range" %}
+						{% endif %}
+					{% endif %}
 				{% elseif isUrlType(element.attributes.type) %}
 					{% set inputType = "url" %}
 				{% endif %}
@@ -76,14 +96,14 @@
 
 			<input 
 				type="{{inputType}}" 
-				class="text value" 
+				class="{{inputClass}} value" 
 				value="{{element.0}}" 
 				name="{{currentInputName}}" 
 				{{disabledInput}}
+				{{min}} {{max}}
 				{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
 			/>
 		{% endif %}
-
 	{% else %}
 		<span class="value"></span>
 	{% endif %}

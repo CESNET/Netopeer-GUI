@@ -32,6 +32,23 @@ $(document).ready(function() {
 	setTimeout(function() {
 		$('.alert.success').fadeOut();
 	}, 5000); /* 5s */
+
+	/* when range input type, add number of current value before input */
+	$("input[type='range']").each(function(i, e) {
+		tmp = $("<input>").attr({
+			'class': 'range-cover-number',
+			type: 'number',
+			disabled: 'disabled',
+			value: e.value
+		}).text(e.value);
+		$(e).after(tmp);
+		$(e).next('.range-cover-number').bind('change', function() {
+			$(e).val(tmp.value);
+		});
+		$(e).bind('change', function() {
+			$(e).next('.range-cover-number').val(e.value);
+		});
+	});
 });
 
 function initDefaultTooltip($el) {
