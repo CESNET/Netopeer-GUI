@@ -42,9 +42,6 @@ $(document).ready(function() {
 			value: e.value
 		}).text(e.value);
 		$(e).after(tmp);
-		$(e).next('.range-cover-number').bind('change', function() {
-			$(e).val(tmp.value);
-		});
 		$(e).bind('change', function() {
 			$(e).next('.range-cover-number').val(e.value);
 		});
@@ -275,25 +272,33 @@ function modifyInputAttributes(el, newIndex, newInputName) {
 	// modify every input
 	inputArr.each(function(i, e) {
 		// rewrite name to duplicatedNodeForm
-		elName = $(e).attr('name').replace('configDataForm', newInputName);
-		$(e).attr('name', elName);
+		if ( $(e).attr('name') ) {
+			elName = $(e).attr('name').replace('configDataForm', newInputName);
+			$(e).attr('name', elName);
 
-		// check, if default attribute is defined
-		// if yes, default value will be used instead of current value
-		if ( $(e).attr('default') !== "" ) {
-			if ( $(e).attr('type') == 'radio' ) {
-				if ( $(e).attr('value') == $(e).attr('default') ) {
-					$(e).parent().parent().find('input[checked=checked]').removeAttr('checked');
-					$(e).attr('checked', 'checked');
-				}
-			} else {
-				if ( $(e).attr('value') != $(e).attr('default') ) {
-					$(e).attr('value', $(e).attr('default'));
+			if ( $(e).attr('type') == 'range' ) {
+				$(e).bind('change', function() {
+					$(e).next('.range-cover-number').val(e.value);
+				});
+			}
+
+			// check, if default attribute is defined
+			// if yes, default value will be used instead of current value
+			if ( $(e).attr('default') !== "" ) {
+				if ( $(e).attr('type') == 'radio' ) {
+					if ( $(e).attr('value') == $(e).attr('default') ) {
+						$(e).parent().parent().find('input[checked=checked]').removeAttr('checked');
+						$(e).attr('checked', 'checked');
+					}
+				} else {
+					if ( $(e).attr('value') != $(e).attr('default') ) {
+						$(e).attr('value', $(e).attr('default'));
+					}
 				}
 			}
+			// we have to remove disabled attribute on input (user should be able to edit this value)
+			$(e).removeAttr('disabled');
 		}
-		// we have to remove disabled attribute on input (user should be able to edit this value)
-		$(e).removeAttr('disabled');
 	});
 
 	// recursively find next level of input

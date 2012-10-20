@@ -783,6 +783,11 @@ XML;
 								if ( !in_array($key, $allowedSubmenu) ) {
 									$allowedSubmenu[] = $subKey;
 								}
+								foreach ($tmp as $subSubKey => $tmp2) {
+									if ( !in_array($subSubKey, $allowedSubmenu) ) {
+										$allowedSubmenu[] = $subSubKey;
+									}
+								}
 							}
 						}
 					}
