@@ -62,7 +62,7 @@
 			<span class="value-cover">
 				<select name="{{currentInputName}}">
 					{% for val in explode('|', element.attributes.enumval) %}
-						<option value="{{val}}">{{val}}</option>
+						<option value="{{val}}" {% if element.0 == val %}selected="selected"{% endif %}>{{val}}</option>
 					{% endfor %}
 				</select>
 			</span>
