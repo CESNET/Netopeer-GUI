@@ -6,7 +6,11 @@ require_once __DIR__.'/../app/AppKernel.php';
 
 use Symfony\Component\HttpFoundation\Request;
 
-$kernel = new AppKernel('prod', false);
+// try {
+$kernel = new AppKernel('prod', true);
 $kernel->loadClassCache();
 //$kernel = new AppCache($kernel);
 $kernel->handle(Request::createFromGlobals())->send();
+// } catch (\ErrorException $e) {
+// 	echo $e->getMessage();
+// }
