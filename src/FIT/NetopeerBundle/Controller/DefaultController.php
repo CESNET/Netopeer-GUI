@@ -223,6 +223,7 @@ class DefaultController extends BaseController
 
 		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
 		$this->assign('routeParams', $routeParams);
+
 		return $this->getTwigArr();
 	}
 
