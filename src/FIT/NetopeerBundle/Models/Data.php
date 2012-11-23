@@ -151,6 +151,10 @@ class Data {
 				break;
 			}
 		} while ($tmp != "");
+		$status = stream_get_meta_data($sock);
+		if (!$response && $status["timed_out"] == true) {
+			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Reached timeout for reading response.");
+		}
 		/* "unchunk" frames (RFC6242) */
 		try {
 			$response = $this->unwrap_rfc6242($response);
@@ -212,7 +216,7 @@ class Data {
 		$response = $this->readnetconf($sock);
 		$decoded = json_decode($response, true);
 
-		if ($decoded["type"] == self::REPLY_OK) {
+		if ($decoded && ($decoded["type"] == self::REPLY_OK)) {
 			$newconnection = new ConnectionSession($decoded["session"], $params["host"]);
 			$newconnection = serialize($newconnection);
 
@@ -254,12 +258,16 @@ class Data {
 		}
 		$sessionKey = $this->getHashFromKey($params['key']);
 
-		$decoded = $this->execute_operation($sock, array(
+		$get_params = array(
 			"type" 		=> self::MSG_GET,
 			"session" 	=> $sessionKey,
 			"source" 	=> "running",
-			"filter" 	=> $params['filter']
-		));
+		);
+		if ($params['filter'] !== "") {
+			$get_params["filter"] = $params['filter'];
+		}
+
+		$decoded = $this->execute_operation($sock, $get_params);
 
 		return $this->checkDecodedData($decoded);
 	}
@@ -525,7 +533,7 @@ class Data {
 			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not connect to socket. Error: $errstr");
 			return 1;
 		}
-		stream_set_timeout($sock, 1, 100);
+		stream_set_timeout($sock, 2, 500);
 
 		switch ($command) {
 			case "connect":
