@@ -15,10 +15,10 @@
 {% block singleContent %}
 	<h1>Config &amp; State data</h1>
 	{% if stateArr is defined and not(stateArr is empty) %}
-		<form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
+		{# <form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
 			{{ form_widget(formState) }}
 		    <input type="submit" value="Get" />
-		</form>
+		</form> #}
 		<form action="#" method="post" name="formConfigData">
 			<div class="root">
 				{% set iterator = 1 %}
@@ -41,10 +41,10 @@
 {% block config %}
 	<h1>Config data only</h1>
 	{% if configArr is defined and not(configArr is empty) %}
-		<form action="" method="post" {{ form_enctype(formConfig) }} class="filter" name="formConfig">
+	{# <form action="" method="post" {{ form_enctype(formConfig) }} class="filter" name="formConfig">
 			{{ form_widget(formConfig) }}
 		    <input type="submit" value="Get" />
-		</form>
+		</form> #}
 		<form action="#" method="post" name="formConfigData">
 			<div class="root">
 				{% set iterator = 1 %}

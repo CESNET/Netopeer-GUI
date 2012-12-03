@@ -169,6 +169,25 @@ class DefaultController extends BaseController
 		// we will prepare filter form in column
 		$this->setSectionFilterForms();
 
+		/* Show the first module we have */
+		if ( $module == null ) {
+			$retArr['key'] = $key;
+			$routeName = 'module';
+			$dataClass->buildMenuStructure($key);
+			$modules = $dataClass->getModels();
+			if (isset($modules[0])) {
+				$module1st = $modules[0];
+				if (!isset($module1st["params"]["module"])) {
+					/* ERROR - wrong structure of model entry */
+					$this->get('data_logger')
+						->err("Cannot get first model (redirect to 1st tab).",
+						array("message" => "\$module1st[\"params\"][\"module\"] is not set"));
+				}
+				$retArr['module'] = $module1st["params"]["module"];
+				return $this->redirect($this->generateUrl($routeName, $retArr));
+			}
+		}
+
 		// if we have module, we are definitely in module or subsection action, so we could load names
 		if ( $module ) {
 			parent::setSubmenuUrl($module);
