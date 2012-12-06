@@ -408,6 +408,33 @@ class Data {
 	}
 
 	/**
+	 * handle info action
+	 * @param  &$sock   		socket descriptor
+	 * @param  {array} &$params array of values for mod_netconf (type, params...)
+	 * @return {int}       		0 on success
+	 */
+	private function handle_info(&$sock, &$params) {
+		if ($this->check_logged_keys() != 0) {
+			return 1;
+		}
+		$session = $this->container->get('request')->getSession();
+		$sessionKey = $this->getHashFromKey($params['key']);
+
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_INFO,
+			"session" 	=> $sessionKey
+		));
+
+		if (!$decoded) {
+			/* error occured, unexpected response */
+			$this->logger->err("Could get session info.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not get session info.");
+		}
+
+		return $decoded;
+	}
+
+	/**
 	 * checks, if logged keys are valid
 	 * @return {int}       		0 on success
 	 */
@@ -558,8 +585,12 @@ class Data {
 			case "unlock":
 				$res = $this->handle_unlock($sock, $params);
 				break;
+			case "info":
+				$res = $this->handle_info($sock, $params);
+				break;
 			default:
 				$this->container->get('request')->getSession()->setFlash($this->flashState .' info', printf("Command not implemented yet. (%s)", $command));
+				return 1;
 		}
 
 		fclose($sock);
