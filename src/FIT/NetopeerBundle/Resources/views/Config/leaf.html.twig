@@ -18,7 +18,7 @@
 		<span class="label-cover {% if element.attributes.description is defined %}has-tooltip{% endif %}">
 			<strong>{{key}}</strong>
 			{% if element.attributes.mandatory is defined %}
-				<span class="mandatory">*</span>
+				<span class="mandatory tooltip" title="Mandatory item">*</span>
 			{% endif %}
 		</span>
 	</span>
