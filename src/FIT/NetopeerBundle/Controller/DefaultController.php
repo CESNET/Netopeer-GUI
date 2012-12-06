@@ -705,7 +705,7 @@ class DefaultController extends BaseController
 								$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node->asXml());
 							}
 						} catch (\ErrorException $e) {
-							// nothing
+							throw new \ErrorException("Could not add create attribute to duplicated node.", array('node', $node->asXml()));
 						}
 					}
 				}
