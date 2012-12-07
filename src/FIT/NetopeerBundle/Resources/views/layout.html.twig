@@ -33,6 +33,7 @@
 					<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" id="ico-unlock">Unlock</a>
 				{% endif %}
 				<a href="{{ path("handleConnection", {"command": "info", "key": app.request.get('key')}) }}">Session info</a>
+				<a href="javascript:document.location.reload(true)">Refresh data</a>
 			{% endif %}
 			{% if topmenu is defined %}
 				{% for section in topmenu %}
