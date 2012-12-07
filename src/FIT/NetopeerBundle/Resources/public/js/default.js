@@ -1,6 +1,6 @@
 
 $(document).ready(function() {
-	$("body > section").height(	$(window).height() - $("nav#top").height());
+	changeSectionHeight();
 
 	if ( $(".edit-bar").length ) {
 		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
@@ -51,10 +51,16 @@ $(document).ready(function() {
 });
 
 $(window).resize(function() {
+	changeSectionHeight();
 	showIconsOnLeafLine();
 });
 
+function changeSectionHeight() {
+	$("body > section, body > section#content").css('min-height', '0%').height($(window).height());
+}
+
 function showIconsOnLeafLine() {
+	/*
 	if ($(window).width() < 1550) {
 		$('.root').delegate(".leaf-line", 'hover', function() {
 			$(this).find('.icon-bar').fadeToggle();
@@ -62,6 +68,7 @@ function showIconsOnLeafLine() {
 	} else {
 		$('.root').undelegate('.leaf-line', hover);
 	}
+	*/
 }
 
 function initDefaultTooltip($el) {

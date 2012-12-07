@@ -25,7 +25,7 @@ $fHeadings:		Arial, Trebuchet, Verdana, sans-serif;
 $img:			'../images/';
 
 html { min-height: 100%; height: 100%; width: 100%; min-width: 800px; }
-body { background: #f0f0f0; font-family: $fBody; font-size: 0.625em; color: $cFont; position: relative; min-height: 100%; height: 100%; overflow: scroll;
+body { background: #f0f0f0; font-family: $fBody; font-size: 0.625em; color: $cFont; position: relative; min-height: 100%; height: 100%; overflow: hidden;
 	> * { @include box-sizing(border-box); }
 }
 a { @include link-colors($cBase, #000); 
@@ -96,7 +96,7 @@ nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background:
 	}
 }
 
-body > section { float: left; width: 50%; min-height: 100%; padding: $hNavTop + $sContentPadding $sContentPadding $sContentPadding $sContentPadding; font-size: 1.4em; overflow-y: scroll; background: #f5f5f5; 
+body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPadding; font-size: 1.4em; overflow-y: scroll; background: #f5f5f5; @include box-sizing(border-box); border-top: $hNavTop solid transparent; 
 	&.left-nav-defined { width: 45%; }
 
 
@@ -166,11 +166,11 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $hNavTop + 
 		&.max-width-column { max-width: 800px; width: 100%; float: none; }
 	}
 }
-.top-part { position: absolute; right: $sContentPadding; top: $hNavTop + $sContentPadding; font-size: 1.2em; @include opacity(0.7); z-index: 10;
+.top-part { position: absolute; right: 2 * $sContentPadding; top: $hNavTop + $sContentPadding; font-size: 1.2em; @include opacity(0.7); z-index: 10;
 	&:hover { @include opacity(1); }
 }
 
-body > section, #content { position: relative;
+body > section, #content { position: relative; @include box-sizing(border-box);
 	h1, h2, h3, h4, legend { font-family: $fHeadings; color: $cBase; }
 	h1 { font-size: 1.9em; margin: 20px 0px 15px 0px; }
 	h2 { font-size: 1.7em; margin: 15px 0px 10px 0px; }
