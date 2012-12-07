@@ -597,6 +597,10 @@ class Data {
 
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
+		if ($command === "info") {
+			return $res;
+		}
+
 		if ( isset($res) && $res !== 1 && $res !== -1) {
 			if (!$this->isResponseValid($res)) {
 				$this->container->get('request')->getSession()->setFlash($this->flashState . ' error', "Requested XML from server is not valid.");

@@ -32,13 +32,13 @@
 				{% else %}
 					<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" id="ico-unlock">Unlock</a>
 				{% endif %}
+				<a href="{{ path("handleConnection", {"command": "info", "key": app.request.get('key')}) }}">Session info</a>
 			{% endif %}
 			{% if topmenu is defined %}
 				{% for section in topmenu %}
 					<a href="{{ path(section.path, section.params) }}" title="{{section.title}}" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %}">{{section.name}}</a>
 				{% endfor %}
 			{% endif %}
-
 			<div id="userpane">
 				Logged user: <strong>{{ app.user.username }}</strong> 
 				{% if is_granted('IS_AUTHENTICATED_FULLY') %}<a href="{{ path('_logout') }}" class="log-out">Log out</a>{% endif %}

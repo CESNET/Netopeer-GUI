@@ -119,13 +119,18 @@ class DefaultController extends BaseController
 			'filter' => ''
 		);
 
-		if ( $command === "get" ) {
+		if ( ($command === "get") || ($command  === "info") ) {
 			$dataClass->setFlashState('state');
 		} else {
 			$dataClass->setFlashState('config');
 		}
 
 		$res = $dataClass->handle($command, $params);
+		if ($command === "info") {
+			/* TODO make more MVC */
+			$session = $this->container->get('request')->getSession();
+			$session->setFlash('state notice', 'Got info about session:'. var_export($res, true));
+		} else
 		// if something goes wrong, we will redirect to connections page
 		if ( $res != 1 ) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
