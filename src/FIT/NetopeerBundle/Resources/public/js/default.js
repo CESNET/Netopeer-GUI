@@ -46,7 +46,23 @@ $(document).ready(function() {
 			$(e).next('.range-cover-number').val(e.value);
 		});
 	});
+
+	showIconsOnLeafLine();
 });
+
+$(window).resize(function() {
+	showIconsOnLeafLine();
+});
+
+function showIconsOnLeafLine() {
+	if ($(window).width() < 1550) {
+		$('.root').delegate(".leaf-line", 'hover', function() {
+			$(this).find('.icon-bar').fadeToggle();
+		});
+	} else {
+		$('.root').undelegate('.leaf-line', hover);
+	}
+}
 
 function initDefaultTooltip($el) {
 	$el.gips({ 'theme': 'blue', placement: 'top', animationSpeed: 100, bottom: $el.parent().parent().parent().outerHeight(), text: $el.siblings('.tooltip-description').text() });
