@@ -284,12 +284,15 @@ class Data {
 		}
 		$sessionKey = $this->getHashFromKey($params['key']);
 
-		$decoded = $this->execute_operation($sock, array(
+		$getconfigparams = array(
 			"type" 		=> self::MSG_GETCONFIG,
 			"session" 	=> $sessionKey,
 			"source" 	=> $params['source'],
-			"filter" 	=> $params['filter']
-		));
+		);
+		if(isset($params['filter']) && $params['filter'] !== "") {
+			$getconfigparams["filter"] = $params['filter'];
+		}
+		$decoded = $this->execute_operation($sock, $getconfigparams);
 		return $this->checkDecodedData($decoded);
 	}
 
