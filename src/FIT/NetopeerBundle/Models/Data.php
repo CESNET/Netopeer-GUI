@@ -366,9 +366,7 @@ class Data {
 			"target" => $params['target'],
 			"config" => $params['config']
 		);
-		//var_dump($params);
 		$decoded = $this->execute_operation($sock, $params);
-
 		return $this->checkDecodedData($decoded);
 	}
 
