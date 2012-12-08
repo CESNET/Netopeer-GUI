@@ -35,7 +35,7 @@ $(document).ready(function() {
 
 	/* when range input type, add number of current value before input */
 	$("input[type='range']").each(function(i, e) {
-		tmp = $("<input>").attr({
+		var tmp = $("<input>").attr({
 			'class': 'range-cover-number',
 			type: 'number',
 			disabled: 'disabled',
@@ -76,19 +76,19 @@ function initDefaultTooltip($el) {
 }
 
 function duplicateNode($elem) {
-	$cover = createFormUnderlay($elem);
+	var $cover = createFormUnderlay($elem);
 
 	var xPath = $elem.attr('rel'),	// parent xPath - in anchor attribute rel
 	level = findLevelValue($elem);
 
-	$currentParent = $elem.parent().parent();
-	$currentParentLevel = $elem.parents('.level-' + level);
+	var $currentParent = $elem.parent().parent();
+	var $currentParentLevel = $elem.parents('.level-' + level);
 
 	// generate new form
-	$form = generateFormObject('duplicatedNodeForm');
+	var $form = generateFormObject('duplicatedNodeForm');
 
 	// current element clone - with all children
-	$newClone = $elem.parent().parent().clone();
+	var $newClone = $elem.parent().parent().clone();
 	$form.html($newClone);
 	if ($elem.parent().parent().is(':first-child')) {
 		$elem.parent().parent().nextAll("*").each(function(i, el) {
@@ -100,7 +100,7 @@ function duplicateNode($elem) {
 	$form.find('.state').remove();
 
 	// create hidden input with path to the duplicated node
-	$elementWithParentXpath = $("<input>")
+	var $elementWithParentXpath = $("<input>")
 		.attr({
 			type: 'hidden',
 			name: "duplicatedNodeForm[parent]",
@@ -130,19 +130,19 @@ function duplicateNode($elem) {
 }
 
 function removeNode($elem) {
-	createFormUnderlay($elem);
+	var $cover = createFormUnderlay($elem);
 
 	var xPath = $elem.attr('rel');	// parent XPath - from attribute rel
-	level = findLevelValue($elem);
+	var level = findLevelValue($elem);
 
-	$currentParent = $elem.parent().parent();
-	$currentParentLevel = $elem.parents('.level-' + level);
+	var $currentParent = $elem.parent().parent();
+	var $currentParentLevel = $elem.parents('.level-' + level);
 
 	// generate new form
-	$form = generateFormObject('removeNodeForm');
+	var $form = generateFormObject('removeNodeForm');
 
 	// create hidden input with path to the duplicated node
-	$elementWithParentXpath = $("<input>")
+	var $elementWithParentXpath = $("<input>")
 		.attr({
 			type: 'hidden',
 			name: "removeNodeForm[parent]",
@@ -161,22 +161,22 @@ function removeNode($elem) {
 }
 
 function generateNode($elem) {
-	createFormUnderlay($elem);
+	var $cover = createFormUnderlay($elem);
 
 	var rel = $elem.attr('rel').split('_');	// rel[0] - xPath, rel[1] - serialized route params
-	level = findLevelValue($elem);
+	var level = findLevelValue($elem);
 
-	$currentParent = $elem.parent().parent();
-	$currentParentLevel = $elem.parents('.level-' + level);
+	var $currentParent = $elem.parent().parent();
+	var $currentParentLevel = $elem.parents('.level-' + level);
 
-	xPath = rel[0];
-	loadUrl = rel[1];
+	var xPath = rel[0];
+	var loadUrl = rel[1];
 
 	// generate new form
-	$form = generateFormObject('generateNodeForm');
+	var $form = generateFormObject('generateNodeForm');
 
 	// create hidden input with path to the duplicated node
-	$elementWithParentXpath = $("<input>")
+	var $elementWithParentXpath = $("<input>")
 		.attr({
 			type: 'hidden',
 			name: "generateNodeForm[parent]",
@@ -185,7 +185,7 @@ function generateNode($elem) {
 		$form.prepend($elementWithParentXpath);
 
 	// load URL with HTML form
-	$tmpDiv = $("<div>").addClass('root');
+	var $tmpDiv = $("<div>").addClass('root');
 	$tmpDiv.load(document.location.protocol + "//" + document.location.host + loadUrl, function() {
 		// we have to modify inputs for all children
 		$tmpDiv.children().each(function(i, el) {
@@ -204,6 +204,7 @@ function generateNode($elem) {
 }
 
 function createFormUnderlay($elem) {
+	var $cover;
 	// find cover - if we are on state, it would be state column
 	if ($elem.parents('#state').length) {
 		$cover = $("#state");
@@ -266,6 +267,7 @@ function findLevelValue($elem) {
 }
 
 function generateFormObject(formName) {
+	var $form;
 	// new form object - if is not created, we will create new one
 	if ( $(".generatedForm").length ) {
 		$form = $('.generatedForm');
@@ -284,22 +286,22 @@ function generateFormObject(formName) {
 }
 
 function modifyInputAttributes(el, newIndex, newInputName) {
-	uniqueId = String(getUniqueId());
+	var uniqueId = String(getUniqueId());
 
 	// clean edit-bar html
 	$(el).find('.edit-bar').html('');
 
 	// find all input in this level
-	inputArr = $.merge( $(el).children('input'), $(el).children('.config-value-cover').find('input') );
+	var inputArr = $.merge( $(el).children('input'), $(el).children('.config-value-cover').find('input') );
 
 	// modify every input
 	inputArr.each(function(i, e) {
 		// rewrite name to duplicatedNodeForm
 		if ( $(e).attr('name') ) {
-			elName = $(e).attr('name').replace('configDataForm', newInputName);
+			var elName = $(e).attr('name').replace('configDataForm', newInputName);
 			$(e).attr('name', elName);
 
-			if ( $(e).attr('type') == 'range' ) {
+			if ( $(e).attr('type') === 'range' ) {
 				$(e).bind('change', function() {
 					$(e).next('.range-cover-number').val(e.value);
 				});
@@ -308,13 +310,13 @@ function modifyInputAttributes(el, newIndex, newInputName) {
 			// check, if default attribute is defined
 			// if yes, default value will be used instead of current value
 			if ( $(e).attr('default') !== "" ) {
-				if ( $(e).attr('type') == 'radio' ) {
-					if ( $(e).attr('value') == $(e).attr('default') ) {
+				if ( $(e).attr('type') === 'radio' ) {
+					if ( $(e).attr('value') === $(e).attr('default') ) {
 						$(e).parent().parent().find('input[checked=checked]').removeAttr('checked');
 						$(e).attr('checked', 'checked');
 					}
 				} else {
-					if ( $(e).attr('value') != $(e).attr('default') ) {
+					if ( $(e).attr('value') !== $(e).attr('default') ) {
 						$(e).attr('value', $(e).attr('default'));
 					}
 				}
@@ -338,7 +340,7 @@ function createSubmitButton($form, inputValue) {
 	if ( $form.children("input[type=submit]").length ) {
 		$form.children("input[type=submit]").remove();
 	}
-	$elementSubmit = $("<input>")
+	var $elementSubmit = $("<input>")
 		.attr({
 			type: 'submit',
 			value: inputValue
@@ -353,7 +355,7 @@ function createSubmitButton($form, inputValue) {
 
 function createCloseButton($cover, $form) {
 	// create close button and append at the end of form
-	$closeButton = $("<a href='#' title='Close' class='close red button'>Close</a>");
+	var $closeButton = $("<a href='#' title='Close' class='close red button'>Close</a>");
 	$form.append($closeButton);
 
 	// bind click and keydown event
@@ -361,7 +363,7 @@ function createCloseButton($cover, $form) {
 		wrapCoverForm($cover, $form);
 	});
 	$(document).bind('keydown', function(event) {
-		if ( event.which == 27 ) {
+		if ( event.which === 27 ) {
 			//event.preventDefault();
 			wrapCoverForm($cover, $form);
 		}
@@ -370,7 +372,7 @@ function createCloseButton($cover, $form) {
 
 // wrap unwrapped form back to cover whole tree form
 function wrapCoverForm($cover, $form) {
-	$originalForm = $cover.children('form');
+	var $originalForm = $cover.children('form');
 	$cover.find('.root').wrap($originalForm);
 	$form.remove();
 	$('.form-underlay').remove();
@@ -382,7 +384,7 @@ function wrapCoverForm($cover, $form) {
 // alone prepending cover - so we can wrap it always back,
 // for example while close button is clicked
 function unwrapCoverForm($currentParentLevel, $cover) {
-	$oldForm = $currentParentLevel.parents('form').clone();
+	var $oldForm = $currentParentLevel.parents('form').clone();
 	$oldForm.html('');
 	$cover.prepend($oldForm);
 	$currentParentLevel.parents('form').children('.root').unwrap();
@@ -393,7 +395,7 @@ function getUniqueId() {
 }
 
 function l (str) {
-	if (console.log) console.log(str);
+	if (console !== null) { console.log(str); }
 }
 
 
@@ -401,7 +403,7 @@ function l (str) {
 
 /*
 function createNode($elem) {
-	$cover = createFormUnderlay($elem);
+	var $cover = $cover = createFormUnderlay($elem);
 
 	var xPath = $elem.attr('rel'),	// parent xPath - in anchor attribute rel
 		$editBar = $elem.parent().clone();	// editBar clone - we will modify it below
