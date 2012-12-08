@@ -737,13 +737,17 @@ class DefaultController extends BaseController
 						try {
 							if ( is_object($node) ) {
 								$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
-								$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node->asXml());
 							}
 						} catch (\ErrorException $e) {
 							// nothing happeds - attribute is already there
 						}
+
+						if ( is_object($node) ) {
+							$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node->asXml());
+						}
 					}
 				}
+
 				$createTree = $this->completeRequestTree($parentNode[0], $createString);
 				// for debuggind, edited configXml will be saved into temp file
 				file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $createTree->asXml());
