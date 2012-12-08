@@ -88,6 +88,7 @@ class DefaultController extends BaseController
 		$this->assign('sessionConnections', $connections);
 		$this->assign('singleColumnLayout', false);
 		$this->assign('hideColumnControl', true);
+		$this->assign('activeAction', 'home');
 		return $this->getTwigArr();
 	}
 
@@ -126,11 +127,6 @@ class DefaultController extends BaseController
 		}
 
 		$res = $dataClass->handle($command, $params);
-		if ($command === "info") {
-			/* TODO make more MVC */
-			$session = $this->container->get('request')->getSession();
-			$session->setFlash('state notice', 'Got info about session:'. var_export($res, true));
-		} else
 		// if something goes wrong, we will redirect to connections page
 		if ( $res != 1 ) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
@@ -142,6 +138,38 @@ class DefaultController extends BaseController
 			$url = $this->get('request')->headers->get('referer');
 			return new RedirectResponse($url);
 		}
+	}
+
+	/**
+	 * @Route("/info-page/{key}/{action}/", name="infoPage")
+	 * @Template("FITNetopeerBundle:Default:section.html.twig")
+	 *
+	 * Shows info page with informatins
+	 */
+	public function sessionInfoAction($key, $action)
+	{
+		$dataClass = $this->get('DataModel');
+		parent::setActiveSectionKey($key);
+		$dataClass->buildMenuStructure($key);
+
+		if ( $action == "session" ) {
+			$session = $this->container->get('request')->getSession();
+			$sessionArr = $session->all();
+
+			$xml = XMLoperations::createXML("session", $sessionArr);
+			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
+
+			$this->assign("stateArr", $xml);
+		}
+
+		$this->assign('singleColumnLayout', true);
+		// because we do not allow changing layout, controls will be hidden
+		$this->assign('hideColumnControl', true);
+
+		$routeParams = array('key' => $key, 'module' => null, 'subsection' => null);
+		$this->assign('routeParams', $routeParams);
+		$this->assign('activeAction', $action);
+		return $this->getTwigArr();
 	}
 
 	/**

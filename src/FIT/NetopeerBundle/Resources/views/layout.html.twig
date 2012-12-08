@@ -25,14 +25,14 @@
 
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="top">
-			<a href="{{ path('_home') }}" title="Home" class="ico-home header-icon"><span></span>Connections</a>
+			<a href="{{ path('_home') }}" title="Home" class="ico-home header-icon {% if activeAction is defined and activeAction == "home" %}active{% endif %}"><span></span>Connections</a>
 			{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
 				{% if lockedConn == false %}
 					<a href="{{ path("handleConnection", {"command": "lock", "key": app.request.get('key')} ) }}" title="Lock" class="ico-unlock header-icon"><span></span></a>
 				{% else %}
 					<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" class="ico-lock header-icon"><span></span></a>
 				{% endif %}
-				<a href="{{ path("handleConnection", {"command": "info", "key": app.request.get('key')}) }}" title="Session info" class="ico-session header-icon"><span></span></a>
+				<a href="{{ path("infoPage", {"key": app.request.get('key'), "action": "session"}) }}" title="Session info" class="ico-session header-icon {% if activeAction is defined and activeAction == "session" %}active{% endif %}"><span></span></a>
 				<a href="javascript:document.location.reload(true)" title="Refresh data" class="ico-refresh header-icon"><span></span></a>
 			{% endif %}
 			{% if topmenu is defined %}

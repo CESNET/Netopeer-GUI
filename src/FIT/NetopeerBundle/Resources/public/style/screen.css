@@ -237,7 +237,7 @@ nav#top .header-icon span, div#top .header-icon span {
   opacity: 0.5;
 }
 /* line 57, ../sass/screen.scss */
-nav#top .header-icon:hover span, div#top .header-icon:hover span {
+nav#top .header-icon:hover span, nav#top .header-icon.active span, div#top .header-icon:hover span, div#top .header-icon.active span {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1;
 }
@@ -256,7 +256,7 @@ nav#top .ico-home span, div#top .ico-home span {
   background: url("../images/ico/16_home.png") center center no-repeat;
 }
 /* line 63, ../sass/screen.scss */
-nav#top .ico-home:hover, div#top .ico-home:hover {
+nav#top .ico-home:hover, nav#top .ico-home.active, div#top .ico-home:hover, div#top .ico-home.active {
   background: #003f67;
 }
 /* line 67, ../sass/screen.scss */

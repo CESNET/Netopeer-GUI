@@ -53,14 +53,14 @@ nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), dark
 	//.ico-lock, .ico-unlock, .ico-session, .ico-refresh
 	.header-icon { background: $cComp1Dark; padding: 0px 4px; border-left: 1px solid lighten($cComp1Dark, 10%);
 		span { display: block; padding: 0px;  float: left; width: 40px; height: 39px; @include opacity(0.5); }
-		&:hover {
+		&:hover, &.active {
 			span { @include opacity(1); }
 		}			
 	}
 
 	.ico-home { float: left; border-right: 1px solid desaturate($cComp1Light, 50%); border-left: 0px; padding: 0px 20px 0px 0px; background: $cBase; height: 39px;
 		span { width: 50px; background: url($img + 'ico/16_home.png') center center no-repeat; }
-		&:hover { background: darken($cBase, 5%); }
+		&:hover, &.active { background: darken($cBase, 5%); }
 	}
 
 	.ico-lock { 
