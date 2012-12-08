@@ -494,7 +494,7 @@ class DefaultController extends BaseController
 		// edit-cofig
 		if ( ($merged = $this->get('DataModel')->handle('editconfig', $editConfigParams)) != 1 ) {
 			// for debuggind purposes, we will save result into the temp file
-			file_put_contents(__DIR__.'/../Data/models/tmp/merged.yin', $merged);
+			file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/merged.yin', $merged);
 		} else {
 			$this->get('logger')->err('Edit-config failed.', array('params', $editConfigParams));
 			// throw new \ErrorException('Edit-config failed.');
@@ -645,7 +645,7 @@ class DefaultController extends BaseController
 				$configXml = simplexml_load_string($configXml, 'SimpleXMLIterator');
 
 				// save to temp file - for debuggind
-				file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $configXml->asXml());
+				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/original.yin', $configXml->asXml());
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
 				$xmlNameSpaces = $configXml->getNamespaces();
@@ -664,7 +664,7 @@ class DefaultController extends BaseController
 				}
 
 				// for debuggind, edited configXml will be saved into temp file
-				file_put_contents(__DIR__.'/../Data/models/tmp/edited.yin', $configXml->asXml());
+				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/edited.yin', $configXml->asXml());
 
 				$res = $this->executeEditConfig($key, $configXml->asXml());
 				$this->get('session')->setFlash('config success', "Config has been edited successfully.");
@@ -697,7 +697,7 @@ class DefaultController extends BaseController
 				$tmpConfigXml = simplexml_load_string($originalXml);
 
 				// save to temp file - for debuggind
-				file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $tmpConfigXml->asXml());
+				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
 				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
@@ -751,7 +751,7 @@ class DefaultController extends BaseController
 
 				$createTree = $this->completeRequestTree($parentNode[0], $createString);
 				// for debuggind, edited configXml will be saved into temp file
-				file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $createTree->asXml());
+				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/newElem.yin', $createTree->asXml());
 				$res = $this->executeEditConfig($key, $createTree->asXml());
 
 				$this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
@@ -803,7 +803,7 @@ class DefaultController extends BaseController
 				$tmpConfigXml = simplexml_load_string($originalXml);
 
 				// save to temp file - for debuggind
-				file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $tmpConfigXml->asXml());
+				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
 				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
@@ -814,17 +814,17 @@ class DefaultController extends BaseController
 				$xpath = $this->decodeXPath($post_vals["parent"]);
 				$toDelete = $tmpConfigXml->xpath($xpath);
 				$deletestring = "";
-				
+
 				foreach ($toDelete as $td) {
 					//$td->registerXPathNamespace("xc", "urn:ietf:params:xml:ns:netconf:base:1.0");
 					$td->addAttribute("xc:operation", "remove", "urn:ietf:params:xml:ns:netconf:base:1.0");
 					$deletestring .= "\n".str_replace('<?xml version="1.0"?'.'>', '', $td->asXml());
 				}
-				
+
 				$deleteTree = $this->completeRequestTree($toDelete[0], $deletestring);
 
 				// for debuggind, edited configXml will be saved into temp file
-				file_put_contents(__DIR__.'/../Data/models/tmp/removeNode.yin', $tmpConfigXml->asXml());
+				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/removeNode.yin', $tmpConfigXml->asXml());
 				$this->executeEditConfig($key, $tmpConfigXml->asXml());
 
 				$this->getRequest()->getSession()->setFlash('config success', "Record has been removed.");
