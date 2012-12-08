@@ -169,6 +169,7 @@ class DefaultController extends BaseController
 		$routeParams = array('key' => $key, 'module' => null, 'subsection' => null);
 		$this->assign('routeParams', $routeParams);
 		$this->assign('activeAction', $action);
+		$this->assign('stateSectionTitle', "Session info");
 		return $this->getTwigArr();
 	}
 
