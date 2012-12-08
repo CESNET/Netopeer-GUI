@@ -649,8 +649,12 @@ class DefaultController extends BaseController
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
 				$xmlNameSpaces = $configXml->getNamespaces();
+
 				if ( isset($xmlNameSpaces[""]) ) {
 					$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+				} else {
+					// we will use this xmlns as backup for XPath request
+					$configXml->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
 				}
 
 				// foreach over all post values
