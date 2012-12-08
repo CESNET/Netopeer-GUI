@@ -139,7 +139,7 @@ class Data {
 	 * @param  &$sock 		socket descriptor
 	 * @return {string}     trimmed string that was read
 	 */
-	private function readnetconf(&$sock) {
+	private function readnetconf2(&$sock) {
 		$response = "";
 		do {
 			$tmp = "";
@@ -162,6 +162,55 @@ class Data {
 			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not read NetConf. Error: ".$e->getMessage());
 			return 1;
 		}
+
+		return trim($response);
+	}
+	/**
+	 * Read response from socket
+	 * @param  &$sock 		socket descriptor
+	 * @return {string}     trimmed string that was read
+	 */
+	private function readnetconf(&$sock) {
+		$response = "";
+		$tmp = "";
+		$tmp = fread($sock, 1024);
+		if ($tmp === false) {
+			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Reading failure.");
+		}
+
+		$response = $tmp;
+		// message is wrapped in "\n#strlen($m)\n$m\n##\n"
+		// get size:
+		$lines = explode("\n", $tmp);
+		if (sizeof($lines >= 2)) {
+			$size = strlen($lines[0]) + 1 + strlen($lines[1]) + 1;
+			$size += intval(substr($lines[1], 1)) + 5;
+		}
+
+		while (strlen($response) < $size) {
+			$tmp = "";
+			$tmp = fread($sock, $size - strlen($response));
+			if ($tmp === false) {
+				$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Reading failure.");
+				break;
+			}
+			$response .= $tmp;
+			//echo strlen($response) ."/". $size ."\n";
+		}
+		$status = stream_get_meta_data($sock);
+		if (!$response && $status["timed_out"] == true) {
+			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Reached timeout for reading response.");
+			//echo "Reached timeout for reading response.";
+		}
+		/* "unchunk" frames (RFC6242) */
+		try {
+			$response = $this->unwrap_rfc6242($response);
+		} catch (\ErrorException $e) {
+			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not read NetConf. Error: ".$e->getMessage());
+			//echo "unwrap exception";
+			return 1;
+		}
+		//echo "readnetconf time consumed: ". (microtime(true) - $start);
 
 		return trim($response);
 	}
@@ -563,7 +612,8 @@ class Data {
 			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not connect to socket. Error: $errstr");
 			return 1;
 		}
-		stream_set_timeout($sock, 2, 500);
+		//stream_set_timeout($sock, 5, 500);
+		stream_set_blocking($sock, 1);
 
 		switch ($command) {
 			case "connect":
