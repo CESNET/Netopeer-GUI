@@ -292,8 +292,7 @@ function modifyInputAttributes(el, newIndex, newInputName) {
 	$(el).find('.edit-bar').html('');
 
 	// find all input in this level
-	var inputArr = $.merge( $(el).children('input'), $(el).children('.config-value-cover').find('input') );
-
+	var inputArr = $.merge( $(el).children('input, select'), $(el).children('.config-value-cover').find('input, select'));
 	// modify every input
 	inputArr.each(function(i, e) {
 		// rewrite name to duplicatedNodeForm

@@ -59,7 +59,7 @@
 				</label>
 			</span>
 		{% elseif element.attributes.type is defined and element.attributes.type == 'enumeration' %}
-			<span class="value-cover">
+			<span class="config-value-cover">
 				<select name="{{currentInputName}}">
 					{% for val in explode('|', element.attributes.enumval) %}
 						<option value="{{val}}" {% if element.0 == val %}selected="selected"{% endif %}>{{val}}</option>

@@ -496,6 +496,7 @@ class DefaultController extends BaseController
 			if ($i == 1) {
 				$config = "<".$pos_subroot[$i]->getName().
 					($namespace!==""?" xmlns=\"$namespace\"":"").
+					" xmlns:xc=\"urn:ietf:params:xml:ns:netconf:base:1.0\"".
 					">\n".$config;
 			} else {
 				$config = "<".$pos_subroot[$i]->getName().
@@ -682,7 +683,8 @@ class DefaultController extends BaseController
 				// we will go through all posted values
 				$newLeafs = array();
 
-				$tmpConfigXml = $this->completeRequestTree($tmpConfigXml, $tmpConfigXml->asXml());
+//				$tmpConfigXml = $this->completeRequestTree($tmpConfigXml, $tmpConfigXml->asXml());
+
 				/* fill values */
 				$i = 0;
 				$createString = "";
@@ -710,12 +712,11 @@ class DefaultController extends BaseController
 								$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node->asXml());
 							}
 						} catch (\ErrorException $e) {
-							throw new \ErrorException("Could not add create attribute to duplicated node.", array('node', $node->asXml()));
+							// nothing happeds - attribute is already there
 						}
 					}
 				}
 				$createTree = $this->completeRequestTree($parentNode[0], $createString);
-
 				// for debuggind, edited configXml will be saved into temp file
 				file_put_contents(__DIR__.'/../Data/models/tmp/newElem.yin', $createTree->asXml());
 				$res = $this->executeEditConfig($key, $createTree->asXml());
