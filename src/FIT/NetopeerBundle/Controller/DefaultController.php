@@ -546,7 +546,7 @@ class DefaultController extends BaseController
 	 * @param  {string} $val         new value
 	 * @return {SimpleXMLElement} 	 modiefied node
 	 */
-	private function elementValReplace(&$configXml, $elementName, $xpath, $val)
+	private function elementValReplace(&$configXml, $elementName, $xpath, $val, $xPathPrefix = "xmlns:")
 	{
 		$isAttribute = false;
 
@@ -557,7 +557,7 @@ class DefaultController extends BaseController
 		}
 
 		// get node according to xPath query
-		$node = $configXml->xpath('/xmlns:'.$xpath);
+		$node = $configXml->xpath('/'.$xPathPrefix.$xpath);
 
 		if (isset($node[0])) {
 			$node = $node[0];
@@ -652,9 +652,11 @@ class DefaultController extends BaseController
 
 				if ( isset($xmlNameSpaces[""]) ) {
 					$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+					$xPathPrefix = "xmlns:";
 				} else {
 					// we will use this xmlns as backup for XPath request
 					$configXml->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
+					$xPathPrefix = "";
 				}
 
 				// foreach over all post values
@@ -664,7 +666,7 @@ class DefaultController extends BaseController
 					$xpath = $this->decodeXPath($values[1]);
 					$xpath = substr($xpath, 1); // removes slash at the begining
 
-					$this->elementValReplace($configXml, $elementName, $xpath, $val);
+					$this->elementValReplace($configXml, $elementName, $xpath, $val, $xPathPrefix);
 				}
 
 				// for debuggind, edited configXml will be saved into temp file

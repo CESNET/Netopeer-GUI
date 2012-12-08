@@ -357,7 +357,17 @@ class Data {
 		}
 		$sessionKey = $this->getHashFromKey($params['key']);
 		/* syntax highlighting problem if XML def. is in one string */
-		$params['config'] = str_replace('<?xml version="1.0"?'.'>', '', $params['config']);
+		$replaceWhatArr = array(
+			"<?xml version=\"1.0\"?>",
+			"<root>",
+			"</root>"
+		);
+		$replaceWithArr = array(
+			"",
+			"",
+			""
+		);
+		$params['config'] = str_replace($replaceWhatArr, $replaceWithArr, $params['config']);
 
 		/* edit-config to store new values */
 		$params = array(
