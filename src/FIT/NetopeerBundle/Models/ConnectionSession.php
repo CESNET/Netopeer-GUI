@@ -23,12 +23,18 @@ class ConnectionSession {
 	 */
 	public $locked = false;
 
-	function __construct($session_hash, $host)
+	/**
+	 * @var session info
+	 */
+	public $status = "";
+
+	function __construct($session_hash, $host, $status="")
 	{
 		$this->hash = $session_hash;
 		$this->host = $host;
 		$newtime = new \DateTime();
 		$this->time = $newtime->format("d.m.Y H:i:s");
 		$this->locked = false;
+		$this->status = $status;
 	}
 }
