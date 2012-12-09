@@ -34,14 +34,14 @@
 				{% endif %}
 				<a href="{{ path("infoPage", {"key": app.request.get('key'), "action": "session"}) }}" title="Session info: {{sessionStatus}}" class="ico-session header-icon {% if activeAction is defined and activeAction == "session" %}active{% endif %}"><span></span></a>
 				<a href="javascript:document.location.reload(true)" title="Refresh data" class="ico-refresh header-icon"><span></span></a>
-			{% endif %}
-			{% if topmenu is defined %}
-				{% set i = 0 %}
-				{% for section in topmenu %}
-					<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %} nth-{{i}}">{{section.name}}</a>
-					{% set i = i + 1 %}
-				{% endfor %}
-				<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" title="GET all information">All</a>
+				{% if topmenu is defined %}
+					{% set i = 0 %}
+					{% for section in topmenu %}
+						<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %} nth-{{i}}">{{section.name}}</a>
+						{% set i = i + 1 %}
+					{% endfor %}
+					<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" title="GET all information">All</a>
+				{% endif %}
 			{% endif %}
 			<div id="userpane">
 				Logged user: <strong>{{ app.user.username }}</strong> 
