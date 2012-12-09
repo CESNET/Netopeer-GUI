@@ -266,7 +266,10 @@ class Data {
 		$decoded = json_decode($response, true);
 
 		if ($decoded && ($decoded["type"] == self::REPLY_OK)) {
+			$param = array( "session" => $decoded["session"] );
+			$status = $this->handle_info($sock, $param);
 			$newconnection = new ConnectionSession($decoded["session"], $params["host"]);
+			$newconnection->session_status = var_export($status, true);
 			$newconnection = serialize($newconnection);
 
 			if ( !$sessionConnections = $session->get("session-connections") ) {
@@ -275,6 +278,7 @@ class Data {
 				$sessionConnections[] = $newconnection;
 				$session->set("session-connections", $sessionConnections);
 			}
+
 			$session->setFlash($this->flashState .' success', "Successfully connected.");
 			/*
 			$session->setFlash($this->flashState .' success', "Successfully connected.".
@@ -474,11 +478,15 @@ class Data {
 	 * @return {int}       		0 on success
 	 */
 	private function handle_info(&$sock, &$params) {
-		if ($this->check_logged_keys() != 0) {
-			return 1;
+		if (isset($params["session"]) && ($params["session"] !== "")) {
+			$sessionKey = $params['session'];
+		} else {
+			if ($this->check_logged_keys() != 0) {
+				return 1;
+			}
+			$session = $this->container->get('request')->getSession();
+			$sessionKey = $this->getHashFromKey($params['key']);
 		}
-		$session = $this->container->get('request')->getSession();
-		$sessionKey = $this->getHashFromKey($params['key']);
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_INFO,
@@ -862,6 +870,7 @@ XML;
 
 			$allowedModels = array();
 			$allowedSubmenu = array();
+			$namespaces = array();
 
 			try {
 				// load GET XML from server
@@ -879,6 +888,8 @@ XML;
 					// get first level nodes (so without root) as items for top menu
 					foreach ($nodes as $node) {
 						foreach ($node as $nodeKey => $submenu) {
+						$ns = $submenu->getNameSpaces();
+						$namespaces[$submenu->getName()] = $ns[""];
 							if ( !in_array($nodeKey, $allowedModels) ) {
 								$allowedModels[] = $nodeKey;
 							}
@@ -927,6 +938,7 @@ XML;
 							"title" => "detail of ".$this->getSectionName($model),
 							"name" => $this->getSectionName($model),
 							"children" => $this->buildSubmenu($key, $model, $allowedSubmenu),
+							"namespace" => $namespaces[$model],
 						);
 					}
 				}

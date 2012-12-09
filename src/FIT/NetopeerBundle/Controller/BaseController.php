@@ -75,6 +75,7 @@ class BaseController extends Controller
 				$conn = unserialize($conn[$this->getRequest()->get('key')]);
 				if ($conn !== false) {
 					$this->assign('lockedConn', $conn->locked);
+					$this->assign('sessionStatus', $conn->session_status);
 				}
 			}
 		} catch (\ErrorException $e) {
