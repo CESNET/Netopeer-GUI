@@ -41,6 +41,7 @@
 					<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %} nth-{{i}}">{{section.name}}</a>
 					{% set i = i + 1 %}
 				{% endfor %}
+				<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" title="GET all information">All</a>
 			{% endif %}
 			<div id="userpane">
 				Logged user: <strong>{{ app.user.username }}</strong> 
