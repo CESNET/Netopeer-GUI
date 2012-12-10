@@ -23,7 +23,10 @@
 				{{element.name}}
 			{% endif %}
 			{% if element.attributes.mandatory is defined and element.attributes.config is defined and element.attributes.config == "true" %}
-				<span class="mandatory tooltip" title="Mandatory item">*</span>
+				<span class="mandatory tooltip">
+				<span class="icon-help">*</span>
+				<span class="tooltip-description">Mandatory item</span>
+				</span>
 			{% endif %}
 		</span>
 	</span>
