@@ -748,14 +748,12 @@ class DefaultController extends BaseController
 						} catch (\ErrorException $e) {
 							// nothing happeds - attribute is already there
 						}
-
-						if ( is_object($node) ) {
-							$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node->asXml());
-						}
 					}
 				}
 
+				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
 				$createTree = $this->completeRequestTree($parentNode[0], $createString);
+
 				// for debuggind, edited configXml will be saved into temp file
 				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/newElem.yin', $createTree->asXml());
 				$res = $this->executeEditConfig($key, $createTree->asXml());
