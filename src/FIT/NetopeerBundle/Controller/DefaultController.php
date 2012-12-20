@@ -758,7 +758,9 @@ class DefaultController extends BaseController
 				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/newElem.yin', $createTree->asXml());
 				$res = $this->executeEditConfig($key, $createTree->asXml());
 
-				$this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
+				if ($res == 0) {
+				  $this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
+				}
 			} else {
 				throw new \ErrorException("Could not load config.");
 			}
