@@ -29,6 +29,7 @@ class Data {
 	const MSG_KILL				= 13;
 	const MSG_INFO				= 14;
 	const MSG_GENERIC			= 15;
+	const MSG_GETSCHEMA			= 16;
 
 	/**
 	 * @var ContainerInterface
@@ -503,6 +504,39 @@ class Data {
 	}
 
 	/**
+	 * handle unlock action
+	 * @param  &$sock   		socket descriptor
+	 * @param  {array} &$params array of values for mod_netconf (type, params...) $params muset contain "identifier" value
+	 * @return {int}       		0 on success
+	 */
+	private function handle_getschema(&$sock, &$params) {
+		if ($this->check_logged_keys() != 0) {
+			return 1;
+		}
+		$session = $this->container->get('request')->getSession();
+		$sessionKey = $this->getHashFromKey($params['key']);
+
+		/* TODO escape string $params["identifier"] */
+		$content = "<get-schema xmlns='urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring'>
+<identifier>".$params["identifier"]."</identifier>
+</get-schema>";
+
+		$decoded = $this->execute_operation($sock, array(
+			"type" 		=> self::MSG_GENERIC,
+			"session" 	=> $sessionKey,
+			"content"	=> $content,
+		));
+
+		if ($decoded["type"] === self::REPLY_OK) {
+			$session->setFlash($this->flashState .' success', "Successfully unlocked.");
+			$this->updateConnLock($params['key']);
+		} else {
+			$this->logger->err("Could not unlock.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not unlock datastore. ");
+		}
+	}
+
+	/**
 	 * checks, if logged keys are valid
 	 * @return {int}       		0 on success
 	 */
@@ -656,6 +690,9 @@ class Data {
 				break;
 			case "info":
 				$res = $this->handle_info($sock, $params);
+				break;
+			case "getschema":
+				$res = $this->handle_getschema($sock, $params);
 				break;
 			default:
 				$this->container->get('request')->getSession()->setFlash($this->flashState .' info', printf("Command not implemented yet. (%s)", $command));
