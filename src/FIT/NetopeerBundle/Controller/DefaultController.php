@@ -59,6 +59,7 @@ class DefaultController extends BaseController
 						"urn:cesnet:tmc:comet:1.0",
 						"urn:cesnet:tmc:combo:1.0",
 						"urn:cesnet:tmc:hanicprobe:1.0",
+						"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring",
 					),
 				);
 
@@ -108,22 +109,26 @@ class DefaultController extends BaseController
 	}
 
 	/**
-	 * @Route("/handle/{command}/{key}/", name="handleConnection")
+	 * @Route("/handle/{command}/{key}/{identifier}", defaults={"identifier" = ""}, name="handleConnection")
 	 *
 	 * Handle actions and execute them in Models/Data
 	 */
-	public function handleConnectionAction($command, $key)
+	public function handleConnectionAction($command, $key, $identifier = "")
 	{
 		$dataClass = $this->get('DataModel');
 		$params = array(
 			'key' => $key,
-			'filter' => ''
+			'filter' => '',
 		);
 
 		if ( ($command === "get") || ($command  === "info") ) {
 			$dataClass->setFlashState('state');
 		} else {
 			$dataClass->setFlashState('config');
+		}
+
+		if ($command === "getschema") {
+			$params['identifier'] = $identifier;
 		}
 
 		$res = $dataClass->handle($command, $params);

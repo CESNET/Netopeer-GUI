@@ -506,7 +506,7 @@ class Data {
 	/**
 	 * handle unlock action
 	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params array of values for mod_netconf (type, params...) $params muset contain "identifier" value
+	 * @param  {array} &$params $params must contain "identifier" of schema, can contain "version" and "format" of schema
 	 * @return {int}       		0 on success
 	 */
 	private function handle_getschema(&$sock, &$params) {
@@ -515,24 +515,29 @@ class Data {
 		}
 		$session = $this->container->get('request')->getSession();
 		$sessionKey = $this->getHashFromKey($params['key']);
+		/* TODO check if: "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring"
+		is in capabilities */
 
-		/* TODO escape string $params["identifier"] */
-		$content = "<get-schema xmlns='urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring'>
-<identifier>".$params["identifier"]."</identifier>
-</get-schema>";
-
-		$decoded = $this->execute_operation($sock, array(
-			"type" 		=> self::MSG_GENERIC,
+		$arguments = array(
+			"type" 		=> self::MSG_GETSCHEMA,
 			"session" 	=> $sessionKey,
-			"content"	=> $content,
-		));
+			"identifier"	=> $params["identifier"], /* TODO escape string $params["identifier"]? */
+		);
 
-		if ($decoded["type"] === self::REPLY_OK) {
-			$session->setFlash($this->flashState .' success', "Successfully unlocked.");
-			$this->updateConnLock($params['key']);
+		if (isset($params["format"])) $arguments["format"] = $params["format"];
+		if (isset($params["version"])) $arguments["version"] = $params["version"];
+
+		$decoded = $this->execute_operation($sock, $arguments);
+
+
+		if ($decoded["type"] === self::REPLY_DATA) {
+			var_dump($decoded["data"]);
+			/* TODO where to put model? */
+			die(); // remove this after solution
+			return 0; // all handle_ methods return 0 on success
 		} else {
-			$this->logger->err("Could not unlock.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not unlock datastore. ");
+			$this->logger->err("Get-schema failed.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Get-schema failed. ");
 		}
 	}
 
