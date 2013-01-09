@@ -537,7 +537,11 @@ class Data {
 			return 0; // all handle_ methods return 0 on success
 		} else {
 			$this->logger->err("Get-schema failed.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Get-schema failed. ");
+			$session->setFlash($this->flashState .' error', "Get-schema failed."
+				. (isset($decoded["error-message"])?" Reason: ".$decoded["error-message"]:"")
+				. (isset($decoded["bad-element"])?" (".  $decoded["bad-element"]  .")":"")
+			);
+			return 1;
 		}
 	}
 

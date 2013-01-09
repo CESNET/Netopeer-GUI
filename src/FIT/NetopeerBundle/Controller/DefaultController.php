@@ -129,6 +129,7 @@ class DefaultController extends BaseController
 
 		if ($command === "getschema") {
 			$params['identifier'] = $identifier;
+			$params['format'] = "yin";
 		}
 
 		$res = $dataClass->handle($command, $params);
@@ -137,7 +138,7 @@ class DefaultController extends BaseController
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 
-		if ( in_array($command, array("connect", "disconnect")) ) {
+		if ( in_array($command, array("connect", "disconnect", "getschema")) ) {
 			return $this->redirect($this->generateUrl('_home'));
 		} else {
 			$url = $this->get('request')->headers->get('referer');
