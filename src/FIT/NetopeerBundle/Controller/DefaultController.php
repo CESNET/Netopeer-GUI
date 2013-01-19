@@ -71,6 +71,8 @@ class DefaultController extends BaseController
 				// if connection is broken (Could not connect)
 				if ( $res = 1 ) {
 					// redirect back to the connection page
+					$session = $this->get('request')->getSession();
+					$this->updateLocalModels($result);
 					return $this->redirect($this->generateUrl('_home'));
 				}
 
@@ -107,6 +109,70 @@ class DefaultController extends BaseController
 		//reconstructs a routing path and gets a routing array called $route_params
         $url = $this->get('request')->headers->get('referer');
         return new RedirectResponse($url);
+	}
+
+
+	/**
+	* Get one model and process it.
+	*
+	* @param {array} &$schparams key, identifier, version, format for get-schema
+	* @return {int} 0 on success, 1 on error
+	*/
+	private function getschema(&$schparams)
+	{
+		$dataClass = $this->get('DataModel');
+		$data = "";
+		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
+			$path = "/tmp/symfony/".$schparams["identifier"].".".$schparams["format"];
+			file_put_contents($path, $data);
+			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"/tmp/symgen/\"");
+		} else {
+			$this->getRequest()->getSession()->setFlash('error', 'Getting model failed.');
+			return 1;
+		}
+		return 0;
+	}
+
+	/**
+	* Get available configuration data models,
+	* store them and transform them.
+	*
+	* @param  {int} $key 	index of session-connection
+	* @return {void}
+	*/
+	private function updateLocalModels($key)
+	{
+		$dataClass = $this->get('DataModel');
+		$ns = "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
+		$params = array(
+			'key' => $key,
+		'filter' => '<netconf-state xmlns="'.$ns.'"><schemas/></netconf-state>',
+		);
+
+		if (($xml = $dataClass->handle('get', $params)) != 1 ) {
+			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+			$xml->registerXPathNamespace("xmlns", $ns);
+			$schemas = $xml->xpath("//xmlns:schema");
+
+			if ($schemas) {
+				/* TODO not to delete everything? */
+				@system("mkdir -p /tmp/symgen /tmp/symfony; rm -rf /tmp/symgen/*");
+			}
+			foreach ($schemas as $sch) {
+				/* TODO if ( is not up-to date ) { */
+					$schparams = array("key" => $params["key"],
+						"identifier" => (string)$sch->identifier,
+						"version" => (string)$sch->version,
+						"format" => (string)$sch->format);
+					if ($this->getschema($schparams) == 1) {
+						break; /* not get the rest on error */
+					}
+				/* } */
+			}
+			$this->getRequest()->getSession()->setFlash('state success', "Configuration data models were updated.");
+		} else {
+			$this->getRequest()->getSession()->setFlash('error', 'Getting the list of schemas failed.');
+		}
 	}
 
 	/**

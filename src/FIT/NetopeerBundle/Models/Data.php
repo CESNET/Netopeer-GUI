@@ -311,6 +311,7 @@ class Data {
 		if ( $this->check_logged_keys() != 0) {
 			return 1;
 		}
+
 		$sessionKey = $this->getHashFromKey($params['key']);
 
 		$get_params = array(
@@ -554,11 +555,17 @@ class Data {
 			$session->setFlash($this->flashState .' error', "Not logged in.");
 			return 1;
 		}
-		if ( !strlen($this->container->get('request')->get('key')) ) {
+		$req = $this->container->get('request');
+		if ($req->get('_route') == "_home") {
+			/* internal call? */
+			return 0;
+		}
+
+		if ( !strlen($req->get('key')) ) {
 			$session->setFlash($this->flashState .' error', "You are not allow to see this connection. No index of key.");
 			return 1;
 		}
-		if ( !in_array( $this->container->get('request')->get('key'), array_keys($session->get("session-connections")) ) ) {
+		if ( !in_array( $req->get('key'), array_keys($session->get("session-connections")) ) ) {
 			$session->setFlash($this->flashState .' error', "You are not allow to see this connection. Bad Index of key.");
 			return 1;
 		}
