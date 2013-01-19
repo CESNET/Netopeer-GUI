@@ -251,7 +251,7 @@ class Data {
 	 * @param  {array} &$params connection params for mod_netconf
 	 * @return {int}    		0 on success
 	 */
-	private function handle_connect(&$sock, &$params) {
+	private function handle_connect(&$sock, &$params, &$result = null) {
 		$session = $this->container->get('request')->getSession();
 
 		$connect = json_encode(array(
@@ -281,6 +281,7 @@ class Data {
 			}
 
 			$session->setFlash($this->flashState .' success', "Successfully connected.");
+			$result = array_search($newconnection, $session->get("session-connections"));
 			/*
 			$session->setFlash($this->flashState .' success', "Successfully connected.".
 			"--".var_export($decoded).
@@ -509,7 +510,7 @@ class Data {
 	 * @param  {array} &$params $params must contain "identifier" of schema, can contain "version" and "format" of schema
 	 * @return {int}       		0 on success
 	 */
-	private function handle_getschema(&$sock, &$params) {
+	private function handle_getschema(&$sock, &$params, &$result) {
 		if ($this->check_logged_keys() != 0) {
 			return 1;
 		}
@@ -531,10 +532,8 @@ class Data {
 
 
 		if ($decoded["type"] === self::REPLY_DATA) {
-			var_dump($decoded["data"]);
-			/* TODO where to put model? */
-			die(); // remove this after solution
-			return 0; // all handle_ methods return 0 on success
+			$result = $decoded["data"];
+			return 0;
 		} else {
 			$this->logger->err("Get-schema failed.", array("error" => var_export($decoded, true)));
 			$session->setFlash($this->flashState .' error', "Get-schema failed."
@@ -647,7 +646,7 @@ class Data {
 	 * @param  {bool} $merge = true 		should be action handle with merge with model
 	 * @return {int}						0 on success
 	 */
-	public function handle($command, $params = array(), $merge = true) {
+	public function handle($command, $params = array(), $merge = true, &$result = null) {
 		$errno = 0;
 		$errstr = "";
 
@@ -676,7 +675,7 @@ class Data {
 
 		switch ($command) {
 			case "connect":
-				$res = $this->handle_connect($sock, $params);
+				$res = $this->handle_connect($sock, $params, $result);
 				break;
 			case "get":
 				$res = $this->handle_get($sock, $params);
@@ -701,7 +700,7 @@ class Data {
 				$res = $this->handle_info($sock, $params);
 				break;
 			case "getschema":
-				$res = $this->handle_getschema($sock, $params);
+				$res = $this->handle_getschema($sock, $params, $result);
 				break;
 			default:
 				$this->container->get('request')->getSession()->setFlash($this->flashState .' info', printf("Command not implemented yet. (%s)", $command));

@@ -65,7 +65,8 @@ class DefaultController extends BaseController
 
 				// state flash = state -> left column in the layout
 				$dataClass->setFlashState('state');
-				$res = $dataClass->handle("connect", $params);
+				$result = "";
+				$res = $dataClass->handle("connect", $params, false, $result);
 
 				// if connection is broken (Could not connect)
 				if ( $res = 1 ) {
