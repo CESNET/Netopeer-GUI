@@ -113,7 +113,7 @@ class Data {
 	private function getConnFromKey($key) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
-		if (isset($sessionConnections[$key]) && $key != '') {
+		if (isset($sessionConnections[$key]) && $key !== '') {
 			return unserialize($sessionConnections[$key]);
 		}
 		return false;
