@@ -25,27 +25,33 @@
 
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="top">
-			<a href="{{ path('_home') }}" title="Home" class="ico-home header-icon {% if activeAction is defined and activeAction == "home" %}active{% endif %}"><span></span>Connections</a>
+			<a href="{{ path('_home') }}" title="Home" class="static ico-home header-icon {% if activeAction is defined and activeAction == "home" %}active{% endif %}"><span></span>Connections</a>
 			{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
 				{% if lockedConn == false %}
-					<a href="{{ path("handleConnection", {"command": "lock", "key": app.request.get('key')} ) }}" title="Lock" class="ico-unlock header-icon"><span></span></a>
+					<a href="{{ path("handleConnection", {"command": "lock", "key": app.request.get('key')} ) }}" title="Lock" class="static ico-unlock header-icon"><span></span></a>
 				{% else %}
-					<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" class="ico-lock header-icon"><span></span></a>
+					<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" class="static ico-lock header-icon"><span></span></a>
 				{% endif %}
-				<a href="{{ path("infoPage", {"key": app.request.get('key'), "action": "session"}) }}" title="Session info: {{sessionStatus}}" class="ico-session header-icon {% if activeAction is defined and activeAction == "session" %}active{% endif %}"><span></span></a>
+				<a href="{{ path("infoPage", {"key": app.request.get('key'), "action": "session"}) }}" title="Session info: {{sessionStatus}}" class="static ico-session header-icon {% if activeAction is defined and activeAction == "session" %}active{% endif %}"><span></span></a>
 				<a href="javascript:document.location.reload(true)" title="Refresh data" class="ico-refresh header-icon"><span></span></a>
 				{% if topmenu is defined %}
 					{% set i = 0 %}
 					{% for section in topmenu %}
-						<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="{% if sectionName is defined and sectionName == section.name %}active{% endif %} nth-{{i}}">{{section.name}}</a>
+						<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="dynamic {% if sectionName is defined and sectionName == section.name %}active{% endif %} nth-{{i}}">{{section.name}}</a>
 						{% set i = i + 1 %}
 					{% endfor %}
-					<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" title="GET all information">All</a>
+					<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" class="dynamic" title="GET all information">All</a>
 				{% endif %}
 			{% endif %}
-			<div id="userpane">
+			<div id="userpane" class="static">
 				Logged user: <strong>{{ app.user.username }}</strong> 
 				{% if is_granted('IS_AUTHENTICATED_FULLY') %}<a href="{{ path('_logout') }}" class="log-out">Log out</a>{% endif %}
+			</div>
+			<div class="others-cover">
+				<div class="show-link header-icon ico-arrow-down">
+					<span></span>
+					<div class="others"></div>
+				</div>
 			</div>
 		</nav>
 

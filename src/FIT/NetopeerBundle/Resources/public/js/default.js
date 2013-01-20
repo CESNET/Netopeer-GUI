@@ -1,6 +1,7 @@
-
 $(document).ready(function() {
 	changeSectionHeight();
+
+	collapseTopNav();
 
 	if ( $(".edit-bar").length ) {
 		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
@@ -53,7 +54,60 @@ $(document).ready(function() {
 $(window).resize(function() {
 	changeSectionHeight();
 	showIconsOnLeafLine();
+	collapseTopNav();
 });
+
+function initPopupMenu($cover) {
+	$cover.children('.show-link').hover(function() {
+		$cover.find(".others").stop(true).slideToggle('fast');
+	});
+}
+
+/**
+ * collapse top nav - when links for sections overflows available space, 
+ * double down arrow with popup submenu will appear
+ */
+function collapseTopNav() {
+	if ( $("nav#top").length ) {
+		var $nav = $("nav#top");
+		var navWidth = $(window).outerWidth();
+
+		// we will count available space for sections hrefs
+		var availableSpace = navWidth;
+		$nav.find('.static').each(function() {
+			availableSpace -= $(this).outerWidth();
+		});
+
+		// check, if dynamic href should be visible or hidden under popup menu
+		if ( $nav.find(".dynamic").length ) {
+			var firstOffset;
+			var maxOffset = $nav.find("#userpane").offset().left;
+			var $othersCover = $nav.find('.others-cover');
+			var $others = $nav.find(".others-cover .others");
+			var $prev;
+			var i = 0;
+			$nav.find('.dynamic').each(function() {
+				if (i++ === 0) {
+					firstOffset = $(this).offset().left;
+				}
+				if ( ($(this).offset().left - firstOffset) >= availableSpace || 
+						$(this).offset().left >= maxOffset
+					) {
+					if ($prev !== null) {
+						$othersCover.addClass('visible');
+						$others.append($prev);
+						initPopupMenu($othersCover);
+						$prev = null;
+					}
+					$others.append($(this).clone());
+					$(this).remove();
+				} else {
+					$prev = $(this);
+				}
+			});
+		}
+	}
+}
 
 function changeSectionHeight() {
 	$("body > section, body > section#content").css('min-height', '0%').height($(window).height());
