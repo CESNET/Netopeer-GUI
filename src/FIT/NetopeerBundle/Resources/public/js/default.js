@@ -58,7 +58,8 @@ $(window).resize(function() {
 });
 
 function initPopupMenu($cover) {
-	$cover.children('.show-link').hover(function() {
+	$cover.find('.show-link').unbind('hover');
+	$cover.find('.show-link').hover(function() {
 		$cover.find(".others").stop(true).slideToggle('fast');
 	});
 }
@@ -70,39 +71,47 @@ function initPopupMenu($cover) {
 function collapseTopNav() {
 	if ( $("nav#top").length ) {
 		var $nav = $("nav#top");
-		var navWidth = $(window).outerWidth();
+		var $othersCover = $nav.find('.others-cover');
+		var $others = $othersCover.find(".others");
+		var navWidth = $nav.outerWidth();
 
 		// we will count available space for sections hrefs
 		var availableSpace = navWidth;
 		$nav.find('.static').each(function() {
 			availableSpace -= $(this).outerWidth();
 		});
+		availableSpace -= $othersCover.children(".show-link").outerWidth() + 50;
+
+		// move old links back to top nav bar
+		if ($othersCover.hasClass('visible')) {
+			$others.children('a').each(function() {
+				$("#userpane").before($(this).clone());
+				$(this).remove();
+			});
+			$othersCover.removeClass('visible');
+		}
 
 		// check, if dynamic href should be visible or hidden under popup menu
 		if ( $nav.find(".dynamic").length ) {
 			var firstOffset;
 			var maxOffset = $nav.find("#userpane").offset().left;
-			var $othersCover = $nav.find('.others-cover');
-			var $others = $nav.find(".others-cover .others");
-			var $prev;
+			var isLastItemVisible = true;
 			var i = 0;
 			$nav.find('.dynamic').each(function() {
 				if (i++ === 0) {
 					firstOffset = $(this).offset().left;
 				}
-				if ( ($(this).offset().left - firstOffset) >= availableSpace || 
-						$(this).offset().left >= maxOffset
+				if ( ($(this).offset().left - firstOffset + $(this).outerWidth()) >= availableSpace || 
+						($(this).offset().left + $(this).outerWidth()) >= maxOffset ||
+						isLastItemVisible === false
 					) {
-					if ($prev !== null) {
+					if (isLastItemVisible === true) {
 						$othersCover.addClass('visible');
-						$others.append($prev);
 						initPopupMenu($othersCover);
-						$prev = null;
+						isLastItemVisible = false;
 					}
 					$others.append($(this).clone());
 					$(this).remove();
-				} else {
-					$prev = $(this);
 				}
 			});
 		}
