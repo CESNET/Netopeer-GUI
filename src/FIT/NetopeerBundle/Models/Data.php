@@ -182,8 +182,9 @@ class Data {
 		$response = $tmp;
 		// message is wrapped in "\n#strlen($m)\n$m\n##\n"
 		// get size:
+		$size = 0;
 		$lines = explode("\n", $tmp);
-		if (sizeof($lines >= 2)) {
+		if (count($lines) >= 2) {
 			$size = strlen($lines[0]) + 1 + strlen($lines[1]) + 1;
 			$size += intval(substr($lines[1], 1)) + 5;
 		}
