@@ -30,7 +30,10 @@
 				{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
 				{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': element.getChildren(), 'xpath': outXpath, 'key': key, 'level': level + 1, 'iterator': outIterator } %}
 			{% else %}
-				{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']/*[' ~ outIterator2 ~ ']' %}
+				{# next line is commented because issue #763, please visit for more informations #}
+				{# set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']/*[' ~ outIterator2 ~ ']' #}
+
+				{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']' %}
 
 				{% if element.current().attributes.config is defined and element.current().attributes.config == "true" %}
 					{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element.current(), 'xpath': tmpXpath, 'key': key, 'level': level + 1, 'addLevel': true, 'iterator': outIterator} %}
