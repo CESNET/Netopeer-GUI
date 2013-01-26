@@ -1,4 +1,17 @@
 {% extends 'FITNetopeerBundle::layout.html.twig' %}
+
+{% block javascripts %}
+	{% if 1 or (getSchemaWithAjax is defined and getSchemaWithAjax == true) %}
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$.get({{ path("getSchema", {"key": 0} ) }}, function(data) {
+					
+				});
+			});
+		</script>
+	{% endif %}
+{% endblock javascripts %}
+
 {% block title %}Connection management{% endblock title %}
 
 {% block singleContentClass %}

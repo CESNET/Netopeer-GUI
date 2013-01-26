@@ -72,12 +72,11 @@ class DefaultController extends BaseController
 				if ( $res = 1 ) {
 					// redirect back to the connection page
 					$session = $this->get('request')->getSession();
-					$this->updateLocalModels($result);
-					return $this->redirect($this->generateUrl('_home'));
+					$this->assign('getSchemaWithAjax', true);
+					$this->assign("keyForAjaxGetSchema", $result);
 				}
 
 				$this->getRequest()->getSession()->setFlash('state success', 'Form had been filled up correctly.');
-				return $this->redirect($this->generateUrl('_home'));
 			} else {
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
 			}
