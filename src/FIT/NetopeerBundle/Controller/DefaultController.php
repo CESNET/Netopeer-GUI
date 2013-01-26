@@ -125,7 +125,10 @@ class DefaultController extends BaseController
 		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
 			$path = "/tmp/symfony/".$schparams["identifier"].".".$schparams["format"];
 			file_put_contents($path, $data);
-			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\"");
+			$user = $dataClass->getUserFromKey($schparams["key"]);
+			$host = $dataClass->getHostFromKey($schparams["key"]);
+			$port = $dataClass->getPortFromKey($schparams["key"]);
+			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'Getting model failed.');
 			return 1;

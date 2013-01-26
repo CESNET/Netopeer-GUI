@@ -119,6 +119,36 @@ class Data {
 		return false;
 	}
 
+	public function getPortFromKey($key) {
+		$session = $this->container->get('request')->getSession();
+		$sessionConnections = $session->get('session-connections');
+		if (isset($sessionConnections[$key]) && $key !== '') {
+			$con = unserialize($sessionConnections[$key]);
+			return $con->port;
+		}
+		return "";
+	}
+
+	public function getUserFromKey($key) {
+		$session = $this->container->get('request')->getSession();
+		$sessionConnections = $session->get('session-connections');
+		if (isset($sessionConnections[$key]) && $key !== '') {
+			$con = unserialize($sessionConnections[$key]);
+			return $con->user;
+		}
+		return "";
+	}
+
+	public function getHostFromKey($key) {
+		$session = $this->container->get('request')->getSession();
+		$sessionConnections = $session->get('session-connections');
+		if (isset($sessionConnections[$key]) && $key !== '') {
+			$con = unserialize($sessionConnections[$key]);
+			return $con->host;
+		}
+		return "";
+	}
+
 	private function updateConnLock($key) {
 		$conn = $this->getConnFromKey($key);
 
@@ -270,7 +300,7 @@ class Data {
 		if ($decoded && ($decoded["type"] == self::REPLY_OK)) {
 			$param = array( "session" => $decoded["session"] );
 			$status = $this->handle_info($sock, $param);
-			$newconnection = new ConnectionSession($decoded["session"], $params["host"]);
+			$newconnection = new ConnectionSession($decoded["session"], $params["host"], $params["port"], $params["user"]);
 			$newconnection->session_status = var_export($status, true);
 			$newconnection = serialize($newconnection);
 
