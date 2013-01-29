@@ -23,12 +23,15 @@ class AjaxController extends BaseController
 	{
 		$schemaData = AjaxSharedData::getInstance();
 		
+		ob_start();
 		$data = $schemaData->getDataForKey($key);
 		if (!(isset($data['isInProgress']) && $data['isInProgress'] === true)) {
 			$this->updateLocalModels($key);
 		}
+		$output = ob_get_clean();
+		$result['output'] = $output;
 
-		return $this->getSchemaStatus($key);
+		return $this->getSchemaStatusAction($key, $result);
 	}
 
 	/**
@@ -36,7 +39,7 @@ class AjaxController extends BaseController
 	 *
 	 * Get status of get-schema operation
 	 */
-	public function getSchemaStatusAction($key)
+	public function getSchemaStatusAction($key, $result = array())
 	{
 		$schemaData = AjaxSharedData::getInstance();
 		

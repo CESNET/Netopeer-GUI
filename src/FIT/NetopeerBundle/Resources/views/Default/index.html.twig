@@ -2,10 +2,17 @@
 
 {% block javascripts %}
 	{% if 1 or (getSchemaWithAjax is defined and getSchemaWithAjax == true) %}
+		{% set idForAjaxGetSchema = 0 %}
 		<script type="text/javascript">
 			$(document).ready(function() {
-				$.get({{ path("getSchema", {"key": 0} ) }}, function(data) {
-					
+				var idForAjaxGetSchema = {{ idForAjaxGetSchema }};
+				var targetConfigure = $("#row-" + idForAjaxGetSchema + " .configure");
+				targetConfigure.find('> a').hide();
+				$("<span/>", {'class': 'loading'}).appendTo(targetConfigure);
+				$.get("{{ path("getSchema", {"key": idForAjaxGetSchema} ) }}", function(data) {
+					l(data);
+					var dataArr = $.parseJSON(data);
+					l(dataArr);
 				});
 			});
 		</script>
@@ -35,10 +42,10 @@
 	{% else %}
 		<table>
 			{% for key in sessionConnections %}
-				<tr>
+				<tr id="row-{{ loop.index - 1 }}">
 					<td> {{ key.time }} </td>
 					<td>{{ key.host }}<!--{{ key.hash }}--></td>
-					<td><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}'><span id="ico-conf"></span>Configure device</a></td>
+					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}'><span id="ico-conf"></span>Configure device</a></td>
 					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}'>disconnect</a></td>
 				</tr>
 			{% endfor %}

@@ -7,7 +7,7 @@ class AjaxSharedData {
 	protected static $instance;
 
   protected function __construct() {
-    echo "new instance";
+    
   }
 
   public static function getInstance() {

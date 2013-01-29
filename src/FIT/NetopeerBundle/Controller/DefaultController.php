@@ -73,7 +73,7 @@ class DefaultController extends BaseController
 					// redirect back to the connection page
 					$session = $this->get('request')->getSession();
 					$this->assign('getSchemaWithAjax', true);
-					$this->assign("keyForAjaxGetSchema", $result);
+					$this->assign("idForAjaxGetSchema", $result);
 				}
 
 				$this->getRequest()->getSession()->setFlash('state success', 'Form had been filled up correctly.');
