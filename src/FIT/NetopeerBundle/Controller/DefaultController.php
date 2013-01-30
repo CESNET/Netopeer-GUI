@@ -110,67 +110,6 @@ class DefaultController extends BaseController
         return new RedirectResponse($url);
 	}
 
-
-	/**
-	* Get one model and process it.
-	*
-	* @param {array} &$schparams key, identifier, version, format for get-schema
-	* @return {int} 0 on success, 1 on error
-	*/
-	private function getschema(&$schparams)
-	{
-		$dataClass = $this->get('DataModel');
-		$data = "";
-		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
-			$path = "/tmp/symfony/".$schparams["identifier"].".".$schparams["format"];
-			file_put_contents($path, $data);
-			$user = $dataClass->getUserFromKey($schparams["key"]);
-			$host = $dataClass->getHostFromKey($schparams["key"]);
-			$port = $dataClass->getPortFromKey($schparams["key"]);
-			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
-		} else {
-			$this->getRequest()->getSession()->setFlash('error', 'Getting model failed.');
-			return 1;
-		}
-		return 0;
-	}
-
-	/**
-	* Get available configuration data models,
-	* store them and transform them.
-	*
-	* @param  {int} $key 	index of session-connection
-	* @return {void}
-	*/
-	private function updateLocalModels($key)
-	{
-		$dataClass = $this->get('DataModel');
-		$ns = "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
-		$params = array(
-			'key' => $key,
-		'filter' => '<netconf-state xmlns="'.$ns.'"><schemas/></netconf-state>',
-		);
-
-		if (($xml = $dataClass->handle('get', $params)) != 1 ) {
-			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-			$xml->registerXPathNamespace("xmlns", $ns);
-			$schemas = $xml->xpath("//xmlns:schema");
-
-			foreach ($schemas as $sch) {
-				$schparams = array("key" => $params["key"],
-					"identifier" => (string)$sch->identifier,
-					"version" => (string)$sch->version,
-					"format" => (string)$sch->format);
-				if ($this->getschema($schparams) == 1) {
-					break; /* not get the rest on error */
-				}
-			}
-			$this->getRequest()->getSession()->setFlash('state success', "Configuration data models were updated.");
-		} else {
-			$this->getRequest()->getSession()->setFlash('error', 'Getting the list of schemas failed.');
-		}
-	}
-
 	/**
 	 * @Route("/handle/{command}/{key}/{identifier}", defaults={"identifier" = ""}, name="handleConnection")
 	 *
