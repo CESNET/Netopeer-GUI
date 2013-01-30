@@ -50,6 +50,7 @@ class AjaxController extends BaseController
 
 		$data = $schemaData->getDataForKey($key);
 		$result['status'] = $data['status'];
+		$result['message'] = $data['message'];
 		$result['key'] = $key;
 
 		return new Response(json_encode($result));
@@ -116,13 +117,12 @@ class AjaxController extends BaseController
 					}
 				/* } */
 			}
-			$this->getRequest()->getSession()->setFlash('state success', "Configuration data models were updated.");
-			$schemaData->setDataForKey($key, 'isInProgress', false);
-			$schemaData->setDataForKey($key, 'status', "ok");
+			$schemaData->setDataForKey($key, 'status', "success");
+			$schemaData->setDataForKey($key, 'message', "Configuration data models were updated.");
 		} else {
-			$this->getRequest()->getSession()->setFlash('error', 'Getting the list of schemas failed.');
-			$schemaData->setDataForKey($key, 'isInProgress', false);
 			$schemaData->setDataForKey($key, 'status', "error");
+			$schemaData->setDataForKey($key, 'message', "Getting the list of schemas failed.");
 		}
+		$schemaData->setDataForKey($key, 'isInProgress', false);
 	}
 }
