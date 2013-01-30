@@ -37,6 +37,15 @@ class DefaultController extends BaseController
 			->getForm();
 		$this->assign('form', $form->createView());
 
+		// check, if in prev action has been added new connection. If yes,
+		// we will set some variables for AJAX requests in indexTemplate.
+		if ($this->get('session')->get('getSchemaWithAjax')) {
+			foreach ($this->get('session')->get('getSchemaWithAjax') as $key => $value) {
+				$this->assign($key, $value);
+			}
+			$this->assign("getSchemaWithAjax", true);
+			$this->get('session')->set('getSchemaWithAjax', false);
+		}
 		// process form for connection to the server
 		if ($this->getRequest()->getMethod() == 'POST') {
 			$form->bindRequest($this->getRequest());
@@ -70,16 +79,18 @@ class DefaultController extends BaseController
 
 				// if connection is broken (Could not connect)
 				if ( $res = 1 ) {
-					// redirect back to the connection page
-					$session = $this->get('request')->getSession();
-					$this->assign('getSchemaWithAjax', true);
-					$this->assign("idForAjaxGetSchema", $result);
+					$arr = array(
+						"idForAjaxGetSchema" => $result,
+					);
+					$this->get('session')->set('getSchemaWithAjax', $arr);
 				}
 
 				$this->getRequest()->getSession()->setFlash('state success', 'Form had been filled up correctly.');
 			} else {
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
 			}
+			$url = $this->get('request')->headers->get('referer');
+			return new RedirectResponse($url);
 		}
 		$connArray = $this->getRequest()->getSession()->get('session-connections');
 		$connections = array();
