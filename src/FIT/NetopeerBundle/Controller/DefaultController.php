@@ -124,7 +124,10 @@ class DefaultController extends BaseController
 		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
 			$path = "/tmp/symfony/".$schparams["identifier"].".".$schparams["format"];
 			file_put_contents($path, $data);
-			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"/tmp/symgen/\"");
+			$user = $dataClass->getUserFromKey($schparams["key"]);
+			$host = $dataClass->getHostFromKey($schparams["key"]);
+			$port = $dataClass->getPortFromKey($schparams["key"]);
+			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'Getting model failed.');
 			return 1;
@@ -153,20 +156,14 @@ class DefaultController extends BaseController
 			$xml->registerXPathNamespace("xmlns", $ns);
 			$schemas = $xml->xpath("//xmlns:schema");
 
-			if ($schemas) {
-				/* TODO not to delete everything? */
-				@system("mkdir -p /tmp/symgen /tmp/symfony; rm -rf /tmp/symgen/*");
-			}
 			foreach ($schemas as $sch) {
-				/* TODO if ( is not up-to date ) { */
-					$schparams = array("key" => $params["key"],
-						"identifier" => (string)$sch->identifier,
-						"version" => (string)$sch->version,
-						"format" => (string)$sch->format);
-					if ($this->getschema($schparams) == 1) {
-						break; /* not get the rest on error */
-					}
-				/* } */
+				$schparams = array("key" => $params["key"],
+					"identifier" => (string)$sch->identifier,
+					"version" => (string)$sch->version,
+					"format" => (string)$sch->format);
+				if ($this->getschema($schparams) == 1) {
+					break; /* not get the rest on error */
+				}
 			}
 			$this->getRequest()->getSession()->setFlash('state success', "Configuration data models were updated.");
 		} else {
