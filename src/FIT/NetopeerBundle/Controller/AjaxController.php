@@ -5,6 +5,7 @@ namespace FIT\NetopeerBundle\Controller;
 use FIT\NetopeerBundle\Controller\BaseController;
 use FIT\NetopeerBundle\Models\XMLoperations;
 use FIT\NetopeerBundle\Models\AjaxSharedData;
+use FIT\NetopeerBundle\Entity\MyConnection;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -73,9 +74,53 @@ class AjaxController extends BaseController
 			$user = $dataClass->getUserFromKey($schparams["key"]);
 			$host = $dataClass->getHostFromKey($schparams["key"]);
 			$port = $dataClass->getPortFromKey($schparams["key"]);
-			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
+			$response = @system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
+
+			preg_match("/\{(.*)\}/", $response, $jsonArr);
+			if (count($jsonArr) > 1) {
+				return $this->saveConnectionInDB(json_decode($jsonArr[0]));
+			}
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'Getting model failed.');
+			return 1;
+		}
+		return 0;
+	}
+
+	/**
+	 * Saves unique connection info into DB
+	 * @param  json $jsonArr 	JSON object of params
+	 * @return 0 on success, 1 on fail
+	 */
+	private function saveConnectionInDB($jsonArr) {
+		$conn = new MyConnection();
+		$conn->setHash($jsonArr->identifier);
+		$conn->setModelName($jsonArr->module);
+		$conn->setModelVersion($jsonArr->version);
+		$conn->setRootElem($jsonArr->root_element);
+		$conn->setNamespace($jsonArr->ns);
+		$conn->setHostname($jsonArr->host);
+		$conn->setPort($jsonArr->port);
+		$conn->setUsername($jsonArr->user);
+
+		try {
+			$em = $this->getDoctrine()->getEntityManager();
+			$em->persist($conn);
+			$em->flush();
+
+			$this->get('logger')->info("Connection added into DB.", array("arr" => var_export($jsonArr)));
+
+		} catch (\PDOException $e) {
+			$this->getDoctrine()->resetEntityManager();
+			if ($e->getCode() == 23000) { // duplicate entry
+				$this->get('logger')->err("Duplicate connection.", array("arr" => var_export($jsonArr)));
+				return 0;
+				// we don't care about
+			} else {
+				throw new \ErrorException($e->getMessage());
+			}
+		} catch (\ErrorException $e) {
+			$this->get('logger')->err("Could not add connection into DB.", array("arr" => var_export($jsonArr)));
 			return 1;
 		}
 		return 0;

@@ -2,3 +2,5 @@
 /app/logs/*
 /app/logs/dev.log
 /src/FIT/NetopeerBundle/Resources/public/.sass-cache/
+/web/phpinfo.php
+/web/adminer.php
