@@ -74,7 +74,7 @@ class AjaxController extends BaseController
 			$user = $dataClass->getUserFromKey($schparams["key"]);
 			$host = $dataClass->getHostFromKey($schparams["key"]);
 			$port = $dataClass->getPortFromKey($schparams["key"]);
-			$response = @system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
+			$response = @system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
 
 			preg_match("/\{(.*)\}/", $response, $jsonArr);
 			if (count($jsonArr) > 1) {

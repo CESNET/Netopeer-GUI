@@ -664,7 +664,7 @@ class DefaultController extends BaseController
 				$configXml = simplexml_load_string($configXml, 'SimpleXMLIterator');
 
 				// save to temp file - for debuggind
-				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/original.yin', $configXml->asXml());
+				file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $configXml->asXml());
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
 				$xmlNameSpaces = $configXml->getNamespaces();
@@ -689,7 +689,7 @@ class DefaultController extends BaseController
 				}
 
 				// for debuggind, edited configXml will be saved into temp file
-				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/edited.yin', $configXml->asXml());
+				file_put_contents(__DIR__.'/../Data/models/tmp/edited.yin', $configXml->asXml());
 
 				$res = $this->executeEditConfig($key, $configXml->asXml());
 				$this->get('session')->setFlash('config success', "Config has been edited successfully.");
