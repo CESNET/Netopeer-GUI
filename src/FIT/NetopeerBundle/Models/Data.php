@@ -7,8 +7,10 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
+use Doctrine\ORM\EntityManager;
 
 use FIT\NetopeerBundle\Models\ConnectionSession;
+use FIT\NetopeerBundle\Entity\MyConnection;
 
 class Data {
 
@@ -39,6 +41,7 @@ class Data {
 
 	private $flashState;
 	private $models;
+	private $dbConnections;
 	private $submenu;
 
 	public function __construct(ContainerInterface $container, $logger)	{
@@ -108,6 +111,45 @@ class Data {
 		}
 		//throw new \ErrorException("No identification key was found.");
 		return "NOHASH";
+	}
+
+	/**
+	 * Find hash identifiers from DB for key
+	 * @param  {int} $key session key
+	 * @return {array}  return array of identifiers on success, false on error
+	 */
+	private function getModuleIdentifiersFromDb($key) {
+		$conn = $this->getConnFromKey($key);
+
+		if (isset($conn->dbIdentifier)) {
+			$idents = $conn->dbIdentifier;
+			$dbConnection = $this->container->get('doctrine')->getRepository('FITNetopeerBundle:MyConnection');
+
+			$arr = array();
+			foreach ($idents as $ident => $val) {
+				$arr[$dbConnection->findOneByHash($ident)->getHash()] = $dbConnection->findOneByHash($ident);
+			}
+			$this->dbConnections = $arr;
+		}
+		return false;
+	}
+
+	/**
+	 * get path for module name, includes identifier
+	 * @param  {int} $key      session key
+	 * @param  {string} $moduleName name of element
+	 * @return {string}           relative path on succes, false on error
+	 */
+	private function getModulePathByRootModuleName($key, $moduleName) {
+		if (!is_array($this->dbConnections) || !count($this->dbConnections)) {
+			$this->getModuleIdentifiersFromDb($key);
+		}
+		foreach ($this->dbConnections as $hash => $conn) {
+			if ($conn->getRootElem() == $moduleName) {
+				return $hash . "/" . $conn->getModelName();
+			}
+		}
+		return false;
 	}
 
 	private function getConnFromKey($key) {
@@ -660,14 +702,45 @@ class Data {
 	}
 
 	/**
+	 * gets model dir name for module
+	 * @param  {string} $moduleName
+	 * @return {string} dir name on success, false on error
+	 */
+	public function getModelDirForName($moduleName) {
+		$key = $this->container->get('request')->get('key');
+		$res = $this->getModulePathByRootModuleName($key, $moduleName);
+		if ($res) {
+			return $res;
+		}
+		return false;
+	}
+
+	/**
+	 * checks if model dir for module exists
+	 * @param  {string} $moduleName
+	 * @return {bool}
+	 */
+	public function existsModelDirForName($moduleName) {
+		$key = $this->container->get('request')->get('key');
+		$res = $this->getModulePathByRootModuleName($key, $moduleName);
+		if ($res) {
+			return true;
+		}
+		return false;	
+	}
+
+	/**
 	 * @return {string} path to wrapped model file
 	 */
-	public function getPathToModels() {
+	public function getPathToModels($moduleName = "") {
 		$path = $this->getModelsDir();
 
 		// add module directory if is set in route
 		if ( $this->container->get('request')->get('module') != null ) {
-			$path .= $this->container->get('request')->get('module').'/';
+			$modelDir = $this->getModelDirForName($this->container->get('request')->get('module'));
+			if ($modelDir) {
+				$path .= $modelDir . '/';
+			}
 		}
 		// add subsection directory if is set in route and wrapped file in subsection directory exists
 		if ( $this->container->get('request')->get('subsection') != null
@@ -758,6 +831,7 @@ class Data {
 				$this->container->get('request')->getSession()->setFlash($this->flashState . ' error', "Requested XML from server is not valid.");
 				return 0;
 			}
+
 			// echo $this->remove_xml_header($a);
 			//die();
 			if ($merge) {
@@ -997,36 +1071,24 @@ XML;
 
 			// we will check, if nodes from GET are same as models structure
 			// if not, they won't be displayed
-			$dir = $this->getModelsDir();
-			if ( !file_exists($dir) ) {
-				$this->models = array();
-			} else {
-				$iterator = $finder
-				  ->directories()
-				  ->depth(0)
-				  ->sortByName()
-				  ->in($dir);
-
-				$folders = array();
-				foreach ($iterator as $folder) {
-					$model = $folder->getFileName();
-
-					if ( in_array($model, $allowedModels) ) {
-						$folders[] = array(
-							'path' => "module",
-							"params" => array(
-								'key' => $key,
-								'module' => $model,
-							),
-							"title" => "detail of ".$this->getSectionName($model),
-							"name" => $this->getSectionName($model),
-							"children" => $this->buildSubmenu($key, $model, $allowedSubmenu),
-							"namespace" => $namespaces[$model],
-						);
-					}
+			$folders = array();
+			sort($allowedModels);
+			foreach ($allowedModels as $moduleName) {
+				if ($this->existsModelDirForName($moduleName)) {
+					$folders[] = array(
+						'path' => "module",
+						"params" => array(
+							'key' => $key,
+							'module' => $moduleName,
+						),
+						"title" => "detail of ".$this->getSectionName($moduleName),
+						"name" => $this->getSectionName($moduleName),
+						"children" => $this->buildSubmenu($key, $moduleName, $allowedSubmenu),
+						"namespace" => $namespaces[$moduleName],
+					);
 				}
-				$this->models = $folders;
 			}
+			$this->models = $folders;
 		}
 	}
 
@@ -1036,15 +1098,9 @@ XML;
 	private function buildSubmenu($key, $module, $allowedSubmenu, $path = "") {
 		$finder = new Finder();
 
-		if ( $path != "" ) {
-			$completePath = $path . "/" . $module;
-		} else {
-			$completePath = $module;
-		}
-
 		// we will check, if nodes from GET are same as models structure
 		// if not, they won't be displayed
-		$dir = $this->getModelsDir().$completePath;
+		$dir = $this->getPathToModels($module);
 		if ( !file_exists($dir) ) {
 			$folders = array();
 		} else {
@@ -1057,7 +1113,6 @@ XML;
 			$folders = array();
 			foreach ($iterator as $folder) {
 				$subsection = $folder->getRelativePathname();
-
 				if ( in_array($subsection, $allowedSubmenu) ) {
 					$folders[] = array(
 						'path' => "subsection",

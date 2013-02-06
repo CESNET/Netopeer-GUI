@@ -14,6 +14,11 @@ class ConnectionSession {
 	public $hash;
 
 	/**
+	 * @var identification key of connection stored in DB
+	 */
+	public $dbIdentifier;
+
+	/**
 	 * @var target hostname
 	 */
 	public $host;
@@ -41,6 +46,7 @@ class ConnectionSession {
 	function __construct($session_hash, $host, $port, $user)
 	{
 		$this->hash = $session_hash;
+		$this->dbIdentifier = array();
 		$this->host = $host;
 		$this->port = $port;
 		$this->user = $user;

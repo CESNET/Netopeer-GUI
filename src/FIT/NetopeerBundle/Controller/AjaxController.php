@@ -74,11 +74,15 @@ class AjaxController extends BaseController
 			$user = $dataClass->getUserFromKey($schparams["key"]);
 			$host = $dataClass->getHostFromKey($schparams["key"]);
 			$port = $dataClass->getPortFromKey($schparams["key"]);
-			$response = @system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
+
+			ob_clean();
+			ob_start();
+			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
+			$response = ob_get_contents();
 
 			preg_match("/\{(.*)\}/", $response, $jsonArr);
 			if (count($jsonArr) > 1) {
-				return $this->saveConnectionInDB(json_decode($jsonArr[0]));
+				return $this->saveConnectionInDB($schparams["key"], json_decode($jsonArr[0]));
 			}
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'Getting model failed.');
@@ -89,10 +93,11 @@ class AjaxController extends BaseController
 
 	/**
 	 * Saves unique connection info into DB
+	 * @param  $key 			session key
 	 * @param  json $jsonArr 	JSON object of params
 	 * @return 0 on success, 1 on fail
 	 */
-	private function saveConnectionInDB($jsonArr) {
+	private function saveConnectionInDB($key, $jsonArr) {
 		$conn = new MyConnection();
 		$conn->setHash($jsonArr->identifier);
 		$conn->setModelName($jsonArr->module);
@@ -114,7 +119,6 @@ class AjaxController extends BaseController
 			$this->getDoctrine()->resetEntityManager();
 			if ($e->getCode() == 23000) { // duplicate entry
 				$this->get('logger')->err("Duplicate connection.", array("arr" => var_export($jsonArr)));
-				return 0;
 				// we don't care about
 			} else {
 				throw new \ErrorException($e->getMessage());
@@ -123,6 +127,14 @@ class AjaxController extends BaseController
 			$this->get('logger')->err("Could not add connection into DB.", array("arr" => var_export($jsonArr)));
 			return 1;
 		}
+
+		$sessionConnections = $this->get('session')->get('session-connections');
+		$sessionConn = unserialize($sessionConnections[$key]);
+		$sessionConn->dbIdentifier[$jsonArr->identifier] = true;
+		$sessionConnections[$key] = serialize($sessionConn);
+
+		$this->get('session')->set('session-connections', $sessionConnections);
+
 		return 0;
 	}
 
@@ -149,6 +161,12 @@ class AjaxController extends BaseController
 			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 			$xml->registerXPathNamespace("xmlns", $ns);
 			$schemas = $xml->xpath("//xmlns:schema");
+
+			$sessionConnections = $this->get('session')->get('session-connections');
+			$sessionConn = unserialize($sessionConnections[$key]);
+			$sessionConn->dbIdentifier = array();
+			$sessionConnections[$key] = serialize($sessionConn);
+			$this->get('session')->set('session-connections', $sessionConnections);
 
 			foreach ($schemas as $sch) {
 				$schparams = array("key" => $params["key"],
