@@ -69,7 +69,10 @@ class AjaxController extends BaseController
 		$dataClass = $this->get('DataModel');
 		$data = "";
 		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
-			$path = "/tmp/symfony/".$schparams["identifier"].".".$schparams["format"];
+			$schparams["user"] = $dataClass->getUserFromKey($schparams["key"]);
+			$path = "/tmp/symfony/".$schparams["user"];
+			@mkdir($path, 0700, true);
+			$path .= "/".$schparams["identifier"].".".$schparams["format"];
 			file_put_contents($path, $data);
 			$schparams["path"] = $path;
 			return 0;
@@ -83,9 +86,9 @@ class AjaxController extends BaseController
 	private function processSchema(&$schparams)
 	{
 		$dataClass = $this->get('DataModel');
-		$user = $dataClass->getUserFromKey($schparams["key"]);
 		$host = $dataClass->getHostFromKey($schparams["key"]);
 		$port = $dataClass->getPortFromKey($schparams["key"]);
+		$user = $schparams["user"];
 		$path = $schparams["path"];
 
 		ob_clean();
@@ -184,9 +187,10 @@ class AjaxController extends BaseController
 					"version" => (string)$sch->version,
 					"format" => (string)$sch->format);
 				if ($this->getschema($schparams) == 1) {
-					break; /* not get the rest on error */
+					//break; /* not get the rest on error */
+				} else {
+					$list[] = $schparams;
 				}
-				$list[] = $schparams;
 			}
 			foreach ($list as $schema) {
 				$this->processSchema($schema);
