@@ -308,14 +308,16 @@ class DefaultController extends BaseController
 	private function loadFilters(&$module, &$subsection) {
 		// if file filter.txt exists in models, we will use it
 		$filterState = $filterConfig = "";
-		$add2path = $module;
+
+		$dataClass = $this->get('DataModel');
+		$path = $dataClass->getPathToModels($module);
 
 		// if subsection is defined, we will add it to path
 		if ( $subsection ) {
-			$add2path .= '/'.$subsection;
+			$path .= $subsection.'/';
 		}
 
-		$file = __DIR__.'/../Data/models/'.$add2path.'/filter.txt';
+		$file = $path.'filter.txt';
 
 		// if file with filter does not exist, only empty filter will be returned
 		if ( file_exists($file) ) {
