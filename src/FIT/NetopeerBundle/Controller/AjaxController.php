@@ -71,24 +71,33 @@ class AjaxController extends BaseController
 		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
 			$path = "/tmp/symfony/".$schparams["identifier"].".".$schparams["format"];
 			file_put_contents($path, $data);
-			$user = $dataClass->getUserFromKey($schparams["key"]);
-			$host = $dataClass->getHostFromKey($schparams["key"]);
-			$port = $dataClass->getPortFromKey($schparams["key"]);
-
-			ob_clean();
-			ob_start();
-			@system("/tmp/symfony/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
-			$response = ob_get_contents();
-
-			preg_match("/\{(.*)\}/", $response, $jsonArr);
-			if (count($jsonArr) > 1) {
-				return $this->saveConnectionInDB($schparams["key"], json_decode($jsonArr[0]));
-			}
+			$schparams["path"] = $path;
+			return 0;
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'Getting model failed.');
 			return 1;
 		}
 		return 0;
+	}
+
+	private function processSchema(&$schparams)
+	{
+		$dataClass = $this->get('DataModel');
+		$user = $dataClass->getUserFromKey($schparams["key"]);
+		$host = $dataClass->getHostFromKey($schparams["key"]);
+		$port = $dataClass->getPortFromKey($schparams["key"]);
+		$path = $schparams["path"];
+
+		ob_clean();
+		ob_start();
+		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
+		$response = ob_get_contents();
+
+		preg_match("/\{(.*)\}/", $response, $jsonArr);
+		if (count($jsonArr) > 1) {
+			return $this->saveConnectionInDB($schparams["key"], json_decode($jsonArr[0]));
+		}
+		return 1;
 	}
 
 	/**
@@ -168,6 +177,7 @@ class AjaxController extends BaseController
 			$sessionConnections[$key] = serialize($sessionConn);
 			$this->get('session')->set('session-connections', $sessionConnections);
 
+			$list = array();
 			foreach ($schemas as $sch) {
 				$schparams = array("key" => $params["key"],
 					"identifier" => (string)$sch->identifier,
@@ -176,6 +186,10 @@ class AjaxController extends BaseController
 				if ($this->getschema($schparams) == 1) {
 					break; /* not get the rest on error */
 				}
+				$list[] = $schparams;
+			}
+			foreach ($list as $schema) {
+				$this->processSchema($schema);
 			}
 			$schemaData->setDataForKey($key, 'status', "success");
 			$schemaData->setDataForKey($key, 'message', "Configuration data models were updated.");
