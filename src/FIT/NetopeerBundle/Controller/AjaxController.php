@@ -3,7 +3,6 @@
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
-use FIT\NetopeerBundle\Models\XMLoperations;
 use FIT\NetopeerBundle\Models\AjaxSharedData;
 use FIT\NetopeerBundle\Entity\MyConnection;
 
@@ -13,12 +12,18 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Controller which handles all Ajax actions
+ */
 class AjaxController extends BaseController
 {
 	/**
+	 * Change session value for showing single or double column layout
+	 *
 	 * @Route("/ajax/get-schema/{key}", name="getSchema")
 	 *
-	 * Change session value for showing single or double column layout
+	 * @param  int      $key 				  session key of current connection
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function getSchemaAction($key)
 	{
@@ -36,9 +41,13 @@ class AjaxController extends BaseController
 	}
 
 	/**
+	 * Get status of get-schema operation
+	 *
 	 * @Route("/ajax/get-schema-status/{key}", name="getSchemaStatus")
 	 *
-	 * Get status of get-schema operation
+	 * @param  int      $key 				  session key of current connection
+	 * @param  array    $result
+	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function getSchemaStatusAction($key, $result = array())
 	{
@@ -61,8 +70,8 @@ class AjaxController extends BaseController
 	/**
 	* Get one model and process it.
 	*
-	* @param {array} &$schparams key, identifier, version, format for get-schema
-	* @return {int} 0 on success, 1 on error
+	* @param array $schparams   key, identifier, version, format for get-schema
+	* @return int               0 on success, 1 on error
 	*/
 	private function getschema(&$schparams)
 	{
@@ -83,6 +92,10 @@ class AjaxController extends BaseController
 		return 0;
 	}
 
+	/**
+	 * @param array $schparams    get-schema parameters
+	 * @return int                0 on success, 1 on error
+	 */
 	private function processSchema(&$schparams)
 	{
 		$dataClass = $this->get('DataModel');
@@ -105,9 +118,11 @@ class AjaxController extends BaseController
 
 	/**
 	 * Saves unique connection info into DB
-	 * @param  $key 			session key
-	 * @param  json $jsonArr 	JSON object of params
-	 * @return 0 on success, 1 on fail
+	 *
+	 * @param  string   $key       session key
+	 * @param  array    $jsonArr   JSON object of params
+	 * @throws \ErrorException
+	 * @return int 0 on success, 1 on fail
 	 */
 	private function saveConnectionInDB($key, $jsonArr) {
 		$conn = new MyConnection();
@@ -154,8 +169,8 @@ class AjaxController extends BaseController
 	* Get available configuration data models,
 	* store them and transform them.
 	*
-	* @param  {int} $key 	index of session-connection
-	* @return {void}
+	* @param  int   $key 	index of session-connection
+	* @return void
 	*/
 	private function updateLocalModels($key)
 	{

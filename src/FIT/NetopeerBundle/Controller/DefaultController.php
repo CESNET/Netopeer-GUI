@@ -10,18 +10,29 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
+/**
+ * Default controller for all pages directly visible from
+ * webGUI. For example connection management, section detail etc.
+ */
 class DefaultController extends BaseController
 {
 
+	/**
+	 * @var array $paramState   array of parameters for <get> command
+	 * @var array $paramsConfig array of parameters for <get-config> command
+	 */
 	private $paramsState, $paramsConfig;
+
+	/**
+	 * @var holds configuration of filter form (in both section)
+	 */
 	private $filterForms;
 
 	/**
+	 * Prepares form for connection to the server and table with active connection list
+	 *
 	 * @Route("/", name="_home")
 	 * @Template()
-	 *
-	 * Prepares form for connection to the server and table with active
-	 * connection list
 	 */
 	public function indexAction()
 	{
@@ -84,7 +95,7 @@ class DefaultController extends BaseController
 					);
 					$this->get('session')->set('getSchemaWithAjax', $arr);
 					$this->getRequest()->getSession()->setFlash('state success', 'Form has been filled up correctly.');
-				} 
+				}
 			} else {
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
 			}
@@ -106,9 +117,11 @@ class DefaultController extends BaseController
 	}
 
 	/**
+	 * Change session value for showing single or double column layout
+	 *
 	 * @Route("/changeColumnLayout/{newValue}/", name="changeColumnLayout")
 	 *
-	 * Change session value for showing single or double column layout
+	 * @param string $newValue    new value of columns settings
 	 */
 	public function changeColumnLayoutAction($newValue)
 	{
@@ -121,9 +134,14 @@ class DefaultController extends BaseController
 	}
 
 	/**
+	 * Handle actions and execute them in Models/Data
+	 *
 	 * @Route("/handle/{command}/{key}/{identifier}", defaults={"identifier" = ""}, name="handleConnection")
 	 *
-	 * Handle actions and execute them in Models/Data
+	 * @param string  $command      name of the command to handle (get, info, getconfig, getschema, connect, disconnect)
+	 * @param int     $key          key of connected server
+	 * @param string   $identifier  identifier for get-schema
+	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
 	 */
 	public function handleConnectionAction($command, $key, $identifier = "")
 	{
@@ -159,10 +177,14 @@ class DefaultController extends BaseController
 	}
 
 	/**
+	 * Shows info page with information
+	 *
 	 * @Route("/info-page/{key}/{action}/", name="infoPage")
 	 * @Template("FITNetopeerBundle:Default:section.html.twig")
 	 *
-	 * Shows info page with informatins
+	 * @param int     $key          key of connected server
+	 * @param string  $action       name of the action
+	 * @return array
 	 */
 	public function sessionInfoAction($key, $action)
 	{
@@ -192,6 +214,8 @@ class DefaultController extends BaseController
 	}
 
 	/**
+	 * Prepares section, module or subsection action data
+	 *
 	 * @Route("/sections/{key}/", name="section")
 	 * @Route("/sections/{key}/{module}/", name="module")
 	 * @Route("/sections/{key}/{module}/{subsection}/", name="subsection")
@@ -200,6 +224,11 @@ class DefaultController extends BaseController
 	 * Prepares section = whole get&get-config part of server
 	 * Shows module part = first level of connected server (except of root)
 	 * Prepares subsection = second level of connected server tree
+	 *
+	 * @param int           $key          key of connected server
+	 * @param null|string   $module       name of the module
+	 * @param null|string   $subsection   name of the subsection
+	 * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
 	 */
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
@@ -300,9 +329,10 @@ class DefaultController extends BaseController
 
 	/**
 	 * loading file with filter specification for current module or subsection
-	 * @param  string &$module     module name
-	 * @param  string &$subsection subsection name
-	 * @return array             array with config and state filter
+	 *
+	 * @param  string $module     module name
+	 * @param  string $subsection subsection name
+	 * @return array              array with config and state filter
 	 */
 	private function loadFilters(&$module, &$subsection) {
 		// if file filter.txt exists in models, we will use it
@@ -331,8 +361,9 @@ class DefaultController extends BaseController
 
 	/**
 	 * Set values of state array
-	 * @param $key   key of associative array
-	 * @param $value value of associative array
+	 *
+	 * @param mixed $key   key of associative array
+	 * @param mixed $value value of associative array
 	 */
 	private function setStateParams($key, $value) {
 		$this->paramsState[$key] = $value;
@@ -340,8 +371,9 @@ class DefaultController extends BaseController
 
 	/**
 	 * Set values of config array
-	 * @param $key   key of associative array
-	 * @param $value value of associative array
+	 *
+	 * @param mixed $key   key of associative array
+	 * @param mixed $value value of associative array
 	 */
 	private function setConfigParams($key, $value) {
 		$this->paramsConfig[$key] = $value;
@@ -349,14 +381,15 @@ class DefaultController extends BaseController
 
 	/**
 	 * Set default values to config and state arrays
-	 * @param {int} $key     	key of connected server
-	 * @param $filterState		state filter
-	 * @param $filterConfig 	config filter
-	 * @param $sourceConfig 	source param of config
+	 *
+	 * @param int     $key          key of connected server
+	 * @param string  $filterState  state filter
+	 * @param string  $filterConfig config filter
+	 * @param string  $sourceConfig source param of config
 	 */
 	private function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = "") {
 
-		// if isset sourceConfig in session and we haven't set it in method call
+		// if is set sourceConfig in session and we haven't set it in method call
 		// we will use value from session
 		if ( $this->get('session')->get('sourceConfig') != null && $sourceConfig == "") {
 			$sourceConfig = $this->get('session')->get('sourceConfig');
@@ -413,10 +446,11 @@ class DefaultController extends BaseController
 
 	/**
 	 * process all kinds of form in section, module or subsection
-	 * @param  {int} $key        key of connected server
-	 * @param  {strign} $module     =             null module name
-	 * @param  {string} $subsection =             null subsection name
-	 * @return redirect to page, which was this method called from
+	 *
+	 * @param  int    $key                key of connected server
+	 * @param  string $module = null      module name
+	 * @param  string $subsection = null  subsection name
+	 * @return RedirectResponse           redirect to page, which was this method called from
 	 */
 	private function processSectionForms($key, $module = null, $subsection = null) {
 		$dataClass = $this->get('DataModel');
@@ -451,7 +485,7 @@ class DefaultController extends BaseController
 			$res = $this->handleRemoveNodeForm($key);
 		}
 
-		// we will redirect page after completition, because we want to load edited get and get-config
+		// we will redirect page after completion, because we want to load edited get and get-config
 		// and what's more, flash message lives exactly one redirect, so without redirect flash message
 		// would stay on the next page, what we do not want...
 		$retArr['key'] = $key;
@@ -468,9 +502,10 @@ class DefaultController extends BaseController
 	}
 
 	/**
-	 * devides string into the array (name, value) (according to the XML tree node => value)
-	 * @param  {string} $postKey post value
-	 * @return {array}           modified array
+	 * divides string into the array (name, value) (according to the XML tree node => value)
+	 *
+	 * @param  string $postKey post value
+	 * @return array           modified array
 	 */
 	private function divideInputName($postKey)
 	{
@@ -485,8 +520,9 @@ class DefaultController extends BaseController
 
 	/**
 	 * decodes XPath value
-	 * @param  {string} $value encoded XPath string
-	 * @return {string}        decoded XPath string
+	 *
+	 * @param  string $value encoded XPath string
+	 * @return string        decoded XPath string
 	 */
 	private function decodeXPath($value) {
 		return str_replace(
@@ -498,10 +534,11 @@ class DefaultController extends BaseController
 
 	/**
 	 * sends modified XML to server
-	 * @param  {int} $key    				session key of current connection
-	 * @param  {string} $config 			XML document which will be send
-	 * @param  {string} $target = "running" target source
-	 * @return {int}						return 0 on success
+	 *
+	 * @param  int    $key    	session key of current connection
+	 * @param  string $config 	XML document which will be send
+	 * @param  string $target = "running" target source
+	 * @return int						  return 0 on success, 1 on error
 	 */
 	private function executeEditConfig($key, $config, $target = "running") {
 		$res = 0;
@@ -513,7 +550,7 @@ class DefaultController extends BaseController
 
 		// edit-cofig
 		if ( ($merged = $this->get('DataModel')->handle('editconfig', $editConfigParams)) != 1 ) {
-			// for debuggind purposes, we will save result into the temp file
+			// for debugging purposes, we will save result into the temp file
 			file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/merged.yin', $merged);
 		} else {
 			$this->get('logger')->err('Edit-config failed.', array('params', $editConfigParams));
@@ -523,6 +560,14 @@ class DefaultController extends BaseController
 		return $res;
 	}
 
+	/**
+	 * Completes request tree (XML) with necessary nodes (parent nodes).
+	 * Tree must be valid for edit-config action
+	 *
+	 * @param \SimpleXMLElement  $tmpConfigXml
+	 * @param string            $config_string
+	 * @return \SimpleXMLElement
+	 */
 	private function completeRequestTree(&$tmpConfigXml, $config_string) {
 
 		$subroot = simplexml_load_file($this->get('DataModel')->getPathToModels() . 'wrapped.wyin');
@@ -560,11 +605,13 @@ class DefaultController extends BaseController
 
 	/**
 	 * updates (modifies) value of XML node
-	 * @param  {simpleXmlElement} $configXml   config XML
-	 * @param  {string} $elementName name of the element
-	 * @param  {string} $xpath       XPath to the element
-	 * @param  {string} $val         new value
-	 * @return {SimpleXMLElement} 	 modiefied node
+	 *
+	 * @param  string $configXml   xml file
+	 * @param  string $elementName name of the element
+	 * @param  string $xpath       XPath to the element
+	 * @param  string $val         new value
+	 * @param  string $xPathPrefix
+	 * @return \SimpleXMLElement   modified node
 	 */
 	private function elementValReplace(&$configXml, $elementName, $xpath, $val, $xPathPrefix = "xmlns:")
 	{
@@ -609,7 +656,8 @@ class DefaultController extends BaseController
 
 	/**
 	 * sets new filter for state part
-	 * @param  {int} &$key session key for current server
+	 *
+	 * @param  int $key   session key for current server
 	 */
 	private function handleFilterState(&$key) {
 		$this->get('DataModel')->setFlashState('state');
@@ -628,7 +676,8 @@ class DefaultController extends BaseController
 
 	/**
 	 * sets new filter for config part
-	 * @param  {int} &$key session key for current server
+	 *
+	 * @param  int $key     session key for current server
 	 */
 	private function handleFilterConfig(&$key) {
 		$this->get('DataModel')->setFlashState('config');
@@ -651,9 +700,11 @@ class DefaultController extends BaseController
 	/**
 	 * handles edit config form - changes config values into the $_POST values
 	 * and sends them to editConfig process
-	 * @param  {int} &$key session key of current connection
-	 * @return {int}       result code
-	 */		
+	 *
+	 * @param  int  $key  session key of current connection
+	 * @throws \ErrorException
+	 * @return int        result code
+	 */
 	private function handleEditConfigForm(&$key) {
 		$post_vals = $this->getRequest()->get('configDataForm');
 		$res = 0;
@@ -664,7 +715,7 @@ class DefaultController extends BaseController
 			if ( ($configXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
 				$configXml = simplexml_load_string($configXml, 'SimpleXMLIterator');
 
-				// save to temp file - for debuggind
+				// save to temp file - for debugging
 				file_put_contents(__DIR__.'/../Data/models/tmp/original.yin', $configXml->asXml());
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
@@ -689,7 +740,7 @@ class DefaultController extends BaseController
 					$this->elementValReplace($configXml, $elementName, $xpath, $val, $xPathPrefix);
 				}
 
-				// for debuggind, edited configXml will be saved into temp file
+				// for debugging, edited configXml will be saved into temp file
 				file_put_contents(__DIR__.'/../Data/models/tmp/edited.yin', $configXml->asXml());
 
 				$res = $this->executeEditConfig($key, $configXml->asXml());
@@ -709,10 +760,13 @@ class DefaultController extends BaseController
 	}
 
 	/**
-	 * duplicates node in config - values of duplicated nodes (elements) 
+	 * duplicates node in config - values of duplicated nodes (elements)
+	 *
 	 * could be changed by user
-	 * @param  {int} &$key session key of current connection
-	 * @return {int}       result code
+	 *
+	 * @param  int  $key  session key of current connection
+	 * @throws \ErrorException
+	 * @return int        result code
 	 */
 	private function handleDuplicateNodeForm(&$key)	{
 		$post_vals = $this->getRequest()->get('duplicatedNodeForm');
@@ -720,11 +774,11 @@ class DefaultController extends BaseController
 		$this->get('DataModel')->setFlashState('config');
 
 		try {
-			// nacteme originalni (nezmeneny) getconfig
+			// load original (not modified) getconfig
 			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
 				$tmpConfigXml = simplexml_load_string($originalXml);
 
-				// save to temp file - for debuggind
+				// save to temp file - for debugging
 				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
@@ -768,7 +822,7 @@ class DefaultController extends BaseController
 								$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
 							}
 						} catch (\ErrorException $e) {
-							// nothing happeds - attribute is already there
+							// nothing happened - attribute is already there
 						}
 					}
 				}
@@ -776,7 +830,7 @@ class DefaultController extends BaseController
 				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
 				$createTree = $this->completeRequestTree($parentNode[0], $createString);
 
-				// for debuggind, edited configXml will be saved into temp file
+				// for debugging, edited configXml will be saved into temp file
 				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/newElem.yin', $createTree->asXml());
 				$res = $this->executeEditConfig($key, $createTree->asXml());
 
@@ -797,11 +851,13 @@ class DefaultController extends BaseController
 
 	/**
 	 * create new node in config - according to the values in XML model
+	 *
 	 * could be changed by user
-	 * @param  {int} &$key 				session key of current connection
-	 * @param  {strign} $module 		module name
-	 * @param  {string} $subsection  	subsection name
-	 * @return {int}       result code
+	 *
+	 * @param  int      $key 				  session key of current connection
+	 * @param  string   $module 		  module name
+	 * @param  string   $subsection  	subsection name
+	 * @return int                    result code
 	 */
 	private function handleGenerateNodeForm(&$key, &$module, &$subsection)	{
 		$post_vals = $this->getRequest()->get('generatedNodeForm');
@@ -819,8 +875,10 @@ class DefaultController extends BaseController
 
 	/**
 	 * removes node from config XML tree
-	 * @param  {int} &$key session key of current connection
-	 * @return {int}       result code
+	 *
+	 * @param  int  $key session key of current connection
+	 * @throws \ErrorException  when get-config could not be loaded
+	 * @return int       result code
 	 */
 	private function handleRemoveNodeForm(&$key) {
 		$post_vals = $this->getRequest()->get('removeNodeForm');
@@ -830,7 +888,7 @@ class DefaultController extends BaseController
 			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
 				$tmpConfigXml = simplexml_load_string($originalXml);
 
-				// save to temp file - for debuggind
+				// save to temp file - for debugging
 				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
@@ -851,7 +909,7 @@ class DefaultController extends BaseController
 
 				$deleteTree = $this->completeRequestTree($toDelete[0], $deletestring);
 
-				// for debuggind, edited configXml will be saved into temp file
+				// for debugging, edited configXml will be saved into temp file
 				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/removeNode.yin', $tmpConfigXml->asXml());
 				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml());
 				if ($res == 0) {

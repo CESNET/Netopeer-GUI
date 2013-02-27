@@ -5,6 +5,8 @@ namespace FIT\NetopeerBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * Entity of connected device
+ *
  * FIT\NetopeerBundle\Entity\MyConnection
  *
  * @ORM\Table()
@@ -13,6 +15,8 @@ use Doctrine\ORM\Mapping as ORM;
 class MyConnection
 {
     /**
+     * Unique numeric identifier
+     *
      * @var integer $id
      *
      * @ORM\Column(name="id", type="integer")
@@ -22,41 +26,56 @@ class MyConnection
     private $id;
 
     /**
+     * Unique identifier - hash as name of folder in /Data/
+     *
      * @ORM\Column(name="hash", type="string", unique=true)
      */
     private $hash;    
 
     /**
+     * Name of the model
+     *
      * @ORM\Column(type="string", length=255)
      */
     protected $modelName;
 
     /**
+     * Version of the model
+     *
      * @ORM\Column(type="string", length=10)
      */
     protected $modelVersion;
 
     /**
+     * Root element in the model
+     *
      * @ORM\Column(type="string", length=50)
      */
     protected $rootElem;
 
     /**
+     * Namespace of the model
+     *
      * @ORM\Column(type="text", length=255)
      */
     protected $namespace;
 
     /**
+     * Hostname of connection
+     *
      * @ORM\Column(type="string", length=255)
      */
     protected $hostname;
 
     /**
+     * Port of connection
+     *
      * @ORM\Column(type="integer")
      */
     protected $port;
 
     /**
+     * Username of connection
      * @ORM\Column(type="string")
      */
     protected $username;

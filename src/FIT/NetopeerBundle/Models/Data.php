@@ -12,6 +12,10 @@ use Doctrine\ORM\EntityManager;
 use FIT\NetopeerBundle\Models\ConnectionSession;
 use FIT\NetopeerBundle\Entity\MyConnection;
 
+/**
+ * @class Data      Data service, handles all communication
+ * between webGUI and mod_netconf
+ */
 class Data {
 
 	/* Enumeration of Message type (taken from mod_netconf.c) */
@@ -53,8 +57,10 @@ class Data {
 
 	/**
 	 * Parse $message formatted by Chunked Framing Mechanism (RFC6242)
-	 * @param  {string} $message input message text
-	 * @return {string}          unwrapped message
+	 * @param  string $message input message text
+	 * @return string          unwrapped message
+	 *
+	 * @throws \ErrorException  when message is not formatted correctly
 	 */
 	private function unwrap_rfc6242($message) {
 		$response = "";
@@ -115,8 +121,8 @@ class Data {
 
 	/**
 	 * Find hash identifiers from DB for key
-	 * @param  {int} $key session key
-	 * @return {array}  return array of identifiers on success, false on error
+	 * @param  int $key session key
+	 * @return array  return array of identifiers on success, false on error
 	 */
 	private function getModuleIdentifiersFromDb($key) {
 		$conn = $this->getConnFromKey($key);
@@ -136,9 +142,9 @@ class Data {
 
 	/**
 	 * get path for module name, includes identifier
-	 * @param  {int} $key      session key
-	 * @param  {string} $moduleName name of element
-	 * @return {string}           relative path on succes, false on error
+	 * @param  int $key      session key
+	 * @param  string $moduleName name of element
+	 * @return string           relative path on succes, false on error
 	 */
 	private function getModulePathByRootModuleName($key, $moduleName) {
 		if (!is_array($this->dbConnections) || !count($this->dbConnections)) {
@@ -209,8 +215,8 @@ class Data {
 
 	/**
 	 * Read response from socket
-	 * @param  &$sock 		socket descriptor
-	 * @return {string}     trimmed string that was read
+	 * @param  resource &$sock 		socket descriptor
+	 * @return string             trimmed string that was read
 	 */
 	private function readnetconf2(&$sock) {
 		$response = "";
@@ -240,8 +246,8 @@ class Data {
 	}
 	/**
 	 * Read response from socket
-	 * @param  &$sock 		socket descriptor
-	 * @return {string}     trimmed string that was read
+	 * @param  resource &$sock 		socket descriptor
+	 * @return string             trimmed string that was read
 	 */
 	private function readnetconf(&$sock) {
 		$response = "";
@@ -320,9 +326,10 @@ class Data {
 
 	/**
 	 * Handles connection to the socket
-	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params connection params for mod_netconf
-	 * @return {int}    		0 on success
+	 * @param  resource $sock     socket descriptor
+	 * @param  array    $params  connection params for mod_netconf
+	 * @param  mixed    $result  result of searching of new connection in all connections
+	 * @return int                0 on success
 	 */
 	private function handle_connect(&$sock, &$params, &$result = null) {
 		$session = $this->container->get('request')->getSession();
@@ -369,6 +376,14 @@ class Data {
 		}
 	}
 
+	/**
+	 * @param   string $text  string to remove XML header in
+	 * @return  mixed         returns an array if the subject parameter
+	 *                        is an array, or a string otherwise.	If matches
+	 *                        are found, the new subject will be returned,
+	 *                        otherwise subject will be returned unchanged
+	 *                        or null if an error occurred.
+	 */
 	public function remove_xml_header(&$text)
 	{
 		return preg_replace("/<\?xml .*\?".">/i", "n", $text);
@@ -376,9 +391,9 @@ class Data {
 
 	/**
 	 * handle get action
-	 * @param  &$sock   			socket descriptor
-	 * @param  {array} &$params 	array of values for mod_netconf (type, params...)
-	 * @return 						decoded data on success
+	 * @param  resource $sock   	socket descriptor
+	 * @param  array    $params 	array of values for mod_netconf (type, params...)
+	 * @return mixed		          decoded data on success
 	 */
 	public function handle_get(&$sock, &$params) {
 		if ( $this->check_logged_keys() != 0) {
@@ -403,9 +418,9 @@ class Data {
 
 	/**
 	 * handle get config action
-	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params array of values for mod_netconf (type, params...)
-	 * @return           		decoded data on success
+	 * @param  resource $sock   	socket descriptor
+	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 * @return mixed          		decoded data on success, 1 on error
 	 */
 	public function handle_getconfig(&$sock, &$params)	{
 		if ( $this->check_logged_keys() != 0) {
@@ -427,9 +442,9 @@ class Data {
 
 	/**
 	 * handle edit config action
-	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params array of values for mod_netconf (type, params...)
-	 * @return           		decoded data on success
+	 * @param  resource $sock   	socket descriptor
+	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 * @return mixed          		decoded data on success, 1 on error
 	 */
 	function handle_editconfig(&$sock, &$params) {
 		if ( $this->check_logged_keys() != 0) {
@@ -462,9 +477,9 @@ class Data {
 
 	/**
 	 * handle get config action
-	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params array of values for mod_netconf (type, params...)
-	 * @return {int}       		0 on success
+	 * @param  resource $sock   	socket descriptor
+	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_disconnect(&$sock, &$params) {
 		if ($this->check_logged_keys() != 0) {
@@ -493,9 +508,9 @@ class Data {
 
 	/**
 	 * handle lock action
-	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params array of values for mod_netconf (type, params...)
-	 * @return {int}       		0 on success
+	 * @param  resource $sock   	socket descriptor
+	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 * @return int       		      0 on success, 1 on error
 	 */
 	private function handle_lock(&$sock, &$params) {
 		if ($this->check_logged_keys() != 0) {
@@ -521,9 +536,9 @@ class Data {
 
 	/**
 	 * handle unlock action
-	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params array of values for mod_netconf (type, params...)
-	 * @return {int}       		0 on success
+	 * @param  resource $sock   	socket descriptor
+	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_unlock(&$sock, &$params) {
 		if ($this->check_logged_keys() != 0) {
@@ -549,9 +564,9 @@ class Data {
 
 	/**
 	 * handle info action
-	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params array of values for mod_netconf (type, params...)
-	 * @return {int}       		0 on success
+	 * @param  resource $sock   	socket descriptor
+	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 * @return int       		      0 on success, 1 on error
 	 */
 	private function handle_info(&$sock, &$params) {
 		if (isset($params["session"]) && ($params["session"] !== "")) {
@@ -580,9 +595,10 @@ class Data {
 
 	/**
 	 * handle unlock action
-	 * @param  &$sock   		socket descriptor
-	 * @param  {array} &$params $params must contain "identifier" of schema, can contain "version" and "format" of schema
-	 * @return {int}       		0 on success
+	 * @param  resource $sock   	socket descriptor
+	 * @param  array    $params   $params must contain "identifier" of schema, can contain "version" and "format" of schema
+	 * @param  mixed    $result   decoded data from response
+	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_getschema(&$sock, &$params, &$result) {
 		if ($this->check_logged_keys() != 0) {
@@ -620,7 +636,7 @@ class Data {
 
 	/**
 	 * checks, if logged keys are valid
-	 * @return {int}       		0 on success
+	 * @return int       		0 on success, 1 on error
 	 */
 	private function check_logged_keys() {
 		$session = $this->container->get('request')->getSession();
@@ -647,8 +663,8 @@ class Data {
 
 	/**
 	 * checks decoded data, if there an error occures
-	 * @param  &$decoded 	decoded data
-	 * @return 				decoded data on success
+	 * @param  mixed  $decoded 	decoded data
+	 * @return mixed				    decoded data on success, 1 on error
 	 */
 	private function checkDecodedData(&$decoded) {
 		$session = $this->container->get('request')->getSession();
@@ -673,8 +689,8 @@ class Data {
 
 	/**
 	 * Wrap message for Chunked Framing Mechanism (RFC6242) and write it into the socket.
-	 * @param  &$sock   			socket descriptor
-	 * @param  {string} $message 	message text
+	 * @param  resource $sock   			socket descriptor
+	 * @param  string   $message 	    message text
 	 */
 	private function write2socket(&$sock, $message)	{
 		$final_message = sprintf("\n#%d\n%s\n##\n", strlen($message), $message);
@@ -683,9 +699,9 @@ class Data {
 
 	/**
 	 * executes operation - sends message into the socket
-	 * @param  &$sock  			socket descriptor
-	 * @param  {array} $params 	array of values for mod_netconf (type, params...)
-	 * @return {array}         	response from mod_netconf
+	 * @param  resource   $sock  			socket descriptor
+	 * @param  array      $params 	  array of values for mod_netconf (type, params...)
+	 * @return array         	        response from mod_netconf
 	 */
 	private function execute_operation(&$sock, $params)	{
 		$operation = json_encode($params);
@@ -695,7 +711,7 @@ class Data {
 	}
 
 	/**
-	 * @return {string} path to models folder
+	 * @return string      path to models folder
 	 */
 	public function getModelsDir() {
 		return __DIR__ . '/../Data/models/';
@@ -703,8 +719,8 @@ class Data {
 
 	/**
 	 * gets model dir name for module
-	 * @param  {string} $moduleName
-	 * @return {string} dir name on success, false on error
+	 * @param  string $moduleName   name of module
+	 * @return string               dir name on success, false on error
 	 */
 	public function getModelDirForName($moduleName) {
 		$key = $this->container->get('request')->get('key');
@@ -717,8 +733,8 @@ class Data {
 
 	/**
 	 * checks if model dir for module exists
-	 * @param  {string} $moduleName
-	 * @return {bool}
+	 * @param  string $moduleName   name of module
+	 * @return bool
 	 */
 	public function existsModelDirForName($moduleName) {
 		$key = $this->container->get('request')->get('key');
@@ -730,7 +746,9 @@ class Data {
 	}
 
 	/**
-	 * @return {string} path to wrapped model file
+	 * get path to models in file system
+	 * @param  string $moduleName  name of the module
+	 * @return string               path to wrapped model file
 	 */
 	public function getPathToModels($moduleName = "") {
 		$path = $this->getModelsDir();
@@ -752,10 +770,11 @@ class Data {
 
 	/**
 	 * handles all actions, which are allowed on socket
-	 * @param  {string} $command 			kind of action (command)
-	 * @param  {array} $params = array() 	parameters for mod_netconf
-	 * @param  {bool} $merge = true 		should be action handle with merge with model
-	 * @return {int}						0 on success
+	 * @param  string   $command 			kind of action (command)
+	 * @param  array    $params       parameters for mod_netconf
+	 * @param  bool     $merge        should be action handle with merge with model
+	 * @param  mixed    $result
+	 * @return int						        0 on success, 1 on error
 	 */
 	public function handle($command, $params = array(), $merge = true, &$result = null) {
 		$errno = 0;
@@ -942,12 +961,11 @@ class Data {
 	 * @param  {SimpleXMLElement} $root_el with element of response
 	 */
 	private function mergeRecursive(&$model, $root_el) {
-		//echo "Rootel";
 		foreach ($root_el as $ch) {
 			$this->find_and_complete($model, $ch);
 			$this->mergeRecursive($model, $ch);
 		}
-		//echo "children";
+
 		foreach ($root_el->children as $ch) {
 			$this->find_and_complete($model, $ch);
 			$this->mergeRecursive($model, $ch);
@@ -956,9 +974,9 @@ class Data {
 
 	/**
 	 * Add attributes from configuration model to response such as config, mandatory, type.
-	 * @param  {SimpleXMLElement} &$model 	data configuration model
-	 * @param  $result 						data from netconf server
-	 * @return 								the result of mege
+	 * @param  {SimpleXMLElement} $model 	data configuration model
+	 * @param  string             $result data from netconf server
+	 * @return string								      the result of merge
 	 */
 	private function mergeWithModel($model, $result) {
 		if ($result) {
@@ -998,7 +1016,9 @@ XML;
 
 	/**
 	 * Sets current flash state - but only for allowed kinds
-	 * @param {string} $state kind of flash state
+	 * @param   string  $state    kind of flash state
+	 * @throws  \ErrorException   if flash state is not in allowedState array
+	 * @return  int               0 on error
 	 */
 	public function setFlashState($state) {
 		$allowedState = array("config", "state", "single");

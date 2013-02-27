@@ -17,9 +17,9 @@ class BaseController extends Controller
 	private $twigArr;
 
 	/**
-	 * Assignes variable to array, which will be send to template
-	 * @param  $key   key of the associative array
-	 * @param  $value value of the associative array
+	 * Assignees variable to array, which will be send to template
+	 * @param  mixed $key   key of the associative array
+	 * @param  mixed $value value of the associative array
 	 */
 	protected function assign($key, $value) {
 		$this->twigArr[$key] = $value;
@@ -44,7 +44,7 @@ class BaseController extends Controller
 		$flashes = $session->getFlashes();
 		$stateFlashes = $configFlashes = $singleFlashes = $allFlashes = array();
 
-		// devide flash messages according to key into categories
+		// divide flash messages according to key into categories
 		foreach ($flashes as $key => $message) {
 			// a little bit tricky - if key contains word state, condition will be pass
 			if ( strpos($key, 'tate') ) { // key contains word state
@@ -93,12 +93,15 @@ class BaseController extends Controller
 
 	/**
 	 * sets info of current section key
-	 * @param $key current section key
+	 * @param string $key current section key
 	 */
 	public function setActiveSectionKey($key) {
 		$this->activeSectionKey = $key;
 	}
 
+	/**
+	 * @param string $submenuUrl URL for submenu
+	 */
 	public function setSubmenuUrl($submenuUrl) {
 		$this->submenuUrl = $submenuUrl;
 	}
