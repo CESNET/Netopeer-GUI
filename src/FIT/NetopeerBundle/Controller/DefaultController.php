@@ -78,14 +78,13 @@ class DefaultController extends BaseController
 				$res = $dataClass->handle("connect", $params, false, $result);
 
 				// if connection is broken (Could not connect)
-				if ( $res = 1 ) {
+				if ($res == 0) {
 					$arr = array(
 						"idForAjaxGetSchema" => $result,
 					);
 					$this->get('session')->set('getSchemaWithAjax', $arr);
-				}
-
-				$this->getRequest()->getSession()->setFlash('state success', 'Form had been filled up correctly.');
+					$this->getRequest()->getSession()->setFlash('state success', 'Form has been filled up correctly.');
+				} 
 			} else {
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
 			}
@@ -694,7 +693,9 @@ class DefaultController extends BaseController
 				file_put_contents(__DIR__.'/../Data/models/tmp/edited.yin', $configXml->asXml());
 
 				$res = $this->executeEditConfig($key, $configXml->asXml());
-				$this->get('session')->setFlash('config success', "Config has been edited successfully.");
+				if ($res == 0) {
+					$this->get('session')->setFlash('config success', "Config has been edited successfully.");
+				}
 			} else {
 				throw new \ErrorException("Could not load config.");
 			}
@@ -780,7 +781,7 @@ class DefaultController extends BaseController
 				$res = $this->executeEditConfig($key, $createTree->asXml());
 
 				if ($res == 0) {
-				  $this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
+			    $this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
 				}
 			} else {
 				throw new \ErrorException("Could not load config.");
@@ -852,9 +853,10 @@ class DefaultController extends BaseController
 
 				// for debuggind, edited configXml will be saved into temp file
 				file_put_contents(__DIR__.'/../../../../app/logs/tmp-files/removeNode.yin', $tmpConfigXml->asXml());
-				$this->executeEditConfig($key, $tmpConfigXml->asXml());
-
-				$this->getRequest()->getSession()->setFlash('config success', "Record has been removed.");
+				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml());
+				if ($res == 0) {
+					$this->getRequest()->getSession()->setFlash('config success', "Record has been removed.");
+				}
 			} else {
 				throw new \ErrorException("Could not load config.");
 			}
