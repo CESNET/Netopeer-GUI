@@ -1,0 +1,3048 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project version="2.0.0a12" title="">
+  <file path="Entity/MyConnection.php" hash="b6470f58ebb5f54d53aab971d7a264ba" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Entity" line="15" package="Default">
+      <extends/>
+      <name>MyConnection</name>
+      <full_name>\FIT\NetopeerBundle\Entity\MyConnection</full_name>
+      <docblock line="7">
+        <description>Entity of connected device</description>
+        <long-description>&lt;p&gt;FIT\NetopeerBundle\Entity\MyConnection&lt;/p&gt;</long-description>
+        <tag line="7" name="ORM\Table" description="" plugin="doctrine" link="http://www.doctrine-project.org/docs/orm/2.1/en/reference/annotations-reference.html#annref-table" content="()">
+          <argument field-name="">()</argument>
+        </tag>
+        <tag line="7" name="ORM\Entity" description="Entity" plugin="doctrine" link="http://www.doctrine-project.org/docs/orm/2.1/en/reference/annotations-reference.html#annref-entity" content=""/>
+      </docblock>
+      <property final="false" static="false" visibility="private" line="26" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$id</name>
+        <default/>
+        <docblock line="17">
+          <description>Unique numeric identifier</description>
+          <long-description/>
+          <tag line="17" name="var" description="" type="integer">
+            <type by_reference="false">integer</type>
+          </tag>
+          <tag line="17" name="ORM\Column" description="(name=&quot;id&quot;, type=&quot;integer&quot;)"/>
+          <tag line="17" name="ORM\Id" description="Id" plugin="doctrine" link="http://www.doctrine-project.org/docs/orm/2.1/en/reference/annotations-reference.html#annref-id" content=""/>
+          <tag line="17" name="ORM\GeneratedValue" description="strategy=&quot;AUTO&quot;" plugin="doctrine" link="http://www.doctrine-project.org/docs/orm/2.1/en/reference/annotations-reference.html#annref-generatedvalue" content="(strategy=&quot;AUTO&quot;)">
+            <argument field-name="(strategy">"AUTO")</argument>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="private" line="33" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$hash</name>
+        <default/>
+        <docblock line="28">
+          <description>Unique identifier - hash as name of folder in /Data/</description>
+          <long-description/>
+          <tag line="28" name="ORM\Column" description="(name=&quot;hash&quot;, type=&quot;string&quot;, unique=true)"/>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="40" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$modelName</name>
+        <default/>
+        <docblock line="35">
+          <description>Name of the model</description>
+          <long-description/>
+          <tag line="35" name="ORM\Column" description="(type=&quot;string&quot;, length=255)"/>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="47" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$modelVersion</name>
+        <default/>
+        <docblock line="42">
+          <description>Version of the model</description>
+          <long-description/>
+          <tag line="42" name="ORM\Column" description="(type=&quot;string&quot;, length=10)"/>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="54" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$rootElem</name>
+        <default/>
+        <docblock line="49">
+          <description>Root element in the model</description>
+          <long-description/>
+          <tag line="49" name="ORM\Column" description="(type=&quot;string&quot;, length=50)"/>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="61" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$namespace</name>
+        <default/>
+        <docblock line="56">
+          <description>Namespace of the model</description>
+          <long-description/>
+          <tag line="56" name="ORM\Column" description="(type=&quot;text&quot;, length=255)"/>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="68" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$hostname</name>
+        <default/>
+        <docblock line="63">
+          <description>Hostname of connection</description>
+          <long-description/>
+          <tag line="63" name="ORM\Column" description="(type=&quot;string&quot;, length=255)"/>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="75" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$port</name>
+        <default/>
+        <docblock line="70">
+          <description>Port of connection</description>
+          <long-description/>
+          <tag line="70" name="ORM\Column" description="(type=&quot;integer&quot;)"/>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="81" namespace="FIT\NetopeerBundle\Entity" package="Default">
+        <name>$username</name>
+        <default/>
+        <docblock line="77">
+          <description>Username of connection</description>
+          <long-description/>
+          <tag line="77" name="ORM\Column" description="(type=&quot;string&quot;)"/>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="89" package="Default">
+        <name>getId</name>
+        <full_name>getId</full_name>
+        <docblock line="84">
+          <description>Get id</description>
+          <long-description/>
+          <tag line="84" name="return" description="" type="integer">
+            <type by_reference="false">integer</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="99" package="Default">
+        <name>setHash</name>
+        <full_name>setHash</full_name>
+        <docblock line="94">
+          <description>Set hash</description>
+          <long-description/>
+          <tag line="94" name="param" description="" type="string" variable="$hash">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="99">
+          <name>$hash</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="109" package="Default">
+        <name>getHash</name>
+        <full_name>getHash</full_name>
+        <docblock line="104">
+          <description>Get hash</description>
+          <long-description/>
+          <tag line="104" name="return" description="" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="119" package="Default">
+        <name>setModelName</name>
+        <full_name>setModelName</full_name>
+        <docblock line="114">
+          <description>Set modelName</description>
+          <long-description/>
+          <tag line="114" name="param" description="" type="string" variable="$modelName">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="119">
+          <name>$modelName</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="129" package="Default">
+        <name>getModelName</name>
+        <full_name>getModelName</full_name>
+        <docblock line="124">
+          <description>Get modelName</description>
+          <long-description/>
+          <tag line="124" name="return" description="" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="139" package="Default">
+        <name>setModelVersion</name>
+        <full_name>setModelVersion</full_name>
+        <docblock line="134">
+          <description>Set modelVersion</description>
+          <long-description/>
+          <tag line="134" name="param" description="" type="string" variable="$modelVersion">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="139">
+          <name>$modelVersion</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="149" package="Default">
+        <name>getModelVersion</name>
+        <full_name>getModelVersion</full_name>
+        <docblock line="144">
+          <description>Get modelVersion</description>
+          <long-description/>
+          <tag line="144" name="return" description="" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="159" package="Default">
+        <name>setRootElem</name>
+        <full_name>setRootElem</full_name>
+        <docblock line="154">
+          <description>Set rootElem</description>
+          <long-description/>
+          <tag line="154" name="param" description="" type="string" variable="$rootElem">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="159">
+          <name>$rootElem</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="169" package="Default">
+        <name>getRootElem</name>
+        <full_name>getRootElem</full_name>
+        <docblock line="164">
+          <description>Get rootElem</description>
+          <long-description/>
+          <tag line="164" name="return" description="" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="179" package="Default">
+        <name>setNamespace</name>
+        <full_name>setNamespace</full_name>
+        <docblock line="174">
+          <description>Set namespace</description>
+          <long-description/>
+          <tag line="174" name="param" description="" type="\FIT\NetopeerBundle\Entity\text" variable="$namespace">
+            <type by_reference="false">\FIT\NetopeerBundle\Entity\text</type>
+          </tag>
+        </docblock>
+        <argument line="179">
+          <name>$namespace</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="189" package="Default">
+        <name>getNamespace</name>
+        <full_name>getNamespace</full_name>
+        <docblock line="184">
+          <description>Get namespace</description>
+          <long-description/>
+          <tag line="184" name="return" description="" type="\FIT\NetopeerBundle\Entity\text">
+            <type by_reference="false">\FIT\NetopeerBundle\Entity\text</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="199" package="Default">
+        <name>setHostname</name>
+        <full_name>setHostname</full_name>
+        <docblock line="194">
+          <description>Set hostname</description>
+          <long-description/>
+          <tag line="194" name="param" description="" type="string" variable="$hostname">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="199">
+          <name>$hostname</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="209" package="Default">
+        <name>getHostname</name>
+        <full_name>getHostname</full_name>
+        <docblock line="204">
+          <description>Get hostname</description>
+          <long-description/>
+          <tag line="204" name="return" description="" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="219" package="Default">
+        <name>setPort</name>
+        <full_name>setPort</full_name>
+        <docblock line="214">
+          <description>Set port</description>
+          <long-description/>
+          <tag line="214" name="param" description="" type="integer" variable="$port">
+            <type by_reference="false">integer</type>
+          </tag>
+        </docblock>
+        <argument line="219">
+          <name>$port</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="229" package="Default">
+        <name>getPort</name>
+        <full_name>getPort</full_name>
+        <docblock line="224">
+          <description>Get port</description>
+          <long-description/>
+          <tag line="224" name="return" description="" type="integer">
+            <type by_reference="false">integer</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="239" package="Default">
+        <name>setUsername</name>
+        <full_name>setUsername</full_name>
+        <docblock line="234">
+          <description>Set username</description>
+          <long-description/>
+          <tag line="234" name="param" description="" type="string" variable="$username">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="239">
+          <name>$username</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Entity" line="249" package="Default">
+        <name>getUsername</name>
+        <full_name>getUsername</full_name>
+        <docblock line="244">
+          <description>Get username</description>
+          <long-description/>
+          <tag line="244" name="return" description="" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Entity/MyConnection.php</error>
+    </parse_markers>
+  </file>
+  <file path="Twig/NetopeerTwigExtension.php" hash="493be9c8c430b031880c5c643c1b2433" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Twig" line="11" package="Default">
+      <extends>\Twig_Extension</extends>
+      <name>NetopeerTwigExtension</name>
+      <full_name>\FIT\NetopeerBundle\Twig\NetopeerTwigExtension</full_name>
+      <docblock line="8">
+        <description>Registers custom functions, which could be used in templates</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Twig" line="18" package="Default">
+        <name>getFunctions</name>
+        <full_name>getFunctions</full_name>
+        <docblock line="13">
+          <description>Array of my defined functions</description>
+          <long-description></long-description>
+          <tag line="13" name="return" description="" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Twig" line="33" package="Default">
+        <name>isNumberType</name>
+        <full_name>isNumberType</full_name>
+        <docblock line="27">
+          <description>Check if param is number</description>
+          <long-description></long-description>
+          <tag line="27" name="param" description="value (string), which we check, if is a number" type="string|mixed" variable="$string">
+            <type by_reference="false">string</type>
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="27" name="return" description="" type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="33">
+          <name>$string</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Twig" line="48" package="Default">
+        <name>isUrlType</name>
+        <full_name>isUrlType</full_name>
+        <docblock line="42">
+          <description>Check if param is URI</description>
+          <long-description></long-description>
+          <tag line="42" name="param" description="check, if value is an URI" type="string" variable="$string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="42" name="return" description="" type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="48">
+          <name>$string</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Twig" line="61" package="Default">
+        <name>explodeString</name>
+        <full_name>explodeString</full_name>
+        <docblock line="54">
+          <description>Explode function</description>
+          <long-description></long-description>
+          <tag line="54" name="param" description="" type="string" variable="$delimiter">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="54" name="param" description="string to explode" type="string" variable="$string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="54" name="return" description="" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="61">
+          <name>$delimiter</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="61">
+          <name>$string</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Twig" line="70" package="Default">
+        <name>getName</name>
+        <full_name>getName</full_name>
+        <docblock line="65">
+          <description>Get name of this extension</description>
+          <long-description></long-description>
+          <tag line="65" name="return" description="" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Twig/NetopeerTwigExtension.php</error>
+    </parse_markers>
+  </file>
+  <file path="DependencyInjection/FITNetopeerExtension.php" hash="49409a4232e0eca9512bb3f599c2d6fe" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\DependencyInjection" line="15" package="Default">
+      <extends>\Symfony\Component\HttpKernel\DependencyInjection\Extension</extends>
+      <name>FITNetopeerExtension</name>
+      <full_name>\FIT\NetopeerBundle\DependencyInjection\FITNetopeerExtension</full_name>
+      <docblock line="10">
+        <description>This is the class that loads and manages your bundle configuration</description>
+        <long-description>&lt;p&gt;To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}&lt;/p&gt;</long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\DependencyInjection" line="20" package="Default">
+        <name>load</name>
+        <full_name>load</full_name>
+        <docblock line="17">
+          <description>{@inheritDoc}</description>
+          <long-description/>
+        </docblock>
+        <argument line="20">
+          <name>$configs</name>
+          <default/>
+          <type>array</type>
+        </argument>
+        <argument line="20">
+          <name>$container</name>
+          <default/>
+          <type>\Symfony\Component\DependencyInjection\ContainerBuilder</type>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file DependencyInjection/FITNetopeerExtension.php</error>
+      <error line="17" code="50015">Argument $configs is missing from the Docblock of load()</error>
+      <error line="17" code="50015">Argument $container is missing from the Docblock of load()</error>
+    </parse_markers>
+  </file>
+  <file path="DependencyInjection/Configuration.php" hash="558880513ef74f2401c336bdb82c5147" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\DependencyInjection" line="13" package="Default">
+      <extends/>
+      <implements>\Symfony\Component\Config\Definition\ConfigurationInterface</implements>
+      <name>Configuration</name>
+      <full_name>\FIT\NetopeerBundle\DependencyInjection\Configuration</full_name>
+      <docblock line="8">
+        <description>This is the class that validates and merges configuration from your app/config files</description>
+        <long-description>&lt;p&gt;To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html#cookbook-bundles-extension-config-class}&lt;/p&gt;</long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\DependencyInjection" line="18" package="Default">
+        <name>getConfigTreeBuilder</name>
+        <full_name>getConfigTreeBuilder</full_name>
+        <docblock line="15">
+          <description>{@inheritDoc}</description>
+          <long-description/>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file DependencyInjection/Configuration.php</error>
+    </parse_markers>
+  </file>
+  <file path="Tests/Controller/DefaultControllerTest.php" hash="e32c9332ba74159ce167bbc18def02ac" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Tests\Controller" line="7" package="Default">
+      <extends>\Symfony\Bundle\FrameworkBundle\Test\WebTestCase</extends>
+      <name>DefaultControllerTest</name>
+      <full_name>\FIT\NetopeerBundle\Tests\Controller\DefaultControllerTest</full_name>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Tests\Controller" line="9" package="Default">
+        <name>testIndex</name>
+        <full_name>testIndex</full_name>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Tests/Controller/DefaultControllerTest.php</error>
+      <error line="7" code="50000">No DocBlock was found for \FIT\NetopeerBundle\Tests\Controller\DefaultControllerTest</error>
+      <error line="9" code="50010">No DocBlock was found for method testIndex()</error>
+    </parse_markers>
+  </file>
+  <file path="FITNetopeerBundle.php" hash="a9d3be0f060ff9bdfc33c47c0a210fa3" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle" line="7" package="Default">
+      <extends>\Symfony\Component\HttpKernel\Bundle\Bundle</extends>
+      <name>FITNetopeerBundle</name>
+      <full_name>\FIT\NetopeerBundle\FITNetopeerBundle</full_name>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file FITNetopeerBundle.php</error>
+      <error line="7" code="50000">No DocBlock was found for \FIT\NetopeerBundle\FITNetopeerBundle</error>
+    </parse_markers>
+  </file>
+  <file path="Models/XMLoperations.php" hash="2414aa2998ac745d975b93944db8a202" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Models" line="42" package="Default">
+      <extends/>
+      <name>XMLoperations</name>
+      <full_name>\FIT\NetopeerBundle\Models\XMLoperations</full_name>
+      <docblock line="5">
+        <description>Array2XML: A class to convert array in PHP to XML
+It also takes into account attributes names unlike SimpleXML in PHP
+It returns the XML in form of DOMDocument class for further manipulation.</description>
+        <long-description>&lt;p&gt;It throws exception if the tag name or attribute name has illegal chars.&lt;/p&gt;
+
+&lt;p&gt;Author : Lalit Patel
+Website: http://www.lalit.org/lab/convert-php-array-to-xml-with-attributes
+License: Apache License 2.0
+         http://www.apache.org/licenses/LICENSE-2.0
+Version: 0.1 (10 July 2011)
+Version: 0.2 (16 August 2011)
+         - replaced htmlentities() with htmlspecialchars() (Thanks to Liel Dulev)
+         - fixed a edge case where root node has a false/null/0 value. (Thanks to Liel Dulev)
+Version: 0.3 (22 August 2011)
+         - fixed tag sanitize regex which didn't allow tagnames with single character.
+Version: 0.4 (18 September 2011)
+         - Added support for CDATA section using @cdata instead of @value.
+Version: 0.5 (07 December 2011)
+         - Changed logic to check numeric array indices not starting from 0.
+Version: 0.6 (04 March 2012)
+         - Code now doesn't @cdata to be placed in an empty array
+Version: 0.7 (24 March 2012)
+         - Reverted to version 0.5
+Version: 0.8 (02 May 2012)
+         - Removed htmlspecialchars() before adding to text node or attributes.&lt;/p&gt;
+
+&lt;p&gt;Usage:
+      $xml = Array2XML::createXML('root_node_name', $php_array);
+      echo $xml-&gt;saveXML();&lt;/p&gt;
+
+&lt;p&gt;Additional functions:
+        mergeXml&lt;/p&gt;</long-description>
+      </docblock>
+      <property final="false" static="true" visibility="private" line="44" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$xml</name>
+        <default>null</default>
+      </property>
+      <property final="false" static="true" visibility="private" line="45" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$encoding</name>
+        <default>'UTF-8'</default>
+      </property>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="FIT\NetopeerBundle\Models" line="53" package="Default">
+        <name>init</name>
+        <full_name>init</full_name>
+        <docblock line="47">
+          <description>Initialize the root XML node [optional]</description>
+          <long-description/>
+          <tag line="47" name="param" description="" type="\FIT\NetopeerBundle\Models\" variable="$version"/>
+          <tag line="47" name="param" description="" type="\FIT\NetopeerBundle\Models\" variable="$encoding"/>
+          <tag line="47" name="param" description="" type="\FIT\NetopeerBundle\Models\" variable="$format_output"/>
+        </docblock>
+        <argument line="53">
+          <name>$version</name>
+          <default>'1.0'</default>
+          <type/>
+        </argument>
+        <argument line="53">
+          <name>$encoding</name>
+          <default>'UTF-8'</default>
+          <type/>
+        </argument>
+        <argument line="53">
+          <name>$format_output</name>
+          <default>true</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="FIT\NetopeerBundle\Models" line="65" package="Default">
+        <name>createXML</name>
+        <full_name>createXML</full_name>
+        <docblock line="59">
+          <description>Convert an Array to XML</description>
+          <long-description/>
+          <tag line="59" name="param" description="- name of the root node to be converted" type="string" variable="$node_name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="59" name="param" description="- aray to be converterd" type="array" variable="$arr">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="59" name="return" description="" type="\FIT\NetopeerBundle\Models\DomDocument">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\DomDocument</type>
+          </tag>
+        </docblock>
+        <argument line="65">
+          <name>$node_name</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="65">
+          <name>$arr</name>
+          <default>array()</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="private" namespace="FIT\NetopeerBundle\Models" line="79" package="Default">
+        <name>convert</name>
+        <full_name>convert</full_name>
+        <docblock line="73">
+          <description>Convert an Array to XML</description>
+          <long-description/>
+          <tag line="73" name="param" description="- name of the root node to be converted" type="string" variable="$node_name">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="73" name="param" description="- aray to be converterd" type="array" variable="$arr">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="73" name="return" description="" type="\FIT\NetopeerBundle\Models\DOMNode">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\DOMNode</type>
+          </tag>
+        </docblock>
+        <argument line="79">
+          <name>$node_name</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="79">
+          <name>$arr</name>
+          <default>array()</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="private" namespace="FIT\NetopeerBundle\Models" line="146" package="Default">
+        <name>getXMLRoot</name>
+        <full_name>getXMLRoot</full_name>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="private" namespace="FIT\NetopeerBundle\Models" line="156" package="Default">
+        <name>bool2str</name>
+        <full_name>bool2str</full_name>
+        <argument line="156">
+          <name>$v</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="private" namespace="FIT\NetopeerBundle\Models" line="167" package="Default">
+        <name>isValidTagName</name>
+        <full_name>isValidTagName</full_name>
+        <argument line="167">
+          <name>$tag</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="FIT\NetopeerBundle\Models" line="179" package="Default">
+        <name>mergeXML</name>
+        <full_name>mergeXML</full_name>
+        <docblock line="172">
+          <description>Pumps all child elements of second SimpleXML object into first one.</description>
+          <long-description/>
+          <tag line="172" name="param" description="SimpleXML object" type="object" variable="$xml1">
+            <type by_reference="false">object</type>
+          </tag>
+          <tag line="172" name="param" description="SimpleXML object" type="object" variable="$xml2">
+            <type by_reference="false">object</type>
+          </tag>
+          <tag line="172" name="return" description="" type="\FIT\NetopeerBundle\Models\xml">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\xml</type>
+          </tag>
+        </docblock>
+        <argument line="179">
+          <name>$xml1</name>
+          <default/>
+          <type>\SimpleXMLIterator</type>
+        </argument>
+        <argument line="179">
+          <name>$xml2</name>
+          <default/>
+          <type>\SimpleXMLIterator</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="private" namespace="FIT\NetopeerBundle\Models" line="211" package="Default">
+        <name>array_merge_recursive_distinct</name>
+        <full_name>array_merge_recursive_distinct</full_name>
+        <docblock line="186">
+          <description>array_merge_recursive does indeed merge arrays, but it converts values with duplicate
+keys to arrays rather than overwriting the value in the first array with the duplicate
+value in the second array, as array_merge does.</description>
+          <long-description>&lt;p&gt;I.e., with array_merge_recursive,
+this happens (documented behavior):&lt;/p&gt;
+
+&lt;p&gt;array_merge_recursive(array('key' =&gt; 'org value'), array('key' =&gt; 'new value'));
+    =&gt; array('key' =&gt; array('org value', 'new value'));&lt;/p&gt;
+
+&lt;p&gt;array_merge_recursive_distinct does not change the datatypes of the values in the arrays.
+Matching keys' values in the second array overwrite those in the first array, as is the
+case with array_merge, i.e.:&lt;/p&gt;
+
+&lt;p&gt;array_merge_recursive_distinct(array('key' =&gt; 'org value'), array('key' =&gt; 'new value'));
+    =&gt; array('key' =&gt; array('new value'));&lt;/p&gt;
+
+&lt;p&gt;Parameters are passed by reference, though only for performance reasons. They're not
+altered by this function.&lt;/p&gt;</long-description>
+          <tag line="186" name="param" description="" type="array" variable="$array1">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="186" name="param" description="" type="array" variable="$array2">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="186" name="return" description="" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="186" name="author" description="Daniel &lt;daniel (at) danielsmedegaardbuus (dot) dk&gt;"/>
+          <tag line="186" name="author" description="Gabriel Sobrinho &lt;gabriel (dot) sobrinho (at) gmail (dot) com&gt;"/>
+        </docblock>
+        <argument line="211">
+          <name>$array1</name>
+          <default/>
+          <type>array</type>
+        </argument>
+        <argument line="211">
+          <name>$array2</name>
+          <default/>
+          <type>array</type>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Models/XMLoperations.php</error>
+      <error line="44" code="50018">No DocBlock was found for property $xml</error>
+      <error line="45" code="50018">No DocBlock was found for property $encoding</error>
+      <error line="146" code="50010">No DocBlock was found for method getXMLRoot()</error>
+      <error line="156" code="50010">No DocBlock was found for method bool2str()</error>
+      <error line="167" code="50010">No DocBlock was found for method isValidTagName()</error>
+      <error line="172" code="50016">The type hint of the argument is incorrect for the type definition of the @param tag with argument $xml1 in mergeXML()</error>
+      <error line="172" code="50016">The type hint of the argument is incorrect for the type definition of the @param tag with argument $xml2 in mergeXML()</error>
+    </parse_markers>
+  </file>
+  <file path="Models/AjaxSharedData.php" hash="ad52de498092424a36dc4e45b2288984" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Models" line="8" package="Default">
+      <extends/>
+      <name>AjaxSharedData</name>
+      <full_name>\FIT\NetopeerBundle\Models\AjaxSharedData</full_name>
+      <docblock line="5">
+        <description>This class holds shared data for Ajax operations</description>
+        <long-description/>
+      </docblock>
+      <property final="false" static="false" visibility="protected" line="12" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$data</name>
+        <default/>
+        <docblock line="9">
+          <description/>
+          <long-description/>
+          <tag line="9" name="var" description="shared data" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="true" visibility="protected" line="17" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$instance</name>
+        <default/>
+        <docblock line="14">
+          <description/>
+          <long-description/>
+          <tag line="14" name="var" description="instance for singleton" type="\FIT\NetopeerBundle\Models\AjaxSharedData">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\AjaxSharedData</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="FIT\NetopeerBundle\Models" line="22" package="Default">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <docblock line="19">
+          <description>Constructor</description>
+          <long-description/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="true" visibility="public" namespace="FIT\NetopeerBundle\Models" line="31" package="Default">
+        <name>getInstance</name>
+        <full_name>getInstance</full_name>
+        <docblock line="26">
+          <description>Get instance of this class</description>
+          <long-description/>
+          <tag line="26" name="return" description="" type="\FIT\NetopeerBundle\Models\AjaxSharedData">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\AjaxSharedData</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="45" package="Default">
+        <name>setDataForKey</name>
+        <full_name>setDataForKey</full_name>
+        <docblock line="38">
+          <description>Set keys and values of shared data array</description>
+          <long-description/>
+          <tag line="38" name="param" description="" type="mixed" variable="$key">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="38" name="param" description="" type="mixed" variable="$arrayKey">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="38" name="param" description="" type="mixed" variable="$value">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="45">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="45">
+          <name>$arrayKey</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="45">
+          <name>$value</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="58" package="Default">
+        <name>getDataForKey</name>
+        <full_name>getDataForKey</full_name>
+        <docblock line="52">
+          <description>Get value from shared data array</description>
+          <long-description/>
+          <tag line="52" name="param" description="key of shared array" type="mixed" variable="$key">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="52" name="return" description="" type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="58">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Models/AjaxSharedData.php</error>
+    </parse_markers>
+  </file>
+  <file path="Models/Data.php" hash="c08cc88bd9a53b66dbe663a65acd3ca6" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Models" line="19" package="Default">
+      <extends/>
+      <name>Data</name>
+      <full_name>\FIT\NetopeerBundle\Models\Data</full_name>
+      <docblock line="15">
+        <description/>
+        <long-description/>
+        <tag line="15" name="class" description="Data      Data service, handles all communication&#10;between webGUI and mod_netconf"/>
+      </docblock>
+      <constant namespace="FIT\NetopeerBundle\Models" line="22" package="Default">
+        <name>REPLY_OK</name>
+        <full_name>REPLY_OK</full_name>
+        <value>0</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="23" package="Default">
+        <name>REPLY_DATA</name>
+        <full_name>REPLY_DATA</full_name>
+        <value>1</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="24" package="Default">
+        <name>REPLY_ERROR</name>
+        <full_name>REPLY_ERROR</full_name>
+        <value>2</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="25" package="Default">
+        <name>REPLY_INFO</name>
+        <full_name>REPLY_INFO</full_name>
+        <value>3</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="26" package="Default">
+        <name>MSG_CONNECT</name>
+        <full_name>MSG_CONNECT</full_name>
+        <value>4</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="27" package="Default">
+        <name>MSG_DISCONNECT</name>
+        <full_name>MSG_DISCONNECT</full_name>
+        <value>5</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="28" package="Default">
+        <name>MSG_GET</name>
+        <full_name>MSG_GET</full_name>
+        <value>6</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="29" package="Default">
+        <name>MSG_GETCONFIG</name>
+        <full_name>MSG_GETCONFIG</full_name>
+        <value>7</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="30" package="Default">
+        <name>MSG_EDITCONFIG</name>
+        <full_name>MSG_EDITCONFIG</full_name>
+        <value>8</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="31" package="Default">
+        <name>MSG_COPYCONFIG</name>
+        <full_name>MSG_COPYCONFIG</full_name>
+        <value>9</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="32" package="Default">
+        <name>MSG_DELETECONFIG</name>
+        <full_name>MSG_DELETECONFIG</full_name>
+        <value>10</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="33" package="Default">
+        <name>MSG_LOCK</name>
+        <full_name>MSG_LOCK</full_name>
+        <value>11</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="34" package="Default">
+        <name>MSG_UNLOCK</name>
+        <full_name>MSG_UNLOCK</full_name>
+        <value>12</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="35" package="Default">
+        <name>MSG_KILL</name>
+        <full_name>MSG_KILL</full_name>
+        <value>13</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="36" package="Default">
+        <name>MSG_INFO</name>
+        <full_name>MSG_INFO</full_name>
+        <value>14</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="37" package="Default">
+        <name>MSG_GENERIC</name>
+        <full_name>MSG_GENERIC</full_name>
+        <value>15</value>
+      </constant>
+      <constant namespace="FIT\NetopeerBundle\Models" line="38" package="Default">
+        <name>MSG_GETSCHEMA</name>
+        <full_name>MSG_GETSCHEMA</full_name>
+        <value>16</value>
+      </constant>
+      <property final="false" static="false" visibility="protected" line="43" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$container</name>
+        <default/>
+        <docblock line="40">
+          <description/>
+          <long-description/>
+          <tag line="40" name="var" description="" type="\Symfony\Component\DependencyInjection\ContainerInterface">
+            <type by_reference="false">\Symfony\Component\DependencyInjection\ContainerInterface</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="protected" line="44" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$logger</name>
+        <default/>
+      </property>
+      <property final="false" static="false" visibility="private" line="46" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$flashState</name>
+        <default/>
+      </property>
+      <property final="false" static="false" visibility="private" line="47" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$models</name>
+        <default/>
+      </property>
+      <property final="false" static="false" visibility="private" line="48" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$dbConnections</name>
+        <default/>
+      </property>
+      <property final="false" static="false" visibility="private" line="49" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$submenu</name>
+        <default/>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="51" package="Default">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <argument line="51">
+          <name>$container</name>
+          <default/>
+          <type>\Symfony\Component\DependencyInjection\ContainerInterface</type>
+        </argument>
+        <argument line="51">
+          <name>$logger</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="65" package="Default">
+        <name>unwrap_rfc6242</name>
+        <full_name>unwrap_rfc6242</full_name>
+        <docblock line="58">
+          <description>Parse $message formatted by Chunked Framing Mechanism (RFC6242)</description>
+          <long-description/>
+          <tag line="58" name="param" description="input message text" type="string" variable="$message">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="58" name="return" description="unwrapped message" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="58" name="throws" description="when message is not formatted correctly" type="\ErrorException">
+            <type by_reference="false">\ErrorException</type>
+          </tag>
+        </docblock>
+        <argument line="65">
+          <name>$message</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="112" package="Default">
+        <name>getHashFromKey</name>
+        <full_name>getHashFromKey</full_name>
+        <argument line="112">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="127" package="Default">
+        <name>getModuleIdentifiersFromDb</name>
+        <full_name>getModuleIdentifiersFromDb</full_name>
+        <docblock line="122">
+          <description>Find hash identifiers from DB for key</description>
+          <long-description/>
+          <tag line="122" name="param" description="session key" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="122" name="return" description="return array of identifiers on success, false on error" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="127">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="149" package="Default">
+        <name>getModulePathByRootModuleName</name>
+        <full_name>getModulePathByRootModuleName</full_name>
+        <docblock line="143">
+          <description>get path for module name, includes identifier</description>
+          <long-description/>
+          <tag line="143" name="param" description="session key" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="143" name="param" description="name of element" type="string" variable="$moduleName">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="143" name="return" description="relative path on succes, false on error" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="149">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="149">
+          <name>$moduleName</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="161" package="Default">
+        <name>getConnFromKey</name>
+        <full_name>getConnFromKey</full_name>
+        <argument line="161">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="170" package="Default">
+        <name>getPortFromKey</name>
+        <full_name>getPortFromKey</full_name>
+        <argument line="170">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="180" package="Default">
+        <name>getUserFromKey</name>
+        <full_name>getUserFromKey</full_name>
+        <argument line="180">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="190" package="Default">
+        <name>getHostFromKey</name>
+        <full_name>getHostFromKey</full_name>
+        <argument line="190">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="200" package="Default">
+        <name>updateConnLock</name>
+        <full_name>updateConnLock</full_name>
+        <argument line="200">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="221" package="Default">
+        <name>readnetconf2</name>
+        <full_name>readnetconf2</full_name>
+        <docblock line="216">
+          <description>Read response from socket</description>
+          <long-description/>
+          <tag line="216" name="param" description="&amp;$sock &#9;&#9;socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="216" name="return" description="trimmed string that was read" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="221">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="252" package="Default">
+        <name>readnetconf</name>
+        <full_name>readnetconf</full_name>
+        <docblock line="247">
+          <description>Read response from socket</description>
+          <long-description/>
+          <tag line="247" name="param" description="&amp;$sock &#9;&#9;socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="247" name="return" description="trimmed string that was read" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="252">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="298" package="Default">
+        <name>getJsonError</name>
+        <full_name>getJsonError</full_name>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="334" package="Default">
+        <name>handle_connect</name>
+        <full_name>handle_connect</full_name>
+        <docblock line="327">
+          <description>Handles connection to the socket</description>
+          <long-description/>
+          <tag line="327" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="327" name="param" description="connection params for mod_netconf" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="327" name="param" description="result of searching of new connection in all connections" type="mixed" variable="$result">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="327" name="return" description="0 on success" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="334">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="334">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="334">
+          <name>$result</name>
+          <default>null</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="387" package="Default">
+        <name>remove_xml_header</name>
+        <full_name>remove_xml_header</full_name>
+        <docblock line="379">
+          <description/>
+          <long-description/>
+          <tag line="379" name="param" description="string to remove XML header in" type="string" variable="$text">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="379" name="return" description="returns an array if the subject parameter&#10;                       is an array, or a string otherwise.&#9;If matches&#10;                       are found, the new subject will be returned,&#10;                       otherwise subject will be returned unchanged&#10;                       or null if an error occurred." type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="387">
+          <name>$text</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="398" package="Default">
+        <name>handle_get</name>
+        <full_name>handle_get</full_name>
+        <docblock line="392">
+          <description>handle get action</description>
+          <long-description/>
+          <tag line="392" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="392" name="param" description="array of values for mod_netconf (type, params...)" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="392" name="return" description="decoded data on success" type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="398">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="398">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="425" package="Default">
+        <name>handle_getconfig</name>
+        <full_name>handle_getconfig</full_name>
+        <docblock line="419">
+          <description>handle get config action</description>
+          <long-description/>
+          <tag line="419" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="419" name="param" description="array of values for mod_netconf (type, params...)" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="419" name="return" description="decoded data on success, 1 on error" type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="425">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="425">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="449" package="Default">
+        <name>handle_editconfig</name>
+        <full_name>handle_editconfig</full_name>
+        <docblock line="443">
+          <description>handle edit config action</description>
+          <long-description/>
+          <tag line="443" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="443" name="param" description="array of values for mod_netconf (type, params...)" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="443" name="return" description="decoded data on success, 1 on error" type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="449">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="449">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="484" package="Default">
+        <name>handle_disconnect</name>
+        <full_name>handle_disconnect</full_name>
+        <docblock line="478">
+          <description>handle get config action</description>
+          <long-description/>
+          <tag line="478" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="478" name="param" description="array of values for mod_netconf (type, params...)" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="478" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="484">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="484">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="515" package="Default">
+        <name>handle_lock</name>
+        <full_name>handle_lock</full_name>
+        <docblock line="509">
+          <description>handle lock action</description>
+          <long-description/>
+          <tag line="509" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="509" name="param" description="array of values for mod_netconf (type, params...)" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="509" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="515">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="515">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="543" package="Default">
+        <name>handle_unlock</name>
+        <full_name>handle_unlock</full_name>
+        <docblock line="537">
+          <description>handle unlock action</description>
+          <long-description/>
+          <tag line="537" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="537" name="param" description="array of values for mod_netconf (type, params...)" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="537" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="543">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="543">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="571" package="Default">
+        <name>handle_info</name>
+        <full_name>handle_info</full_name>
+        <docblock line="565">
+          <description>handle info action</description>
+          <long-description/>
+          <tag line="565" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="565" name="param" description="array of values for mod_netconf (type, params...)" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="565" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="571">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="571">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="603" package="Default">
+        <name>handle_getschema</name>
+        <full_name>handle_getschema</full_name>
+        <docblock line="596">
+          <description>handle unlock action</description>
+          <long-description/>
+          <tag line="596" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="596" name="param" description="$params must contain &quot;identifier&quot; of schema, can contain &quot;version&quot; and &quot;format&quot; of schema" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="596" name="param" description="decoded data from response" type="mixed" variable="$result">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="596" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="603">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="603">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="603">
+          <name>$result</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="641" package="Default">
+        <name>check_logged_keys</name>
+        <full_name>check_logged_keys</full_name>
+        <docblock line="637">
+          <description>checks, if logged keys are valid</description>
+          <long-description/>
+          <tag line="637" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="669" package="Default">
+        <name>checkDecodedData</name>
+        <full_name>checkDecodedData</full_name>
+        <docblock line="664">
+          <description>checks decoded data, if there an error occures</description>
+          <long-description/>
+          <tag line="664" name="param" description="decoded data" type="mixed" variable="$decoded">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="664" name="return" description="decoded data on success, 1 on error" type="mixed">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="669">
+          <name>$decoded</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="695" package="Default">
+        <name>write2socket</name>
+        <full_name>write2socket</full_name>
+        <docblock line="690">
+          <description>Wrap message for Chunked Framing Mechanism (RFC6242) and write it into the socket.</description>
+          <long-description/>
+          <tag line="690" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="690" name="param" description="message text" type="string" variable="$message">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="695">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="695">
+          <name>$message</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="706" package="Default">
+        <name>execute_operation</name>
+        <full_name>execute_operation</full_name>
+        <docblock line="700">
+          <description>executes operation - sends message into the socket</description>
+          <long-description/>
+          <tag line="700" name="param" description="socket descriptor" type="resource" variable="$sock">
+            <type by_reference="false">resource</type>
+          </tag>
+          <tag line="700" name="param" description="array of values for mod_netconf (type, params...)" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="700" name="return" description="response from mod_netconf" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="706">
+          <name>$sock</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="706">
+          <name>$params</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="716" package="Default">
+        <name>getModelsDir</name>
+        <full_name>getModelsDir</full_name>
+        <docblock line="713">
+          <description/>
+          <long-description/>
+          <tag line="713" name="return" description="path to models folder" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="725" package="Default">
+        <name>getModelDirForName</name>
+        <full_name>getModelDirForName</full_name>
+        <docblock line="720">
+          <description>gets model dir name for module</description>
+          <long-description/>
+          <tag line="720" name="param" description="name of module" type="string" variable="$moduleName">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="720" name="return" description="dir name on success, false on error" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="725">
+          <name>$moduleName</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="739" package="Default">
+        <name>existsModelDirForName</name>
+        <full_name>existsModelDirForName</full_name>
+        <docblock line="734">
+          <description>checks if model dir for module exists</description>
+          <long-description/>
+          <tag line="734" name="param" description="name of module" type="string" variable="$moduleName">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="734" name="return" description="" type="bool">
+            <type by_reference="false">bool</type>
+          </tag>
+        </docblock>
+        <argument line="739">
+          <name>$moduleName</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="753" package="Default">
+        <name>getPathToModels</name>
+        <full_name>getPathToModels</full_name>
+        <docblock line="748">
+          <description>get path to models in file system</description>
+          <long-description/>
+          <tag line="748" name="param" description="name of the module" type="string" variable="$moduleName">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="748" name="return" description="path to wrapped model file" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="753">
+          <name>$moduleName</name>
+          <default>""</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="779" package="Default">
+        <name>handle</name>
+        <full_name>handle</full_name>
+        <docblock line="771">
+          <description>handles all actions, which are allowed on socket</description>
+          <long-description/>
+          <tag line="771" name="param" description="kind of action (command)" type="string" variable="$command">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="771" name="param" description="parameters for mod_netconf" type="array" variable="$params">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="771" name="param" description="should be action handle with merge with model" type="bool" variable="$merge">
+            <type by_reference="false">bool</type>
+          </tag>
+          <tag line="771" name="param" description="" type="mixed" variable="$result">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="771" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="779">
+          <name>$command</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="779">
+          <name>$params</name>
+          <default>array()</default>
+          <type/>
+        </argument>
+        <argument line="779">
+          <name>$merge</name>
+          <default>true</default>
+          <type/>
+        </argument>
+        <argument line="779">
+          <name>$result</name>
+          <default>null</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="887" package="Default">
+        <name>isResponseValid</name>
+        <full_name>isResponseValid</full_name>
+        <argument line="887">
+          <name>$res</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="904" package="Default">
+        <name>get_element_parent</name>
+        <full_name>get_element_parent</full_name>
+        <argument line="904">
+          <name>$element</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="912" package="Default">
+        <name>check_elem_match</name>
+        <full_name>check_elem_match</full_name>
+        <argument line="912">
+          <name>$model_el</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="912">
+          <name>$possible_el</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="925" package="Default">
+        <name>complete_attributes</name>
+        <full_name>complete_attributes</full_name>
+        <argument line="925">
+          <name>$source</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="925">
+          <name>$target</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="941" package="Default">
+        <name>find_and_complete</name>
+        <full_name>find_and_complete</full_name>
+        <docblock line="936">
+          <description>Find corresponding $el in configuration model $model and complete attributes from $model.</description>
+          <long-description/>
+          <tag line="936" name="param" description="&amp;$model with data model" type="\FIT\NetopeerBundle\Models\{SimpleXMLElement}" variable="$model">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\{SimpleXMLElement}</type>
+          </tag>
+          <tag line="936" name="param" description="with element of response" type="\FIT\NetopeerBundle\Models\{SimpleXMLElement}" variable="$el">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\{SimpleXMLElement}</type>
+          </tag>
+        </docblock>
+        <argument line="941">
+          <name>$model</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="941">
+          <name>$el</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="963" package="Default">
+        <name>mergeRecursive</name>
+        <full_name>mergeRecursive</full_name>
+        <docblock line="958">
+          <description>Go through $root_el tree that represents the response from Netconf server.</description>
+          <long-description/>
+          <tag line="958" name="param" description="&amp;$model  with data model" type="\FIT\NetopeerBundle\Models\{SimpleXMLElement}" variable="$model">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\{SimpleXMLElement}</type>
+          </tag>
+          <tag line="958" name="param" description="with element of response" type="\FIT\NetopeerBundle\Models\{SimpleXMLElement}" variable="$root_el">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\{SimpleXMLElement}</type>
+          </tag>
+        </docblock>
+        <argument line="963">
+          <name>$model</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="963">
+          <name>$root_el</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="981" package="Default">
+        <name>mergeWithModel</name>
+        <full_name>mergeWithModel</full_name>
+        <docblock line="975">
+          <description>Add attributes from configuration model to response such as config, mandatory, type.</description>
+          <long-description/>
+          <tag line="975" name="param" description="data configuration model" type="\FIT\NetopeerBundle\Models\{SimpleXMLElement}" variable="$model">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\{SimpleXMLElement}</type>
+          </tag>
+          <tag line="975" name="param" description="data from netconf server" type="string" variable="$result">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="975" name="return" description="the result of merge" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="981">
+          <name>$model</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="981">
+          <name>$result</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="993" package="Default">
+        <name>getXMLFromModel</name>
+        <full_name>getXMLFromModel</full_name>
+        <argument line="993">
+          <name>$xPath</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="993">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="993">
+          <name>$module</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="993">
+          <name>$subsection</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="1023" package="Default">
+        <name>setFlashState</name>
+        <full_name>setFlashState</full_name>
+        <docblock line="1017">
+          <description>Sets current flash state - but only for allowed kinds</description>
+          <long-description/>
+          <tag line="1017" name="param" description="kind of flash state" type="string" variable="$state">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="1017" name="throws" description="if flash state is not in allowedState array" type="\ErrorException">
+            <type by_reference="false">\ErrorException</type>
+          </tag>
+          <tag line="1017" name="return" description="0 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="1023">
+          <name>$state</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="1037" package="Default">
+        <name>buildMenuStructure</name>
+        <full_name>buildMenuStructure</full_name>
+        <docblock line="1034">
+          <description>Prepares top menu - gets items from server response</description>
+          <long-description/>
+        </docblock>
+        <argument line="1037">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="1037">
+          <name>$path</name>
+          <default>""</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="1118" package="Default">
+        <name>buildSubmenu</name>
+        <full_name>buildSubmenu</full_name>
+        <docblock line="1115">
+          <description>prepares left submenu - modules of current top menu item</description>
+          <long-description/>
+        </docblock>
+        <argument line="1118">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="1118">
+          <name>$module</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="1118">
+          <name>$allowedSubmenu</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="1118">
+          <name>$path</name>
+          <default>""</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="1156" package="Default">
+        <name>getModels</name>
+        <full_name>getModels</full_name>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="1160" package="Default">
+        <name>getSubmenu</name>
+        <full_name>getSubmenu</full_name>
+        <argument line="1160">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="1164" package="Default">
+        <name>getSectionName</name>
+        <full_name>getSectionName</full_name>
+        <argument line="1164">
+          <name>$section</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="1168" package="Default">
+        <name>getSubsectionName</name>
+        <full_name>getSubsectionName</full_name>
+        <argument line="1168">
+          <name>$subsection</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Models" line="1172" package="Default">
+        <name>addLog</name>
+        <full_name>addLog</full_name>
+        <argument line="1172">
+          <name>$str</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <markers>
+      <todo line="869"/>
+      <todo line="872">if is not set module direcotory, we have to set model to merge with</todo>
+      <todo line="1012">load XML from model</todo>
+    </markers>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Models/Data.php</error>
+      <critical line="15" code="50005">No short description for class \FIT\NetopeerBundle\Models\Data</critical>
+      <critical line="40" code="50019">No short description for property $container</critical>
+      <error line="44" code="50018">No DocBlock was found for property $logger</error>
+      <error line="46" code="50018">No DocBlock was found for property $flashState</error>
+      <error line="47" code="50018">No DocBlock was found for property $models</error>
+      <error line="48" code="50018">No DocBlock was found for property $dbConnections</error>
+      <error line="49" code="50018">No DocBlock was found for property $submenu</error>
+      <error line="51" code="50010">No DocBlock was found for method __construct()</error>
+      <error line="112" code="50010">No DocBlock was found for method getHashFromKey()</error>
+      <error line="161" code="50010">No DocBlock was found for method getConnFromKey()</error>
+      <error line="170" code="50010">No DocBlock was found for method getPortFromKey()</error>
+      <error line="180" code="50010">No DocBlock was found for method getUserFromKey()</error>
+      <error line="190" code="50010">No DocBlock was found for method getHostFromKey()</error>
+      <error line="200" code="50010">No DocBlock was found for method updateConnLock()</error>
+      <error line="298" code="50010">No DocBlock was found for method getJsonError()</error>
+      <error line="379" code="50012">No short description for method remove_xml_header()</error>
+      <error line="713" code="50012">No short description for method getModelsDir()</error>
+      <error line="887" code="50010">No DocBlock was found for method isResponseValid()</error>
+      <error line="904" code="50010">No DocBlock was found for method get_element_parent()</error>
+      <error line="912" code="50010">No DocBlock was found for method check_elem_match()</error>
+      <error line="925" code="50010">No DocBlock was found for method complete_attributes()</error>
+      <error line="993" code="50010">No DocBlock was found for method getXMLFromModel()</error>
+      <error line="1034" code="50015">Argument $key is missing from the Docblock of buildMenuStructure()</error>
+      <error line="1034" code="50015">Argument $path is missing from the Docblock of buildMenuStructure()</error>
+      <error line="1115" code="50015">Argument $key is missing from the Docblock of buildSubmenu()</error>
+      <error line="1115" code="50015">Argument $module is missing from the Docblock of buildSubmenu()</error>
+      <error line="1115" code="50015">Argument $allowedSubmenu is missing from the Docblock of buildSubmenu()</error>
+      <error line="1115" code="50015">Argument $path is missing from the Docblock of buildSubmenu()</error>
+      <error line="1156" code="50010">No DocBlock was found for method getModels()</error>
+      <error line="1160" code="50010">No DocBlock was found for method getSubmenu()</error>
+      <error line="1164" code="50010">No DocBlock was found for method getSectionName()</error>
+      <error line="1168" code="50010">No DocBlock was found for method getSubsectionName()</error>
+      <error line="1172" code="50010">No DocBlock was found for method addLog()</error>
+    </parse_markers>
+  </file>
+  <file path="Models/ConnectionSession.php" hash="753dacb09e0d873c26496bc6a0311400" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Models" line="5" package="Default">
+      <extends/>
+      <name>ConnectionSession</name>
+      <full_name>\FIT\NetopeerBundle\Models\ConnectionSession</full_name>
+      <property final="false" static="false" visibility="public" line="9" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$time</name>
+        <default/>
+        <docblock line="6">
+          <description/>
+          <long-description/>
+          <tag line="6" name="var" description="of connection start" type="\FIT\NetopeerBundle\Models\time">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\time</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="public" line="14" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$hash</name>
+        <default/>
+        <docblock line="11">
+          <description/>
+          <long-description/>
+          <tag line="11" name="var" description="key of connection" type="\FIT\NetopeerBundle\Models\identification">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\identification</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="public" line="19" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$dbIdentifier</name>
+        <default/>
+        <docblock line="16">
+          <description/>
+          <long-description/>
+          <tag line="16" name="var" description="key of connection stored in DB" type="\FIT\NetopeerBundle\Models\identification">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\identification</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="public" line="24" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$host</name>
+        <default/>
+        <docblock line="21">
+          <description/>
+          <long-description/>
+          <tag line="21" name="var" description="hostname" type="\FIT\NetopeerBundle\Models\target">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\target</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="public" line="29" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$port</name>
+        <default/>
+        <docblock line="26">
+          <description/>
+          <long-description/>
+          <tag line="26" name="var" description="port" type="\FIT\NetopeerBundle\Models\target">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\target</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="public" line="34" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$user</name>
+        <default/>
+        <docblock line="31">
+          <description/>
+          <long-description/>
+          <tag line="31" name="var" description="username" type="\FIT\NetopeerBundle\Models\logged">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\logged</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="public" line="39" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$locked</name>
+        <default>false</default>
+        <docblock line="36">
+          <description/>
+          <long-description/>
+          <tag line="36" name="var" description="by us" type="\FIT\NetopeerBundle\Models\locked">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\locked</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="public" line="44" namespace="FIT\NetopeerBundle\Models" package="Default">
+        <name>$session_status</name>
+        <default>""</default>
+        <docblock line="41">
+          <description/>
+          <long-description/>
+          <tag line="41" name="var" description="info" type="\FIT\NetopeerBundle\Models\session">
+            <type by_reference="false">\FIT\NetopeerBundle\Models\session</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Models" line="46" package="Default">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+        <argument line="46">
+          <name>$session_hash</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="46">
+          <name>$host</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="46">
+          <name>$port</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="46">
+          <name>$user</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Models/ConnectionSession.php</error>
+      <error line="5" code="50000">No DocBlock was found for \FIT\NetopeerBundle\Models\ConnectionSession</error>
+      <error line="46" code="50010">No DocBlock was found for method __construct()</error>
+    </parse_markers>
+  </file>
+  <file path="Controller/DefaultController.php" hash="b69dfc90dd19f2bc22e275f3bda28884" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Controller" line="17" package="Default">
+      <extends>\FIT\NetopeerBundle\Controller\BaseController</extends>
+      <name>DefaultController</name>
+      <full_name>\FIT\NetopeerBundle\Controller\DefaultController</full_name>
+      <docblock line="13">
+        <description>Default controller for all pages directly visible from
+webGUI.</description>
+        <long-description>&lt;p&gt;For example connection management, section detail etc.&lt;/p&gt;</long-description>
+      </docblock>
+      <property final="false" static="false" visibility="private" line="24" namespace="FIT\NetopeerBundle\Controller" package="Default">
+        <name>$paramsState</name>
+        <default/>
+        <docblock line="20">
+          <description/>
+          <long-description/>
+          <tag line="20" name="var" description="array of parameters for &lt;get&gt; command" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="20" name="var" description="array of parameters for &lt;get-config&gt; command" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="private" line="24" namespace="FIT\NetopeerBundle\Controller" package="Default">
+        <name>$paramsConfig</name>
+        <default/>
+        <docblock line="20">
+          <description/>
+          <long-description/>
+          <tag line="20" name="var" description="array of parameters for &lt;get&gt; command" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="20" name="var" description="array of parameters for &lt;get-config&gt; command" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </property>
+      <property final="false" static="false" visibility="private" line="29" namespace="FIT\NetopeerBundle\Controller" package="Default">
+        <name>$filterForms</name>
+        <default/>
+        <docblock line="26">
+          <description/>
+          <long-description/>
+          <tag line="26" name="var" description="configuration of filter form (in both section)" type="\FIT\NetopeerBundle\Controller\holds">
+            <type by_reference="false">\FIT\NetopeerBundle\Controller\holds</type>
+          </tag>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="37" package="Default">
+        <name>indexAction</name>
+        <full_name>indexAction</full_name>
+        <docblock line="31">
+          <description>Prepares form for connection to the server and table with active connection list</description>
+          <long-description/>
+          <tag line="31" name="Route" description="(&quot;/&quot;, name=&quot;_home&quot;)"/>
+          <tag line="31" name="Template" description="()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="126" package="Default">
+        <name>changeColumnLayoutAction</name>
+        <full_name>changeColumnLayoutAction</full_name>
+        <docblock line="119">
+          <description>Change session value for showing single or double column layout</description>
+          <long-description/>
+          <tag line="119" name="Route" description="(&quot;/changeColumnLayout/{newValue}/&quot;, name=&quot;changeColumnLayout&quot;)"/>
+          <tag line="119" name="param" description="new value of columns settings" type="string" variable="$newValue">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="126">
+          <name>$newValue</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="146" package="Default">
+        <name>handleConnectionAction</name>
+        <full_name>handleConnectionAction</full_name>
+        <docblock line="136">
+          <description>Handle actions and execute them in Models/Data</description>
+          <long-description/>
+          <tag line="136" name="Route" description="(&quot;/handle/{command}/{key}/{identifier}&quot;, defaults={&quot;identifier&quot; = &quot;&quot;}, name=&quot;handleConnection&quot;)"/>
+          <tag line="136" name="param" description="name of the command to handle (get, info, getconfig, getschema, connect, disconnect)" type="string" variable="$command">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="136" name="param" description="key of connected server" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="136" name="param" description="identifier for get-schema" type="string" variable="$identifier">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="136" name="return" description="" type="\Symfony\Component\HttpFoundation\RedirectResponse">
+            <type by_reference="false">\Symfony\Component\HttpFoundation\RedirectResponse</type>
+          </tag>
+        </docblock>
+        <argument line="146">
+          <name>$command</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="146">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="146">
+          <name>$identifier</name>
+          <default>""</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="189" package="Default">
+        <name>sessionInfoAction</name>
+        <full_name>sessionInfoAction</full_name>
+        <docblock line="179">
+          <description>Shows info page with information</description>
+          <long-description/>
+          <tag line="179" name="Route" description="(&quot;/info-page/{key}/{action}/&quot;, name=&quot;infoPage&quot;)"/>
+          <tag line="179" name="Template" description="(&quot;FITNetopeerBundle:Default:section.html.twig&quot;)"/>
+          <tag line="179" name="param" description="key of connected server" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="179" name="param" description="name of the action" type="string" variable="$action">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="179" name="return" description="" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="189">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="189">
+          <name>$action</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="233" package="Default">
+        <name>moduleAction</name>
+        <full_name>moduleAction</full_name>
+        <docblock line="216">
+          <description>Prepares section, module or subsection action data</description>
+          <long-description/>
+          <tag line="216" name="Route" description="(&quot;/sections/{key}/&quot;, name=&quot;section&quot;)"/>
+          <tag line="216" name="Route" description="(&quot;/sections/{key}/{module}/&quot;, name=&quot;module&quot;)"/>
+          <tag line="216" name="Route" description="(&quot;/sections/{key}/{module}/{subsection}/&quot;, name=&quot;subsection&quot;)"/>
+          <tag line="216" name="Template" description="(&quot;FITNetopeerBundle:Default:section.html.twig&quot;)&#10;Prepares section = whole get&amp;get-config part of server&#10;Shows module part = first level of connected server (except of root)&#10;Prepares subsection = second level of connected server tree"/>
+          <tag line="216" name="param" description="key of connected server" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="216" name="param" description="name of the module" type="null|string" variable="$module">
+            <type by_reference="false">null</type>
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="216" name="param" description="name of the subsection" type="null|string" variable="$subsection">
+            <type by_reference="false">null</type>
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="216" name="return" description="" type="array|\Symfony\Component\HttpFoundation\RedirectResponse">
+            <type by_reference="false">array</type>
+            <type by_reference="false">\Symfony\Component\HttpFoundation\RedirectResponse</type>
+          </tag>
+        </docblock>
+        <argument line="233">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="233">
+          <name>$module</name>
+          <default>null</default>
+          <type/>
+        </argument>
+        <argument line="233">
+          <name>$subsection</name>
+          <default>null</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="337" package="Default">
+        <name>loadFilters</name>
+        <full_name>loadFilters</full_name>
+        <docblock line="330">
+          <description>loading file with filter specification for current module or subsection</description>
+          <long-description/>
+          <tag line="330" name="param" description="module name" type="string" variable="$module">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="330" name="param" description="subsection name" type="string" variable="$subsection">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="330" name="return" description="array with config and state filter" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="337">
+          <name>$module</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="337">
+          <name>$subsection</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="368" package="Default">
+        <name>setStateParams</name>
+        <full_name>setStateParams</full_name>
+        <docblock line="362">
+          <description>Set values of state array</description>
+          <long-description/>
+          <tag line="362" name="param" description="key of associative array" type="mixed" variable="$key">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="362" name="param" description="value of associative array" type="mixed" variable="$value">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="368">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="368">
+          <name>$value</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="378" package="Default">
+        <name>setConfigParams</name>
+        <full_name>setConfigParams</full_name>
+        <docblock line="372">
+          <description>Set values of config array</description>
+          <long-description/>
+          <tag line="372" name="param" description="key of associative array" type="mixed" variable="$key">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="372" name="param" description="value of associative array" type="mixed" variable="$value">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="378">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="378">
+          <name>$value</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="390" package="Default">
+        <name>setSectionFormsParams</name>
+        <full_name>setSectionFormsParams</full_name>
+        <docblock line="382">
+          <description>Set default values to config and state arrays</description>
+          <long-description/>
+          <tag line="382" name="param" description="key of connected server" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="382" name="param" description="state filter" type="string" variable="$filterState">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="382" name="param" description="config filter" type="string" variable="$filterConfig">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="382" name="param" description="source param of config" type="string" variable="$sourceConfig">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="390">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="390">
+          <name>$filterState</name>
+          <default>""</default>
+          <type/>
+        </argument>
+        <argument line="390">
+          <name>$filterConfig</name>
+          <default>""</default>
+          <type/>
+        </argument>
+        <argument line="390">
+          <name>$sourceConfig</name>
+          <default>""</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="412" package="Default">
+        <name>setSectionFilterForms</name>
+        <full_name>setSectionFilterForms</full_name>
+        <docblock line="409">
+          <description>prepares filter forms for both sections</description>
+          <long-description/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="455" package="Default">
+        <name>processSectionForms</name>
+        <full_name>processSectionForms</full_name>
+        <docblock line="447">
+          <description>process all kinds of form in section, module or subsection</description>
+          <long-description/>
+          <tag line="447" name="param" description="key of connected server" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="447" name="param" description="= null      module name" type="string" variable="$module">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="447" name="param" description="= null  subsection name" type="string" variable="$subsection">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="447" name="return" description="redirect to page, which was this method called from" type="\Symfony\Component\HttpFoundation\RedirectResponse">
+            <type by_reference="false">\Symfony\Component\HttpFoundation\RedirectResponse</type>
+          </tag>
+        </docblock>
+        <argument line="455">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="455">
+          <name>$module</name>
+          <default>null</default>
+          <type/>
+        </argument>
+        <argument line="455">
+          <name>$subsection</name>
+          <default>null</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="510" package="Default">
+        <name>divideInputName</name>
+        <full_name>divideInputName</full_name>
+        <docblock line="504">
+          <description>divides string into the array (name, value) (according to the XML tree node =&gt; value)</description>
+          <long-description/>
+          <tag line="504" name="param" description="post value" type="string" variable="$postKey">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="504" name="return" description="modified array" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+        <argument line="510">
+          <name>$postKey</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="527" package="Default">
+        <name>decodeXPath</name>
+        <full_name>decodeXPath</full_name>
+        <docblock line="521">
+          <description>decodes XPath value</description>
+          <long-description/>
+          <tag line="521" name="param" description="encoded XPath string" type="string" variable="$value">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="521" name="return" description="decoded XPath string" type="string">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="527">
+          <name>$value</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="543" package="Default">
+        <name>executeEditConfig</name>
+        <full_name>executeEditConfig</full_name>
+        <docblock line="535">
+          <description>sends modified XML to server</description>
+          <long-description/>
+          <tag line="535" name="param" description="session key of current connection" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="535" name="param" description="XML document which will be send" type="string" variable="$config">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="535" name="param" description="= &quot;running&quot; target source" type="string" variable="$target">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="535" name="return" description="return 0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="543">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="543">
+          <name>$config</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="543">
+          <name>$target</name>
+          <default>"running"</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="571" package="Default">
+        <name>completeRequestTree</name>
+        <full_name>completeRequestTree</full_name>
+        <docblock line="563">
+          <description>Completes request tree (XML) with necessary nodes (parent nodes).</description>
+          <long-description>&lt;p&gt;Tree must be valid for edit-config action&lt;/p&gt;</long-description>
+          <tag line="563" name="param" description="" type="\SimpleXMLElement" variable="$tmpConfigXml">
+            <type by_reference="false">\SimpleXMLElement</type>
+          </tag>
+          <tag line="563" name="param" description="" type="string" variable="$config_string">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="563" name="return" description="" type="\SimpleXMLElement">
+            <type by_reference="false">\SimpleXMLElement</type>
+          </tag>
+        </docblock>
+        <argument line="571">
+          <name>$tmpConfigXml</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="571">
+          <name>$config_string</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="616" package="Default">
+        <name>elementValReplace</name>
+        <full_name>elementValReplace</full_name>
+        <docblock line="606">
+          <description>updates (modifies) value of XML node</description>
+          <long-description/>
+          <tag line="606" name="param" description="xml file" type="string" variable="$configXml">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="606" name="param" description="name of the element" type="string" variable="$elementName">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="606" name="param" description="XPath to the element" type="string" variable="$xpath">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="606" name="param" description="new value" type="string" variable="$val">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="606" name="param" description="" type="string" variable="$xPathPrefix">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="606" name="return" description="modified node" type="\SimpleXMLElement">
+            <type by_reference="false">\SimpleXMLElement</type>
+          </tag>
+        </docblock>
+        <argument line="616">
+          <name>$configXml</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="616">
+          <name>$elementName</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="616">
+          <name>$xpath</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="616">
+          <name>$val</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="616">
+          <name>$xPathPrefix</name>
+          <default>"xmlns:"</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="662" package="Default">
+        <name>handleFilterState</name>
+        <full_name>handleFilterState</full_name>
+        <docblock line="657">
+          <description>sets new filter for state part</description>
+          <long-description/>
+          <tag line="657" name="param" description="session key for current server" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="662">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="682" package="Default">
+        <name>handleFilterConfig</name>
+        <full_name>handleFilterConfig</full_name>
+        <docblock line="677">
+          <description>sets new filter for config part</description>
+          <long-description/>
+          <tag line="677" name="param" description="session key for current server" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="682">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="708" package="Default">
+        <name>handleEditConfigForm</name>
+        <full_name>handleEditConfigForm</full_name>
+        <docblock line="700">
+          <description>handles edit config form - changes config values into the $_POST values
+and sends them to editConfig process</description>
+          <long-description/>
+          <tag line="700" name="param" description="session key of current connection" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="700" name="throws" description="" type="\ErrorException">
+            <type by_reference="false">\ErrorException</type>
+          </tag>
+          <tag line="700" name="return" description="result code" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="708">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="771" package="Default">
+        <name>handleDuplicateNodeForm</name>
+        <full_name>handleDuplicateNodeForm</full_name>
+        <docblock line="762">
+          <description>duplicates node in config - values of duplicated nodes (elements)</description>
+          <long-description>&lt;p&gt;could be changed by user&lt;/p&gt;</long-description>
+          <tag line="762" name="param" description="session key of current connection" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="762" name="throws" description="" type="\ErrorException">
+            <type by_reference="false">\ErrorException</type>
+          </tag>
+          <tag line="762" name="return" description="result code" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="771">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="862" package="Default">
+        <name>handleGenerateNodeForm</name>
+        <full_name>handleGenerateNodeForm</full_name>
+        <docblock line="852">
+          <description>create new node in config - according to the values in XML model</description>
+          <long-description>&lt;p&gt;could be changed by user&lt;/p&gt;</long-description>
+          <tag line="852" name="param" description="session key of current connection" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="852" name="param" description="module name" type="string" variable="$module">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="852" name="param" description="subsection name" type="string" variable="$subsection">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="852" name="return" description="result code" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="862">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="862">
+          <name>$module</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="862">
+          <name>$subsection</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="883" package="Default">
+        <name>handleRemoveNodeForm</name>
+        <full_name>handleRemoveNodeForm</full_name>
+        <docblock line="876">
+          <description>removes node from config XML tree</description>
+          <long-description/>
+          <tag line="876" name="param" description="session key of current connection" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="876" name="throws" description="when get-config could not be loaded" type="\ErrorException">
+            <type by_reference="false">\ErrorException</type>
+          </tag>
+          <tag line="876" name="return" description="result code" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="883">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <markers>
+      <todo line="867">load XML file - https://sauvignon.liberouter.org/symfony/generate/2/-%252A-%252A%253F1%2521-%252A%253F2%2521-%252A%253F1%2521/0/hanic-probe/exporters/model.xml</todo>
+    </markers>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Controller/DefaultController.php</error>
+    </parse_markers>
+  </file>
+  <file path="Controller/GenerateController.php" hash="95bc703d04294bcd3c6b1b5fba745255" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Controller" line="15" package="Default">
+      <extends>\FIT\NetopeerBundle\Controller\BaseController</extends>
+      <name>GenerateController</name>
+      <full_name>\FIT\NetopeerBundle\Controller\GenerateController</full_name>
+      <docblock line="12">
+        <description>Generate simple output, for example model in XML or HTML (using templates)</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="24" package="Default">
+        <name>generateXMLFromModelAction</name>
+        <full_name>generateXMLFromModelAction</full_name>
+        <docblock line="17">
+          <description>Gets XML subtree from model (according to given xPath) and shows it either as rendered HTML or as clean XML</description>
+          <long-description></long-description>
+          <tag line="17" name="Route" description="(&quot;/generate/{level}/{xPath}/{key}/{module}/{subsection}/model.{_format}&quot;, defaults={&quot;module&quot; = null, &quot;subsection&quot; = null, &quot;_format&quot; = &quot;html&quot;}, requirements={&quot;_format&quot; = &quot;html|xml&quot;}, name=&quot;generateFromModel&quot;)"/>
+          <tag line="17" name="Template" description="()"/>
+        </docblock>
+        <argument line="24">
+          <name>$level</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="24">
+          <name>$xPath</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="24">
+          <name>$key</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="24">
+          <name>$module</name>
+          <default>null</default>
+          <type/>
+        </argument>
+        <argument line="24">
+          <name>$subsection</name>
+          <default>null</default>
+          <type/>
+        </argument>
+        <argument line="24">
+          <name>$_format</name>
+          <default>'html'</default>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Controller/GenerateController.php</error>
+      <error line="17" code="50015">Argument $level is missing from the Docblock of generateXMLFromModelAction()</error>
+      <error line="17" code="50015">Argument $xPath is missing from the Docblock of generateXMLFromModelAction()</error>
+      <error line="17" code="50015">Argument $key is missing from the Docblock of generateXMLFromModelAction()</error>
+      <error line="17" code="50015">Argument $module is missing from the Docblock of generateXMLFromModelAction()</error>
+      <error line="17" code="50015">Argument $subsection is missing from the Docblock of generateXMLFromModelAction()</error>
+      <error line="17" code="50015">Argument $_format is missing from the Docblock of generateXMLFromModelAction()</error>
+    </parse_markers>
+  </file>
+  <file path="Controller/SecurityController.php" hash="276fea185e6907b2cff127b000b1c2da" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Controller" line="12" package="Default">
+      <extends>\FIT\NetopeerBundle\Controller\BaseController</extends>
+      <name>SecurityController</name>
+      <full_name>\FIT\NetopeerBundle\Controller\SecurityController</full_name>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="19" package="Default">
+        <name>loginAction</name>
+        <full_name>loginAction</full_name>
+        <docblock line="15">
+          <description/>
+          <long-description/>
+          <tag line="15" name="Route" description="(&quot;/login/&quot;, name=&quot;_login&quot;)"/>
+          <tag line="15" name="Template" description="()"/>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="43" package="Default">
+        <name>logoutAction</name>
+        <full_name>logoutAction</full_name>
+        <docblock line="39">
+          <description/>
+          <long-description/>
+          <tag line="39" name="Route" description="(&quot;/logout/&quot;, name=&quot;_logout&quot;)"/>
+          <tag line="39" name="Template" description="()"/>
+        </docblock>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Controller/SecurityController.php</error>
+      <error line="12" code="50000">No DocBlock was found for \FIT\NetopeerBundle\Controller\SecurityController</error>
+      <error line="15" code="50012">No short description for method loginAction()</error>
+      <error line="39" code="50012">No short description for method logoutAction()</error>
+    </parse_markers>
+  </file>
+  <file path="Controller/AjaxController.php" hash="ff111537cad289f02029da386631fe40" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Controller" line="18" package="Default">
+      <extends>\FIT\NetopeerBundle\Controller\BaseController</extends>
+      <name>AjaxController</name>
+      <full_name>\FIT\NetopeerBundle\Controller\AjaxController</full_name>
+      <docblock line="15">
+        <description>Controller which handles all Ajax actions</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="28" package="Default">
+        <name>getSchemaAction</name>
+        <full_name>getSchemaAction</full_name>
+        <docblock line="20">
+          <description>Change session value for showing single or double column layout</description>
+          <long-description></long-description>
+          <tag line="20" name="Route" description="(&quot;/ajax/get-schema/{key}&quot;, name=&quot;getSchema&quot;)"/>
+          <tag line="20" name="param" description="session key of current connection" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="20" name="return" description="" type="\Symfony\Component\HttpFoundation\Response">
+            <type by_reference="false">\Symfony\Component\HttpFoundation\Response</type>
+          </tag>
+        </docblock>
+        <argument line="28">
+          <name>$key</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="52" package="Default">
+        <name>getSchemaStatusAction</name>
+        <full_name>getSchemaStatusAction</full_name>
+        <docblock line="43">
+          <description>Get status of get-schema operation</description>
+          <long-description></long-description>
+          <tag line="43" name="Route" description="(&quot;/ajax/get-schema-status/{key}&quot;, name=&quot;getSchemaStatus&quot;)"/>
+          <tag line="43" name="param" description="session key of current connection" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="43" name="param" description="" type="array" variable="$result">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="43" name="return" description="" type="\Symfony\Component\HttpFoundation\Response">
+            <type by_reference="false">\Symfony\Component\HttpFoundation\Response</type>
+          </tag>
+        </docblock>
+        <argument line="52">
+          <name>$key</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="52">
+          <name>$result</name>
+          <default>array()</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="76" package="Default">
+        <name>getschema</name>
+        <full_name>getschema</full_name>
+        <docblock line="70">
+          <description>Get one model and process it.</description>
+          <long-description></long-description>
+          <tag line="70" name="param" description="key, identifier, version, format for get-schema" type="array" variable="$schparams">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="70" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="76">
+          <name>$schparams</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="99" package="Default">
+        <name>processSchema</name>
+        <full_name>processSchema</full_name>
+        <docblock line="95">
+          <description></description>
+          <long-description></long-description>
+          <tag line="95" name="param" description="get-schema parameters" type="array" variable="$schparams">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="95" name="return" description="0 on success, 1 on error" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="99">
+          <name>$schparams</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="127" package="Default">
+        <name>saveConnectionInDB</name>
+        <full_name>saveConnectionInDB</full_name>
+        <docblock line="119">
+          <description>Saves unique connection info into DB</description>
+          <long-description></long-description>
+          <tag line="119" name="param" description="session key" type="string" variable="$key">
+            <type by_reference="false">string</type>
+          </tag>
+          <tag line="119" name="param" description="JSON object of params" type="array" variable="$jsonArr">
+            <type by_reference="false">array</type>
+          </tag>
+          <tag line="119" name="throws" description="" type="\ErrorException">
+            <type by_reference="false">\ErrorException</type>
+          </tag>
+          <tag line="119" name="return" description="0 on success, 1 on fail" type="int">
+            <type by_reference="false">int</type>
+          </tag>
+        </docblock>
+        <argument line="127">
+          <name>$key</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="127">
+          <name>$jsonArr</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="FIT\NetopeerBundle\Controller" line="175" package="Default">
+        <name>updateLocalModels</name>
+        <full_name>updateLocalModels</full_name>
+        <docblock line="168">
+          <description>Get available configuration data models,
+store them and transform them.</description>
+          <long-description></long-description>
+          <tag line="168" name="param" description="index of session-connection" type="int" variable="$key">
+            <type by_reference="false">int</type>
+          </tag>
+          <tag line="168" name="return" description="" type="void">
+            <type by_reference="false">void</type>
+          </tag>
+        </docblock>
+        <argument line="175">
+          <name>$key</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Controller/AjaxController.php</error>
+      <error line="95" code="50012">No short description for method processSchema()</error>
+    </parse_markers>
+  </file>
+  <file path="Controller/BaseController.php" hash="cc2e0258a8cef4166fe29107c3f2f99e" package="Default">
+    <class final="false" abstract="false" namespace="FIT\NetopeerBundle\Controller" line="13" package="Default">
+      <extends>\Symfony\Bundle\FrameworkBundle\Controller\Controller</extends>
+      <name>BaseController</name>
+      <full_name>\FIT\NetopeerBundle\Controller\BaseController</full_name>
+      <property final="false" static="false" visibility="private" line="15" namespace="FIT\NetopeerBundle\Controller" package="Default">
+        <name>$activeSectionKey</name>
+        <default/>
+      </property>
+      <property final="false" static="false" visibility="private" line="16" namespace="FIT\NetopeerBundle\Controller" package="Default">
+        <name>$submenuUrl</name>
+        <default/>
+      </property>
+      <property final="false" static="false" visibility="private" line="17" namespace="FIT\NetopeerBundle\Controller" package="Default">
+        <name>$twigArr</name>
+        <default/>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="FIT\NetopeerBundle\Controller" line="24" package="Default">
+        <name>assign</name>
+        <full_name>assign</full_name>
+        <docblock line="19">
+          <description>Assignees variable to array, which will be send to template</description>
+          <long-description/>
+          <tag line="19" name="param" description="key of the associative array" type="mixed" variable="$key">
+            <type by_reference="false">mixed</type>
+          </tag>
+          <tag line="19" name="param" description="value of the associative array" type="mixed" variable="$value">
+            <type by_reference="false">mixed</type>
+          </tag>
+        </docblock>
+        <argument line="24">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+        <argument line="24">
+          <name>$value</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="protected" namespace="FIT\NetopeerBundle\Controller" line="32" package="Default">
+        <name>getTwigArr</name>
+        <full_name>getTwigArr</full_name>
+        <docblock line="28">
+          <description>Prepares variables to template, sort flashes and prepare menu</description>
+          <long-description/>
+          <tag line="28" name="return" description="of assigned variables to template" type="array">
+            <type by_reference="false">array</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="89" package="Default">
+        <name>__construct</name>
+        <full_name>__construct</full_name>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="98" package="Default">
+        <name>setActiveSectionKey</name>
+        <full_name>setActiveSectionKey</full_name>
+        <docblock line="94">
+          <description>sets info of current section key</description>
+          <long-description/>
+          <tag line="94" name="param" description="current section key" type="string" variable="$key">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="98">
+          <name>$key</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="FIT\NetopeerBundle\Controller" line="105" package="Default">
+        <name>setSubmenuUrl</name>
+        <full_name>setSubmenuUrl</full_name>
+        <docblock line="102">
+          <description/>
+          <long-description/>
+          <tag line="102" name="param" description="URL for submenu" type="string" variable="$submenuUrl">
+            <type by_reference="false">string</type>
+          </tag>
+        </docblock>
+        <argument line="105">
+          <name>$submenuUrl</name>
+          <default/>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <parse_markers>
+      <error line="0" code="50007">No page-level DocBlock was found in file Controller/BaseController.php</error>
+      <error line="13" code="50000">No DocBlock was found for \FIT\NetopeerBundle\Controller\BaseController</error>
+      <error line="15" code="50018">No DocBlock was found for property $activeSectionKey</error>
+      <error line="16" code="50018">No DocBlock was found for property $submenuUrl</error>
+      <error line="17" code="50018">No DocBlock was found for property $twigArr</error>
+      <error line="89" code="50010">No DocBlock was found for method __construct()</error>
+      <error line="102" code="50012">No short description for method setSubmenuUrl()</error>
+    </parse_markers>
+  </file>
+  <package name="Default" full_name="Default"/>
+  <namespace name="FIT" full_name="FIT">
+    <namespace name="NetopeerBundle" full_name="FIT\NetopeerBundle">
+      <namespace name="Controller" full_name="FIT\NetopeerBundle\Controller"/>
+      <namespace name="DependencyInjection" full_name="FIT\NetopeerBundle\DependencyInjection"/>
+      <namespace name="Entity" full_name="FIT\NetopeerBundle\Entity"/>
+      <namespace name="Models" full_name="FIT\NetopeerBundle\Models"/>
+      <namespace name="Tests" full_name="FIT\NetopeerBundle\Tests">
+        <namespace name="Controller" full_name="FIT\NetopeerBundle\Tests\Controller"/>
+      </namespace>
+      <namespace name="Twig" full_name="FIT\NetopeerBundle\Twig"/>
+    </namespace>
+  </namespace>
+  <marker count="4">todo</marker>
+  <marker count="0">fixme</marker>
+  <deprecated count="0"/>
+</project>
