@@ -69,14 +69,13 @@ function initPopupMenu($cover) {
  * double down arrow with popup submenu will appear
  */
 function collapseTopNav() {
-	if ( $("nav#top").length ) {
-		var $nav = $("nav#top");
+    var $nav = $("nav#top");
+	if ( $nav.length ) {
 		var $othersCover = $nav.find('.others-cover');
 		var $others = $othersCover.find(".others");
-		var navWidth = $nav.outerWidth();
+        var availableSpace = $nav.outerWidth();
 
 		// we will count available space for sections hrefs
-		var availableSpace = navWidth;
 		$nav.find('.static').each(function() {
 			availableSpace -= $(this).outerWidth();
 		});
@@ -101,7 +100,7 @@ function collapseTopNav() {
 				if (i++ === 0) {
 					firstOffset = $(this).offset().left;
 				}
-				if ( ($(this).offset().left - firstOffset + $(this).outerWidth()) >= availableSpace || 
+				if ( ($(this).offset().left - firstOffset + $(this).outerWidth()) >= availableSpace ||
 						($(this).offset().left + $(this).outerWidth()) >= maxOffset ||
 						isLastItemVisible === false
 					) {
@@ -151,10 +150,10 @@ function duplicateNode($elem) {
 	var $form = generateFormObject('duplicatedNodeForm');
 
 	// current element clone - with all children
-	var $newClone = $elem.parent().parent().clone();
+	var $newClone = $currentParent.clone();
 	$form.html($newClone);
-	if ($elem.parent().parent().is(':first-child')) {
-		$elem.parent().parent().nextAll("*").each(function(i, el) {
+	if ($currentParent.is(':first-child')) {
+        $currentParent.nextAll("*").each(function(i, el) {
 			$form.append($(el).clone());
 		});
 	}
@@ -197,8 +196,6 @@ function removeNode($elem) {
 
 	var xPath = $elem.attr('rel');	// parent XPath - from attribute rel
 	var level = findLevelValue($elem);
-
-	var $currentParent = $elem.parent().parent();
 	var $currentParentLevel = $elem.parents('.level-' + level);
 
 	// generate new form
@@ -228,8 +225,6 @@ function generateNode($elem) {
 
 	var rel = $elem.attr('rel').split('_');	// rel[0] - xPath, rel[1] - serialized route params
 	var level = findLevelValue($elem);
-
-	var $currentParent = $elem.parent().parent();
 	var $currentParentLevel = $elem.parents('.level-' + level);
 
 	var xPath = rel[0];
@@ -349,8 +344,6 @@ function generateFormObject(formName) {
 }
 
 function modifyInputAttributes(el, newIndex, newInputName) {
-	var uniqueId = String(getUniqueId());
-
 	// clean edit-bar html
 	$(el).find('.edit-bar').html('');
 
@@ -450,10 +443,6 @@ function unwrapCoverForm($currentParentLevel, $cover) {
 	$oldForm.html('');
 	$cover.prepend($oldForm);
 	$currentParentLevel.parents('form').children('.root').unwrap();
-}
-
-function getUniqueId() {
-	return Math.floor( Math.random()*99999 );
 }
 
 function l (str) {
