@@ -77,7 +77,7 @@ class AjaxController extends BaseController
 	* @param array &$schparams  key, identifier, version, format for get-schema
 	* @return int               0 on success, 1 on error
 	*/
-	private function getschema(&$schparams)
+	private function getschema(&$schparams, $identifier)
 	{
 		$dataClass = $this->get('DataModel');
 		$data = "";
@@ -112,7 +112,7 @@ class AjaxController extends BaseController
 
 		ob_clean();
 		ob_start();
-		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\" -u \"$user\" -t \"$host\" -p \"$port\"");
+		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\"");
 		$response = ob_get_contents();
 
 		preg_match("/\{(.*)\}/", $response, $jsonArr);
@@ -207,7 +207,11 @@ class AjaxController extends BaseController
 					"identifier" => (string)$sch->identifier,
 					"version" => (string)$sch->version,
 					"format" => (string)$sch->format);
-				if ($this->getschema($schparams) == 1) {
+				$ident = $dataClass->getModelIdentificator($schparams["identifier"], $schparams["version"],((string) $sch->namespace));
+				if (file_exists($dataClass->getModelsDir()."/$ident") {
+					//echo "exists";
+					continue;
+				} else if ($this->getschema($schparams, $ident) == 1) {
 					//break; /* not get the rest on error */
 				} else {
 					$list[] = $schparams;

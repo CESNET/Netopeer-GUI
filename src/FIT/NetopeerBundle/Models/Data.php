@@ -1320,6 +1320,18 @@ XML;
 	}
 
 	/**
+	 * Get identificator (hash) of model - it is used as directory name of model
+	 * @param $name - module name from conf. model
+	 * @param $version - version of conf. model
+	 * @param $ns - namespace
+	 */
+	public function getModelIdentificator($name, $version, $ns)
+	{
+		$ident = "$name|$version|$ns";
+		return sha1($ident);
+	}
+
+	/**
 	 * Add text to info log.
 	 *
 	 * @param $str
