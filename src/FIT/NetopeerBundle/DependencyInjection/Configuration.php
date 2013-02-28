@@ -1,4 +1,7 @@
 <?php
+/**
+ * Validates and merges configuration from your app/config files
+ */
 
 namespace FIT\NetopeerBundle\DependencyInjection;
 

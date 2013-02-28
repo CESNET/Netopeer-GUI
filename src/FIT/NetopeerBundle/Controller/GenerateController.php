@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Controller for custom text output, for example XML or HTML file.
+ *
+ * @author David Alexa
+ */
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
@@ -20,6 +24,13 @@ class GenerateController extends BaseController
 	 * @Route("/generate/{level}/{xPath}/{key}/{module}/{subsection}/model.{_format}", defaults={"module" = null, "subsection" = null, "_format" = "html"}, requirements={"_format" = "html|xml"}, name="generateFromModel")
 	 * @Template()
 	 *
+	 * @param $level
+	 * @param $xPath
+	 * @param int $key                    section key
+	 * @param string|null $module         module identifier (url)
+	 * @param string|null $subsection     subsection identifier (url)
+	 * @param string      $_format        output format
+	 * @return array
 	 */
 	public function generateXMLFromModelAction($level, $xPath, $key, $module = null, $subsection = null, $_format = 'html') {
 		// DependencyInjection (DI) - defined in Resources/config/services.yml

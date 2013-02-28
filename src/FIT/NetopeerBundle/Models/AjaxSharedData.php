@@ -1,5 +1,14 @@
 <?php
-
+/**
+ * This class holds shared data for Ajax operations.
+ *
+ * But Singleton is not working properly and every
+ * getInstance() creates new instance instead of using
+ * static one.
+ *
+ * @file    AjaxSharedData.php
+ * @author  David Alexa
+ */
 namespace FIT\NetopeerBundle\Models;
 
 /**
@@ -26,6 +35,7 @@ class AjaxSharedData {
 	/**
 	 * Get instance of this class
 	 *
+	 * @todo  Is not working correctly, creates new instance every time.
 	 * @return AjaxSharedData
 	 */
 	public static function getInstance() {

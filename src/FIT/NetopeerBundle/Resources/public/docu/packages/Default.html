@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>phpDocumentor » Default</title>
+<title>NetconfWebGUI » Default</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -15,7 +15,7 @@
 <body>
 <div class="navbar navbar-fixed-top">
 <div class="navbar-inner"><div class="container">
-<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">phpDocumentor</a><div class="nav-collapse"><ul class="nav">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetconfWebGUI</a><div class="nav-collapse"><ul class="nav">
 <li class="dropdown">
 <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
                                     API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
@@ -31,10 +31,10 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">78</span></a></li>
+                <span class="label label-info">16</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
-                <span class="label label-info">4</span>
+                <span class="label label-info">6</span>
 </li></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
                 <span class="label label-info">0</span></a></li>
@@ -67,19 +67,17 @@
 <li><a href="#FITNetopeerExtension" title="This is the class that loads and manages your bundle configuration">FITNetopeerExtension</a></li>
 <li><a href="#Configuration" title="This is the class that validates and merges configuration from your app/config files">Configuration</a></li>
 <li><a href="#DefaultControllerTest" title="">DefaultControllerTest</a></li>
-<li><a href="#FITNetopeerBundle" title="">FITNetopeerBundle</a></li>
-<li><a href="#XMLoperations" title="Array2XML: A class to convert array in PHP to XML
-It also takes into account attributes names unlike SimpleXML in PHP
-It returns the XML in form of DOMDocument class for further manipulation.">XMLoperations</a></li>
+<li><a href="#FITNetopeerBundle" title="Class of FITNetopeerBundle">FITNetopeerBundle</a></li>
+<li><a href="#XMLoperations" title="">XMLoperations</a></li>
 <li><a href="#AjaxSharedData" title="This class holds shared data for Ajax operations">AjaxSharedData</a></li>
-<li><a href="#Data" title="">Data</a></li>
+<li><a href="#Data" title="Data service, handles all communication between webGUI and mod_netconf.">Data</a></li>
 <li><a href="#ConnectionSession" title="">ConnectionSession</a></li>
 <li><a href="#DefaultController" title="Default controller for all pages directly visible from
 webGUI.">DefaultController</a></li>
 <li><a href="#GenerateController" title="Generate simple output, for example model in XML or HTML (using templates)">GenerateController</a></li>
-<li><a href="#SecurityController" title="">SecurityController</a></li>
+<li><a href="#SecurityController" title="Controller for security pages.">SecurityController</a></li>
 <li><a href="#AjaxController" title="Controller which handles all Ajax actions">AjaxController</a></li>
-<li><a href="#BaseController" title="">BaseController</a></li>
+<li><a href="#BaseController" title="BaseController - parent of all other controllers in this Bundle.">BaseController</a></li>
 </ul>
 </div>
 <div class="span8 package-contents">
@@ -99,7 +97,7 @@ webGUI.">DefaultController</a></li>
 <div id="BaseController" class="element ajax clickable class">
 <h1>BaseController<a href="../classes/FIT.NetopeerBundle.Controller.BaseController.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">BaseController - parent of all other controllers in this Bundle.</p>
 <div class="details collapse"></div>
 <a href="../classes/FIT.NetopeerBundle.Controller.BaseController.html" class="more">« More »</a>
 </div>
@@ -121,7 +119,7 @@ webGUI.</p>
 <div id="SecurityController" class="element ajax clickable class">
 <h1>SecurityController<a href="../classes/FIT.NetopeerBundle.Controller.SecurityController.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">Controller for security pages.</p>
 <div class="details collapse"></div>
 <a href="../classes/FIT.NetopeerBundle.Controller.SecurityController.html" class="more">« More »</a>
 </div>
@@ -149,7 +147,7 @@ webGUI.</p>
 <div id="FITNetopeerBundle" class="element ajax clickable class">
 <h1>FITNetopeerBundle<a href="../classes/FIT.NetopeerBundle.FITNetopeerBundle.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">Class of FITNetopeerBundle</p>
 <div class="details collapse"></div>
 <a href="../classes/FIT.NetopeerBundle.FITNetopeerBundle.html" class="more">« More »</a>
 </div>
@@ -170,16 +168,14 @@ webGUI.</p>
 <div id="Data" class="element ajax clickable class">
 <h1>Data<a href="../classes/FIT.NetopeerBundle.Models.Data.html">¶</a>
 </h1>
-<p class="short_description"></p>
+<p class="short_description">Data service, handles all communication between webGUI and mod_netconf.</p>
 <div class="details collapse"></div>
 <a href="../classes/FIT.NetopeerBundle.Models.Data.html" class="more">« More »</a>
 </div>
 <div id="XMLoperations" class="element ajax clickable class">
 <h1>XMLoperations<a href="../classes/FIT.NetopeerBundle.Models.XMLoperations.html">¶</a>
 </h1>
-<p class="short_description">Array2XML: A class to convert array in PHP to XML
-It also takes into account attributes names unlike SimpleXML in PHP
-It returns the XML in form of DOMDocument class for further manipulation.</p>
+<p class="short_description"></p>
 <div class="details collapse"></div>
 <a href="../classes/FIT.NetopeerBundle.Models.XMLoperations.html" class="more">« More »</a>
 </div>
@@ -203,7 +199,7 @@ It returns the XML in form of DOMDocument class for further manipulation.</p>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-02-27T21:11:51+01:00.<br></footer></div>
+            generated on 2013-02-28T19:51:27+01:00.<br></footer></div>
 </div>
 </body>
 </html>

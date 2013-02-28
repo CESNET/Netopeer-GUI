@@ -1,4 +1,12 @@
 <?php
+/**
+ * File with Entity of connected device.
+ *
+ * Holds all information about device, which are saved into DB using ORM.
+ *
+ * @file    MyConnection.php
+ * @author  David Alexa
+ */
 
 namespace FIT\NetopeerBundle\Entity;
 

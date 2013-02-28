@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Handles pages for login and logout.
+ *
+ * @author David Alexa
+ */
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
@@ -9,10 +13,15 @@ use Symfony\Component\Security\Core\SecurityContext;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+/**
+ * Controller for security pages.
+ */
 class SecurityController extends BaseController
 {
 
     /**
+     * Login page action.
+     *
      * @Route("/login/", name="_login")
      * @Template()
      */
@@ -37,6 +46,8 @@ class SecurityController extends BaseController
     }
 
     /**
+     * Logout page action.
+     *
      * @Route("/logout/", name="_logout")
      * @Template()
      */

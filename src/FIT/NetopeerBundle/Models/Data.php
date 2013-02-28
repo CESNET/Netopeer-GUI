@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * Base class for all communication with mod_netconf,
+ * getting and processing input and output data.
+ */
 namespace FIT\NetopeerBundle\Models;
 
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,8 +16,7 @@ use FIT\NetopeerBundle\Models\ConnectionSession;
 use FIT\NetopeerBundle\Entity\MyConnection;
 
 /**
- * @class Data      Data service, handles all communication
- * between webGUI and mod_netconf
+ * Data service, handles all communication between webGUI and mod_netconf.
  */
 class Data {
 
@@ -38,16 +40,36 @@ class Data {
 	const MSG_GETSCHEMA			= 16;
 
 	/**
-	 * @var ContainerInterface
+	 * @var ContainerInterface   base bundle container
 	 */
 	protected $container;
+	/**
+	 * @var \Symfony\Bridge\Monolog\Logger       instance of logging class
+	 */
 	protected $logger;
-
+	/**
+	 * @var string    current state of flash messages
+	 */
 	private $flashState;
+	/**
+	 * @var array|null  array with names of models for creating top menu
+	 */
 	private $models;
+	/**
+	 * @var array|null  array of MyConnection instances (array of connected devices).
+	 */
 	private $dbConnections;
+	/**
+	 * @var array       array of submenu structure for every module
+	 */
 	private $submenu;
 
+	/**
+	 * Constructor with DependencyInjection params.
+	 *
+	 * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+	 * @param \Symfony\Bridge\Monolog\Logger $logger   logging class
+	 */
 	public function __construct(ContainerInterface $container, $logger)	{
 		$this->container = $container;
 		$this->logger = $logger;
@@ -57,6 +79,7 @@ class Data {
 
 	/**
 	 * Parse $message formatted by Chunked Framing Mechanism (RFC6242)
+	 *
 	 * @param  string $message input message text
 	 * @return string          unwrapped message
 	 *
@@ -109,6 +132,12 @@ class Data {
 		return $response;
 	}
 
+	/**
+	 * Get hash for current connection
+	 *
+	 * @param  int $key      session key
+	 * @return string
+	 */
 	private function getHashFromKey($key) {
 		$conn = $this->getConnFromKey($key);
 
@@ -121,6 +150,7 @@ class Data {
 
 	/**
 	 * Find hash identifiers from DB for key
+	 *
 	 * @param  int $key session key
 	 * @return array  return array of identifiers on success, false on error
 	 */
@@ -142,9 +172,10 @@ class Data {
 
 	/**
 	 * get path for module name, includes identifier
+	 *
 	 * @param  int $key      session key
 	 * @param  string $moduleName name of element
-	 * @return string           relative path on succes, false on error
+	 * @return string           relative path on success, false on error
 	 */
 	private function getModulePathByRootModuleName($key, $moduleName) {
 		if (!is_array($this->dbConnections) || !count($this->dbConnections)) {
@@ -158,6 +189,12 @@ class Data {
 		return false;
 	}
 
+	/**
+	 * Find instance of SessionConnection.class for key.
+	 *
+	 * @param  int $key      session key
+	 * @return bool|\ConnectionSession
+	 */
 	private function getConnFromKey($key) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
@@ -167,6 +204,12 @@ class Data {
 		return false;
 	}
 
+	/**
+	 * Get port of SessionConnection for key.
+	 *
+	 * @param  int $key      session key
+	 * @return string
+	 */
 	public function getPortFromKey($key) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
@@ -177,6 +220,12 @@ class Data {
 		return "";
 	}
 
+	/**
+	 * Get user of SessionConnection for key.
+	 *
+	 * @param  int $key      session key
+	 * @return string
+	 */
 	public function getUserFromKey($key) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
@@ -187,6 +236,12 @@ class Data {
 		return "";
 	}
 
+	/**
+	 * Get host of SessionConnection for key.
+	 *
+	 * @param  int $key      session key
+	 * @return string
+	 */
 	public function getHostFromKey($key) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
@@ -197,6 +252,11 @@ class Data {
 		return "";
 	}
 
+	/**
+	 * Updates array of SessionConnections.
+	 *
+	 * @param  int $key      session key
+	 */
 	private function updateConnLock($key) {
 		$conn = $this->getConnFromKey($key);
 
@@ -246,6 +306,7 @@ class Data {
 	}
 	/**
 	 * Read response from socket
+	 *
 	 * @param  resource &$sock 		socket descriptor
 	 * @return string             trimmed string that was read
 	 */
@@ -295,8 +356,12 @@ class Data {
 		return trim($response);
 	}
 
+	/**
+	 * Sets error message based on JSON ERROR CODE.
+	 *
+	 * @return array  errorCode and message for this errorCode.
+	 */
 	private function getJsonError() {
-		$session = $this->container->get('request')->getSession();
 		$res = 0;
 		switch ($errorCode = json_last_error()) {
 			case JSON_ERROR_NONE:
@@ -326,9 +391,9 @@ class Data {
 
 	/**
 	 * Handles connection to the socket
-	 * @param  resource $sock     socket descriptor
-	 * @param  array    $params  connection params for mod_netconf
-	 * @param  mixed    $result  result of searching of new connection in all connections
+	 * @param  resource &$sock     socket descriptor
+	 * @param  array    &$params  connection params for mod_netconf
+	 * @param  mixed    &$result  result of searching of new connection in all connections
 	 * @return int                0 on success
 	 */
 	private function handle_connect(&$sock, &$params, &$result = null) {
@@ -377,7 +442,9 @@ class Data {
 	}
 
 	/**
-	 * @param   string $text  string to remove XML header in
+	 * Removes <?xml?> header from text.
+	 *
+	 * @param   string &$text  string to remove XML header in
 	 * @return  mixed         returns an array if the subject parameter
 	 *                        is an array, or a string otherwise.	If matches
 	 *                        are found, the new subject will be returned,
@@ -391,8 +458,9 @@ class Data {
 
 	/**
 	 * handle get action
-	 * @param  resource $sock   	socket descriptor
-	 * @param  array    $params 	array of values for mod_netconf (type, params...)
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params 	array of values for mod_netconf (type, params...)
 	 * @return mixed		          decoded data on success
 	 */
 	public function handle_get(&$sock, &$params) {
@@ -418,8 +486,9 @@ class Data {
 
 	/**
 	 * handle get config action
-	 * @param  resource $sock   	socket descriptor
-	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
 	 * @return mixed          		decoded data on success, 1 on error
 	 */
 	public function handle_getconfig(&$sock, &$params)	{
@@ -442,8 +511,9 @@ class Data {
 
 	/**
 	 * handle edit config action
-	 * @param  resource $sock   	socket descriptor
-	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
 	 * @return mixed          		decoded data on success, 1 on error
 	 */
 	function handle_editconfig(&$sock, &$params) {
@@ -477,8 +547,9 @@ class Data {
 
 	/**
 	 * handle get config action
-	 * @param  resource $sock   	socket descriptor
-	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
 	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_disconnect(&$sock, &$params) {
@@ -508,8 +579,9 @@ class Data {
 
 	/**
 	 * handle lock action
-	 * @param  resource $sock   	socket descriptor
-	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
 	 * @return int       		      0 on success, 1 on error
 	 */
 	private function handle_lock(&$sock, &$params) {
@@ -536,8 +608,9 @@ class Data {
 
 	/**
 	 * handle unlock action
-	 * @param  resource $sock   	socket descriptor
-	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
 	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_unlock(&$sock, &$params) {
@@ -564,8 +637,9 @@ class Data {
 
 	/**
 	 * handle info action
-	 * @param  resource $sock   	socket descriptor
-	 * @param  array    $params   array of values for mod_netconf (type, params...)
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
 	 * @return int       		      0 on success, 1 on error
 	 */
 	private function handle_info(&$sock, &$params) {
@@ -585,7 +659,7 @@ class Data {
 		));
 
 		if (!$decoded) {
-			/* error occured, unexpected response */
+			/* error occurred, unexpected response */
 			$this->logger->err("Could get session info.", array("error" => var_export($decoded, true)));
 			$session->setFlash($this->flashState .' error', "Could not get session info.");
 		}
@@ -595,9 +669,10 @@ class Data {
 
 	/**
 	 * handle unlock action
-	 * @param  resource $sock   	socket descriptor
-	 * @param  array    $params   $params must contain "identifier" of schema, can contain "version" and "format" of schema
-	 * @param  mixed    $result   decoded data from response
+	 *
+	 * @param  resource &$sock    socket descriptor
+	 * @param  array    &$params   must contain "identifier" of schema, can contain "version" and "format" of schema
+	 * @param  mixed    &$result  decoded data from response
 	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_getschema(&$sock, &$params, &$result) {
@@ -636,6 +711,7 @@ class Data {
 
 	/**
 	 * checks, if logged keys are valid
+	 *
 	 * @return int       		0 on success, 1 on error
 	 */
 	private function check_logged_keys() {
@@ -662,8 +738,9 @@ class Data {
 	}
 
 	/**
-	 * checks decoded data, if there an error occures
-	 * @param  mixed  $decoded 	decoded data
+	 * checks decoded data, if there an error occurs
+	 *
+	 * @param  mixed  &$decoded 	decoded data
 	 * @return mixed				    decoded data on success, 1 on error
 	 */
 	private function checkDecodedData(&$decoded) {
@@ -689,7 +766,8 @@ class Data {
 
 	/**
 	 * Wrap message for Chunked Framing Mechanism (RFC6242) and write it into the socket.
-	 * @param  resource $sock   			socket descriptor
+	 *
+	 * @param  resource &$sock   			socket descriptor
 	 * @param  string   $message 	    message text
 	 */
 	private function write2socket(&$sock, $message)	{
@@ -699,7 +777,8 @@ class Data {
 
 	/**
 	 * executes operation - sends message into the socket
-	 * @param  resource   $sock  			socket descriptor
+	 *
+	 * @param  resource   &$sock  			socket descriptor
 	 * @param  array      $params 	  array of values for mod_netconf (type, params...)
 	 * @return array         	        response from mod_netconf
 	 */
@@ -711,6 +790,8 @@ class Data {
 	}
 
 	/**
+	 * Get path to directory of data models.
+	 *
 	 * @return string      path to models folder
 	 */
 	public function getModelsDir() {
@@ -782,7 +863,7 @@ class Data {
 
 		$logParams = $params;
 		if ( $command == "connect" ) {
-			// nebudeme do logu vkladat heslo
+			// we won't log password
 			unset($logParams['pass']);
 		}
 		$this->logger->info('Handle: '.$command.' with params', array('params' => $logParams));
@@ -883,14 +964,19 @@ class Data {
 		return 0;
 	}
 
-	// check, if XML is valid
-	private function isResponseValid(&$res) {
+	/**
+	 * Check, if XML response is valid.
+	 *
+	 * @param &$xmlString
+	 * @return int  1 on success, 0 on error
+	 */
+	private function isResponseValid(&$xmlString) {
 		try {
-			$xml = simplexml_load_string($res);
+			$xml = simplexml_load_string($xmlString);
 		} catch (\ErrorException $e) {
 			// sometimes is exactly one root node missing
 			// we will check, if is not XML valid with root node
-			$res = "<root>".$res."</root>";
+			$xmlString = "<root>".$xmlString."</root>";
 			try {
 				$xml = simplexml_load_string($res);
 			} catch (\ErrorException $e) {
@@ -901,6 +987,12 @@ class Data {
 		return 1;
 	}
 
+	/**
+	 * Get parent for element.
+	 *
+	 * @param $element
+	 * @return bool|\SimpleXMLElement
+	 */
 	private function get_element_parent($element) {
 		$parents = $element->xpath("parent::*");
 		if ($parents) {
@@ -909,6 +1001,13 @@ class Data {
 		return false;
 	}
 
+	/**
+	 * Check if two elements match.
+	 *
+	 * @param $model_el
+	 * @param $possible_el
+	 * @return bool
+	 */
 	private function check_elem_match($model_el, $possible_el) {
 		$mel = $this->get_element_parent($model_el);
 		$pel = $this->get_element_parent($possible_el);
@@ -922,6 +1021,12 @@ class Data {
 		return true;
 	}
 
+	/**
+	 * Completes tree structure for target element.
+	 *
+	 * @param $source
+	 * @param $target
+	 */
 	private function complete_attributes(&$source, &$target) {
 		if ($source->attributes()) {
 			$attrs = $source->attributes();
@@ -935,8 +1040,9 @@ class Data {
 
 	/**
 	 * Find corresponding $el in configuration model $model and complete attributes from $model.
-	 * @param  {SimpleXMLElement} &$model with data model
-	 * @param  {SimpleXMLElement} $el     with element of response
+	 *
+	 * @param  \SimpleXMLElement &$model with data model
+	 * @param  \SimpleXMLElement $el     with element of response
 	 */
 	private function find_and_complete(&$model, $el) {
 		$modelns = $model->getNamespaces();
@@ -957,8 +1063,9 @@ class Data {
 
 	/**
 	 * Go through $root_el tree that represents the response from Netconf server.
-	 * @param  {SimpleXMLElement} &$model  with data model
-	 * @param  {SimpleXMLElement} $root_el with element of response
+	 *
+	 * @param  \SimpleXMLElement &$model  with data model
+	 * @param  \SimpleXMLElement $root_el with element of response
 	 */
 	private function mergeRecursive(&$model, $root_el) {
 		foreach ($root_el as $ch) {
@@ -974,7 +1081,8 @@ class Data {
 
 	/**
 	 * Add attributes from configuration model to response such as config, mandatory, type.
-	 * @param  {SimpleXMLElement} $model 	data configuration model
+	 *
+	 * @param  \SimpleXMLElement  $model 	data configuration model
 	 * @param  string             $result data from netconf server
 	 * @return string								      the result of merge
 	 */
@@ -990,6 +1098,17 @@ class Data {
 		}
 	}
 
+	/**
+	 * Get XML code of model for creating new node.
+	 *
+	 * @todo  implement this method (load XML from model)
+	 *
+	 * @param $xPath
+	 * @param $key
+	 * @param $module
+	 * @param $subsection
+	 * @return string
+	 */
 	public function getXMLFromModel($xPath, $key, $module, $subsection) {
 		$xml = <<<XML
 <?xml version="1.0"?>
@@ -1009,13 +1128,12 @@ class Data {
 </root>
 XML;
 
-		// TODO: load XML from model
-
 		return $xml;
 	}
 
 	/**
 	 * Sets current flash state - but only for allowed kinds
+	 *
 	 * @param   string  $state    kind of flash state
 	 * @throws  \ErrorException   if flash state is not in allowedState array
 	 * @return  int               0 on error
@@ -1033,6 +1151,9 @@ XML;
 
 	/**
 	 * Prepares top menu - gets items from server response
+	 *
+	 * @param  int    $key  session key of current connection
+	 * @param  string $path
 	 */
 	public function buildMenuStructure($key, $path = "") {
 		// we will build menu structure only if we have not build it before
@@ -1114,6 +1235,12 @@ XML;
 
 	/**
 	 * prepares left submenu - modules of current top menu item
+	 *
+	 * @param  int  $key session key of current connection
+	 * @param $module
+	 * @param $allowedSubmenu
+	 * @param string $path
+	 * @return array
 	 */
 	private function buildSubmenu($key, $module, $allowedSubmenu, $path = "") {
 		$finder = new Finder();
@@ -1153,22 +1280,50 @@ XML;
 		return $folders;
 	}
 
+	/**
+	 * Get models.
+	 *
+	 * @return array|null
+	 */
 	public function getModels() {
 		return $this->models;
 	}
 
+	/**
+	 * Get submenu for key.
+	 *
+	 * @param  int  $key session key of current connection
+	 * @return array
+	 */
 	public function getSubmenu($key) {
 		return isset($this->submenu[$key]) ? $this->submenu[$key] : array();
 	}
 
+	/**
+	 * Get name for section.
+	 *
+	 * @param $section
+	 * @return string
+	 */
 	public function getSectionName($section) {
 		return ucfirst( str_replace(array('-', '_'), ' ', $section) );
 	}
 
+	/**
+	 * Get name for subsection.
+	 *
+	 * @param $subsection
+	 * @return string
+	 */
 	public function getSubsectionName($subsection) {
 		return $this->getSectionName($subsection);
 	}
 
+	/**
+	 * Add text to info log.
+	 *
+	 * @param $str
+	 */
 	private function addLog($str) {
 		$this->logger->addInfo($str);
 	}

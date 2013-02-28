@@ -1,19 +1,38 @@
 <?php
-
+/**
+ * BaseController as parent of  all controllers in this bundle handles all common functions
+ * such as assigning template variables, menu structure...
+ *
+ * @author David Alexa
+ */
 namespace FIT\NetopeerBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
+/**
+ * BaseController - parent of all other controllers in this Bundle.
+ *
+ * Defines common functions for all controllers, such as assigning template variables etc.
+ */
 class BaseController extends Controller
 {
+	/**
+	 * @var int  Active section key
+	 */
 	private $activeSectionKey;
+	/**
+	 * @var string  url of submenu
+	 */
 	private $submenuUrl;
+	/**
+	 * @var array   array of all variables assigned into template
+	 */
 	private $twigArr;
 
 	/**
@@ -27,7 +46,7 @@ class BaseController extends Controller
 
 	/**
 	 * Prepares variables to template, sort flashes and prepare menu
-	 * @return 					array of assigned variables to template
+	 * @return array					array of assigned variables to template
 	 */
 	protected function getTwigArr() {
 
@@ -86,21 +105,27 @@ class BaseController extends Controller
 		return $this->twigArr;
 	}
 
+	/**
+	 * constructor, which instantiate empty class variables
+	 */
 	public function __construct () {
 		$this->twigArr = array();	
 		$this->activeSectionKey = null;	
 	}
 
 	/**
-	 * sets info of current section key
-	 * @param string $key current section key
+	 * sets current section key
+	 *
+	 * @param int     $key          key of connected server
 	 */
 	public function setActiveSectionKey($key) {
 		$this->activeSectionKey = $key;
 	}
 
 	/**
-	 * @param string $submenuUrl URL for submenu
+	 * sets submenu URL.
+	 *
+	 * @param string $submenuUrl  URL for submenu
 	 */
 	public function setSubmenuUrl($submenuUrl) {
 		$this->submenuUrl = $submenuUrl;

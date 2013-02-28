@@ -1,14 +1,13 @@
 <?php
  
-namespace FIT\NetopeerBundle\Models;
-
 /**
  * Array2XML: A class to convert array in PHP to XML
+ *
  * It also takes into account attributes names unlike SimpleXML in PHP
  * It returns the XML in form of DOMDocument class for further manipulation.
  * It throws exception if the tag name or attribute name has illegal chars.
  *
- * Author : Lalit Patel
+ * @Author : Lalit Patel
  * Website: http://www.lalit.org/lab/convert-php-array-to-xml-with-attributes
  * License: Apache License 2.0
  *          http://www.apache.org/licenses/LICENSE-2.0
@@ -38,7 +37,9 @@ namespace FIT\NetopeerBundle\Models;
  * Additional functions:
  * 		mergeXml
  */
- 
+
+namespace FIT\NetopeerBundle\Models;
+
 class XMLoperations {
 
 	private static $xml = null;

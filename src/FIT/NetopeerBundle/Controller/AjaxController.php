@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * File, which handles all Ajax actions.
+ *
+ * @author David Alexa
+ */
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
@@ -70,7 +74,7 @@ class AjaxController extends BaseController
 	/**
 	* Get one model and process it.
 	*
-	* @param array $schparams   key, identifier, version, format for get-schema
+	* @param array &$schparams  key, identifier, version, format for get-schema
 	* @return int               0 on success, 1 on error
 	*/
 	private function getschema(&$schparams)
@@ -93,7 +97,9 @@ class AjaxController extends BaseController
 	}
 
 	/**
-	 * @param array $schparams    get-schema parameters
+	 * Process <get-schema> action based on schparams.
+	 *
+	 * @param array &$schparams   get-schema parameters
 	 * @return int                0 on success, 1 on error
 	 */
 	private function processSchema(&$schparams)

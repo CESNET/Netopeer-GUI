@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Default controller for all pages directly visible from  webGUI.
+ *
+ * @author David Alexa
+ */
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;

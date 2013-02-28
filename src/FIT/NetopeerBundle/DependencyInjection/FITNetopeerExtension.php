@@ -1,4 +1,7 @@
 <?php
+/**
+ * Generated file that loads and manage FITNetopeerBundle configuration.
+ */
 
 namespace FIT\NetopeerBundle\DependencyInjection;
 

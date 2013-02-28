@@ -1,5 +1,7 @@
 <?php
-
+/**
+ *  @todo move to Entity folder, merge with MyConnection?
+ */
 namespace FIT\NetopeerBundle\Models;
 
 class ConnectionSession {

@@ -1,4 +1,12 @@
 <?php
+/**
+ * File extends twig extension with custom functions.
+ *
+ * This functions could be used in TWIG template.
+ *
+ * @file    NetopeerTwigExtension.php
+ * @author  David Alexa
+ */
 
 namespace FIT\NetopeerBundle\Twig;
 
@@ -11,7 +19,7 @@ use Twig_Function_Method;
 class NetopeerTwigExtension extends Twig_Extension
 {
 	/**
-	 * Array of my defined functions
+	 * Defines array of custom defined functions
 	 *
 	 * @return array
 	 */
