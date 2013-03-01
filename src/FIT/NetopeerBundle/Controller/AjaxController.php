@@ -81,11 +81,15 @@ class AjaxController extends BaseController
 	{
 		$dataClass = $this->get('DataModel');
 		$data = "";
+		$path = "/tmp/symfony/";
+		@mkdir($path, 0700, true);
+		$path .= "/$identifier.".$schparams["format"];
+		if (file_exists($path)) {
+			/* already exists */
+			return 1;
+		}
 		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
 			$schparams["user"] = $dataClass->getUserFromKey($schparams["key"]);
-			$path = "/tmp/symfony/".$schparams["user"];
-			@mkdir($path, 0700, true);
-			$path .= "/".$schparams["identifier"].".".$schparams["format"];
 			file_put_contents($path, $data);
 			$schparams["path"] = $path;
 			return 0;
@@ -202,14 +206,16 @@ class AjaxController extends BaseController
 			$this->get('session')->set('session-connections', $sessionConnections);
 
 			$list = array();
+			$lock = sem_get(12345678, 1, 0666, 1);
+			sem_acquire($lock); /* critical section */
 			foreach ($schemas as $sch) {
 				$schparams = array("key" => $params["key"],
 					"identifier" => (string)$sch->identifier,
 					"version" => (string)$sch->version,
 					"format" => (string)$sch->format);
 				$ident = $dataClass->getModelIdentificator($schparams["identifier"], $schparams["version"],((string) $sch->namespace));
-				if (file_exists($dataClass->getModelsDir()."/$ident") {
-					//echo "exists";
+
+				if (file_exists($dataClass->getModelsDir()."/$ident")) {
 					continue;
 				} else if ($this->getschema($schparams, $ident) == 1) {
 					//break; /* not get the rest on error */
@@ -217,6 +223,8 @@ class AjaxController extends BaseController
 					$list[] = $schparams;
 				}
 			}
+			sem_release($lock);
+			/* non-critical - only models, that I downloaded will be processed, others already exist */
 			foreach ($list as $schema) {
 				$this->processSchema($schema);
 			}
