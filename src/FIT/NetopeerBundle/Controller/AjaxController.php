@@ -2,13 +2,12 @@
 /**
  * File, which handles all Ajax actions.
  *
- * @author David Alexa
+ * @author David Alexa, Tomas Cejka
  */
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
 use FIT\NetopeerBundle\Models\AjaxSharedData;
-use FIT\NetopeerBundle\Entity\MyConnection;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -75,6 +74,7 @@ class AjaxController extends BaseController
 	* Get one model and process it.
 	*
 	* @param array &$schparams  key, identifier, version, format for get-schema
+	* @param string $identifier identifier of folder in /tmp/symfony directory
 	* @return int               0 on success, 1 on error
 	*/
 	private function getschema(&$schparams, $identifier)
@@ -84,10 +84,12 @@ class AjaxController extends BaseController
 		$path = "/tmp/symfony/";
 		@mkdir($path, 0700, true);
 		$path .= "/$identifier.".$schparams["format"];
+
 		if (file_exists($path)) {
 			/* already exists */
 			return 1;
 		}
+
 		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
 			$schparams["user"] = $dataClass->getUserFromKey($schparams["key"]);
 			file_put_contents($path, $data);
@@ -114,65 +116,8 @@ class AjaxController extends BaseController
 		$user = $schparams["user"];
 		$path = $schparams["path"];
 
-		ob_clean();
-		ob_start();
 		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\"");
-		$response = ob_get_contents();
-
-		preg_match("/\{(.*)\}/", $response, $jsonArr);
-		if (count($jsonArr) > 1) {
-			return $this->saveConnectionInDB($schparams["key"], json_decode($jsonArr[0]));
-		}
 		return 1;
-	}
-
-	/**
-	 * Saves unique connection info into DB
-	 *
-	 * @param  string   $key       session key
-	 * @param  array    $jsonArr   JSON object of params
-	 * @throws \ErrorException
-	 * @return int 0 on success, 1 on fail
-	 */
-	private function saveConnectionInDB($key, $jsonArr) {
-		$conn = new MyConnection();
-		$conn->setHash($jsonArr->identifier);
-		$conn->setModelName($jsonArr->module);
-		$conn->setModelVersion($jsonArr->version);
-		$conn->setRootElem($jsonArr->root_element);
-		$conn->setNamespace($jsonArr->ns);
-		$conn->setHostname($jsonArr->host);
-		$conn->setPort($jsonArr->port);
-		$conn->setUsername($jsonArr->user);
-
-		try {
-			$em = $this->getDoctrine()->getEntityManager();
-			$em->persist($conn);
-			$em->flush();
-
-			$this->get('logger')->info("Connection added into DB.", array("arr" => var_export($jsonArr)));
-
-		} catch (\PDOException $e) {
-			$this->getDoctrine()->resetEntityManager();
-			if ($e->getCode() == 23000) { // duplicate entry
-				$this->get('logger')->err("Duplicate connection.", array("arr" => var_export($jsonArr)));
-				// we don't care about
-			} else {
-				throw new \ErrorException($e->getMessage());
-			}
-		} catch (\ErrorException $e) {
-			$this->get('logger')->err("Could not add connection into DB.", array("arr" => var_export($jsonArr)));
-			return 1;
-		}
-
-		$sessionConnections = $this->get('session')->get('session-connections');
-		$sessionConn = unserialize($sessionConnections[$key]);
-		$sessionConn->dbIdentifier[$jsonArr->identifier] = true;
-		$sessionConnections[$key] = serialize($sessionConn);
-
-		$this->get('session')->set('session-connections', $sessionConnections);
-
-		return 0;
 	}
 
 	/**
@@ -198,12 +143,6 @@ class AjaxController extends BaseController
 			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 			$xml->registerXPathNamespace("xmlns", $ns);
 			$schemas = $xml->xpath("//xmlns:schema");
-
-			$sessionConnections = $this->get('session')->get('session-connections');
-			$sessionConn = unserialize($sessionConnections[$key]);
-			$sessionConn->dbIdentifier = array();
-			$sessionConnections[$key] = serialize($sessionConn);
-			$this->get('session')->set('session-connections', $sessionConnections);
 
 			$list = array();
 			$lock = sem_get(12345678, 1, 0666, 1);

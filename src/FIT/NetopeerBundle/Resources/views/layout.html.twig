@@ -32,7 +32,7 @@
 				{% else %}
 					<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" class="static ico-lock header-icon"><span></span></a>
 				{% endif %}
-				<a href="{{ path("infoPage", {"key": app.request.get('key'), "action": "session"}) }}" title="Session info: {{sessionStatus}}" class="static ico-session header-icon {% if activeAction is defined and activeAction == "session" %}active{% endif %}"><span></span></a>
+				<a href="{{ path("infoPage", {"key": app.request.get('key'), "action": "session"}) }}" title="Session info" class="static ico-session header-icon {% if activeAction is defined and activeAction == "session" %}active{% endif %}"><span></span></a>
 				<a href="javascript:document.location.reload(true)" title="Refresh data" class="ico-refresh header-icon"><span></span></a>
 				{% if topmenu is defined %}
 					{% set i = 0 %}

@@ -12,8 +12,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Finder\Finder;
 use Doctrine\ORM\EntityManager;
 
-use FIT\NetopeerBundle\Models\ConnectionSession;
-use FIT\NetopeerBundle\Entity\MyConnection;
+use FIT\NetopeerBundle\Entity\ConnectionSession;
 
 /**
  * Data service, handles all communication between webGUI and mod_netconf.
@@ -52,13 +51,17 @@ class Data {
 	 */
 	private $flashState;
 	/**
+	 * @var array     array of namespaces for module name
+	 */
+	private $modelNamespaces;
+	/**
 	 * @var array|null  array with names of models for creating top menu
 	 */
 	private $models;
 	/**
-	 * @var array|null  array of MyConnection instances (array of connected devices).
+	 * @var array|null  array of hash identifiers (array of connected devices).
 	 */
-	private $dbConnections;
+	private $moduleIdentifiers;
 	/**
 	 * @var array       array of submenu structure for every module
 	 */
@@ -74,6 +77,7 @@ class Data {
 		$this->container = $container;
 		$this->logger = $logger;
 		$this->models = null;
+		$this->modelNamespaces = array();
 		$this->setFlashState('single');
 	}
 
@@ -154,19 +158,28 @@ class Data {
 	 * @param  int $key session key
 	 * @return array  return array of identifiers on success, false on error
 	 */
-	private function getModuleIdentifiersFromDb($key) {
+	private function getModuleIdentifiersForCurrentDevice($key) {
 		$conn = $this->getConnFromKey($key);
+		$sessionStatus = json_decode($conn->sessionStatus);
+		$capabilities = $sessionStatus->capabilities;
 
-		if (isset($conn->dbIdentifier)) {
-			$idents = $conn->dbIdentifier;
-			$dbConnection = $this->container->get('doctrine')->getRepository('FITNetopeerBundle:MyConnection');
-
-			$arr = array();
-			foreach ($idents as $ident => $val) {
-				$arr[$dbConnection->findOneByHash($ident)->getHash()] = $dbConnection->findOneByHash($ident);
+		$arr = array();
+		if (is_array($capabilities) && count($capabilities)) {
+			foreach ($capabilities as $connKey => $value) {
+				$regex = "/(.*)\?module=(.*)&revision=([0-9|-]*)/";
+				preg_match($regex, $value, $matches);
+				if ($matches !== null && count($matches) == 4) {
+					$arr[$matches[1]] = array(
+						'hash' => $this->getModelIdentificator($matches[2], $matches[3], $matches[1]),
+						'ns' => $matches[1],
+						'moduleName' => $matches[2],
+						'revision' => $matches[3],
+					);
+				}
 			}
-			$this->dbConnections = $arr;
+			$this->moduleIdentifiers = $arr;
 		}
+
 		return false;
 	}
 
@@ -178,12 +191,19 @@ class Data {
 	 * @return string           relative path on success, false on error
 	 */
 	private function getModulePathByRootModuleName($key, $moduleName) {
-		if (!is_array($this->dbConnections) || !count($this->dbConnections)) {
-			$this->getModuleIdentifiersFromDb($key);
+		if (!is_array($this->moduleIdentifiers) || !count($this->moduleIdentifiers)) {
+			$this->getModuleIdentifiersForCurrentDevice($key);
 		}
-		foreach ($this->dbConnections as $hash => $conn) {
-			if ($conn->getRootElem() == $moduleName) {
-				return $hash . "/" . $conn->getModelName();
+
+		if (isset($this->modelNamespaces[$moduleName])) {
+			$cnt = count($this->modelNamespaces[$moduleName]);
+			if ($cnt == 1) {
+				$namespace = $this->modelNamespaces[$moduleName];
+				if (isset($this->moduleIdentifiers[$namespace])) {
+					return $this->moduleIdentifiers[$namespace]['hash'] . "/" . $this->moduleIdentifiers[$namespace]['moduleName'];
+				}
+			} elseif ($cnt > 1) {
+				/* @todo handle conflict in namespaces => for one moduleName more namespaces */
 			}
 		}
 		return false;
@@ -415,7 +435,7 @@ class Data {
 			$param = array( "session" => $decoded["session"] );
 			$status = $this->handle_info($sock, $param);
 			$newconnection = new ConnectionSession($decoded["session"], $params["host"], $params["port"], $params["user"]);
-			$newconnection->session_status = var_export($status, true);
+			$newconnection->sessionStatus = json_encode($status);
 			$newconnection = serialize($newconnection);
 
 			if ( !$sessionConnections = $session->get("session-connections") ) {
@@ -834,9 +854,12 @@ class Data {
 	public function getPathToModels($moduleName = "") {
 		$path = $this->getModelsDir();
 
+		if ($moduleName == "") {
+			$moduleName = $this->container->get('request')->get('module');
+		}
 		// add module directory if is set in route
-		if ( $this->container->get('request')->get('module') != null ) {
-			$modelDir = $this->getModelDirForName($this->container->get('request')->get('module'));
+		if ($moduleName != "") {
+			$modelDir = $this->getModelDirForName($moduleName);
 			if ($modelDir) {
 				$path .= $modelDir . '/';
 			}
@@ -919,7 +942,6 @@ class Data {
 		}
 
 		fclose($sock);
-
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
 		if ($command === "info") {
@@ -967,18 +989,18 @@ class Data {
 	/**
 	 * Check, if XML response is valid.
 	 *
-	 * @param &$xmlString
+	 * @param string            &$xmlString       xml response
 	 * @return int  1 on success, 0 on error
 	 */
 	private function isResponseValid(&$xmlString) {
 		try {
-			$xml = simplexml_load_string($xmlString);
+			$simpleXMLRes = simplexml_load_string($xmlString);
 		} catch (\ErrorException $e) {
 			// sometimes is exactly one root node missing
 			// we will check, if is not XML valid with root node
 			$xmlString = "<root>".$xmlString."</root>";
 			try {
-				$xml = simplexml_load_string($res);
+				$simpleXMLRes = simplexml_load_string($xmlString);
 			} catch (\ErrorException $e) {
 				return 0;
 			}
@@ -1174,6 +1196,7 @@ XML;
 				// load GET XML from server
 				if ( ($xml = $this->handle('get', $params, false)) != 1 ) {
 					$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+
 					$xmlNameSpaces = $xml->getNamespaces();
 
 					if ( isset($xmlNameSpaces[""]) ) {
@@ -1209,6 +1232,7 @@ XML;
 				$this->logger->err("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
 				// nothing
 			}
+			$this->modelNamespaces = $namespaces;
 
 			// we will check, if nodes from GET are same as models structure
 			// if not, they won't be displayed
@@ -1321,9 +1345,11 @@ XML;
 
 	/**
 	 * Get identificator (hash) of model - it is used as directory name of model
-	 * @param $name - module name from conf. model
-	 * @param $version - version of conf. model
-	 * @param $ns - namespace
+	 *
+	 * @param string $name       module name from conf. model
+	 * @param string $version    version of conf. model
+	 * @param string $ns         namespace
+	 * @return string            hashed identificator
 	 */
 	public function getModelIdentificator($name, $version, $ns)
 	{

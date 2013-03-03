@@ -238,13 +238,14 @@ class DefaultController extends BaseController
 	{
 		$dataClass = $this->get('DataModel');
 		parent::setActiveSectionKey($key);
+		$dataClass->buildMenuStructure($key);
 
 		// now, we could set forms params with filter (even if we don't have module or subsection)
 		// filter will be empty
 		$filters = $this->loadFilters($module, $subsection);
 		$this->setSectionFormsParams($key, $filters['state'], $filters['config']);
 
-		// if form has been send, we well proccess it
+		// if form has been send, we well process it
 		if ($this->getRequest()->getMethod() == 'POST') {
 			$this->processSectionForms($key, $module, $subsection);
 			// the code below wont be precess, because at the end of processSectionForms
@@ -258,7 +259,6 @@ class DefaultController extends BaseController
 		if ( $module == null ) {
 			$retArr['key'] = $key;
 			$routeName = 'module';
-			$dataClass->buildMenuStructure($key);
 			$modules = $dataClass->getModels();
 			if (isset($modules[0])) {
 				$module1st = $modules[0];
