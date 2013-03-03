@@ -63,6 +63,12 @@ class Data {
 	 */
 	private $moduleIdentifiers;
 	/**
+	 * @var array array of handle* result
+	 *
+	 * no need to call for example <get> more than once
+	 */
+	private $handleResultsArr;
+	/**
 	 * @var array       array of submenu structure for every module
 	 */
 	private $submenu;
@@ -891,6 +897,20 @@ class Data {
 		}
 		$this->logger->info('Handle: '.$command.' with params', array('params' => $logParams));
 
+		/**
+		 * check, if current command had not been called in the past. If yes, we will
+		 * return previous response (and not ask again for response from server).
+		 */
+		$hashedParams = sha1(json_encode($params));
+		if (isset($this->handleResultsArr[$command])) {
+
+			if ($merge && isset($this->handleResultsArr[$command][$hashedParams]['merged'])) {
+				return $this->handleResultsArr[$command][$hashedParams]['merged'];
+			} elseif (isset($this->handleResultsArr[$command][$hashedParams]['unmerged'])) {
+				return $this->handleResultsArr[$command][$hashedParams]['unmerged'];
+			}
+		}
+
 		try {
 			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);
 		} catch (\ErrorException $e) {
@@ -945,6 +965,7 @@ class Data {
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
 		if ($command === "info") {
+			$this->handleResultsArr['info'] = $res;
 			return $res;
 		}
 
@@ -978,7 +999,11 @@ class Data {
 				} else {
 					$this->logger->warn("Could not find model on ", array('pathToFile' => $modelFile));
 				}
+				$this->handleResultsArr[$command][$hashedParams]['merged'] = $res;
+			} else {
+				$this->handleResultsArr[$command][$hashedParams]['unmerged'] = $res;
 			}
+
 			return $res;
 		} else {
 			return 1;
