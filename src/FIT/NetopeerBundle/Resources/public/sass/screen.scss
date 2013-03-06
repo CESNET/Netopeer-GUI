@@ -255,7 +255,9 @@ form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 
 	.close { float: left; margin-left: 15px; }
 }
 
-#login-hp { padding: 100px 0px 0px 0px; }
+article#content #login-hp { padding: 100px 0px 0px 0px;
+	.alert { margin-bottom: 0px; }
+}
 
 table { width: 100%; margin: 15px 0px; 
 	th, td { border: 1px solid #ccc; padding: 8px 15px; }

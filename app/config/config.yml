@@ -40,6 +40,7 @@ doctrine:
         host:     %database_host%
         port:     %database_port%
         dbname:   %database_name%
+        path:     %database_path%
         user:     %database_user%
         password: %database_password%
         charset:  UTF8

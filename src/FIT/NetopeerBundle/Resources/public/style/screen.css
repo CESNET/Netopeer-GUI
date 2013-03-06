@@ -1184,31 +1184,35 @@ form.generatedForm .close {
 }
 
 /* line 258, ../sass/screen.scss */
-#login-hp {
+article#content #login-hp {
   padding: 100px 0px 0px 0px;
 }
+/* line 259, ../sass/screen.scss */
+article#content #login-hp .alert {
+  margin-bottom: 0px;
+}
 
-/* line 260, ../sass/screen.scss */
+/* line 262, ../sass/screen.scss */
 table {
   width: 100%;
   margin: 15px 0px;
 }
-/* line 261, ../sass/screen.scss */
+/* line 263, ../sass/screen.scss */
 table th, table td {
   border: 1px solid #ccc;
   padding: 8px 15px;
 }
-/* line 263, ../sass/screen.scss */
+/* line 265, ../sass/screen.scss */
 table tr:nth-child(even) th, table tr:nth-child(even) td {
   background: #eaeaea;
 }
 
 /* tooltip */
-/* line 268, ../sass/screen.scss */
+/* line 270, ../sass/screen.scss */
 .tooltip {
   cursor: help;
 }
-/* line 269, ../sass/screen.scss */
+/* line 271, ../sass/screen.scss */
 .tooltip .icon-help {
   background: rgba(255, 255, 255, 0.3);
   border: 1px solid #ddd;
@@ -1232,17 +1236,17 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   font-size: 13px;
   margin: -6px 0px -2px 0px;
 }
-/* line 270, ../sass/screen.scss */
+/* line 272, ../sass/screen.scss */
 .tooltip .icon-help:hover {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid #bbb;
 }
-/* line 272, ../sass/screen.scss */
+/* line 274, ../sass/screen.scss */
 .tooltip .tooltip-description {
   display: none;
 }
 
-/* line 274, ../sass/screen.scss */
+/* line 276, ../sass/screen.scss */
 .gips-container {
   max-width: 252px;
   position: absolute;
@@ -1258,7 +1262,7 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   border-radius: 4px;
 }
 
-/* line 275, ../sass/screen.scss */
+/* line 277, ../sass/screen.scss */
 .gips-body {
   color: #fff;
   font-size: 13px;
@@ -1273,12 +1277,12 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   -o-border-radius: 4px;
   border-radius: 4px;
 }
-/* line 276, ../sass/screen.scss */
+/* line 278, ../sass/screen.scss */
 .gips-body.blue {
   background-color: #004f80;
 }
 
-/* line 278, ../sass/screen.scss */
+/* line 280, ../sass/screen.scss */
 .gips-icon {
   width: 0;
   height: 0;
@@ -1292,16 +1296,16 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
 
 /* media queries */
 @media screen and (max-width: 1280px) {
-  /* line 282, ../sass/screen.scss */
+  /* line 284, ../sass/screen.scss */
   nav#left {
     width: 14%;
   }
 
-  /* line 284, ../sass/screen.scss */
+  /* line 286, ../sass/screen.scss */
   body > section.left-nav-defined {
     width: 43%;
   }
-  /* line 286, ../sass/screen.scss */
+  /* line 288, ../sass/screen.scss */
   body > section#content.left-nav-defined {
     width: 86%;
   }

@@ -1,6 +1,9 @@
 /src/Acme/*
 /app/logs/*
 /app/logs/dev.log
+/app/*.db
 /src/FIT/NetopeerBundle/Resources/public/.sass-cache/
 /web/phpinfo.php
 /web/adminer.php
+.idea
+/src/FIT/NetopeerBundle/Entity/*~
