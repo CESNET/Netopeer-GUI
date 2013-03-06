@@ -208,8 +208,6 @@ class Data {
 				if (isset($this->moduleIdentifiers[$namespace])) {
 					return $this->moduleIdentifiers[$namespace]['hash'] . "/" . $this->moduleIdentifiers[$namespace]['moduleName'];
 				}
-			} elseif ($cnt > 1) {
-				/* @todo handle conflict in namespaces => for one moduleName more namespaces */
 			}
 		}
 		return false;
@@ -1234,19 +1232,29 @@ XML;
 					// get first level nodes (so without root) as items for top menu
 					foreach ($nodes as $node) {
 						foreach ($node as $nodeKey => $submenu) {
-						$ns = $submenu->getNameSpaces();
-						$namespaces[$submenu->getName()] = $ns[""];
-							if ( !in_array($nodeKey, $allowedModels) ) {
-								$allowedModels[] = $nodeKey;
+							$ns = $submenu->getNameSpaces();
+							$i = 0;
+							if (isset($namespaces[$nodeKey])) {
+								$i = 1;
+								while(isset($namespaces[$nodeKey.$i])) {
+									$i++;
+								}
+								$namespaces[$nodeKey.$i] = $ns[""];
+							} else {
+								$namespaces[$nodeKey] = $ns[""];
+							}
+
+							if ( !in_array(array("name" => $nodeKey, 'index' => $i), $allowedModels) ) {
+								$allowedModels[] = array("name" => $nodeKey, 'index' => $i);
 							}
 
 							foreach ($submenu as $subKey => $tmp) {
-								if ( !in_array($key, $allowedSubmenu) ) {
-									$allowedSubmenu[] = $subKey;
+								if ( !in_array(array("name" => $subKey, 'index' => 0), $allowedSubmenu) ) {
+									$allowedSubmenu[] = array("name" => $subKey, 'index' => 0);
 								}
 								foreach ($tmp as $subSubKey => $tmp2) {
-									if ( !in_array($subSubKey, $allowedSubmenu) ) {
-										$allowedSubmenu[] = $subSubKey;
+									if ( !in_array(array("name" => $subSubKey, 'index' => 0), $allowedSubmenu) ) {
+										$allowedSubmenu[] = array("name" => $subSubKey, 'index' => 0);
 									}
 								}
 							}
@@ -1263,18 +1271,22 @@ XML;
 			// if not, they won't be displayed
 			$folders = array();
 			sort($allowedModels);
-			foreach ($allowedModels as $moduleName) {
-				if ($this->existsModelDirForName($moduleName)) {
+			foreach ($allowedModels as $module) {
+				$moduleWithIndex = $module['name'];
+				if ($module['index'] !== 0) {
+					$moduleWithIndex .= $module['index'];
+				}
+				if ($this->existsModelDirForName($moduleWithIndex)) {
 					$folders[] = array(
 						'path' => "module",
 						"params" => array(
 							'key' => $key,
-							'module' => $moduleName,
+							'module' => $moduleWithIndex,
 						),
-						"title" => "detail of ".$this->getSectionName($moduleName),
-						"name" => $this->getSectionName($moduleName),
-						"children" => $this->buildSubmenu($key, $moduleName, $allowedSubmenu),
-						"namespace" => $namespaces[$moduleName],
+						"title" => "detail of ".$this->getSectionName($module['name']),
+						"name" => $this->getSectionName($module['name']),
+						"children" => $this->buildSubmenu($key, $module, $allowedSubmenu),
+						"namespace" => $namespaces[$moduleWithIndex],
 					);
 				}
 			}
@@ -1286,7 +1298,7 @@ XML;
 	 * prepares left submenu - modules of current top menu item
 	 *
 	 * @param  int  $key session key of current connection
-	 * @param $module
+	 * @param array $module       array with indexes: name and index
 	 * @param $allowedSubmenu
 	 * @param string $path
 	 * @return array
@@ -1294,9 +1306,14 @@ XML;
 	private function buildSubmenu($key, $module, $allowedSubmenu, $path = "") {
 		$finder = new Finder();
 
+		$moduleWithIndex = $module['name'];
+		if ($module['index'] !== 0) {
+			$moduleWithIndex .= $module['index'];
+		}
+
 		// we will check, if nodes from GET are same as models structure
 		// if not, they won't be displayed
-		$dir = $this->getPathToModels($module);
+		$dir = $this->getPathToModels($moduleWithIndex);
 		if ( !file_exists($dir) ) {
 			$folders = array();
 		} else {
@@ -1309,12 +1326,12 @@ XML;
 			$folders = array();
 			foreach ($iterator as $folder) {
 				$subsection = $folder->getRelativePathname();
-				if ( in_array($subsection, $allowedSubmenu) ) {
+				if ( in_array(array("name" => $subsection, "index" => 0), $allowedSubmenu) ) {
 					$folders[] = array(
 						'path' => "subsection",
 						"params" => array(
 							'key' => $key,
-							'module' => $module,
+							'module' => $moduleWithIndex,
 							'subsection' => $subsection,
 						),
 						"title" => "detail of ".$this->getSubsectionName($subsection),
@@ -1324,7 +1341,7 @@ XML;
 				}
 			}
 		}
-		$this->submenu[$module] = $folders;
+		$this->submenu[$moduleWithIndex] = $folders;
 
 		return $folders;
 	}
