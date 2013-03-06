@@ -8,6 +8,7 @@ namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
 use FIT\NetopeerBundle\Models\XMLoperations;
+use FIT\NetopeerBundle\Entity\BaseConnection;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -36,18 +37,38 @@ class DefaultController extends BaseController
 	 * Prepares form for connection to the server and table with active connection list
 	 *
 	 * @Route("/", name="_home")
+	 * @Route("/device-{connectedDeviceId}/", name="homeFromHistory")
 	 * @Template()
+	 *
+	 * @param int $connectedDeviceId    id of connected device from history
+	 * @return array
 	 */
-	public function indexAction()
+	public function indexAction($connectedDeviceId = NULL)
 	{
 		// DependencyInjection (DI) - defined in Resources/config/services.yml
 		$dataClass = $this->get('DataModel');
 
+		$host = "";
+		$port = "22";
+		$userName = "";
+		if ($connectedDeviceId !== NULL) {
+			/**
+			 * @var \FIT\NetopeerBundle\Entity\BaseConnection $baseConn
+			 */
+			$baseConn = $this->get("BaseConnection");
+			$device = $baseConn->getConnectionForCurrentUserById($connectedDeviceId);
+			if ($device) {
+				$host = $device->getHost();
+				$port = $device->getPort();
+				$userName = $device->getUsername();
+			}
+		}
+
 		// build form for connection to the server
 		$form = $this->createFormBuilder()
-			->add('host', 'text')
-			->add('port', 'number', array('attr' => array('value' => '22')))
-			->add('user', 'text')
+			->add('host', 'text', array('attr' => array('value' => $host)))
+			->add('port', 'number', array('attr' => array('value' => $port)))
+			->add('user', 'text', array('attr' => array('value' => $userName)))
 			->add('password', 'password')
 			->getForm();
 		$this->assign('form', $form->createView());
@@ -99,6 +120,10 @@ class DefaultController extends BaseController
 					);
 					$this->get('session')->set('getSchemaWithAjax', $arr);
 					$this->getRequest()->getSession()->setFlash('state success', 'Form has been filled up correctly.');
+
+					$baseConn = $this->get('BaseConnection');
+					$baseConn->saveConnectionIntoDB($post_vals['host'], $post_vals['port'], $post_vals['user']);
+
 				}
 			} else {
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');

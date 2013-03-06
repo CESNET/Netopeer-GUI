@@ -9,7 +9,7 @@
 		{# data odesíláme na login_check #}
 		<form action="{{ path('login_check') }}" method="post" id="login-form">
 			<legend>Log in is required for this site!</legend>		
-			<p class="desc">[hint: admin,pass]</p>
+			<p class="desc">[hint: admin,pass; without DB: admin-no-db,pass]</p>
 
 			{% if error %}
 			    <div class="alert error">{{ error.message }}</div>

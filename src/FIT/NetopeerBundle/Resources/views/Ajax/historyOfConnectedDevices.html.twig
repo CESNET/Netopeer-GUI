@@ -1,0 +1,12 @@
+{% if connectedDevices|length %}
+<div id="history-of-connected-devices">
+	<h3>History of connected devices</h3>
+	{% for key, device in connectedDevices %}
+		<a href="{{ path("homeFromHistory", {"connectedDeviceId": device.getId()} ) }}"
+		   title="Device: {{ device.getHost() }}:{{ device.getPort() }}, Last connection: {{ device.getAccessTime()|date("d.m.y h:i") }}"
+		   data-device-id="{{ device.getId() }}">
+			{{ device.getHost() }}:{{ device.getPort() }}
+		</a>
+	{% endfor %}
+</div>
+{% endif %}

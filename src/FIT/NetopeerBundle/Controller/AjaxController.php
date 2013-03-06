@@ -69,6 +69,59 @@ class AjaxController extends BaseController
 		return new Response(json_encode($result));
 	}
 
+	/**
+	 * Get history of connected devices
+	 *
+	 * @Route("/ajax/get-connected-devices/", name="historyOfConnectedDevices")
+	 * @Template()
+	 *
+	 * @return array    $result
+	 */
+	public function historyOfConnectedDevicesAction()
+	{
+		try {
+		/**
+		 * @var \FIT\NetopeerBundle\Entity\User $user
+		 */
+			$user = $this->get('security.context')->getToken()->getUser();
+			if (method_exists($user, "getConnectedDevicesInHistory")) {
+				$this->assign('connectedDevices', $user->getConnectedDevicesInHistory());
+			}
+		} catch (\ErrorException $e) {
+			// we don't care
+		}
+
+
+		return $this->getTwigArr();
+	}
+
+	/**
+	 * Get connected device attributes.
+	 *
+	 * @Route("/ajax/get-connected-device-attr/{connectedDeviceId}/", name="connectedDeviceAttr")
+	 * @Template()
+	 *
+	 * @var int         $connectedDeviceId
+	 * @return array|bool    $result
+	 */
+	public function connectedDeviceAttrAction($connectedDeviceId)
+	{
+		$baseConn = $this->get("BaseConnection");
+		/**
+		 * @var \FIT\NetopeerBundle\Entity\BaseConnection $device
+		 */
+		$device = $baseConn->getConnectionForCurrentUserById($connectedDeviceId);
+
+		if ($device) {
+			$result['host'] = $device->getHost();
+			$result['port'] = $device->getPort();
+			$result['userName'] = $device->getUsername();
+			return new Response(json_encode($result));
+		} else {
+			return new Response(false);
+		}
+	}
+
 
 	/**
 	* Get one model and process it.

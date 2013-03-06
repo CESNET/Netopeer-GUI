@@ -28,10 +28,45 @@
 						flashMessage.text(dataArr['message']);
 						$("#config h2").after(flashMessage);
 					}
+
+					reloadHistoryOfConnectedDevices();
 				});
 			});
 		</script>
 	{% endif %}
+	<script type="text/javascript">
+		$(document).ready(function() {
+			reloadHistoryOfConnectedDevices();
+		});
+
+		function reloadHistoryOfConnectedDevices() {
+			$.get("{{ path("historyOfConnectedDevices") }}", function(data) {
+				if (!$("#history-of-connected-devices").length) {
+					$("#left").html(data);
+					$("#history-of-connected-devices").delegate("a", 'click', function($e) {
+						$e.preventDefault();
+						updateConnectFormValues($(this), $(this).data().deviceId);
+					});
+				}
+			});
+		}
+
+		function updateConnectFormValues($el, connectedDeviceId) {
+			var url = "{{ path("connectedDeviceAttr", {"connectedDeviceId": 0}) }}";
+			url = url.replace("0", connectedDeviceId);
+			$.get(url, function(data) {
+				if (data !== false) {
+					var jsonArr = $.parseJSON(data);
+					$("#form_host").val(jsonArr['host']);
+					$("#form_port").val(jsonArr['port']);
+					$("#form_user").val(jsonArr['userName']);
+
+					$el.parent().children('a').removeClass('active');
+					$el.addClass('active');
+				}
+			});
+		}
+	</script>
 {% endblock javascripts %}
 
 {% block title %}Connection management{% endblock title %}

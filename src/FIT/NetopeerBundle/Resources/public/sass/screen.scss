@@ -103,6 +103,7 @@ nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), dark
 }
 
 nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop + $sContentPadding 0px 0px 0px; font-size: 1.3em;
+	h3 { padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1.1em; border-bottom: 1px solid #888; margin-bottom: 5px; }
 	a { display: block; padding: 9px $sContentPadding; @include link-colors($cFont, #000); text-decoration: none;
 		&:hover, &.active { padding-left: $sContentPadding - 5px; margin-left: 5px; }
 		&:hover { background: #bbb;  }

@@ -9,13 +9,13 @@ security:
 
     providers:
         chain_provider:
-            providers:          [in_memory, user_db]
+            providers:          [user_db, in_memory]
+        user_db:
+            entity: { class: FIT\NetopeerBundle\Entity\User, property: username }
         in_memory:
             users:
                 user:           { password: pass,    roles: [ 'ROLE_USER' ] }
-                admin:          { password: pass,    roles: [ 'ROLE_ADMIN' ] }
-        user_db:
-            entity: { class: FIT\NetopeerBundle\Entity\User, property: username }
+                admin-no-db:    { password: pass,    roles: [ 'ROLE_ADMIN' ] }
 
     firewalls:
         dev:

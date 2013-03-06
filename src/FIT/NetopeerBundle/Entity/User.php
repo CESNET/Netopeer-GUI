@@ -52,46 +52,17 @@ class User implements UserInterface {
 	 * @var string  salt for salting password
 	 * @ORM\Column(type="string", length=32)
 	 */
-	private $salt;
+	protected $salt;
+
+	/**
+	 * @var array   array of connected devices (from history)
+	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
+	 */
+	protected $connectedDevicesInHistory;
 
 	public function __construct() {
 		$this->salt = md5(uniqid(null, true));
-	}
-
-	/**
-	 * Set id
-	 *
-	 * @param integer $id
-	 */
-	public function setId($id) {
-		$this->id = $id;
-	}
-
-	/**
-	 * Get id
-	 *
-	 * @return integer
-	 */
-	public function getId() {
-		return $this->id;
-	}
-
-	/**
-	 * Set name
-	 *
-	 * @param string $name
-	 */
-	public function setName($name) {
-		$this->name = $name;
-	}
-
-	/**
-	 * Get name
-	 *
-	 * @return string
-	 */
-	public function getName() {
-		return $this->name;
+		$this->connectedDevicesInHistory = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	/**
@@ -151,40 +122,90 @@ class User implements UserInterface {
 		return true;
 	}
 
-	/**
-	 * Set password
-	 *
-	 * @param string $password
-	 */
-	public function setPassword($password) {
-		$this->password = $password;
+
+  /**
+   * Set id
+   *
+   * @param integer $id
+   */
+  public function setId($id)
+  {
+      $this->id = $id;
+  }
+
+  /**
+   * Get id
+   *
+   * @return integer
+   */
+  public function getId()
+  {
+      return $this->id;
+  }
+
+  /**
+   * Set username
+   *
+   * @param string $username
+   */
+  public function setUsername($username)
+  {
+      $this->username = $username;
+  }
+
+  /**
+   * Set password
+   *
+   * @param string $password
+   */
+  public function setPassword($password)
+  {
+      $this->password = $password;
+  }
+
+  /**
+   * Set roles
+   *
+   * @param string $roles
+   */
+  public function setRoles($roles)
+  {
+      $this->roles = $roles;
+  }
+
+  /**
+   * Set salt
+   *
+   * @param string $salt
+   */
+  public function setSalt($salt)
+  {
+      $this->salt = $salt;
+  }
+	
+
+	public function __sleep()
+	{
+		return array('id');
 	}
 
-	/**
-	 * Set roles
-	 *
-	 * @param string $roles
-	 */
-	public function setRoles($roles) {
-		$this->roles = $roles;
-	}
+  /**
+   * Add connectedDevicesInHistory
+   *
+   * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory
+   */
+  public function addBaseConnection(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
+  {
+      $this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
+  }
 
-	/**
-	 * Set salt
-	 *
-	 * @param string $salt
-	 */
-	public function setSalt($salt) {
-		$this->salt = $salt;
-	}
-
-	/**
-	 * Set username
-	 *
-	 * @param string $username
-	 */
-	public function setUsername($username) {
-		$this->username = $username;
-	}
-
+  /**
+   * Get connectedDevicesInHistory
+   *
+   * @return \Doctrine\Common\Collections\Collection
+   */
+  public function getConnectedDevicesInHistory()
+  {
+      return $this->connectedDevicesInHistory;
+  }
 }

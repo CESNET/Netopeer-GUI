@@ -17,6 +17,10 @@ services:
         class: %netopeer.data.class%
         arguments: [@service_container, @data_logger]
 
+    BaseConnection:
+        class: FIT\NetopeerBundle\Entity\BaseConnection
+        arguments: [@doctrine.orm.entity_manager, @security.context, @data_logger]
+
     netopeer.twig.netopeer_twig_extension:
         class: FIT\NetopeerBundle\Twig\NetopeerTwigExtension
         tags:
