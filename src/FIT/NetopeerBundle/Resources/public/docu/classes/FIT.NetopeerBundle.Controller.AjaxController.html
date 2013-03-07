@@ -34,7 +34,7 @@
                 <span class="label label-info">16</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
-                <span class="label label-info">6</span>
+                <span class="label label-info">5</span>
 </li></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
                 <span class="label label-info">0</span></a></li>
@@ -59,8 +59,10 @@
 <i class="icon-custom icon-method"></i> Methods
                     <ul>
 <li class="method public inherited"><a href="#method___construct" title="__construct :: constructor, which instantiate empty class variables"><span class="description">constructor, which instantiate empty class variables</span><pre>__construct()</pre></a></li>
+<li class="method public "><a href="#method_connectedDeviceAttrAction" title="connectedDeviceAttrAction :: Get connected device attributes."><span class="description">Get connected device attributes.</span><pre>connectedDeviceAttrAction()</pre></a></li>
 <li class="method public "><a href="#method_getSchemaAction" title="getSchemaAction :: Change session value for showing single or double column layout"><span class="description">Change session value for showing single or double column layout</span><pre>getSchemaAction()</pre></a></li>
 <li class="method public "><a href="#method_getSchemaStatusAction" title="getSchemaStatusAction :: Get status of get-schema operation"><span class="description">Get status of get-schema operation</span><pre>getSchemaStatusAction()</pre></a></li>
+<li class="method public "><a href="#method_historyOfConnectedDevicesAction" title="historyOfConnectedDevicesAction :: Get history of connected devices"><span class="description">Get history of connected devices</span><pre>historyOfConnectedDevicesAction()</pre></a></li>
 <li class="method public inherited"><a href="#method_setActiveSectionKey" title="setActiveSectionKey :: sets current section key"><span class="description">sets current section key</span><pre>setActiveSectionKey()</pre></a></li>
 <li class="method public inherited"><a href="#method_setSubmenuUrl" title="setSubmenuUrl :: sets submenu URL."><span class="description">sets submenu URL.</span><pre>setSubmenuUrl()</pre></a></li>
 </ul>
@@ -75,7 +77,6 @@
                     <ul>
 <li class="method private "><a href="#method_getschema" title="getschema :: Get one model and process it."><span class="description">Get one model and process it.</span><pre>getschema()</pre></a></li>
 <li class="method private "><a href="#method_processSchema" title="processSchema :: Process &lt;get-schema&gt; action based on schparams."><span class="description">Process &lt;get-schema&gt; action based on schparams.</span><pre>processSchema()</pre></a></li>
-<li class="method private "><a href="#method_saveConnectionInDB" title="saveConnectionInDB :: Saves unique connection info into DB"><span class="description">Saves unique connection info into DB</span><pre>saveConnectionInDB()</pre></a></li>
 <li class="method private "><a href="#method_updateLocalModels" title="updateLocalModels :: Get available configuration data models,
 store them and transform them."><span class="description">Get available configuration data models,
 store them and transform them.</span><pre>updateLocalModels()</pre></a></li>
@@ -128,6 +129,33 @@ store them and transform them.</span><pre>updateLocalModels()</pre></a></li>
 </tr></table>
 </div></div>
 </div>
+<a id="method_connectedDeviceAttrAction"></a><div class="element clickable method public method_connectedDeviceAttrAction" data-toggle="collapse" data-target=".method_connectedDeviceAttrAction .collapse">
+<h2>Get connected device attributes.</h2>
+<pre>connectedDeviceAttrAction($connectedDeviceId) : array | bool</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>Route</th>
+<td>("/ajax/get-connected-device-attr/{connectedDeviceId}/", name="connectedDeviceAttr")</td>
+</tr>
+<tr>
+<th>Template</th>
+<td>()</td>
+</tr>
+<tr>
+<th>var</th>
+<td></td>
+</tr>
+</table>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$connectedDeviceId</h4></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code><code>bool</code>$result</div>
+</div></div>
+</div>
 <a id="method_getSchemaAction"></a><div class="element clickable method public method_getSchemaAction" data-toggle="collapse" data-target=".method_getSchemaAction .collapse">
 <h2>Change session value for showing single or double column layout</h2>
 <pre>getSchemaAction(int $key) : \Symfony\Component\HttpFoundation\Response</pre>
@@ -166,6 +194,27 @@ store them and transform them.</span><pre>updateLocalModels()</pre></a></li>
 </div>
 <h3>Returns</h3>
 <div class="subelement response"><code>\Symfony\Component\HttpFoundation\Response</code></div>
+</div></div>
+</div>
+<a id="method_historyOfConnectedDevicesAction"></a><div class="element clickable method public method_historyOfConnectedDevicesAction" data-toggle="collapse" data-target=".method_historyOfConnectedDevicesAction .collapse">
+<h2>Get history of connected devices</h2>
+<pre>historyOfConnectedDevicesAction() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>Route</th>
+<td>("/ajax/get-connected-devices/", name="historyOfConnectedDevices")</td>
+</tr>
+<tr>
+<th>Template</th>
+<td>()</td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>$result</div>
 </div></div>
 </div>
 <a id="method_setActiveSectionKey"></a><div class="element clickable method public method_setActiveSectionKey" data-toggle="collapse" data-target=".method_setActiveSectionKey .collapse">
@@ -236,7 +285,7 @@ store them and transform them.</span><pre>updateLocalModels()</pre></a></li>
 </div>
 <a id="method_getschema"></a><div class="element clickable method private method_getschema" data-toggle="collapse" data-target=".method_getschema .collapse">
 <h2>Get one model and process it.</h2>
-<pre>getschema(array $schparams) : int</pre>
+<pre>getschema(array $schparams, string $identifier) : int</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -244,6 +293,10 @@ store them and transform them.</span><pre>updateLocalModels()</pre></a></li>
 <div class="subelement argument">
 <h4>$schparams</h4>
 <code>array</code><p>&$schparams  key, identifier, version, format for get-schema</p>
+</div>
+<div class="subelement argument">
+<h4>$identifier</h4>
+<code>string</code><p>identifier of folder in /tmp/symfony directory</p>
 </div>
 <h3>Returns</h3>
 <div class="subelement response">
@@ -264,29 +317,6 @@ store them and transform them.</span><pre>updateLocalModels()</pre></a></li>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>int</code>0 on success, 1 on error</div>
-</div></div>
-</div>
-<a id="method_saveConnectionInDB"></a><div class="element clickable method private method_saveConnectionInDB" data-toggle="collapse" data-target=".method_saveConnectionInDB .collapse">
-<h2>Saves unique connection info into DB</h2>
-<pre>saveConnectionInDB(string $key, array $jsonArr) : int</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$key</h4>
-<code>string</code><p>session key</p></div>
-<div class="subelement argument">
-<h4>$jsonArr</h4>
-<code>array</code><p>JSON object of params</p></div>
-<h3>Exceptions</h3>
-<table class="table table-bordered"><tr>
-<th><code><a href="http://php.net/manual/en/class.errorexception.php">\ErrorException</a></code></th>
-<td></td>
-</tr></table>
-<h3>Returns</h3>
-<div class="subelement response">
-<code>int</code>0 on success, 1 on fail</div>
 </div></div>
 </div>
 <a id="method_updateLocalModels"></a><div class="element clickable method private method_updateLocalModels" data-toggle="collapse" data-target=".method_updateLocalModels .collapse">
@@ -348,7 +378,7 @@ store them and transform them.</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-02-28T19:51:32+01:00.<br></footer></div>
+            generated on 2013-03-07T19:25:50+01:00.<br></footer></div>
 </div>
 </body>
 </html>

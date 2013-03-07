@@ -101,7 +101,7 @@ class AjaxController extends BaseController
 	 * @Route("/ajax/get-connected-device-attr/{connectedDeviceId}/", name="connectedDeviceAttr")
 	 * @Template()
 	 *
-	 * @var int         $connectedDeviceId
+	 * @var int $connectedDeviceId
 	 * @return array|bool    $result
 	 */
 	public function connectedDeviceAttrAction($connectedDeviceId)

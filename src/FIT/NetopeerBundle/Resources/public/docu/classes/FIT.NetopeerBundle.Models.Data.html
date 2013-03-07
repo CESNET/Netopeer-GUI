@@ -34,7 +34,7 @@
                 <span class="label label-info">16</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
-                <span class="label label-info">6</span>
+                <span class="label label-info">5</span>
 </li></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
                 <span class="label label-info">0</span></a></li>
@@ -63,6 +63,7 @@
 <li class="method public "><a href="#method_existsModelDirForName" title="existsModelDirForName :: checks if model dir for module exists"><span class="description">checks if model dir for module exists</span><pre>existsModelDirForName()</pre></a></li>
 <li class="method public "><a href="#method_getHostFromKey" title="getHostFromKey :: Get host of SessionConnection for key."><span class="description">Get host of SessionConnection for key.</span><pre>getHostFromKey()</pre></a></li>
 <li class="method public "><a href="#method_getModelDirForName" title="getModelDirForName :: gets model dir name for module"><span class="description">gets model dir name for module</span><pre>getModelDirForName()</pre></a></li>
+<li class="method public "><a href="#method_getModelIdentificator" title="getModelIdentificator :: Get identificator (hash) of model - it is used as directory name of model"><span class="description">Get identificator (hash) of model - it is used as directory name of model</span><pre>getModelIdentificator()</pre></a></li>
 <li class="method public "><a href="#method_getModels" title="getModels :: Get models."><span class="description">Get models.</span><pre>getModels()</pre></a></li>
 <li class="method public "><a href="#method_getModelsDir" title="getModelsDir :: Get path to directory of data models."><span class="description">Get path to directory of data models.</span><pre>getModelsDir()</pre></a></li>
 <li class="method public "><a href="#method_getPathToModels" title="getPathToModels :: get path to models in file system"><span class="description">get path to models in file system</span><pre>getPathToModels()</pre></a></li>
@@ -93,7 +94,7 @@
 <li class="method private "><a href="#method_getConnFromKey" title="getConnFromKey :: Find instance of SessionConnection.class for key."><span class="description">Find instance of SessionConnection.class for key.</span><pre>getConnFromKey()</pre></a></li>
 <li class="method private "><a href="#method_getHashFromKey" title="getHashFromKey :: Get hash for current connection"><span class="description">Get hash for current connection</span><pre>getHashFromKey()</pre></a></li>
 <li class="method private "><a href="#method_getJsonError" title="getJsonError :: Sets error message based on JSON ERROR CODE."><span class="description">Sets error message based on JSON ERROR CODE.</span><pre>getJsonError()</pre></a></li>
-<li class="method private "><a href="#method_getModuleIdentifiersFromDb" title="getModuleIdentifiersFromDb :: Find hash identifiers from DB for key"><span class="description">Find hash identifiers from DB for key</span><pre>getModuleIdentifiersFromDb()</pre></a></li>
+<li class="method private "><a href="#method_getModuleIdentifiersForCurrentDevice" title="getModuleIdentifiersForCurrentDevice :: Find hash identifiers from DB for key"><span class="description">Find hash identifiers from DB for key</span><pre>getModuleIdentifiersForCurrentDevice()</pre></a></li>
 <li class="method private "><a href="#method_getModulePathByRootModuleName" title="getModulePathByRootModuleName :: get path for module name, includes identifier"><span class="description">get path for module name, includes identifier</span><pre>getModulePathByRootModuleName()</pre></a></li>
 <li class="method private "><a href="#method_get_element_parent" title="get_element_parent :: Get parent for element."><span class="description">Get parent for element.</span><pre>get_element_parent()</pre></a></li>
 <li class="method private "><a href="#method_handle_connect" title="handle_connect :: Handles connection to the socket"><span class="description">Handles connection to the socket</span><pre>handle_connect()</pre></a></li>
@@ -124,9 +125,11 @@
 </li>
 <li class="nav-header private">» Private
                     <ul>
-<li class="property private "><a href="#property_dbConnections" title="$dbConnections :: "><span class="description">array of MyConnection instances (array of connected devices).</span><pre>$dbConnections</pre></a></li>
 <li class="property private "><a href="#property_flashState" title="$flashState :: "><span class="description">current state of flash messages</span><pre>$flashState</pre></a></li>
+<li class="property private "><a href="#property_handleResultsArr" title="$handleResultsArr :: "><span class="description">array of handle* result no need to call for example &lt;get&gt; more than once</span><pre>$handleResultsArr</pre></a></li>
+<li class="property private "><a href="#property_modelNamespaces" title="$modelNamespaces :: "><span class="description">array of namespaces for module name</span><pre>$modelNamespaces</pre></a></li>
 <li class="property private "><a href="#property_models" title="$models :: "><span class="description">array with names of models for creating top menu</span><pre>$models</pre></a></li>
+<li class="property private "><a href="#property_moduleIdentifiers" title="$moduleIdentifiers :: "><span class="description">array of hash identifiers (array of connected devices).</span><pre>$moduleIdentifiers</pre></a></li>
 <li class="property private "><a href="#property_submenu" title="$submenu :: "><span class="description">array of submenu structure for every module</span><pre>$submenu</pre></a></li>
 </ul>
 </li>
@@ -249,6 +252,27 @@
 <h3>Returns</h3>
 <div class="subelement response">
 <code>string</code>dir name on success, false on error</div>
+</div></div>
+</div>
+<a id="method_getModelIdentificator"></a><div class="element clickable method public method_getModelIdentificator" data-toggle="collapse" data-target=".method_getModelIdentificator .collapse">
+<h2>Get identificator (hash) of model - it is used as directory name of model</h2>
+<pre>getModelIdentificator(string $name, string $version, string $ns) : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$name</h4>
+<code>string</code><p>module name from conf. model</p></div>
+<div class="subelement argument">
+<h4>$version</h4>
+<code>string</code><p>version of conf. model</p></div>
+<div class="subelement argument">
+<h4>$ns</h4>
+<code>string</code><p>namespace</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>string</code>hashed identificator</div>
 </div></div>
 </div>
 <a id="method_getModels"></a><div class="element clickable method public method_getModels" data-toggle="collapse" data-target=".method_getModels .collapse">
@@ -512,7 +536,7 @@
 </div>
 <a id="method_buildSubmenu"></a><div class="element clickable method private method_buildSubmenu" data-toggle="collapse" data-target=".method_buildSubmenu .collapse">
 <h2>prepares left submenu - modules of current top menu item</h2>
-<pre>buildSubmenu(int $key, $module, $allowedSubmenu, string $path) : array</pre>
+<pre>buildSubmenu(int $key, array $module, $allowedSubmenu, string $path) : array</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -520,7 +544,9 @@
 <div class="subelement argument">
 <h4>$key</h4>
 <code>int</code><p>session key of current connection</p></div>
-<div class="subelement argument"><h4>$module</h4></div>
+<div class="subelement argument">
+<h4>$module</h4>
+<code>array</code><p>array with indexes: name and index</p></div>
 <div class="subelement argument"><h4>$allowedSubmenu</h4></div>
 <div class="subelement argument">
 <h4>$path</h4>
@@ -658,9 +684,9 @@
 <code>array</code>errorCode and message for this errorCode.</div>
 </div></div>
 </div>
-<a id="method_getModuleIdentifiersFromDb"></a><div class="element clickable method private method_getModuleIdentifiersFromDb" data-toggle="collapse" data-target=".method_getModuleIdentifiersFromDb .collapse">
+<a id="method_getModuleIdentifiersForCurrentDevice"></a><div class="element clickable method private method_getModuleIdentifiersForCurrentDevice" data-toggle="collapse" data-target=".method_getModuleIdentifiersForCurrentDevice .collapse">
 <h2>Find hash identifiers from DB for key</h2>
-<pre>getModuleIdentifiersFromDb(int $key) : array</pre>
+<pre>getModuleIdentifiersForCurrentDevice(int $key) : array</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -835,14 +861,14 @@
 </div>
 <a id="method_isResponseValid"></a><div class="element clickable method private method_isResponseValid" data-toggle="collapse" data-target=".method_isResponseValid .collapse">
 <h2>Check, if XML response is valid.</h2>
-<pre>isResponseValid(\FIT\NetopeerBundle\Models\$xmlString $xmlString) : int</pre>
+<pre>isResponseValid(string $xmlString) : int</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
 <h3>Parameters</h3>
 <div class="subelement argument">
 <h4>$xmlString</h4>
-<code>\FIT\NetopeerBundle\Models\$xmlString</code>
+<code>string</code><p>&$xmlString       xml response</p>
 </div>
 <h3>Returns</h3>
 <div class="subelement response">
@@ -977,21 +1003,33 @@
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
-<a id="property_dbConnections"> </a><div class="element clickable property private property_dbConnections" data-toggle="collapse" data-target=".property_dbConnections .collapse">
-<h2>array of MyConnection instances (array of connected devices).</h2>
-<pre>$dbConnections : array | null</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
-</div>
 <a id="property_flashState"> </a><div class="element clickable property private property_flashState" data-toggle="collapse" data-target=".property_flashState .collapse">
 <h2>current state of flash messages</h2>
 <pre>$flashState : string</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
+<a id="property_handleResultsArr"> </a><div class="element clickable property private property_handleResultsArr" data-toggle="collapse" data-target=".property_handleResultsArr .collapse">
+<h2>array of handle* result no need to call for example &lt;get&gt; more than once</h2>
+<pre>$handleResultsArr : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_modelNamespaces"> </a><div class="element clickable property private property_modelNamespaces" data-toggle="collapse" data-target=".property_modelNamespaces .collapse">
+<h2>array of namespaces for module name</h2>
+<pre>$modelNamespaces : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
 <a id="property_models"> </a><div class="element clickable property private property_models" data-toggle="collapse" data-target=".property_models .collapse">
 <h2>array with names of models for creating top menu</h2>
 <pre>$models : array | null</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_moduleIdentifiers"> </a><div class="element clickable property private property_moduleIdentifiers" data-toggle="collapse" data-target=".property_moduleIdentifiers .collapse">
+<h2>array of hash identifiers (array of connected devices).</h2>
+<pre>$moduleIdentifiers : array | null</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
@@ -1112,7 +1150,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-02-28T19:51:30+01:00.<br></footer></div>
+            generated on 2013-03-07T19:25:48+01:00.<br></footer></div>
 </div>
 </body>
 </html>

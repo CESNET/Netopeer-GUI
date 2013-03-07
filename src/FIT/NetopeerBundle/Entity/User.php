@@ -62,6 +62,9 @@ class User implements UserInterface {
 	 */
 	protected $connectedDevicesInHistory;
 
+	/**
+	 * initialize User object and generates salt for password
+	 */
 	public function __construct() {
 		$this->salt = md5(uniqid(null, true));
 		$this->connectedDevicesInHistory = new \Doctrine\Common\Collections\ArrayCollection();
@@ -184,8 +187,14 @@ class User implements UserInterface {
   {
       $this->salt = $salt;
   }
-	
 
+
+	/**
+	 * don't know, why this method must exist, but some
+	 * error occurred without
+	 *
+	 * @return array
+	 */
 	public function __sleep()
 	{
 		return array('id');

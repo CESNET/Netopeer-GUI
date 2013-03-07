@@ -34,7 +34,7 @@
                 <span class="label label-info">16</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
-                <span class="label label-info">6</span>
+                <span class="label label-info">5</span>
 </li></ul></a></li>
 <li><a href="../deprecated.html"><i class="icon-stop"></i> Deprecated elements 
                 <span class="label label-info">0</span></a></li>
@@ -192,7 +192,7 @@ webGUI.</p>
 </div>
 <a id="method_indexAction"></a><div class="element clickable method public method_indexAction" data-toggle="collapse" data-target=".method_indexAction .collapse">
 <h2>Prepares form for connection to the server and table with active connection list</h2>
-<pre>indexAction() </pre>
+<pre>indexAction(int $connectedDeviceId) : array</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -202,10 +202,20 @@ webGUI.</p>
 <td>("/", name="_home")</td>
 </tr>
 <tr>
+<th>Route</th>
+<td>("/device-{connectedDeviceId}/", name="homeFromHistory")</td>
+</tr>
+<tr>
 <th>Template</th>
 <td>()</td>
 </tr>
 </table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$connectedDeviceId</h4>
+<code>int</code><p>id of connected device from history</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>array</code></div>
 </div></div>
 </div>
 <a id="method_moduleAction"></a><div class="element clickable method public method_moduleAction" data-toggle="collapse" data-target=".method_moduleAction .collapse">
@@ -710,7 +720,7 @@ and sends them to editConfig process</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-02-28T19:51:31+01:00.<br></footer></div>
+            generated on 2013-03-07T19:25:49+01:00.<br></footer></div>
 </div>
 </body>
 </html>

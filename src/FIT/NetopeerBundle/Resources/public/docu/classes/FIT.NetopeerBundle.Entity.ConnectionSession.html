@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>NetconfWebGUI » \FIT\NetopeerBundle\Twig\NetopeerTwigExtension</title>
+<title>NetconfWebGUI » \FIT\NetopeerBundle\Entity\ConnectionSession</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -54,19 +54,27 @@
 <span class="btn-group visibility" data-toggle="buttons-checkbox"><button class="btn public active" title="Show public elements">Public</button><button class="btn protected" title="Show protected elements">Protected</button><button class="btn private" title="Show private elements">Private</button><button class="btn inherited active" title="Show inherited elements">Inherited</button></span><div class="btn-group view pull-right" data-toggle="buttons-radio">
 <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button><button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
 </div>
-<ul class="side-nav nav nav-list"><li class="nav-header">
+<ul class="side-nav nav nav-list">
+<li class="nav-header">
 <i class="icon-custom icon-method"></i> Methods
+                    <ul><li class="method public "><a href="#method___construct" title="__construct :: Creates new instance and fill in all class variables except of sessionStatus."><span class="description">Creates new instance and fill in all class variables except of sessionStatus.</span><pre>__construct()</pre></a></li></ul>
+</li>
+<li class="nav-header">
+<i class="icon-custom icon-property"></i> Properties
                     <ul>
-<li class="method public "><a href="#method_explodeString" title="explodeString :: Explode function"><span class="description">Explode function</span><pre>explodeString()</pre></a></li>
-<li class="method public "><a href="#method_getFunctions" title="getFunctions :: Defines array of custom defined functions"><span class="description">Defines array of custom defined functions</span><pre>getFunctions()</pre></a></li>
-<li class="method public "><a href="#method_getName" title="getName :: Get name of this extension"><span class="description">Get name of this extension</span><pre>getName()</pre></a></li>
-<li class="method public "><a href="#method_isNumberType" title="isNumberType :: Check if param is number"><span class="description">Check if param is number</span><pre>isNumberType()</pre></a></li>
-<li class="method public "><a href="#method_isUrlType" title="isUrlType :: Check if param is URI"><span class="description">Check if param is URI</span><pre>isUrlType()</pre></a></li>
+<li class="property public "><a href="#property_hash" title="$hash :: "><span class="description">identification key of connection</span><pre>$hash</pre></a></li>
+<li class="property public "><a href="#property_host" title="$host :: "><span class="description">target hostname</span><pre>$host</pre></a></li>
+<li class="property public "><a href="#property_locked" title="$locked :: "><span class="description">locked by us</span><pre>$locked</pre></a></li>
+<li class="property public "><a href="#property_port" title="$port :: "><span class="description">target port</span><pre>$port</pre></a></li>
+<li class="property public "><a href="#property_sessionStatus" title="$sessionStatus :: "><span class="description">session info</span><pre>$sessionStatus</pre></a></li>
+<li class="property public "><a href="#property_time" title="$time :: "><span class="description">time of connection start</span><pre>$time</pre></a></li>
+<li class="property public "><a href="#property_user" title="$user :: "><span class="description">logged username</span><pre>$user</pre></a></li>
 </ul>
-</li></ul>
+</li>
+</ul>
 </div>
 <div class="span8">
-<a id="\FIT\NetopeerBundle\Twig\NetopeerTwigExtension"></a><ul class="breadcrumb">
+<a id="\FIT\NetopeerBundle\Entity\ConnectionSession"></a><ul class="breadcrumb">
 <li>
 <a href="../index.html"><i class="icon-custom icon-class"></i></a><span class="divider">\</span>
 </li>
@@ -75,84 +83,82 @@
 <span class="divider">\</span><a href="../namespaces/FIT.NetopeerBundle.html">NetopeerBundle</a>
 </li>
 <li>
-<span class="divider">\</span><a href="../namespaces/FIT.NetopeerBundle.Twig.html">Twig</a>
+<span class="divider">\</span><a href="../namespaces/FIT.NetopeerBundle.Entity.html">Entity</a>
 </li>
 <li class="active">
-<span class="divider">\</span><a href="../classes/FIT.NetopeerBundle.Twig.NetopeerTwigExtension.html">NetopeerTwigExtension</a>
+<span class="divider">\</span><a href="../classes/FIT.NetopeerBundle.Entity.ConnectionSession.html">ConnectionSession</a>
 </li>
 </ul>
 <div class="element class">
-<p class="short_description">Registers custom functions, which could be used in templates</p>
+<p class="short_description">Class with Entity of connected device.</p>
 <div class="details">
 <div class="long_description"></div>
 <h3>
 <i class="icon-custom icon-method"></i> Methods</h3>
-<a id="method_explodeString"></a><div class="element clickable method public method_explodeString" data-toggle="collapse" data-target=".method_explodeString .collapse">
-<h2>Explode function</h2>
-<pre>explodeString(string $delimiter, string $string) : array</pre>
+<a id="method___construct"></a><div class="element clickable method public method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
+<h2>Creates new instance and fill in all class variables except of sessionStatus.</h2>
+<pre>__construct(string $session_hash, string $host, int $port, string $user) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
 <h3>Parameters</h3>
 <div class="subelement argument">
-<h4>$delimiter</h4>
-<code>string</code>
-</div>
+<h4>$session_hash</h4>
+<code>string</code><p>identification key of connection</p></div>
 <div class="subelement argument">
-<h4>$string</h4>
-<code>string</code><p>string to explode</p></div>
-<h3>Returns</h3>
-<div class="subelement response"><code>array</code></div>
-</div></div>
-</div>
-<a id="method_getFunctions"></a><div class="element clickable method public method_getFunctions" data-toggle="collapse" data-target=".method_getFunctions .collapse">
-<h2>Defines array of custom defined functions</h2>
-<pre>getFunctions() : array</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Returns</h3>
-<div class="subelement response"><code>array</code></div>
-</div></div>
-</div>
-<a id="method_getName"></a><div class="element clickable method public method_getName" data-toggle="collapse" data-target=".method_getName .collapse">
-<h2>Get name of this extension</h2>
-<pre>getName() : string</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Returns</h3>
-<div class="subelement response"><code>string</code></div>
-</div></div>
-</div>
-<a id="method_isNumberType"></a><div class="element clickable method public method_isNumberType" data-toggle="collapse" data-target=".method_isNumberType .collapse">
-<h2>Check if param is number</h2>
-<pre>isNumberType(string | mixed $string) : bool</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Parameters</h3>
+<h4>$host</h4>
+<code>string</code><p>target hostname</p></div>
 <div class="subelement argument">
-<h4>$string</h4>
-<code>string</code><code>mixed</code><p>value (string), which we check, if is a number</p>
-</div>
-<h3>Returns</h3>
-<div class="subelement response"><code>bool</code></div>
-</div></div>
-</div>
-<a id="method_isUrlType"></a><div class="element clickable method public method_isUrlType" data-toggle="collapse" data-target=".method_isUrlType .collapse">
-<h2>Check if param is URI</h2>
-<pre>isUrlType(string $string) : bool</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Parameters</h3>
+<h4>$port</h4>
+<code>int</code><p>target port</p></div>
 <div class="subelement argument">
-<h4>$string</h4>
-<code>string</code><p>check, if value is an URI</p></div>
-<h3>Returns</h3>
-<div class="subelement response"><code>bool</code></div>
+<h4>$user</h4>
+<code>string</code><p>logged username</p></div>
 </div></div>
+</div>
+<h3>
+<i class="icon-custom icon-property"></i> Properties</h3>
+<a id="property_hash"> </a><div class="element clickable property public property_hash" data-toggle="collapse" data-target=".property_hash .collapse">
+<h2>identification key of connection</h2>
+<pre>$hash : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_host"> </a><div class="element clickable property public property_host" data-toggle="collapse" data-target=".property_host .collapse">
+<h2>target hostname</h2>
+<pre>$host : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_locked"> </a><div class="element clickable property public property_locked" data-toggle="collapse" data-target=".property_locked .collapse">
+<h2>locked by us</h2>
+<pre>$locked : bool</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_port"> </a><div class="element clickable property public property_port" data-toggle="collapse" data-target=".property_port .collapse">
+<h2>target port</h2>
+<pre>$port : int</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_sessionStatus"> </a><div class="element clickable property public property_sessionStatus" data-toggle="collapse" data-target=".property_sessionStatus .collapse">
+<h2>session info</h2>
+<pre>$sessionStatus : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_time"> </a><div class="element clickable property public property_time" data-toggle="collapse" data-target=".property_time .collapse">
+<h2>time of connection start</h2>
+<pre>$time : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_user"> </a><div class="element clickable property public property_user" data-toggle="collapse" data-target=".property_user .collapse">
+<h2>logged username</h2>
+<pre>$user : string</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
 </div>
 </div>
 </div>

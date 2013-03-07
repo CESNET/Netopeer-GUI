@@ -88,6 +88,10 @@ class BaseConnection {
 	 * @var ContainerInterface   base bundle container
 	 */
 	protected $em;
+
+	/**
+	 * @var \Symfony\Component\Security\Core\SecurityContextInterface $securityContext
+	 */
 	protected $securityContext;
 	/**
 	 * @var \Symfony\Bridge\Monolog\Logger       instance of logging class
@@ -333,6 +337,8 @@ class BaseConnection {
   }
 
 	/**
+	 * Get baseConnection for logged user by connection id
+	 *
 	 * @param $connectedDeviceId
 	 * @return BaseConnection
 	 */
