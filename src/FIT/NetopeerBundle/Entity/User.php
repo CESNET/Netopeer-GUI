@@ -25,6 +25,7 @@ class User implements UserInterface {
 	 *
 	 * @ORM\Id
 	 * @ORM\Column(type="integer")
+	 * @ORM\GeneratedValue(strategy="AUTO")
 	 */
 	protected $id;
 
@@ -57,6 +58,7 @@ class User implements UserInterface {
 	/**
 	 * @var array   array of connected devices (from history)
 	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
+	 * @ORM\OrderBy({"accessTime" = "DESC"})
 	 */
 	protected $connectedDevicesInHistory;
 

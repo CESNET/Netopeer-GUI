@@ -4,6 +4,8 @@
  */
 namespace FIT\NetopeerBundle;
 
+date_default_timezone_set("Europe/Prague");
+
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**

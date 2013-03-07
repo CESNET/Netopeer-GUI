@@ -343,7 +343,7 @@ class BaseConnection {
 		$user = $this->securityContext->getToken()->getUser();
 		$em = $this->em;
 
-		if (!method_exists($user, "getId")) {
+		if (!$user instanceof \FIT\NetopeerBundle\Entity\User) {
 			return false;
 		}
 		try {

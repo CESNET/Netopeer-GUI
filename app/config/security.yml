@@ -15,7 +15,7 @@ security:
         in_memory:
             users:
                 user:           { password: pass,    roles: [ 'ROLE_USER' ] }
-                admin-no-db:    { password: pass,    roles: [ 'ROLE_ADMIN' ] }
+                adminNoDb:    { password: pass,    roles: [ 'ROLE_ADMIN' ] }
 
     firewalls:
         dev:

@@ -84,7 +84,7 @@ class AjaxController extends BaseController
 		 * @var \FIT\NetopeerBundle\Entity\User $user
 		 */
 			$user = $this->get('security.context')->getToken()->getUser();
-			if (method_exists($user, "getConnectedDevicesInHistory")) {
+			if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
 				$this->assign('connectedDevices', $user->getConnectedDevicesInHistory());
 			}
 		} catch (\ErrorException $e) {
