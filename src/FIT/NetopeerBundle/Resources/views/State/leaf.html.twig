@@ -1,5 +1,6 @@
 <div class="leaf-line
-	{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %} 
+	{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %}
+	{% if hasChildren is defined and hasChildren == true %} has-children{% endif %}
 	{% if element.attributes.eltype is defined %}
 		type-{{element.attributes.eltype}}
 	{% else %}
@@ -18,6 +19,7 @@
 			</span>
 		{% endif %}
 		<span class="label-cover {% if element.attributes.description is defined %}has-tooltip{% endif %}">
+			{% if hasChildren is defined and hasChildren == true %}<span class="bull"></span>{% endif %}
 			<strong>{{key}}</strong>
 			{% if key != element.name %}
 				{{element.name}}

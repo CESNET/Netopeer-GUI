@@ -158,6 +158,10 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 		+ .leaf { }
 
 		&.active { position: relative; z-index: 25; background: #fff; }
+		&.has-children {
+			.label-cover { position: relative; }
+			span.bull { width: 5px; height: 5px; position: absolute; left: -9px; top: 6px; background-color: #666; }
+		}
 //		&.config { background: #ccc; }
 	}	
 	.container, .list { margin: 25px 0px; 

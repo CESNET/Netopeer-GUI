@@ -1,5 +1,9 @@
 {% set outIterator = 0 %}
 {% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
+{% if hasChildren is not defined %}
+	{% set hasChildren = false %}
+{% endif %}
+
 {% if element|length %}	
 	<div class="level-{{ level }} {{key}}">
 		
@@ -9,13 +13,14 @@
 			{% set useLevel = false %}
 		{% endif %}
 
-		{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': useLevel, 'iterator': iterator} %}
+		{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': useLevel, 'iterator': iterator, 'hasChildren': hasChildren} %}
+		{% set hasChildren = false %}
 
 		{% for key, el in element %}
 			{% set outIterator = outIterator + 1 %}
 
 			{% if element.hasChildren() %}
-				{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': element.getChildren(), 'xpath': outXpath, 'key': key, 'level': level + 1, 'iterator': outIterator } %}
+				{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': element.getChildren(), 'xpath': outXpath, 'key': key, 'level': level + 1, 'iterator': outIterator, 'hasChildren': true} %}
 			{% else %}
 				{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']' %}
 				{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element.current(), 'xpath': tmpXpath, 'key': key, 'level': level + 1, 'addLevel': true, 'iterator': outIterator} %}
