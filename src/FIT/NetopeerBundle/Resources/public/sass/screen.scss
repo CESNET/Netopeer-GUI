@@ -44,10 +44,13 @@ strong, b { font-weight: bold; }
 
 /* navigation */
 nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), darken($cBase, 10%))); height: $hNavTop; line-height: $hNavTop; color: #fff; border-bottom: 1px solid #000; @include box-shadow( 0px 0px 7px rgba(0,0,0,0.9)); position: absolute; z-index: 100; top: 0px; width: 100%;
-	> a { color: #fff; text-decoration: none; @include text-shadow(1px 1px 2px #000); padding: 0px 20px; border-left: 1px solid $cBase; float: left; font-size: 1.3em;
+	> a { color: #fff; text-decoration: none; @include text-shadow(1px 1px 2px #000); padding: 0px 20px; border-left: 1px solid $cBase; float: left; font-size: 1.3em; position: relative;
 		&:first-child + a { border-left: 1px solid #000; }
 		&:hover, &.active { background: darken($cBase, 20%); }
 		&.nth-0 { border-left: 1px solid desaturate($cComp1Light, 50%); }
+		&.active {
+			span.arrow { position: absolute; bottom: -8px; left: 50%; margin-left: -4px; width: 0px; height: 0px; display: block; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid darken($cBase, 20%); }
+		}
 	}
 
 	//.ico-lock, .ico-unlock, .ico-session, .ico-refresh
