@@ -142,6 +142,7 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 		> span.dash { display: none; }
 	}
 	.leaf-line { padding: 7px 1.5% 7px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
+		&.hover { background-color: #dadada; border-color: #aaa; }
 		.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
 		.value { width: 59%; float: left; color: #000; margin-left: 2%; }
 		.range { width: 42%; float: left; }

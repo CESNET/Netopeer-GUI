@@ -29,6 +29,11 @@ $(document).ready(function() {
 		initDefaultTooltip($(this));
 	});
 
+	// line of XML output
+	$(".leaf-line").hover(function() {
+		$(this).toggleClass("hover");
+	});
+
 	/* hide alerts after some time - only successfull */
 	setTimeout(function() {
 		$('.alert.success').fadeOut();
