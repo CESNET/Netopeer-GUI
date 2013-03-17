@@ -19,7 +19,11 @@
 			</span>
 		{% endif %}
 		<span class="label-cover {% if element.attributes.description is defined %}has-tooltip{% endif %}">
-			{% if hasChildren is defined and hasChildren == true %}<span class="bull"></span>{% endif %}
+			{% if hasChildren is defined and hasChildren == true %}
+				<span class="bull"></span>
+			{% else %}
+				<span class="dash"></span>
+			{% endif %}
 			<strong>{{key}}</strong>
 			{% if key != element.name %}
 				{{element.name}}

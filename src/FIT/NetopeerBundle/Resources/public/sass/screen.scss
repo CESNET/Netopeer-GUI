@@ -4,7 +4,7 @@
 
 
 
-// basic colors - http://kuler.adobe.com/index.cfm#themeID/2007406
+// basic colors - http://kuler.adobe.com/#themeID/233350
 $cBase:					#004F80;
 $cComp1Light: 			#1486CD;
 $cComp1Dark: 			#002034;
@@ -138,6 +138,9 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 			> .leaf-line:first-child { border-top: 1px solid #aaa; }
 		}
 	}
+	.level-0> .leaf-line > .label > .label-cover {
+		> span.dash { display: none; }
+	}
 	.leaf-line { padding: 7px 1.5% 7px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
 		.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
 		.value { width: 59%; float: left; color: #000; margin-left: 2%; }
@@ -159,8 +162,10 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 
 		&.active { position: relative; z-index: 25; background: #fff; }
 		&.has-children {
-			.label-cover { position: relative; }
 			span.bull { width: 5px; height: 5px; position: absolute; left: -9px; top: 6px; background-color: #666; }
+		}
+		.label-cover { position: relative;
+			span.dash { width: 5px; height: 1px; position: absolute; left: -9px; top: 8px; background-color: #666; }
 		}
 //		&.config { background: #ccc; }
 	}	
