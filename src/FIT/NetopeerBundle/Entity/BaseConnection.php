@@ -169,7 +169,7 @@ class BaseConnection {
 
 			$em->flush();
 
-		} catch (\PDOException $e) {
+		} catch (\ErrorException $e) {
 			$this->logger->err("Could not add connection into DB.", array(
 				"host" => $host,
 				"port" => $port,
