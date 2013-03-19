@@ -11,6 +11,7 @@ namespace FIT\NetopeerBundle\Entity;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
+use FIT\NetopeerBundle\Entity\BaseConnection as BaseConnection;
 
 /**
  * Class with Entity of logged user.
@@ -63,11 +64,19 @@ class User implements UserInterface {
 	protected $connectedDevicesInHistory;
 
 	/**
+	 * @var array   array of connected devices (from profiles)
+	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
+	 * @ORM\OrderBy({"accessTime" = "DESC"})
+	 */
+	protected $connectedDevicesInProfiles;
+
+	/**
 	 * initialize User object and generates salt for password
 	 */
 	public function __construct() {
 		$this->salt = md5(uniqid(null, true));
 		$this->connectedDevicesInHistory = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->connectedDevicesInProfiles = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	/**
@@ -207,16 +216,50 @@ class User implements UserInterface {
    */
   public function addBaseConnection(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
   {
-      $this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
+		$connectedDevicesInHistory->setKind(BaseConnection::$kindHistory);
+    $this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
   }
 
-  /**
+	/**
+   * Add connectedDevicesInProfile
+   *
+   * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfile
+   */
+  public function addProfileConnection(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfile)
+  {
+	  $connectedDevicesInProfile->setKind(BaseConnection::$kindProfile);
+    $this->connectedDevicesInProfiles[] = $connectedDevicesInProfile;
+  }
+
+	/**
    * Get connectedDevicesInHistory
    *
    * @return \Doctrine\Common\Collections\Collection
    */
   public function getConnectedDevicesInHistory()
   {
-      return $this->connectedDevicesInHistory;
+	  $arr = $this->connectedDevicesInHistory;
+	  foreach ($arr as $key => $conn) {
+		  if ($conn->getKind() != BaseConnection::$kindHistory) {
+			  unset($arr[$key]);
+		  }
+	  }
+    return $arr;
   }
+
+	/**
+	 * Get connectedDevicesInProfiles
+	 *
+	 * @return \Doctrine\Common\Collections\Collection
+	 */
+	public function getConnectedDevicesInProfiles()
+	{
+		$arr = $this->connectedDevicesInProfiles;
+		foreach ($arr as $key => $conn) {
+			if ($conn->getKind() != BaseConnection::$kindProfile) {
+				unset($arr[$key]);
+			}
+		}
+		return $arr;
+	}
 }

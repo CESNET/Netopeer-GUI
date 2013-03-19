@@ -24,6 +24,16 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class BaseConnection {
 	/**
+	 * @var int constant for kind history
+	 */
+	public static $kindHistory = 1;
+
+	/**
+	 * @var int constant for kind profile
+	 */
+	public static $kindProfile = 2;
+
+	/**
 	 * Unique numeric identifier
 	 *
 	 * @var integer $id
@@ -76,6 +86,13 @@ class BaseConnection {
 	 * @ORM\Column(type="datetime")
 	 */
 	protected $accessTime;
+
+	/**
+	 * @var int   kind of the connection (history or profile)
+	 *
+	 * @ORM\Column(type="integer", options={"default" = 1})
+	 */
+	protected $kind;
 
 	/**
 	 * @var bool   is this connection enabled
@@ -368,4 +385,50 @@ class BaseConnection {
 	}
 
 
+
+  /**
+   * Set kind
+   *
+   * @param int $kind
+   */
+  public function setKind(\int $kind)
+  {
+      $this->kind = $kind;
+  }
+
+  /**
+   * Get kind
+   *
+   * @return int
+   */
+  public function getKind()
+  {
+      return $this->kind;
+  }
+
+
+	public function removeDeviceWithId($deviceId) {
+		/**
+		 * @var \FIT\NetopeerBundle\Entity\User $user
+		 */
+		$user = $this->securityContext->getToken()->getUser();
+		$em = $this->em;
+
+		if (!$user instanceof \FIT\NetopeerBundle\Entity\User) {
+			return false;
+		}
+		try {
+			/**
+			 * @var BaseConnection $device
+			 */
+			$device = $em->getRepository('FITNetopeerBundle:BaseConnection')->findOneBy(array(
+				"id" => $deviceId
+			));
+			$em->remove($device);
+			$em->flush();
+			return true;
+		} catch (\ErrorException $e) {
+			return false;
+		}
+	}
 }

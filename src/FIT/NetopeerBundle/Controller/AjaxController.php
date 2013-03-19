@@ -84,8 +84,51 @@ class AjaxController extends BaseController
 		 * @var \FIT\NetopeerBundle\Entity\User $user
 		 */
 			$user = $this->get('security.context')->getToken()->getUser();
+			$this->assign('isProfile', false);
 			if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
 				$this->assign('connectedDevices', $user->getConnectedDevicesInHistory());
+			}
+		} catch (\ErrorException $e) {
+			// we don't care
+		}
+
+
+		return $this->getTwigArr();
+	}
+
+	/**
+	 * Remove device from history or profile
+	 *
+	 * @Route("/ajax/remove-device/{connectionId}", name="removeFromHistoryOrProfile")
+	 *
+	 * @param int $connectionId   ID of connection
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function removeFromHistoryOrProfileAction($connectionId)
+	{
+		$baseConn = $this->get("BaseConnection");
+		$result = $baseConn->removeDeviceWithId($connectionId);
+		return new Response($result);
+	}
+
+	/**
+	 * Get saved profiles of connected devices
+	 *
+	 * @Route("/ajax/get-profiles/", name="profilesOfConnectedDevices")
+	 * @Template("FITNetopeerBundle:Ajax:historyOfConnectedDevices.html.twig")
+	 *
+	 * @return array    $result
+	 */
+	public function profilesOfConnectedDevicesAction()
+	{
+		try {
+		/**
+		 * @var \FIT\NetopeerBundle\Entity\User $user
+		 */
+			$user = $this->get('security.context')->getToken()->getUser();
+			$this->assign('isProfile', true);
+			if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
+				$this->assign('connectedDevices', $user->getConnectedDevicesInProfiles());
 			}
 		} catch (\ErrorException $e) {
 			// we don't care

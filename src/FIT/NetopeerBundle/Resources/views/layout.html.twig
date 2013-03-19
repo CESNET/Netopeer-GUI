@@ -61,6 +61,8 @@
 				{% for subsection in submenu %}
 					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="{% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 				{% endfor %}
+				{% block leftColumn %}
+				{% endblock leftColumn %}
 			</nav>
 			{% set addToColumnClass = ' left-nav-defined' %}
 		{# endif #}

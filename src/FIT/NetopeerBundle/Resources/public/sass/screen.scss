@@ -1,6 +1,7 @@
 @import "compass/reset";
 @import "compass/css3";
 @import "compass/typography/links/link-colors";
+@import "compass/utilities/text/ellipsis";
 
 
 
@@ -11,6 +12,7 @@ $cComp1Dark: 			#002034;
 $cComp2Light: 			#804B00;
 $cComp2Dark: 			#341E00;
 $cAlert:				#820101;
+$cGreen:				#007711;
 
 $cFont: 				#333;
 
@@ -32,6 +34,11 @@ a { @include link-colors($cBase, #000);
 	&:hover { text-decoration: none; }
 }
 strong, b { font-weight: bold; }
+.left { float: left; }
+.right { float: right; }
+hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: transparent; background: transparent; visibility: hidden; clear: both; }
+.red { color: $cAlert; }
+.green { color: $cGreen; }
 
 .button { @include background( linear-gradient(lighten($cBase, 10%), darken($cBase, 4%)) ); @include border-radius(5px); padding: 8px 20px; color: #fff; @include text-shadow(1px, 1px, 2px, #333); font-size: 1em; font-weight: normal; border: 1px solid darken($cBase, 4%); cursor: pointer; @include single-box-shadow(#aaa, 0px, 0px, 8px); margin: 15px 0px; position: relative; z-index: 1; text-decoration: none;
 	&:before { position: absolute; z-index: -1; content: ""; top: 1px; left: 0px; right: 0px; bottom: 0px; border-top: 1px solid rgba(255,255,255,0.2); }
@@ -105,12 +112,26 @@ nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), dark
 	}
 }
 
-nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop + $sContentPadding 0px 0px 0px; font-size: 1.3em;
+nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop + $sContentPadding 0px 0px 0px; font-size: 1.3em; position: relative;
 	h3 { padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1.1em; border-bottom: 1px solid #888; margin-bottom: 5px; }
 	a { display: block; padding: 9px $sContentPadding; @include link-colors($cFont, #000); text-decoration: none;
 		&:hover, &.active { padding-left: $sContentPadding - 5px; margin-left: 5px; }
 		&:hover { background: #bbb;  }
 		&.active { background: #f5f5f5; color: $cComp2Dark; margin-right: -1px; padding: 9px $sContentPadding + 1px 8px $sContentPadding - 6px; border: 1px solid #bababa; border-right: 0px none; }
+	}
+
+	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative;
+		> div { position: relative; height: 50%; overflow-y: scroll; width: 100%; min-height: 50%; }
+		#profiles-of-connected-devices { bottom: 0px; }
+		a { position: relative; @include ellipsis();
+			.icon { position: absolute; width: 18px; height: 18px; @include border-radius(3px); background: #fff; line-height: 18px; text-align: center; right: 4px; top: 5px; border: 1px solid #ccc; display: none;
+				&:hover { background-color: #e0e0e0; border-color: #aaa; }
+				&.addToProfiles { right: 24px; }
+			}
+			&:hover {
+				.icon { @include inline-block; }
+			}
+		}
 	}
 }
 
@@ -210,7 +231,7 @@ body > section, #content { position: relative; @include box-sizing(border-box);
 
 	.alert { padding: 15px 20px; border: 1px solid #ccc; background: #fff; @include border-radius(5px); @include single-box-shadow(#d5d5d5, 0px, 0px, 8px); clear: both; margin: 15px 0px;
 		&.info { background: url($img + 'ico/info.png'); }
-		&.success { background: url($img + 'ico/ok.png'); color: #007711; }
+		&.success { background: url($img + 'ico/ok.png'); color: $cGreen; }
 		&.error { background: url($img + 'ico/error.png'); color: #820101; }
 
 		&.info, &.success, &.error { padding-left: 40px; background-position: 10px 12px; background-repeat: no-repeat; background-color: #fff; }

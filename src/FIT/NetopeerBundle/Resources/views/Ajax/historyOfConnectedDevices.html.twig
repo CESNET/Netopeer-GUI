@@ -1,11 +1,15 @@
 {% if connectedDevices|length %}
-<div id="history-of-connected-devices">
-	<h3>History of connected devices</h3>
+<div id="{% if isProfile %}profiles{% else %}history{% endif %}-of-connected-devices">
+	<h3>
+		{% if isProfile %}Profiles{% else %}History{% endif %} of connected devices
+	</h3>
 	{% for key, device in connectedDevices %}
 		<a href="{{ path("homeFromHistory", {"connectedDeviceId": device.getId()} ) }}"
 		   title="Device: {{ device.getHost() }}:{{ device.getPort() }}, Last connection: {{ device.getAccessTime()|date("d.m.y h:i") }}"
 		   data-device-id="{{ device.getId() }}">
 			{{ device.getHost() }}:{{ device.getPort() }}
+			<span data-action="{{ path("removeFromHistoryOrProfile", {"connectionId": device.getId()} ) }}" class="icon delete red" title="Remove">x</span>
+			{% if isProfile == false %}<span class="icon addToProfiles green" title="Add to profiles">+</span>{% endif %}
 		</a>
 	{% endfor %}
 </div>

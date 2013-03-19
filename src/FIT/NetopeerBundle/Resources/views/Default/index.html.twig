@@ -37,16 +37,50 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			reloadHistoryOfConnectedDevices();
+			reloadProfilesOfConnectedDevices();
+			setLeftPaneHeight();
 		});
+
+		$(window).resize(function() {
+			setLeftPaneHeight();
+		});
+
+		function setLeftPaneHeight() {
+			$("#history-and-profiles").height($("#left").height());
+		}
+
+		function delegateAnchorActions($elem) {
+			$elem.delegate("> a", 'click', function($e) {
+				$e.preventDefault();
+				updateConnectFormValues($(this), $(this).data().deviceId);
+			}).delegate(".icon", 'click', function($e) {
+				$e.preventDefault();
+				$.get($($e.target).data().action, function(data) {
+					l(data);
+					if (data === "true") {
+						reloadHistoryOfConnectedDevices();
+						reloadProfilesOfConnectedDevices();
+					}
+				});
+			});
+		}
 
 		function reloadHistoryOfConnectedDevices() {
 			$.get("{{ path("historyOfConnectedDevices") }}", function(data) {
 				if (!$("#history-of-connected-devices").length) {
-					$("#left").html(data);
-					$("#history-of-connected-devices").delegate("a", 'click', function($e) {
-						$e.preventDefault();
-						updateConnectFormValues($(this), $(this).data().deviceId);
-					});
+					$("#history-of-connected-devices").remove();
+					$("#history-and-profiles").prepend(data);
+					delegateAnchorActions($("#history-of-connected-devices"));
+				}
+			});
+		}
+
+		function reloadProfilesOfConnectedDevices() {
+			$.get("{{ path("profilesOfConnectedDevices") }}", function(data) {
+				if (!$("#profiles-of-connected-devices").length) {
+					$("#profiles-of-connected-devices").remove();
+					$("#history-and-profiles").append(data);
+					delegateAnchorActions($("#profiles-of-connected-devices"));
 				}
 			});
 		}
@@ -74,6 +108,10 @@
 {% block singleContentClass %}
 	max-width-column
 {% endblock singleContentClass %}
+
+{% block leftColumn %}
+	<div id="history-and-profiles"></div>
+{% endblock leftColumn %}
 
 {% block state %}
 	<form action="{{ path('_home') }}" method="post" {{ form_enctype(form) }} class="login">
