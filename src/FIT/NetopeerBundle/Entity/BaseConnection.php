@@ -128,8 +128,9 @@ class BaseConnection {
 	 */
 	public function saveConnectionIntoDB($host, $port, $username) {
 		$repository = $this->em->getRepository('FITNetopeerBundle:BaseConnection');
+		$user = $this->securityContext->getToken()->getUser();
 		$connection = $repository->findOneBy(
-			array('host' => $host, 'port' => $port, 'username' => $username)
+			array('host' => $host, 'port' => $port, 'username' => $username, 'userId' => $user->getId())
 		);
 
 		try {
@@ -141,7 +142,6 @@ class BaseConnection {
 				$this->setPort($port);
 				$this->setUsername($username);
 
-				$user = $this->securityContext->getToken()->getUser();
 				$user->addBaseConnection($this);
 				$this->setUserId($user);
 
