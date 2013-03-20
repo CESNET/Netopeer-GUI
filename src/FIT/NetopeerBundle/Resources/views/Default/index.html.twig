@@ -22,13 +22,8 @@
 						targetConfigure.text("Could not configure device.");
 					}
 					if (dataArr['message']) {
-						var flashMessage = $("<div/>", {
-							"class": "alert " + dataArr['status']
-						});
-						flashMessage.text(dataArr['message']);
-						$("#config h2").after(flashMessage);
+						$("#config h2").after(prepareFlashMessage(dataArr['status'], dataArr['message']));
 					}
-
 					reloadHistoryOfConnectedDevices();
 				});
 			});
@@ -45,29 +40,54 @@
 			setLeftPaneHeight();
 		});
 
+		function prepareFlashMessage(status, message) {
+			var flashMessage = $("<div/>", {
+				"class": "alert " + status
+			});
+			flashMessage.text(message);
+			setTimeout(function() {
+				flashMessage.fadeOut().remove();
+			}, 3000);
+			return flashMessage;
+		}
+
 		function setLeftPaneHeight() {
-			$("#history-and-profiles").height($("#left").height());
+			$("#history-and-profiles").height($(window).height() - parseInt($("#left").css('padding-top'), 10) - 30);
 		}
 
 		function delegateAnchorActions($elem) {
-			$elem.delegate("> a", 'click', function($e) {
+			$elem.delegate(".icon", 'click', function($e) {
 				$e.preventDefault();
-				updateConnectFormValues($(this), $(this).data().deviceId);
-			}).delegate(".icon", 'click', function($e) {
-				$e.preventDefault();
-				$.get($($e.target).data().action, function(data) {
-					l(data);
-					if (data === "true") {
-						reloadHistoryOfConnectedDevices();
-						reloadProfilesOfConnectedDevices();
+				var $target = $($e.target);
+				$.get($target.data().action, function(data) {
+					var jsonArr = $.parseJSON(data);
+					if (jsonArr['result'] === 0) {
+						if ($target.hasClass('delete')) {
+							$target.parents('a.device-item').unbind('click').remove();
+							if ($elem.attr('id') == "profiles-of-connected-devices") {
+								reloadProfilesOfConnectedDevices(true);
+							}
+						} else if ($target.hasClass('addToProfiles')) {
+							reloadProfilesOfConnectedDevices(true);
+						}
+					}
+					if (jsonArr['message']) {
+						$("#history-and-profiles").prepend(prepareFlashMessage(jsonArr['status'], jsonArr['message']));
 					}
 				});
-			});
+			}).delegate("a.device-item", 'click', function($e) {
+				$e.preventDefault();
+
+				var $target = $($e.target);
+				if (!$target.hasClass('icon')) {
+					updateConnectFormValues($(this), $(this).data().deviceId);
+				}
+			})
 		}
 
-		function reloadHistoryOfConnectedDevices() {
+		function reloadHistoryOfConnectedDevices(force) {
 			$.get("{{ path("historyOfConnectedDevices") }}", function(data) {
-				if (!$("#history-of-connected-devices").length) {
+				if (!$("#history-of-connected-devices").length || force === true) {
 					$("#history-of-connected-devices").remove();
 					$("#history-and-profiles").prepend(data);
 					delegateAnchorActions($("#history-of-connected-devices"));
@@ -75,9 +95,9 @@
 			});
 		}
 
-		function reloadProfilesOfConnectedDevices() {
+		function reloadProfilesOfConnectedDevices(force) {
 			$.get("{{ path("profilesOfConnectedDevices") }}", function(data) {
-				if (!$("#profiles-of-connected-devices").length) {
+				if (!$("#profiles-of-connected-devices").length || force === true) {
 					$("#profiles-of-connected-devices").remove();
 					$("#history-and-profiles").append(data);
 					delegateAnchorActions($("#profiles-of-connected-devices"));
@@ -95,7 +115,7 @@
 					$("#form_port").val(jsonArr['port']);
 					$("#form_user").val(jsonArr['userName']);
 
-					$el.parent().children('a').removeClass('active');
+					$("#history-and-profiles").find('a').removeClass('active');
 					$el.addClass('active');
 				}
 			});

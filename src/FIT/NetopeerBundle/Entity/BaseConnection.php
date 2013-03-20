@@ -135,72 +135,6 @@ class BaseConnection {
 	}
 
 	/**
-	 * Saves  connection info into DB - for history
-	 *
-	 * @param  string   $host      hostname
-	 * @param  int      $port      target port
-	 * @param  string   $username
-	 *
-	 * @return int 0 on success, 1 on fail
-	 */
-	public function saveConnectionIntoDB($host, $port, $username) {
-		$repository = $this->em->getRepository('FITNetopeerBundle:BaseConnection');
-		$user = $this->securityContext->getToken()->getUser();
-		$connection = $repository->findOneBy(
-			array('host' => $host, 'port' => $port, 'username' => $username, 'userId' => $user->getId())
-		);
-
-		try {
-			$em = $this->em;
-
-			// we will create new record for this connection
-			if (!$connection) {
-				$this->setHost($host);
-				$this->setPort($port);
-				$this->setUsername($username);
-
-				$user->addBaseConnection($this);
-				$this->setUserId($user);
-
-				$em->persist($this);
-				$em->persist($user);
-
-				$this->logger->info("History of connection added into DB.", array(
-					"host" => $host,
-					"port" => $port,
-					"username" => $username
-				));
-
-			// else we will just modify access time
-			} else {
-				$connection->setAccessTime();
-				$em->persist($connection);
-
-				$this->logger->info("Modify history of connection in DB.", array(
-					"id"  => $connection->getId(),
-					"host" => $host,
-					"port" => $port,
-					"username" => $username
-				));
-			}
-
-			$em->flush();
-
-		} catch (\ErrorException $e) {
-			$this->logger->err("Could not add connection into DB.", array(
-				"host" => $host,
-				"port" => $port,
-				"username" => $username,
-				"error" => $e->getMessage()
-			));
-			return 1;
-		}
-
-		return 0;
-	}
-
-
-  /**
    * Get id
    *
    * @return integer
@@ -313,6 +247,26 @@ class BaseConnection {
       return $this->accessTime;
   }
 
+	/**
+	 * Set kind
+	 *
+	 * @param integer $kind
+	 */
+	public function setKind($kind)
+	{
+		$this->kind = $kind;
+	}
+
+	/**
+	 * Get kind
+	 *
+	 * @return int
+	 */
+	public function getKind()
+	{
+		return $this->kind;
+	}
+
   /**
    * Set enabled
    *
@@ -353,6 +307,78 @@ class BaseConnection {
       return $this->userId;
   }
 
+
+
+
+	/**
+	 * Saves  connection info into DB - for history
+	 *
+	 * @param  string   $host      hostname
+	 * @param  int      $port      target port
+	 * @param  string   $username
+	 * @param  int      $kind      kind of connection, values available as static variables
+	 *
+	 * @return int 0 on success, 1 on fail
+	 */
+	public function saveConnectionIntoDB($host, $port, $username, $kind = 1) {
+		$repository = $this->em->getRepository('FITNetopeerBundle:BaseConnection');
+		$user = $this->securityContext->getToken()->getUser();
+		$connection = $repository->findOneBy(
+			array('host' => $host, 'port' => $port, 'username' => $username, 'userId' => $user->getId(), 'kind' => $kind)
+		);
+
+		try {
+			$em = $this->em;
+
+			// we will create new record for this connection
+			if (!$connection) {
+				$this->setHost($host);
+				$this->setPort($port);
+				$this->setUsername($username);
+
+				$user->addConnection($this, $kind);
+				$this->setUserId($user);
+
+				$em->persist($this);
+				$em->persist($user);
+
+				$this->logger->info("History of connection added into DB.", array(
+					"host" => $host,
+					"port" => $port,
+					"username" => $username,
+					"kind" => $kind
+				));
+
+				// else we will just modify access time
+			} else {
+				$connection->setAccessTime();
+				$em->persist($connection);
+
+				$this->logger->info("Modify history of connection in DB.", array(
+					"id"  => $connection->getId(),
+					"host" => $host,
+					"port" => $port,
+					"username" => $username,
+					"kind" => $kind
+				));
+			}
+
+			$em->flush();
+
+		} catch (\ErrorException $e) {
+			$this->logger->err("Could not add connection into DB.", array(
+				"host" => $host,
+				"port" => $port,
+				"username" => $username,
+				"kind" => $kind,
+				"error" => $e->getMessage()
+			));
+			return 1;
+		}
+
+		return 0;
+	}
+
 	/**
 	 * Get baseConnection for logged user by connection id
 	 *
@@ -384,29 +410,10 @@ class BaseConnection {
 		return $device;
 	}
 
-
-
-  /**
-   * Set kind
-   *
-   * @param int $kind
-   */
-  public function setKind(\int $kind)
-  {
-      $this->kind = $kind;
-  }
-
-  /**
-   * Get kind
-   *
-   * @return int
-   */
-  public function getKind()
-  {
-      return $this->kind;
-  }
-
-
+	/**
+	 * @param $deviceId id of connected device
+	 * @return bool 0 on success, 1 on error
+	 */
 	public function removeDeviceWithId($deviceId) {
 		/**
 		 * @var \FIT\NetopeerBundle\Entity\User $user
@@ -415,7 +422,7 @@ class BaseConnection {
 		$em = $this->em;
 
 		if (!$user instanceof \FIT\NetopeerBundle\Entity\User) {
-			return false;
+			return 1;
 		}
 		try {
 			/**
@@ -424,11 +431,14 @@ class BaseConnection {
 			$device = $em->getRepository('FITNetopeerBundle:BaseConnection')->findOneBy(array(
 				"id" => $deviceId
 			));
-			$em->remove($device);
-			$em->flush();
-			return true;
+			if ($device) {
+				$em->remove($device);
+				$em->flush();
+				return 0;
+			}
 		} catch (\ErrorException $e) {
-			return false;
+			return 1;
 		}
+		return 1;
 	}
 }

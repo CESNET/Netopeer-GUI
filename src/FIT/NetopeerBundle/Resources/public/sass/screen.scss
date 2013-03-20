@@ -1,7 +1,7 @@
 @import "compass/reset";
 @import "compass/css3";
 @import "compass/typography/links/link-colors";
-@import "compass/utilities/text/ellipsis";
+@import "compass/typography/text/ellipsis";
 
 
 
@@ -112,7 +112,7 @@ nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), dark
 	}
 }
 
-nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop + $sContentPadding 0px 0px 0px; font-size: 1.3em; position: relative;
+nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop + $sContentPadding 0px 0px 0px; font-size: 1.3em; position: relative; overflow-y: scroll;
 	h3 { padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1.1em; border-bottom: 1px solid #888; margin-bottom: 5px; }
 	a { display: block; padding: 9px $sContentPadding; @include link-colors($cFont, #000); text-decoration: none;
 		&:hover, &.active { padding-left: $sContentPadding - 5px; margin-left: 5px; }
@@ -121,14 +121,15 @@ nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background:
 	}
 
 	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative;
-		> div { position: relative; height: 50%; overflow-y: scroll; width: 100%; min-height: 50%; }
-		#profiles-of-connected-devices { bottom: 0px; }
-		a { position: relative; @include ellipsis();
-			.icon { position: absolute; width: 18px; height: 18px; @include border-radius(3px); background: #fff; line-height: 18px; text-align: center; right: 4px; top: 5px; border: 1px solid #ccc; display: none;
-				&:hover { background-color: #e0e0e0; border-color: #aaa; }
-				&.addToProfiles { right: 24px; }
+		#history-of-connected-devices, #profiles-of-connected-devices { position: relative; height: 50%; overflow-y: scroll; width: 100%; min-height: 50%; }
+		.alert { margin-top: 0px; margin-left: 5px; margin-right: 5px; }
+		#history-of-connected-devices { height: 40%; margin-bottom: 5%; }
+		a { position: relative; @include ellipsis(); padding-top: 7px; padding-bottom: 7px;
+			&.active { margin-right:  0px; }
+			.icon { width: 18px; height: 18px; padding: 0px; @include border-radius(3px); background: #fff; line-height: 18px; text-align: center; border: 1px solid #aaa; display: none; margin-top: -7px; margin-bottom: -4px; margin-right: -3px;
+				&:hover { background-color: #bbb; border-color: #888; }
 			}
-			&:hover {
+			&:hover { padding-left: 3px;
 				.icon { @include inline-block; }
 			}
 		}
@@ -228,14 +229,13 @@ body > section, #content { position: relative; @include box-sizing(border-box);
 	h4 { font-size: 1.3em; margin: 5px 0px 5px 0px; }
 
 	legend { font-size: 1.9em; margin-bottom: 15px; }
+}
+.alert { padding: 15px 20px; border: 1px solid #ccc; background: #fff; @include border-radius(5px); @include single-box-shadow(#d5d5d5, 0px, 0px, 8px); clear: both; margin: 15px 0px;
+	&.info { background: url($img + 'ico/info.png'); }
+	&.success { background: url($img + 'ico/ok.png'); color: $cGreen; }
+	&.error { background: url($img + 'ico/error.png'); color: #820101; }
 
-	.alert { padding: 15px 20px; border: 1px solid #ccc; background: #fff; @include border-radius(5px); @include single-box-shadow(#d5d5d5, 0px, 0px, 8px); clear: both; margin: 15px 0px;
-		&.info { background: url($img + 'ico/info.png'); }
-		&.success { background: url($img + 'ico/ok.png'); color: $cGreen; }
-		&.error { background: url($img + 'ico/error.png'); color: #820101; }
-
-		&.info, &.success, &.error { padding-left: 40px; background-position: 10px 12px; background-repeat: no-repeat; background-color: #fff; }
-	}
+	&.info, &.success, &.error { padding-left: 40px; background-position: 10px 12px; background-repeat: no-repeat; background-color: #fff; }
 }
 
 article#content { font-size: 1.4em; padding: $hNavTop $sContentPadding; 

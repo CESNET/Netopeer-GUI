@@ -61,7 +61,7 @@ class BaseController extends Controller
 
 		$session = $this->getRequest()->getSession();
 		$flashes = $session->getFlashes();
-		$stateFlashes = $configFlashes = $singleFlashes = $allFlashes = array();
+		$stateFlashes = $configFlashes = $leftPaneFlashes = $singleFlashes = $allFlashes = array();
 
 		// divide flash messages according to key into categories
 		foreach ($flashes as $key => $message) {
@@ -70,6 +70,8 @@ class BaseController extends Controller
 				$stateFlashes[$key] = $message;
 			} elseif ( strpos($key, 'onfig') ) { // key contains word config
 				$configFlashes[$key] = $message;
+			} elseif ( strpos($key, 'eftPane') ) { // key contains word leftPane
+				$leftPaneFlashes[$key] = $message;
 			} else { // key contains word single
 				$singleFlashes[$key] = $message;
 			}
@@ -80,6 +82,7 @@ class BaseController extends Controller
 
 		$this->assign("stateFlashes", $stateFlashes);
 		$this->assign("configFlashes", $configFlashes);
+		$this->assign("leftPaneFlashes", $leftPaneFlashes);
 		$this->assign("singleFlashes", $singleFlashes);
 		$this->assign("allFlashes", $allFlashes);
 

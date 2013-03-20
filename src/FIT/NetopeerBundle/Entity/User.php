@@ -66,7 +66,7 @@ class User implements UserInterface {
 	/**
 	 * @var array   array of connected devices (from profiles)
 	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
-	 * @ORM\OrderBy({"accessTime" = "DESC"})
+	 * @ORM\OrderBy({"host" = "ASC"})
 	 */
 	protected $connectedDevicesInProfiles;
 
@@ -209,12 +209,27 @@ class User implements UserInterface {
 		return array('id');
 	}
 
+	/**
+	 * Add connection either to history or profile
+	 *
+	 * @param BaseConnection $conn
+	 * @param int $kind   kind of connection
+	 */
+	public function addConnection(BaseConnection $conn, $kind)
+	{
+		if ($kind == BaseConnection::$kindProfile) {
+			$this->addConnectionToProfiles($conn);
+		} else if ($kind == BaseConnection::$kindHistory) {
+			$this->addBaseConnection($conn);
+		}
+	}
+
   /**
    * Add connectedDevicesInHistory
    *
-   * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory
+   * @param BaseConnection $connectedDevicesInHistory
    */
-  public function addBaseConnection(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
+  public function addBaseConnection(BaseConnection $connectedDevicesInHistory)
   {
 		$connectedDevicesInHistory->setKind(BaseConnection::$kindHistory);
     $this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
@@ -223,9 +238,9 @@ class User implements UserInterface {
 	/**
    * Add connectedDevicesInProfile
    *
-   * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfile
+   * @param BaseConnection $connectedDevicesInProfile
    */
-  public function addProfileConnection(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfile)
+  public function addConnectionToProfiles(BaseConnection $connectedDevicesInProfile)
   {
 	  $connectedDevicesInProfile->setKind(BaseConnection::$kindProfile);
     $this->connectedDevicesInProfiles[] = $connectedDevicesInProfile;

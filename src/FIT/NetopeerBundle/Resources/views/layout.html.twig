@@ -58,6 +58,9 @@
 		{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
 		{# if submenu is defined and submenu #}
 			<nav id="left">
+				{% for type, message in leftPaneFlashes %}
+					<div class='alert {{type}}'>{{message|raw}}</div>
+				{% endfor %}
 				{% for subsection in submenu %}
 					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="{% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 				{% endfor %}

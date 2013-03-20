@@ -106,9 +106,48 @@ class AjaxController extends BaseController
 	 */
 	public function removeFromHistoryOrProfileAction($connectionId)
 	{
+		/**
+		 * @var \FIT\NetopeerBundle\Entity\BaseConnection $baseConn
+		 */
 		$baseConn = $this->get("BaseConnection");
-		$result = $baseConn->removeDeviceWithId($connectionId);
-		return new Response($result);
+		$result = array();
+		$result['result'] = $baseConn->removeDeviceWithId($connectionId);
+		if ($result['result'] == 0) {
+			$result['status'] = "success";
+			$result['message'] = "Device has been removed.";
+		} else {
+			$result['status'] = "error";
+			$result['message'] = "Could not remove device from the list.";
+		}
+		return new Response(json_encode($result));
+	}
+
+	/**
+	 * Add device from history to profiles
+	 *
+	 * @Route("/ajax/add-device-to-profiles/{connectionId}", name="addFromHistoryToProfiles")
+	 *
+	 * @param int $connectionId   ID of connection
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function addFromHistoryToProfilesAction($connectionId)
+	{
+		/**
+		 * @var \FIT\NetopeerBundle\Entity\BaseConnection $baseConn
+		 */
+		$baseConn = $this->get("BaseConnection");
+		$conn = $baseConn->getConnectionForCurrentUserById($connectionId);
+		$result = array();
+		$result['result'] = $baseConn->saveConnectionIntoDB($conn->getHost(), $conn->getPort(), $conn->getUsername(), $baseConn::$kindProfile);
+		if ($result['result'] === 0) {
+			$result['status'] = "success";
+			$result['message'] = "Device has been added into profiles.";
+		} else {
+			$result['status'] = "error";
+			$result['message'] = "Could not add device into profiles.";
+		}
+
+		return new Response(json_encode($result));
 	}
 
 	/**
