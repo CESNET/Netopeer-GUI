@@ -31,9 +31,9 @@
 	{% endif %}
 	<script type="text/javascript">
 		$(document).ready(function() {
+			setLeftPaneHeight();
 			reloadHistoryOfConnectedDevices();
 			reloadProfilesOfConnectedDevices();
-			setLeftPaneHeight();
 		});
 
 		$(window).resize(function() {

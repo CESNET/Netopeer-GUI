@@ -12,6 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\ORM\Mapping as ORM;
 use FIT\NetopeerBundle\Entity\BaseConnection as BaseConnection;
+use FIT\NetopeerBundle\Entity\UserSettings as UserSettings;
 
 /**
  * Class with Entity of logged user.
@@ -57,6 +58,12 @@ class User implements UserInterface {
 	protected $salt;
 
 	/**
+	 * @var string  serialized object of UserSettings class
+	 * @ORM\Column(type="object")
+	 */
+	protected $settings;
+
+	/**
 	 * @var array   array of connected devices (from history)
 	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
 	 * @ORM\OrderBy({"accessTime" = "DESC"})
@@ -77,6 +84,7 @@ class User implements UserInterface {
 		$this->salt = md5(uniqid(null, true));
 		$this->connectedDevicesInHistory = new \Doctrine\Common\Collections\ArrayCollection();
 		$this->connectedDevicesInProfiles = new \Doctrine\Common\Collections\ArrayCollection();
+		$this->settings = new UserSettings();
 	}
 
 	/**
@@ -197,6 +205,26 @@ class User implements UserInterface {
       $this->salt = $salt;
   }
 
+	/**
+	 * Set user settings
+	 *
+	 * @param UserSettings $settings
+	 */
+	public function setSettings(UserSettings $settings)
+	{
+		$this->settings = $settings;
+	}
+
+	/**
+	 * Get user settings
+	 *
+	 * @return UserSettings
+	 */
+	public function getSettings()
+	{
+		return $this->settings;
+	}
+
 
 	/**
 	 * don't know, why this method must exist, but some
@@ -253,11 +281,18 @@ class User implements UserInterface {
    */
   public function getConnectedDevicesInHistory()
   {
-	  $arr = $this->connectedDevicesInHistory;
-	  foreach ($arr as $key => $conn) {
+	  $tmpArr = $this->connectedDevicesInHistory;
+	  $arr = array();
+
+	  $max = $this->getSettings()->getHistoryDuration();
+	  $limit = new \DateTime();
+	  $limit->modify('- '.$max.' day');
+	  foreach ($tmpArr as $key => $conn) {
 		  if ($conn->getKind() != BaseConnection::$kindHistory) {
-			  unset($arr[$key]);
+			  continue;
 		  }
+		  if ($conn->getAccessTime() < $limit) break;
+		  $arr[] = $conn;
 	  }
     return $arr;
   }
