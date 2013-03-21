@@ -112,7 +112,8 @@ nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), dark
 	}
 }
 
-nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop + $sContentPadding 0px 0px 0px; font-size: 1.3em; position: relative; overflow-y: scroll;
+nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop 0px 0px 0px; font-size: 1.3em; position: relative; //overflow-y: scroll;
+	> *:first-child { margin-top: $sContentPadding; }
 	h3 { padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1.1em; border-bottom: 1px solid #888; margin-bottom: 5px; }
 	a { display: block; padding: 9px $sContentPadding; @include link-colors($cFont, #000); text-decoration: none;
 		&:hover, &.active { padding-left: $sContentPadding - 5px; margin-left: 5px; }
@@ -120,10 +121,12 @@ nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background:
 		&.active { background: #f5f5f5; color: $cComp2Dark; margin-right: -1px; padding: 9px $sContentPadding + 1px 8px $sContentPadding - 6px; border: 1px solid #bababa; border-right: 0px none; }
 	}
 
-	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative;
-		#history-of-connected-devices, #profiles-of-connected-devices { position: relative; height: 50%; overflow-y: scroll; width: 100%; min-height: 50%; }
+	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative; margin-top: 0px;
+		#history-of-connected-devices, #profiles-of-connected-devices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; overflow-y: scroll;
+		}
 		.alert { margin-top: 0px; margin-left: 5px; margin-right: 5px; }
-		#history-of-connected-devices { height: 40%; margin-bottom: 5%; }
+		#history-of-connected-devices { @include box-sizing(border-box); height: 50%; padding-top: $sContentPadding; }
+		#profiles-of-connected-devices { border-top: 1px solid #333; padding-top: 5%; height: 50%; }
 		a { position: relative; @include ellipsis(); padding-top: 7px; padding-bottom: 7px;
 			&.active { margin-right:  0px; }
 			.icon { width: 18px; height: 18px; padding: 0px; @include border-radius(3px); background: #fff; line-height: 18px; text-align: center; border: 1px solid #aaa; display: none; margin-top: -7px; margin-bottom: -4px; margin-right: -3px;
