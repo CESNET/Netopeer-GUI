@@ -978,26 +978,30 @@ class Data {
 			// echo $this->remove_xml_header($a);
 			//die();
 			if ($merge) {
-
 				// load model
 				$notEditedPath = $this->getModelsDir();
 				$path = $this->getPathToModels();
 				$modelFile = $path . 'wrapped.wyin';
 
+				$this->logger->info("Trying to find model in ", array('pathToFile' => $modelFile));
+
 				if ( file_exists($modelFile) ) {
+					$this->logger->info("Model found in ", array('pathToFile' => $modelFile));
 					if ( $path != $notEditedPath ) {
 						$model = simplexml_load_file($modelFile);
 						try {
 							$res = $this->mergeWithModel($model, $res);
 						} catch (\ErrorException $e) {
 							// TODO
+							$this->logger->err("Could not merge with model");
 						}
 					} else {
 						// TODO: if is not set module direcotory, we have to set model to merge with
 						// problem: we have to load all models (for example combo, comet-tester...)
+						$this->logger->warn("Could not find model in ", array('pathToFile' => $modelFile));
 					}
 				} else {
-					$this->logger->warn("Could not find model on ", array('pathToFile' => $modelFile));
+					$this->logger->warn("Could not find model in ", array('pathToFile' => $modelFile));
 				}
 				$this->handleResultsArr[$command][$hashedParams]['merged'] = $res;
 			} else {
