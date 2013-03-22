@@ -206,7 +206,9 @@ class Data {
 			if ($cnt == 1) {
 				$namespace = $this->modelNamespaces[$moduleName];
 				if (isset($this->moduleIdentifiers[$namespace])) {
-					return $this->moduleIdentifiers[$namespace]['hash'] . "/" . $this->moduleIdentifiers[$namespace]['moduleName'];
+					return $this->moduleIdentifiers[$namespace]['hash'] .
+							"/" . $this->moduleIdentifiers[$namespace]['moduleName'] .
+							"/" . $this->moduleIdentifiers[$namespace]['revision'];
 				}
 			}
 		}
@@ -1395,7 +1397,8 @@ XML;
 	 */
 	public function getModelIdentificator($name, $version, $ns)
 	{
-		$ident = "$name|$version|$ns";
+//		$ident = "$name|$version|$ns";
+		$ident = $ns;
 		return sha1($ident);
 	}
 

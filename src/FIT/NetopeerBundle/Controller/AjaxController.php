@@ -218,7 +218,7 @@ class AjaxController extends BaseController
 		$data = "";
 		$path = "/tmp/symfony/";
 		@mkdir($path, 0700, true);
-		$path .= "/$identifier.".$schparams["format"];
+		$path .= "/$identifier";
 
 		if (file_exists($path)) {
 			/* already exists */
@@ -246,9 +246,6 @@ class AjaxController extends BaseController
 	private function processSchema(&$schparams)
 	{
 		$dataClass = $this->get('DataModel');
-		$host = $dataClass->getHostFromKey($schparams["key"]);
-		$port = $dataClass->getPortFromKey($schparams["key"]);
-		$user = $schparams["user"];
 		$path = $schparams["path"];
 
 		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\"");
@@ -279,6 +276,8 @@ class AjaxController extends BaseController
 			$xml->registerXPathNamespace("xmlns", $ns);
 			$schemas = $xml->xpath("//xmlns:schema");
 
+			$this->get('data_logger')->info("Trying to find models for namespaces: ", array('namespaces', var_export($schemas)));
+
 			$list = array();
 			$lock = sem_get(12345678, 1, 0666, 1);
 			sem_acquire($lock); /* critical section */
@@ -287,8 +286,7 @@ class AjaxController extends BaseController
 					"identifier" => (string)$sch->identifier,
 					"version" => (string)$sch->version,
 					"format" => (string)$sch->format);
-				$ident = $dataClass->getModelIdentificator($schparams["identifier"], $schparams["version"],((string) $sch->namespace));
-
+				$ident = $schparams["identifier"]."@".$schparams["version"].".".$schparams["format"];
 				if (file_exists($dataClass->getModelsDir()."/$ident")) {
 					continue;
 				} else if ($this->getschema($schparams, $ident) == 1) {
@@ -298,6 +296,9 @@ class AjaxController extends BaseController
 				}
 			}
 			sem_release($lock);
+
+			$this->get('data_logger')->info("Not found models for namespaces: ", array('namespaces', var_export($list)));
+
 			/* non-critical - only models, that I downloaded will be processed, others already exist */
 			foreach ($list as $schema) {
 				$this->processSchema($schema);
