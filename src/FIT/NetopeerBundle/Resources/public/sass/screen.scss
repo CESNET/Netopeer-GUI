@@ -122,10 +122,9 @@ nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background:
 	}
 
 	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative; margin-top: 0px;
-		#history-of-connected-devices, #profiles-of-connected-devices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; overflow-y: scroll;
-		}
+		#history-of-connected-devices, #profiles-of-connected-devices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; overflow-y: scroll; @include box-sizing(border-box); }
 		.alert { margin-top: 0px; margin-left: 5px; margin-right: 5px; }
-		#history-of-connected-devices { @include box-sizing(border-box); height: 50%; padding-top: $sContentPadding; }
+		#history-of-connected-devices { height: 50%; padding-top: $sContentPadding; }
 		#profiles-of-connected-devices { border-top: 1px solid #333; padding-top: 5%; height: 50%; }
 		a { position: relative; @include ellipsis(); padding-top: 7px; padding-bottom: 7px;
 			&.active { margin-right:  0px; }
@@ -311,7 +310,7 @@ table { width: 100%; margin: 15px 0px;
 	}
 	.tooltip-description { display: none; }
 }
-.gips-container { max-width: 252px; position: absolute; z-index: 10; margin-left: 8px; @include single-box-shadow(rgba(0,0,0,0.4), 0px, 0px, 7px); @include border-radius(4px); }
+.gips-container { max-width: 252px; position: absolute; z-index: 10; margin-left: 2px; @include single-box-shadow(rgba(0,0,0,0.4), 0px, 0px, 7px); @include border-radius(4px); }
 .gips-body { color: #fff; font-size: 13px; line-height: 1.55em; padding: 10px; padding-right: 20px; position: relative; float: left; @include border-radius(4px);
 	&.blue { background-color: $cBase; }
 }
