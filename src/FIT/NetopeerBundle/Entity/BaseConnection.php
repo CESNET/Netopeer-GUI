@@ -323,6 +323,11 @@ class BaseConnection {
 	public function saveConnectionIntoDB($host, $port, $username, $kind = 1) {
 		$repository = $this->em->getRepository('FITNetopeerBundle:BaseConnection');
 		$user = $this->securityContext->getToken()->getUser();
+
+		if (!$user instanceof \FIT\NetopeerBundle\Entity\User) {
+			return 1;
+		}
+
 		$connection = $repository->findOneBy(
 			array('host' => $host, 'port' => $port, 'username' => $username, 'userId' => $user->getId(), 'kind' => $kind)
 		);
