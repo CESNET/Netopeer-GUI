@@ -95,7 +95,7 @@ class Data {
 	 *
 	 * @throws \ErrorException  when message is not formatted correctly
 	 */
-	private function unwrap_rfc6242($message) {
+	private function unwrapRFC6242($message) {
 		$response = "";
 		if ($message == "") {
 			return $response;
@@ -322,7 +322,7 @@ class Data {
 		}
 		/* "unchunk" frames (RFC6242) */
 		try {
-			$response = $this->unwrap_rfc6242($response);
+			$response = $this->unwrapRFC6242($response);
 		} catch (\ErrorException $e) {
 			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not read NetConf. Error: ".$e->getMessage());
 			return 1;
@@ -371,7 +371,7 @@ class Data {
 		}
 		/* "unchunk" frames (RFC6242) */
 		try {
-			$response = $this->unwrap_rfc6242($response);
+			$response = $this->unwrapRFC6242($response);
 		} catch (\ErrorException $e) {
 			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not read NetConf. Error: ".$e->getMessage());
 			//echo "unwrap exception";
@@ -477,7 +477,7 @@ class Data {
 	 *                        otherwise subject will be returned unchanged
 	 *                        or null if an error occurred.
 	 */
-	public function remove_xml_header(&$text)
+	public function removeXmlHeader(&$text)
 	{
 		return preg_replace("/<\?xml .*\?".">/i", "n", $text);
 	}
@@ -490,7 +490,7 @@ class Data {
 	 * @return mixed		          decoded data on success
 	 */
 	public function handle_get(&$sock, &$params) {
-		if ( $this->check_logged_keys() != 0) {
+		if ( $this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 
@@ -518,7 +518,7 @@ class Data {
 	 * @return mixed          		decoded data on success, 1 on error
 	 */
 	public function handle_getconfig(&$sock, &$params)	{
-		if ( $this->check_logged_keys() != 0) {
+		if ( $this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 		$sessionKey = $this->getHashFromKey($params['key']);
@@ -542,8 +542,8 @@ class Data {
 	 * @param  array    &$params   array of values for mod_netconf (type, params...)
 	 * @return mixed          		decoded data on success, 1 on error
 	 */
-	function handle_editconfig(&$sock, &$params) {
-		if ( $this->check_logged_keys() != 0) {
+	private function handle_editconfig(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 		$sessionKey = $this->getHashFromKey($params['key']);
@@ -579,7 +579,7 @@ class Data {
 	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_disconnect(&$sock, &$params) {
-		if ($this->check_logged_keys() != 0) {
+		if ($this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 		$session = $this->container->get('request')->getSession();
@@ -611,7 +611,7 @@ class Data {
 	 * @return int       		      0 on success, 1 on error
 	 */
 	private function handle_lock(&$sock, &$params) {
-		if ($this->check_logged_keys() != 0) {
+		if ($this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 		$session = $this->container->get('request')->getSession();
@@ -640,7 +640,7 @@ class Data {
 	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_unlock(&$sock, &$params) {
-		if ($this->check_logged_keys() != 0) {
+		if ($this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 		$session = $this->container->get('request')->getSession();
@@ -672,7 +672,7 @@ class Data {
 		if (isset($params["session"]) && ($params["session"] !== "")) {
 			$sessionKey = $params['session'];
 		} else {
-			if ($this->check_logged_keys() != 0) {
+			if ($this->checkLoggedKeys() != 0) {
 				return 1;
 			}
 			$session = $this->container->get('request')->getSession();
@@ -702,7 +702,7 @@ class Data {
 	 * @return int             		0 on success, 1 on error
 	 */
 	private function handle_getschema(&$sock, &$params, &$result) {
-		if ($this->check_logged_keys() != 0) {
+		if ($this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 		$session = $this->container->get('request')->getSession();
@@ -740,7 +740,7 @@ class Data {
 	 *
 	 * @return int       		0 on success, 1 on error
 	 */
-	private function check_logged_keys() {
+	private function checkLoggedKeys() {
 		$session = $this->container->get('request')->getSession();
 		if ( !count($session->get("session-connections")) ) {
 			$session->setFlash($this->flashState .' error', "Not logged in.");
@@ -975,7 +975,7 @@ class Data {
 				return 0;
 			}
 
-			// echo $this->remove_xml_header($a);
+			// echo $this->removeXmlHeader($a);
 			//die();
 			if ($merge) {
 				// load model
@@ -1044,7 +1044,7 @@ class Data {
 	 * @param $element
 	 * @return bool|\SimpleXMLElement
 	 */
-	private function get_element_parent($element) {
+	private function getElementParent($element) {
 		$parents = $element->xpath("parent::*");
 		if ($parents) {
 			return $parents[0];
@@ -1059,15 +1059,15 @@ class Data {
 	 * @param $possible_el
 	 * @return bool
 	 */
-	private function check_elem_match($model_el, $possible_el) {
-		$mel = $this->get_element_parent($model_el);
-		$pel = $this->get_element_parent($possible_el);
+	private function checkElemMatch($model_el, $possible_el) {
+		$mel = $this->getElementParent($model_el);
+		$pel = $this->getElementParent($possible_el);
 		while ($pel && $mel) {
 			if ($pel->getName() !== $mel->getName()) {
 				return false;
 			}
-			$pel = $this->get_element_parent($pel);
-			$mel = $this->get_element_parent($mel);
+			$pel = $this->getElementParent($pel);
+			$mel = $this->getElementParent($mel);
 		}
 		return true;
 	}
@@ -1078,7 +1078,7 @@ class Data {
 	 * @param $source
 	 * @param $target
 	 */
-	private function complete_attributes(&$source, &$target) {
+	private function completeAttributes(&$source, &$target) {
 		if ($source->attributes()) {
 			$attrs = $source->attributes();
 			if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
@@ -1095,17 +1095,17 @@ class Data {
 	 * @param  \SimpleXMLElement &$model with data model
 	 * @param  \SimpleXMLElement $el     with element of response
 	 */
-	private function find_and_complete(&$model, $el) {
+	private function findAndComplete(&$model, $el) {
 		$modelns = $model->getNamespaces();
 		$model->registerXPathNamespace("c", $modelns[""]);
 		$found = $model->xpath("//c:". $el->getName());
 		if (sizeof($found) == 1) {
-			$this->complete_attributes($found[0], $el);
+			$this->completeAttributes($found[0], $el);
 		} else {
 			//echo "Not found unique<br>";
 			foreach ($found as $found_el) {
-				if ($this->check_elem_match($el, $found_el)) {
-					$this->complete_attributes($found_el, $el);
+				if ($this->checkElemMatch($el, $found_el)) {
+					$this->completeAttributes($found_el, $el);
 					break;
 				}
 			}
@@ -1120,12 +1120,12 @@ class Data {
 	 */
 	private function mergeRecursive(&$model, $root_el) {
 		foreach ($root_el as $ch) {
-			$this->find_and_complete($model, $ch);
+			$this->findAndComplete($model, $ch);
 			$this->mergeRecursive($model, $ch);
 		}
 
 		foreach ($root_el->children as $ch) {
-			$this->find_and_complete($model, $ch);
+			$this->findAndComplete($model, $ch);
 			$this->mergeRecursive($model, $ch);
 		}
 	}
