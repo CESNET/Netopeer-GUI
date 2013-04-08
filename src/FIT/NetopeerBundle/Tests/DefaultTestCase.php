@@ -1,18 +1,12 @@
 <?php
-//require_once '../WebDriver/WebDriver.php';
-//require_once '../WebDriver/WebDriver/Driver.php';
-//require_once '../WebDriver/WebDriver/MockDriver.php';
-//require_once '../WebDriver/WebDriver/WebElement.php';
-//require_once '../WebDriver/WebDriver/MockElement.php';
-//require_once '../WebDriver/WebDriver/FirefoxProfile.php';
-
 class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 {
 	private static $browserUrl = "https://sauvignon.liberouter.org/symfony/app.php/";
 
 	protected function setUp()
 	{
-		$this->setBrowser("*firefox");
+//		$this->setBrowser("*firefox");
+		$this->setBrowser("*safari");
 		$this->setBrowserUrl(self::$browserUrl);
 	}
 
@@ -24,7 +18,14 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 		$this->type("id=password", "dfadfadsfasf");
 		$this->click("name=login");
 		$this->waitForPageToLoad("30000");
-		$this->verifyTextPresent("The presented password is invalid.");
+		$this->isTextPresent("The presented password is invalid.");
+
+		$this->type("id=username", "dfasfdahsofhdasdfiasjdfpasjdfpasijfpasjfdpasdf");
+		$this->type("id=password", "dfadfadsfasf");
+		$this->click("name=login");
+		$this->waitForPageToLoad("30000");
+		$this->isTextPresent("Bad credentials.");
+
 		if ($this->loginCorrectly()) {
 			$this->click("link=Log out");
 			$this->waitForPageToLoad("30000");
@@ -43,17 +44,61 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 		$this->open("/symfony/app.php/");
 		if ($this->loginCorrectly()) {
 			$this->checkImages();
+
 			$this->type("id=form_host", "localhost");
 			$this->type("id=form_user", "alexadav");
 			$this->type("id=form_password", "w.uLR9dj");
 			$this->click("css=input[type=\"submit\"]");
 			$this->waitForPageToLoad("30000");
 			try {
-				$this->assertFalse($this->isTextPresent("Could not connect to socket. Error: Connection refused"));
+				$this->assertFalse($this->isTextPresent("Could not connect"));
 			} catch (PHPUnit_Framework_AssertionFailedError $e) {
 				array_push($this->verificationErrors, $e->toString());
-				throw new \Exception('Could not connect to socket. Error: Connection refused.');
+				throw new \Exception('Could not connect to server.');
+				return;
 			}
+
+			sleep(3);
+
+			$this->click("css=a.device-item");
+
+			sleep(3);
+
+			$this->type("id=form_password", "w.uLR9dj");
+			$this->click("css=input[type=\"submit\"]");
+			$this->waitForPageToLoad("30000");
+			try {
+				$this->assertFalse($this->isTextPresent("Could not connect"));
+			} catch (PHPUnit_Framework_AssertionFailedError $e) {
+				array_push($this->verificationErrors, $e->toString());
+				throw new \Exception('Could not connect to server for second time.');
+				return;
+			}
+
+			$this->isTextPresent("Form has been filled up correctly.");
+			sleep(2);
+			$this->click("//div[@id='history-of-connected-devices']/a/span[2]");
+			$this->isTextPresent("Device has been");
+
+			sleep(2);
+			$this->click("//div[@id='profiles-of-connected-devices']/a/span");
+			sleep(2);
+			$this->isTextPresent("Device has been");
+
+			$this->click("css=a.device-item");
+			$this->type("id=form_password", "w.uLR9dj");
+			$this->click("css=input[type=\"submit\"]");
+			$this->waitForPageToLoad("30000");
+
+			$this->click("link=disconnect");
+			$this->waitForPageToLoad("30000");
+			$this->click("link=disconnect");
+			$this->waitForPageToLoad("30000");
+
+			sleep(2);
+			$this->click("//div[@id='history-of-connected-devices']/a/span");
+			sleep(2);
+			$this->isTextPresent("Device has been");
 		}
 	}
 
