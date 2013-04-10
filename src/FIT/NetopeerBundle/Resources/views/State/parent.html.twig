@@ -1,10 +1,5 @@
-{% set outIterator2 = 1 %}
-{% if outIterator is not defined %}
-	{% set outIterator = 0 %}
-{% endif %}
-{% if outXpath is not defined %}
-	{% set outXpath = xpath %}
-{% endif %}
+{% set outIterator = 0 %}
+{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
 {% if hasChildren is not defined %}
 	{% set hasChildren = false %}
 {% endif %}
@@ -19,8 +14,6 @@
 		{% endif %}
 
 		{% if element.attributes.config is defined and element.attributes.config == "true" %}
-			{% set outIterator = 1 %}
-			{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
 			{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': useLevel, 'iterator': iterator, 'hasChildren': hasChildren} %}
 		{% else %}
 			{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element, 'key': key, 'level': level, 'addLevel': useLevel, 'hasChildren': hasChildren} %}
@@ -30,23 +23,21 @@
 		
 
 		{% for key, el in element %}
+			{% set outIterator = outIterator + 1 %}
+
 			{% if element.hasChildren() %}
-				{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
 				{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': element.getChildren(), 'xpath': outXpath, 'key': key, 'level': level + 1, 'iterator': outIterator, 'hasChildren': true } %}
 			{% else %}
 				{# next line is commented because issue #763, please visit for more informations #}
-				{# set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']/*[' ~ outIterator2 ~ ']' #}
+				{#{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']/*[' ~ outIterator2 ~ ']' %}#}
 
 				{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']' %}
-
 				{% if element.current().attributes.config is defined and element.current().attributes.config == "true" %}
 					{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element.current(), 'xpath': tmpXpath, 'key': key, 'level': level + 1, 'addLevel': true, 'iterator': outIterator} %}
 				{% else %}
 					{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element.current(), 'key': key, 'level': level + 1, 'addLevel': true} %}
 				{% endif %}
 			{% endif %}
-			{% set outIterator = outIterator + 1 %}
-			{% set outIterator2 = outIterator2 + 1 %}
 		{% endfor %}
 	</div>
 {% else %}	
