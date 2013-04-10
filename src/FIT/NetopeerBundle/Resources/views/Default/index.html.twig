@@ -22,7 +22,9 @@
 						targetConfigure.text("Could not configure device.");
 					}
 					if (dataArr['message']) {
-						$("#config h2").after(prepareFlashMessage(dataArr['status'], dataArr['message']));
+						var flash = prepareFlashMessage(jsonArr['status'], jsonArr['message']);
+						$(".alert-cover").append($(flash).hide());
+						$(flash).animateAlert();
 					}
 					reloadHistoryOfConnectedDevices();
 				});
@@ -45,6 +47,7 @@
 				"class": "alert " + status
 			});
 			flashMessage.text(message);
+			flashMessage.prepend($("<span/>").addClass('close').text('X'));
 			setTimeout(function() {
 				flashMessage.fadeOut().remove();
 			}, 3000);
@@ -72,7 +75,9 @@
 						}
 					}
 					if (jsonArr['message']) {
-						$("#history-and-profiles").prepend(prepareFlashMessage(jsonArr['status'], jsonArr['message']));
+						var flash = prepareFlashMessage(jsonArr['status'], jsonArr['message']);
+						$(".alert-cover").append($(flash).hide());
+						$(flash).animateAlert();
 					}
 				});
 			}).delegate("a.device-item", 'click', function($e) {
