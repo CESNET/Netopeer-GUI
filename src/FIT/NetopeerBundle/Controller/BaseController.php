@@ -90,10 +90,15 @@ class BaseController extends Controller
 		$this->assign("singleFlashes", $singleFlashes);
 		$this->assign("allFlashes", $allFlashes);
 
-		$dataClass = $this->get('DataModel');
-		$dataClass->buildMenuStructure($this->activeSectionKey);
-		$this->assign('topmenu', $dataClass->getModels());
-		$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl));
+		$this->assign("topmenu", array());
+		$this->assign("submenu", array());
+		if ($this->getRequest()->get('_route') !== '_home' &&
+				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
+			$dataClass = $this->get('DataModel');
+			$dataClass->buildMenuStructure($this->activeSectionKey);
+			$this->assign('topmenu', $dataClass->getModels());
+			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl));
+		}
 
 		try {
 			if ($this->getRequest()->get('key') != "") {

@@ -310,8 +310,13 @@ class DefaultController extends BaseController
 		// we are in section
 		} else {
 			$connArray = $this->getRequest()->getSession()->get('session-connections');
-			$host = unserialize($connArray[$key]);
-			$this->assign('sectionName', $host->host);
+			if (isset($connArray[$key])) {
+				$host = unserialize($connArray[$key]);
+				$this->assign('sectionName', $host->host);
+			} else {
+				$this->getRequest()->getSession()->setFlash('state error', "You try to load device you are not connected to.");
+				return $this->redirect($this->generateUrl("_home", array()));
+			}
 
 			// because we do not allow changing layout in section, controls will be hidden
 			$this->assign('hideColumnControl', true);

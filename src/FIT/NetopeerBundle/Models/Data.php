@@ -747,15 +747,7 @@ class Data {
 			return 1;
 		}
 		$req = $this->container->get('request');
-		if ($req->get('_route') == "_home") {
-			/* internal call? */
-			return 0;
-		}
 
-		if ( !strlen($req->get('key')) ) {
-			$session->setFlash($this->flashState .' error', "You are not allow to see this connection. No index of key.");
-			return 1;
-		}
 		if ( !in_array( $req->get('key'), array_keys($session->get("session-connections")) ) ) {
 			$session->setFlash($this->flashState .' error', "You are not allow to see this connection. Bad Index of key.");
 			return 1;
