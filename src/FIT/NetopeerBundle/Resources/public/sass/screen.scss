@@ -311,7 +311,7 @@ table { width: 100%; margin: 15px 0px;
 
 /* tooltip */
 .tooltip { cursor: help;
-	.icon-help { @include background(rgba(255,255,255,0.3)); border: 1px solid #ddd; color: #888; text-shadow: 1px 1px 2px #ccc; width: 16px; height: 16px; line-height: 16px; text-align: center; @include inline-block; @include border-radius(3px); font-size: 13px; margin: -2px 0px -2px 0px; 
+	.icon-help { @include background(rgba(255,255,255,0.3)); border: 1px solid #ddd; color: #888; text-shadow: 1px 1px 2px #ccc; width: 16px; height: 16px; line-height: 16px; text-align: center; @include inline-block; @include border-radius(3px); font-size: 13px; margin: -4px 0px -2px 0px; 
 		&:hover { @include background(rgba(255,255,255,0.7)); border: 1px solid #bbb; }
 	}
 	.tooltip-description { display: none; }
