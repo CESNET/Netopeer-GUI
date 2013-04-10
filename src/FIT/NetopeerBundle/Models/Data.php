@@ -1001,7 +1001,7 @@ class Data {
 			}
 
 			return $res;
-		} else {
+		} else if ($res !== -1) {
 			return 1;
 		}
 		return 0;

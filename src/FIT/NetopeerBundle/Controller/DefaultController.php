@@ -778,7 +778,7 @@ class DefaultController extends BaseController
 				file_put_contents(__DIR__.'/../Data/models/tmp/edited.yin', $configXml->asXml());
 
 				$res = $this->executeEditConfig($key, $configXml->asXml());
-				if ($res == 0) {
+				if ($res !== 1) {
 					$this->get('session')->setFlash('config success', "Config has been edited successfully.");
 				}
 			} else {
