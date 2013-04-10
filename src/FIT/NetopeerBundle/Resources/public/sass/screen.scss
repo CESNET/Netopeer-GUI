@@ -100,6 +100,7 @@ nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), dark
 		.others { position:absolute; right: 0px; top: $hNavTop; min-width: 150px; @include background(rgba(darken($cBase, 5%), 0.9)); @include single-box-shadow(rgba(0,0,0,0.4), 0px, 0px, 8px);
 			a { border-bottom: 1px solid #000; display:block; padding: 10px 20px; color: #fff; font-size: 1.25em; text-decoration:none; text-align:right; line-height: 1em;
 				&:hover { background: $cComp1Dark; }
+				span.arrow { display: none; }
 			}
 		}
 	}
