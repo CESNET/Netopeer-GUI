@@ -37,7 +37,12 @@ $(document).ready(function() {
 	/* hide alerts after some time - only successfull */
 	setTimeout(function() {
 		$('.alert.success').fadeOut();
-	}, 5000); /* 5s */
+	}, 7000); /* 3s animation + 4s visible */
+
+	$(".alert-cover .alert").hide().delay(500).each(function() {
+		$(this).animateAlert();
+	});
+
 
 	/* when range input type, add number of current value before input */
 	$("input[type='range']").each(function(i, e) {
@@ -61,6 +66,25 @@ $(window).resize(function() {
 	showIconsOnLeafLine();
 	collapseTopNav();
 });
+
+/**
+ * set animation for alerts in .alert-cover
+ */
+(function( $ ) {
+	$.fn.animateAlert = function() {
+		if (!$(this).is(":hidden")) {
+			$(this).hide();
+		}
+		var topOffset = $(this).position().top;
+		var $alert = $(this);
+
+		$(this).css('top', 0 - $(this).outerHeight() - parseInt($(".alert-cover").css('top'), 10)).show().animate({
+			top: topOffset
+		}, 3000, 'easeOutBack').find('.close').click(function() {
+			$alert.fadeOut('fast');
+		});
+	};
+})( jQuery );
 
 function initPopupMenu($cover) {
 	$cover.find('.show-link').unbind('hover');

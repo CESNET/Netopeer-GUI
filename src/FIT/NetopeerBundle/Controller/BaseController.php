@@ -65,24 +65,28 @@ class BaseController extends Controller
 
 		// divide flash messages according to key into categories
 		foreach ($flashes as $key => $message) {
+			$isInfoMessage = false;
+
 			// a little bit tricky - if key contains word state, condition will be pass
-			if ( strpos($key, 'tate') ) { // key contains word state
+			if ( strpos($key, 'tate') && strpos($key, "info") ) { // key contains word state
 				$stateFlashes[$key] = $message;
-			} elseif ( strpos($key, 'onfig') ) { // key contains word config
+				$isInfoMessage = true;
+			} elseif ( strpos($key, 'onfig') && strpos($key, "info") ) { // key contains word config
 				$configFlashes[$key] = $message;
+				$isInfoMessage = true;
 			} elseif ( strpos($key, 'eftPane') ) { // key contains word leftPane
 				$leftPaneFlashes[$key] = $message;
 			} else { // key contains word single
 				$singleFlashes[$key] = $message;
 			}
 
-			$allFlashes[$key] = $message;
+			if (!$isInfoMessage) $allFlashes[$key] = $message;
 			$session->removeFlash($key);
 		}
 
-		$this->assign("stateFlashes", $stateFlashes);
-		$this->assign("configFlashes", $configFlashes);
-		$this->assign("leftPaneFlashes", $leftPaneFlashes);
+		$this->assign("stateInfoFlashes", $stateFlashes);
+		$this->assign("configInfoFlashes", $configFlashes);
+		$this->assign("allInfoFlashes", array_merge($stateFlashes, $configFlashes));
 		$this->assign("singleFlashes", $singleFlashes);
 		$this->assign("allFlashes", $allFlashes);
 

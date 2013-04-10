@@ -123,7 +123,6 @@ nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background:
 
 	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative; margin-top: 0px;
 		#history-of-connected-devices, #profiles-of-connected-devices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; overflow-y: scroll; @include box-sizing(border-box); }
-		.alert { margin-top: 0px; margin-left: 5px; margin-right: 5px; }
 		#history-of-connected-devices { height: 50%; padding-top: $sContentPadding; }
 		#profiles-of-connected-devices { border-top: 1px solid #333; padding-top: 5%; height: 50%; }
 		a { position: relative; @include ellipsis(); padding-top: 7px; padding-bottom: 7px;
@@ -232,12 +231,19 @@ body > section, #content { position: relative; @include box-sizing(border-box);
 
 	legend { font-size: 1.9em; margin-bottom: 15px; }
 }
-.alert { padding: 15px 20px; border: 1px solid #ccc; background: #fff; @include border-radius(5px); @include single-box-shadow(#d5d5d5, 0px, 0px, 8px); clear: both; margin: 15px 0px;
-	&.info { background: url($img + 'ico/info.png'); }
+.alert { padding: 15px 20px; border: 1px solid #ccc; background: #fff; @include border-radius(5px); @include single-box-shadow(#d5d5d5, 0px, 0px, 8px); clear: both; margin: 0px 0px 15px 0px;
+	&.info { background: url($img + 'ico/info.png'); background-color: #fff; }
 	&.success { background: url($img + 'ico/ok.png'); color: $cGreen; }
 	&.error { background: url($img + 'ico/error.png'); color: #820101; }
-
-	&.info, &.success, &.error { padding-left: 40px; background-position: 10px 12px; background-repeat: no-repeat; background-color: #fff; }
+	
+	&.info, &.success, &.error { padding-left: 40px; background-position: 10px 12px; background-repeat: no-repeat; }
+}
+.alert-cover { position: fixed; right: $sContentPadding; top: $hNavTop + 10px; z-index: 120; font-size: 1.4em;
+	.alert { background-color: #fff; background-color: rgba(255,255,255,0.8); border: 10px solid rgba(0,0,0,0.8); position: relative; padding-right: 40px;
+		.close { width: 16px; height: 16px; line-height: 16px; position: absolute; right: 5px; top: 5px; @include border-radius(3px); background: #fff; border: 1px solid #ccc; text-align: center;
+			&:hover { cursor: pointer; background-color: #ccc; border-color: #999; }
+		}
+	}
 }
 
 article#content { font-size: 1.4em; padding: $hNavTop $sContentPadding; 
@@ -305,7 +311,7 @@ table { width: 100%; margin: 15px 0px;
 
 /* tooltip */
 .tooltip { cursor: help;
-	.icon-help { @include background(rgba(255,255,255,0.3)); border: 1px solid #ddd; color: #888; text-shadow: 1px 1px 2px #ccc; width: 16px; height: 16px; line-height: 16px; text-align: center; @include inline-block; @include border-radius(3px); font-size: 13px; margin: -6px 0px -2px 0px; 
+	.icon-help { @include background(rgba(255,255,255,0.3)); border: 1px solid #ddd; color: #888; text-shadow: 1px 1px 2px #ccc; width: 16px; height: 16px; line-height: 16px; text-align: center; @include inline-block; @include border-radius(3px); font-size: 13px; margin: -2px 0px -2px 0px; 
 		&:hover { @include background(rgba(255,255,255,0.7)); border: 1px solid #bbb; }
 	}
 	.tooltip-description { display: none; }

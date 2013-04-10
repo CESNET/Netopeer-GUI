@@ -13,6 +13,7 @@
 	{% block stylesheet %}{% endblock stylesheet %}
 
 	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/jquery-1.7.2.min.js')}} "></script>
+	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/jquery-ui-1.10.2.custom.min.js')}} "></script>
 	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/modernizr.custom.43627.js')}} "></script>
 	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/selectivizr-min.js')}} "></script>
 	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/tooltip/gips.js')}} "></script>
@@ -58,9 +59,6 @@
 		{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
 		{# if submenu is defined and submenu #}
 			<nav id="left">
-				{% for type, message in leftPaneFlashes %}
-					<div class='alert {{type}}'>{{message|raw}}</div>
-				{% endfor %}
 				{% for subsection in submenu %}
 					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="{% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 				{% endfor %}
@@ -73,9 +71,17 @@
 		{% block topPart %}
 		{% endblock topPart %}
 
+		<div class="alert-cover">
+			{% if allFlashes|length %}
+				{% for type, message in allFlashes %}
+						<div class='alert {{type}}'><span class="close">X</span>{{message|raw}}</div>
+					{% endfor %}
+			{% endif %}
+		</div>
+
 		{% if singleColumnLayout == false %}
 			<section id="state" class="column{{addToColumnClass}}">
-				{% for type, message in stateFlashes %}
+				{% for type, message in stateInfoFlashes %}
 				    <div class='alert {{type}}'>{{message|raw}}</div>
 				{% endfor %}
 
@@ -84,9 +90,9 @@
 			</section>
 
 			<section id="config" class="column{{addToColumnClass}}">
-				{% for type, message in configFlashes %}
+				{% for type, message in configInfoFlashes %}
 				    <div class='alert {{type}}'>{{message|raw}}</div>
-				{% endfor %}				
+				{% endfor %}
 
 				{% block config %}
 				{% endblock config %}
@@ -94,7 +100,7 @@
 		{% else %}
 			<section id="content" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %}">
 
-				{% for type, message in allFlashes %}
+				{% for type, message in allInfoFlashes %}
 					<div class='alert {{type}}'>{{message|raw}}</div>
 				{% endfor %}
 
@@ -110,8 +116,8 @@
 
 		<article id="content">
 			{% block flashes %}
-				{% for type, message in singleFlashes %}
-				    <div class='alert {{type}}'>{{message|raw}}</div>
+				{% for type, message in allFlashes %}
+					<div class='alert {{type}}'><span class="close">X</span>{{message|raw}}</div>
 				{% endfor %}
 			{% endblock flashes %}	
 
