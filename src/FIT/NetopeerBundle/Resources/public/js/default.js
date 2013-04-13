@@ -218,6 +218,16 @@ function duplicateNode($elem) {
 	$form.find('.tooltip .icon-help').each(function() {
 		initDefaultTooltip($(this));
 	});
+
+	scrollToGeneratedForm($elem, $form);
+}
+
+function scrollToGeneratedForm($elem, $form) {
+	var section = $elem.parents("section");
+	l($form.offset().top - $("nav#top").outerHeight() - 20);
+	$(section).animate({
+		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight() - 20
+	}, 1000);
 }
 
 function removeNode($elem) {
@@ -247,6 +257,7 @@ function removeNode($elem) {
 	$currentParentLevel.append($form);
 
 	unwrapCoverForm($currentParentLevel, $cover);
+	scrollToGeneratedForm($elem, $form);
 }
 
 function generateNode($elem) {
@@ -288,6 +299,7 @@ function generateNode($elem) {
 	// append created form into the parent
 	$currentParentLevel.append($form);
 	unwrapCoverForm($currentParentLevel, $cover);
+	scrollToGeneratedForm($elem, $form);
 }
 
 function createFormUnderlay($elem) {
@@ -323,6 +335,10 @@ function createFormUnderlay($elem) {
 	$cover.find(".form-underlay").width(nWidth).height(nHeight).css({
 		'margin-top': 0,
 		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
+	});
+
+	$cover.find(".form-underlay").click(function() {
+
 	});
 
 	return $cover;
@@ -452,6 +468,11 @@ function createCloseButton($cover, $form) {
 			wrapCoverForm($cover, $form);
 		}
 	});
+	if ($cover.find('.form-underlay')) {
+		$cover.find('.form-underlay').click(function() {
+			wrapCoverForm($cover, $form);
+		});
+	}
 }
 
 // wrap unwrapped form back to cover whole tree form
