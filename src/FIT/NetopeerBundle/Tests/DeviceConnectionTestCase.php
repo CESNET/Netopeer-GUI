@@ -55,10 +55,13 @@ class DeviceConnectionTestCase extends DefaultTestCase
 			$this->waitForPageToLoad("30000");
 
 			// disconnect from devices
-			$this->click("link=disconnect");
-			$this->waitForPageToLoad("30000");
-			$this->click("link=disconnect");
-			$this->waitForPageToLoad("30000");
+			for ($i = 0; $i < 2; $i++) {
+				$this->click("link=disconnect");
+				$this->waitForPageToLoad("30000");
+				$this->assertTrue($this->isTextPresent("Successfully disconnected."), "Could not disconnect from device.");
+			}
+
+			$this->assertTrue($this->isTextPresent('You are not connected to any server'), "Did not disconnet from all devices");
 
 			sleep(2);
 

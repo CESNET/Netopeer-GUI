@@ -117,7 +117,7 @@
 		<article id="content">
 			{% block flashes %}
 				{% for type, message in allFlashes %}
-					<div class='alert {{type}}'><span class="close">X</span>{{message|raw}}</div>
+					<div class='alert {{type}}'>{{message|raw}}</div>
 				{% endfor %}
 			{% endblock flashes %}	
 
