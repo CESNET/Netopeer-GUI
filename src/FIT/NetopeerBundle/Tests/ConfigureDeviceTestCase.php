@@ -63,7 +63,8 @@ class ConfigureDeviceTestCase extends DefaultTestCase
 			$this->waitForPageToLoad("30000");
 			$this->checkPageError();
 
-			$this->assertTrue($this->isElementPresent("css=div.alert.error"), "Alert with Could not turn on Combo  should appear, error occured: ".$this->getText("css=.alert"));
+			sleep(2);
+			$this->assertTrue($this->isElementPresent("css=div.alert.error"), "Alert with Could not turn on Combo should appear");
 
 
 			if ($this->isTextPresent("Hanic probes")) {
