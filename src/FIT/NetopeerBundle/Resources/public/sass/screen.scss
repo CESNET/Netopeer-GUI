@@ -239,7 +239,7 @@ body > section, #content { position: relative; @include box-sizing(border-box);
 	
 	&.info, &.success, &.error { padding-left: 40px; background-position: 10px 12px; background-repeat: no-repeat; }
 }
-.alert-cover { position: fixed; right: $sContentPadding; top: $hNavTop + 10px; z-index: 120; font-size: 1.4em;
+.alert-cover { position: fixed; right: $sContentPadding; top: $hNavTop + 10px; z-index: 120; font-size: 1.4em; max-width: 25%;
 	.alert { background-color: #fff; background-color: rgba(255,255,255,0.8); border: 10px solid rgba(0,0,0,0.8); position: relative; padding-right: 40px;
 		.close { width: 16px; height: 16px; line-height: 16px; position: absolute; right: 5px; top: 5px; @include border-radius(3px); background: #fff; border: 1px solid #ccc; text-align: center;
 			&:hover { cursor: pointer; background-color: #ccc; border-color: #999; }
