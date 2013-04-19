@@ -931,6 +931,7 @@ class Data {
 				break;
 			case "editconfig":
 				$this->logger->info("Handle editConfig: ", array('configToSend' => $params['config']));
+				$this->validateXml($params['config']);
 				$res = $this->handle_editconfig($sock, $params);
 				break;
 			case "disconnect":
@@ -1139,6 +1140,42 @@ class Data {
 		} else {
 			return $result;
 		}
+	}
+
+	/**
+	 * Validates input string against validation files saved in models directory.
+	 * For now, only two validation step are set up - RelaxNG (*.rng) and Schema (*.xsd)
+	 *
+	 * @param string $xml   xml string to validate with RelaxNG and Schema, if available
+	 * @return int          0 on success, 1 on error
+	 */
+	private function validateXml($xml) {
+		$finder = new Finder();
+		$domDoc = new \DOMDocument();
+		$xml = "<mynetconfbase:data  xmlns:mynetconfbase='urn:ietf:params:xml:ns:netconf:base:1.0'>".$xml."</mynetconfbase:data>";
+		$domDoc->loadXML($xml);
+
+		$iterator = $finder
+				->files()
+				->name("/.*data\.(rng|xsd)$/")
+				->in($this->getPathToModels());
+
+		try {
+			foreach ($iterator as $file) {
+				$path = $file->getRealPath();
+				if (strpos($path, "rng")) {
+					$domDoc->relaxNGValidate($path);
+				} else if (strpos($path, "xsd")) {
+					$domDoc->schemaValidate($path);
+				}
+			}
+		} catch (\ErrorException $e) {
+			$this->logger->warn("XML is not valid.", array('error' => $e->getMessage(), 'xml' => $xml, 'RNGfile' => $path));
+			return 1;
+		}
+
+		return 0;
+
 	}
 
 	/**
