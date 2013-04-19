@@ -155,13 +155,13 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 	  	input.label { margin-left: 6px + (8px * $i); padding-left: 0px; }
 	  }
 	}
-	.level-0:not(.container):not(.list) { margin: 0px; border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f0f0f0;
+	.level-0:not(.container):not(.list) { margin: 0px; border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f4f4f4;
 		&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
-			.even { background: #f8f8f8; }
+			//.even { background: #f8f8f8; }
 			> .leaf-line:first-child { border-top: 1px solid #666; }
 		}
-		&:nth-child(odd) { 
-			.even { background: #f8f8f8; }
+		&:nth-child(odd) {
+			//.even { background: #f8f8f8; }
 			> .leaf-line:first-child { border-top: 1px solid #aaa; }
 		}
 	}
@@ -199,7 +199,7 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 	}	
 	.container, .list { margin: 25px 0px; 
 		> *:not(.container):not(.list) { border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f0f0f0;
-			&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333; 
+			&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
 				.dots { background-color: #fff; }
 			}
 		}
