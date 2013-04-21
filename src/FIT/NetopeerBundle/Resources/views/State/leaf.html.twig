@@ -37,7 +37,12 @@
 		</span>
 	</span>
 	{% if element.0 is defined %}
-		<span class="value">{{element.0}}</span>
+		<span class="value">{{element.0}}
+		</span>
+		{% if element.name == "session-id" %}
+<a href="{{ path("handleConnection", {"command": "killsession", "key": app.request.get('key'), "identifier": element.0} ) }}" title="Kill session" ><img src="{{ asset('bundles/netopeer/images/ico/skull.png') }}" alt="Kill" title="Kill"></a>
+		{% endif %}
+
 	{% else %}
 		<span class="value"></span>
 	{% endif %}

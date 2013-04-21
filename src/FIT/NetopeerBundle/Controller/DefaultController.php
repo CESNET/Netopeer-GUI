@@ -189,6 +189,8 @@ class DefaultController extends BaseController
 		if ($command === "getschema") {
 			$params['identifier'] = $identifier;
 			$params['format'] = "yin";
+		} elseif ($command === "killsession") {
+			$params['session-id'] = $identifier;
 		}
 
 		$res = $dataClass->handle($command, $params);

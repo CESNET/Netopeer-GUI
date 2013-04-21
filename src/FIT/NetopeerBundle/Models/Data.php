@@ -694,7 +694,7 @@ class Data {
 	}
 
 	/**
-	 * handle unlock action
+	 * handle getschema action
 	 *
 	 * @param  resource &$sock    socket descriptor
 	 * @param  array    &$params   must contain "identifier" of schema, can contain "version" and "format" of schema
@@ -732,6 +732,38 @@ class Data {
 				. (isset($decoded["bad-element"])?" (".  $decoded["bad-element"]  .")":"")
 			);
 			return 1;
+		}
+	}
+
+	/**
+	 * handle kill-session action
+	 *
+	 * @param  resource &$sock    socket descriptor
+	 * @param  array    &$params   must contain "session-id"
+	 * @param  mixed    &$result  decoded data from response
+	 * @return int          		0 on success, 1 on error
+	 */
+	private function handle_killsession(&$sock, &$params, &$result) {
+		if ($this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+		$session = $this->container->get('request')->getSession();
+		$sessionKey = $this->getHashFromKey($params['key']);
+
+		$arguments = array(
+			"type" 		=> self::MSG_KILL,
+			"session" 	=> $sessionKey,
+			"session-id"	=> $params["session-id"],
+		);
+
+		$decoded = $this->execute_operation($sock, $arguments);
+
+		if ($decoded["type"] === self::REPLY_OK) {
+			$session->setFlash($this->flashState .' success', "Session successfully killed.");
+			$this->updateConnLock($params['key']);
+		} else {
+			$this->logger->err("Could not kill session.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not kill session.");
 		}
 	}
 
@@ -948,6 +980,9 @@ class Data {
 				break;
 			case "getschema":
 				$res = $this->handle_getschema($sock, $params, $result);
+				break;
+			case "killsession":
+				$res = $this->handle_killsession($sock, $params, $result);
 				break;
 			default:
 				$this->container->get('request')->getSession()->setFlash($this->flashState .' info', printf("Command not implemented yet. (%s)", $command));
