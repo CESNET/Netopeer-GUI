@@ -129,6 +129,8 @@
 		</article>
 	{% endif %}	
 
-<div id="notif-bar">Notifications: <button onClick="notifWebSocket();">Connect</button><button onClick="doSend('{% if sessionHash is defined %}{{sessionHash}}{% endif %} -10 120');">Start</button><div id="notif-output"></div></div>
+{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
+<div id="notif-bar" style="position: fixed; bottom:30px; right: 0px;">Notifications: <button onClick="notifWebSocket();">Connect</button><button onClick="doSend('{% if sessionHash is defined %}{{sessionHash}}{% endif %} -10 0');">Start</button><div id="notif-output" style="overfow: scroll;"></div></div>
+{% endif %}
 </body>
 </html>
