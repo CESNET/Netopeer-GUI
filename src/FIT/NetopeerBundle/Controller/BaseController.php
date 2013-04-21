@@ -107,6 +107,7 @@ class BaseController extends Controller
 				if ($conn !== false) {
 					$this->assign('lockedConn', $conn->locked);
 					$this->assign('sessionStatus', $conn->sessionStatus);
+					$this->assign('sessionHash', $conn->hash);
 				}
 			}
 		} catch (\ErrorException $e) {

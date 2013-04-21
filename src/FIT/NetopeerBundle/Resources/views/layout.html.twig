@@ -18,6 +18,7 @@
 	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/selectivizr-min.js')}} "></script>
 	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/tooltip/gips.js')}} "></script>
 	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/default.js')}} "></script>
+	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/notifications.js')}} "></script>
 	{% block javascripts %}{% endblock javascripts %}
 
 	<title>{% block title %}{% endblock title %} {% block additionalTitle %}| Project Netopeer{% endblock additionalTitle %}</title>
@@ -123,9 +124,11 @@
 
 			{% block content %}
 			{% endblock content %}
+
+
 		</article>
 	{% endif %}	
 
-	
+<div id="notif-bar">Notifications: <button onClick="notifWebSocket();">Connect</button><button onClick="doSend('{% if sessionHash is defined %}{{sessionHash}}{% endif %} -10 120');">Start</button><div id="notif-output"></div></div>
 </body>
 </html>
