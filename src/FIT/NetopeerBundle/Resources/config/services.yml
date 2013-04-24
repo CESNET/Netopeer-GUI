@@ -25,3 +25,11 @@ services:
         class: FIT\NetopeerBundle\Twig\NetopeerTwigExtension
         tags:
             - { name: twig.extension }
+
+    winzou_cache:
+        factory_service: winzou_cache.factory
+        factory_method:  get
+        class:           %winzou_cache.driver.abstract%
+        arguments:
+            - file                       # just modify this value to use another cache
+            #- {'cache_dir': /tmp/cache } # you can omit this if you don't use FileCache or if the default value is ok for you

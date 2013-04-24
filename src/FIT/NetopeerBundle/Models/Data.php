@@ -201,10 +201,11 @@ class Data {
 			$this->getModuleIdentifiersForCurrentDevice($key);
 		}
 
-		if (isset($this->modelNamespaces[$moduleName])) {
-			$cnt = count($this->modelNamespaces[$moduleName]);
+		$modelNamespaces = $this->getModelNamespaces($key);
+		if (isset($modelNamespaces[$moduleName])) {
+			$cnt = count($modelNamespaces[$moduleName]);
 			if ($cnt == 1) {
-				$namespace = $this->modelNamespaces[$moduleName];
+				$namespace = $modelNamespaces[$moduleName];
 				if (isset($this->moduleIdentifiers[$namespace])) {
 					return $this->moduleIdentifiers[$namespace]['hash'] .
 							"/" . $this->moduleIdentifiers[$namespace]['moduleName'] .
@@ -1271,8 +1272,9 @@ XML;
 	 * @param  string $path
 	 */
 	public function buildMenuStructure($key, $path = "") {
+
 		// we will build menu structure only if we have not build it before
-		if ( !isset($this->models) || !count($this->models) ) {
+		if ( !$this->getModels($key) || !$this->getModelNamespaces($key) ) {
 			$finder = new Finder();
 
 			$params = array(
@@ -1335,7 +1337,8 @@ XML;
 				$this->logger->err("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
 				// nothing
 			}
-			$this->modelNamespaces = $namespaces;
+			$this->setModelNamespaces($key, $namespaces);
+
 
 			// we will check, if nodes from GET are same as models structure
 			// if not, they won't be displayed
@@ -1347,7 +1350,7 @@ XML;
 					$moduleWithIndex .= $module['index'];
 				}
 				if ($this->existsModelDirForName($moduleWithIndex)) {
-					$folders[] = array(
+					$folders[$moduleWithIndex] = array(
 						'path' => "module",
 						"params" => array(
 							'key' => $key,
@@ -1360,7 +1363,7 @@ XML;
 					);
 				}
 			}
-			$this->models = $folders;
+			$this->setModels($key, $folders);
 		}
 	}
 
@@ -1411,28 +1414,117 @@ XML;
 				}
 			}
 		}
-		$this->submenu[$moduleWithIndex] = $folders;
-
 		return $folders;
 	}
 
 	/**
 	 * Get models.
 	 *
+	 * @param  int    $key        session key of current connection
 	 * @return array|null
 	 */
-	public function getModels() {
+	public function getModels($key = -1) {
+		/**
+		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
+		 */
+		$cache = $this->container->get('winzou_cache');
+
+		if ($key === -1) {
+			$key = $this->container->get('request')->get('key');
+		}
+		$hashedKey = $this->getHashFromKey($key);
+		if ($hashedKey && $cache->contains('menuStructure_'.$hashedKey)) {
+//			$this->logger->addInfo("Cached file for menuStructure found.", array('key' => 'menuStructure_'.$hashedKey));
+			return $cache->fetch('menuStructure_'.$hashedKey);
+		}
 		return $this->models;
+	}
+
+	/**
+	 * save model folder structure
+	 *
+	 * @param  int    $key        session key of current connection
+	 * @param  array  $folders    array to persist
+	 * @param   int   $lifetime   cache lifetime in seconds
+	 */
+	public function setModels($key, $folders, $lifetime = 6000) {
+		/**
+		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
+		 */
+		$cache = $this->container->get('winzou_cache');
+		$hashedKey = $this->getHashFromKey($key);
+		$this->models = $folders;
+		$cache->save('menuStructure_'.$hashedKey, $folders, $lifetime);
+	}
+
+	/**
+	 * Get model namespaces.
+	 *
+	 * @param  int    $key        session key of current connection
+	 * @return array|null
+	 */
+	public function getModelNamespaces($key) {
+		/**
+		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
+		 */
+		$cache = $this->container->get('winzou_cache');
+		$hashedKey = $this->getHashFromKey($key);
+		if ($hashedKey && $cache->contains('modelNamespaces_'.$hashedKey)) {
+//			$this->logger->addInfo("Cached file for modelNamespaces found.", array('key' => 'modelNamespaces_'.$hashedKey));
+			return $cache->fetch('modelNamespaces_'.$hashedKey);
+		}
+		return $this->modelNamespaces;
+	}
+
+	/**
+	 * save model folder structure
+	 *
+	 * @param  int    $key        session key of current connection
+	 * @param  array  $namespaces array of namespaces to persist
+	 * @param   int   $lifetime   cache lifetime in seconds
+	 */
+	public function setModelNamespaces($key, $namespaces, $lifetime = 6000) {
+		/**
+		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
+		 */
+		$cache = $this->container->get('winzou_cache');
+		$hashedKey = $this->getHashFromKey($key);
+		$this->modelNamespaces = $namespaces;
+		$cache->save('modelNamespaces_'.$hashedKey, $namespaces, $lifetime);
+	}
+
+	/**
+	 * Invalidates cached files for menu structure
+	 *
+	 * @param  int    $key        session key of current connection
+	 */
+	public function invalidateMenuStructureForKey($key) {
+		/**
+		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
+		 */
+		$cache = $this->container->get('winzou_cache');
+		$hashedKey = $this->getHashFromKey($key);
+		if ($hashedKey && $cache->contains('modelNamespaces_'.$hashedKey)) {
+			$this->logger->addInfo("Invalidate cached file", array('key' => 'modelNamespaces_'.$hashedKey));
+			$cache->delete('modelNamespaces_'.$hashedKey);
+		}
+		if ($hashedKey && $cache->contains('menuStructure_'.$hashedKey)) {
+			$this->logger->addInfo("Invalidate cached file", array('key' => 'menuStructure_'.$hashedKey));
+			$cache->delete('menuStructure_'.$hashedKey);
+		}
+		$cache->deleteDeads();
 	}
 
 	/**
 	 * Get submenu for key.
 	 *
-	 * @param  int  $key session key of current connection
+	 * @param  string $index      index in array of submenu structure
+	 * @param  int    $key        session key of current connection
 	 * @return array
 	 */
-	public function getSubmenu($key) {
-		return isset($this->submenu[$key]) ? $this->submenu[$key] : array();
+	public function getSubmenu($index, $key) {
+		$models = $this->getModels($key);
+		return isset($models[$index]['children']) ? $models[$index]['children'] : array();
 	}
 
 	/**

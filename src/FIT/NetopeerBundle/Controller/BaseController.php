@@ -97,7 +97,7 @@ class BaseController extends Controller
 			$dataClass = $this->get('DataModel');
 			$dataClass->buildMenuStructure($this->activeSectionKey);
 			$this->assign('topmenu', $dataClass->getModels());
-			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl));
+			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
 		}
 
 		try {

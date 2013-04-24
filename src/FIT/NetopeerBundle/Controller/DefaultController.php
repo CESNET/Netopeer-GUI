@@ -151,6 +151,7 @@ class DefaultController extends BaseController
 	 * @Route("/changeColumnLayout/{newValue}/", name="changeColumnLayout")
 	 *
 	 * @param string $newValue    new value of columns settings
+	 * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
 	 */
 	public function changeColumnLayoutAction($newValue)
 	{
@@ -163,12 +164,30 @@ class DefaultController extends BaseController
 	}
 
 	/**
+	 * Reload current device and invalidate cache
+	 *
+	 * @Route("/reload/{key}/", name="reloadDevice")
+	 *
+	 * @param int     $key          key of connected device
+	 * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
+	 */
+	public function reloadDeviceAction($key)
+	{
+		$dataClass = $this->get('DataModel');
+		$dataClass->invalidateMenuStructureForKey($key);
+
+		//reconstructs a routing path and gets a routing array called $route_params
+		$url = $this->get('request')->headers->get('referer');
+		return new RedirectResponse($url);
+	}
+
+	/**
 	 * Handle actions and execute them in Models/Data
 	 *
 	 * @Route("/handle/{command}/{key}/{identifier}", defaults={"identifier" = ""}, name="handleConnection")
 	 *
 	 * @param string  $command      name of the command to handle (get, info, getconfig, getschema, connect, disconnect)
-	 * @param int     $key          key of connected server
+	 * @param int     $key          key of connected device
 	 * @param string   $identifier  identifier for get-schema
 	 * @return \Symfony\Component\HttpFoundation\RedirectResponse
 	 */
@@ -287,8 +306,8 @@ class DefaultController extends BaseController
 			$retArr['key'] = $key;
 			$routeName = 'module';
 			$modules = $dataClass->getModels();
-			if (isset($modules[0])) {
-				$module1st = $modules[0];
+			if (count($modules)) {
+				$module1st = array_shift($modules);
 				if (!isset($module1st["params"]["module"])) {
 					/* ERROR - wrong structure of model entry */
 					$this->get('data_logger')
