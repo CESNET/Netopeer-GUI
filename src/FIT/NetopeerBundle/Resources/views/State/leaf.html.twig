@@ -36,13 +36,17 @@
 			{% endif %}
 		</span>
 	</span>
-	{% if element.0 is defined %}
-		<span class="value">{{element.0}}
-		</span>
-		{% if element.name == "session-id" %}
-<a href="{{ path("handleConnection", {"command": "killsession", "key": app.request.get('key'), "identifier": element.0} ) }}" title="Kill session" ><img src="{{ asset('bundles/netopeer/images/ico/skull.png') }}" alt="Kill" title="Kill"></a>
-		{% endif %}
 
+	{% if element.name == "session-id" %}
+		<span class="edit-bar">
+				<a href="{{ path("handleConnection", {"command": "killsession", "key": app.request.get('key'), "identifier": element.0} ) }}" title="Kill this session" >
+					<img src="{{ asset('bundles/netopeer/images/ico/16_kill.png') }}" alt="Kill this session" title="Kill this session">
+				</a>
+			</span>
+	{% endif %}
+
+	{% if element.0 is defined %}
+		<span class="value">{{element.0}}</span>
 	{% else %}
 		<span class="value"></span>
 	{% endif %}
