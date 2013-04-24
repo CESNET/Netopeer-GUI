@@ -1,10 +1,17 @@
 <?php
 require_once 'DefaultTestCase.php';
 
+/**
+ * This class test
+ *
+ * tuje správné
+rozdělení horního menu do modulů, levého sloupce do sekcí, provedení změn ve vypsaném XML stromě --- editace hodnot,
+duplikování uzlů, mazání uzlů, zamykání a odemykání úložiště či zobrazení jedno- a dvou-sloupcového layoutu.
+ */
 class ConfigureDeviceTestCase extends DefaultTestCase
 {
 	/**
-	 * test Configure device link
+	 * Testing device configuration
 	 */
 	public function testConfigureDevice() {
 		$this->open(self::$browserUrl);
@@ -12,7 +19,6 @@ class ConfigureDeviceTestCase extends DefaultTestCase
 		// login to webGUI
 		if ($this->loginCorrectly()) {
 			$this->connectToDevice();
-
 			for ($second = 0; ; $second++) {
 				if ($second >= 60) $this->fail("Could not process get-schema. Connection timeout.");
 				try {
@@ -21,27 +27,76 @@ class ConfigureDeviceTestCase extends DefaultTestCase
 				sleep(1);
 			}
 
+
+			$this->connectToDevice();
+			for ($second = 0; ; $second++) {
+				if ($second >= 60) $this->fail("Could not process get-schema. Connection timeout.");
+				try {
+					if ($this->isTextPresent("Configure device")) break;
+				} catch (Exception $e) {}
+				sleep(1);
+			}
+
+			// handling lock and unlock
 			$this->click("link=Configure device");
 			$this->waitForPageToLoad("30000");
-			$this->checkPageError();
-
-			$this->checkColumnsChange();
-
-			$this->assertTrue($this->isElementPresent("css=.tooltip"), "Tooltip not presented");
-
-			// check lock and unlock
 			$this->click("//nav[@id='top']/a[2]/span");
 			$this->waitForPageToLoad("30000");
 
 			sleep(2);
-			$this->assertTrue($this->isTextPresent("Successfully locked."), "Error while locking data-store, error occured: ".$this->getText("css=.alert"));
 			$this->checkPageError();
+			$this->assertTrue($this->isTextPresent("Successfully locked."), "Error while locking data-store, error occured: ".$this->getText("css=.alert"));
 
+			$this->click("link=Connections");
+			$this->waitForPageToLoad("30000");
+			$this->click("css=#row-1 > td.configure > a");
+			$this->waitForPageToLoad("30000");
+
+			$this->click("css=input[type=\"submit\"]");
+			$this->waitForPageToLoad("30000");
+
+			sleep(2);
+			$this->assertTrue($this->isTextPresent("Error: The request requires a resource that is already in use."), "Edit config on locked resource should be disallowed, error occured: ".$this->getText("css=.alert"));
+
+			$this->click("//nav[@id='top']/a[2]/span");
+			$this->waitForPageToLoad("30000");
+
+			sleep(2);
+			$this->assertTrue($this->isTextPresent("Could not lock datastore"), "Locking device, which is already locked, should be disallowed, error occured: ".$this->getText("css=.alert"));
+
+			$this->click("link=Connections");
+			$this->waitForPageToLoad("30000");
+			$this->click("link=Configure device");
+			$this->waitForPageToLoad("30000");
 			$this->click("//nav[@id='top']/a[2]/span");
 			$this->waitForPageToLoad("30000");
 
 			sleep(2);
 			$this->assertTrue($this->isTextPresent("Successfully unlocked."), "Error while unlocking data-store, error occured: ".$this->getText("css=.alert"));
+
+			$this->click("link=Connections");
+			$this->waitForPageToLoad("30000");
+			$this->click("css=#row-1 > td.configure > a");
+			$this->waitForPageToLoad("30000");
+			$this->click("//nav[@id='top']/a[2]/span");
+			$this->waitForPageToLoad("30000");
+
+			sleep(2);
+			$this->assertTrue($this->isTextPresent("Successfully locked."), "Error while locking data-store, error occured: ".$this->getText("css=.alert"));
+			$this->click("css=input[type=\"submit\"]");
+			$this->waitForPageToLoad("30000");
+
+			sleep(2);
+			$this->assertTrue($this->isTextPresent("Config has been edited successfully."), "Device should be locked and edit-config should pass, error occured: ".$this->getText("css=.alert"));
+
+			$this->click("//nav[@id='top']/a[2]/span");
+			$this->waitForPageToLoad("30000");
+			sleep(2);
+			$this->assertTrue($this->isTextPresent("Successfully unlocked."), "Error while unlocking data-store, error occured: ".$this->getText("css=.alert"));
+			// end handling lock and unlock
+
+			$this->checkColumnsChange();
+			$this->assertTrue($this->isElementPresent("css=.tooltip"), "Tooltip not presented");
 
 			// check, if link All is presented
 			$this->assertTrue($this->isElementPresent("link=All"), "No module ALL exists.");
