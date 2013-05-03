@@ -1,0 +1,25 @@
+{
+    "name": "winzou/cache-bundle",
+    "description": "This bundle provides a simple cache management to Symfony2. Now you can use a cache system without reinventing it. It supports Apc, XCache, File, ZendData and Array..",
+    "keywords": ["symfony2", "cache", "apc", "memcache", "filecache"],
+    "type": "symfony-bundle",
+    "license": "MIT",
+    "homepage": "https://github.com/winzou/CacheBundle",
+    "authors": [
+        {
+            "name":     "winzou",
+            "homepage": "http://www.tutoriel-symfony2.fr/"
+        }
+    ],
+    "require": {
+        "php":             ">=5.3.0",
+        "symfony/symfony": ">=2.0",
+        "doctrine/common": ">=2.2"
+    },
+    "autoload": {
+        "psr-0": {
+            "winzou\\CacheBundle": ""
+        }
+    },
+    "target-dir" : "winzou/CacheBundle"
+}

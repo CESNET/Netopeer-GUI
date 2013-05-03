@@ -1,0 +1,38 @@
+services:
+    winzou_cache.factory:
+        class:     %winzou_cache.factory.class%
+        arguments:
+            - %winzou_cache.internal.drivers%
+            - { 'cache_dir': %winzou_cache.options.cache_dir% }
+
+    winzou_cache:
+        factory_service: winzou_cache.factory
+        factory_method:  getCache
+        class:           %winzou_cache.driver.abstract%
+        arguments:
+            - %winzou_cache.options.default_driver%
+
+    winzou_cache.apc:
+        class: %winzou_cache.driver.apc%
+
+    winzou_cache.array:
+        class: %winzou_cache.driver.array%
+
+    winzou_cache.file:
+        class: %winzou_cache.driver.file%
+        arguments:
+            - {'cache_dir': %winzou_cache.options.cache_dir%}
+
+    winzou_cache.lifetimefile:
+        class: %winzou_cache.driver.lifetimefile%
+        arguments:
+            - {'cache_dir': %winzou_cache.options.cache_dir_lifetime%}
+
+    winzou_cache.memcache:
+        class: %winzou_cache.driver.memcache%
+
+    winzou_cache.xcache:
+        class: %winzou_cache.driver.xcache%
+
+    winzou_cache.zenddata:
+        class: %winzou_cache.driver.zenddata%
