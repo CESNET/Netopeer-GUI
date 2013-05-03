@@ -1,6 +1,10 @@
 <?php
 require_once 'DefaultTestCase.php';
 
+/**
+ * Tests connection to the device, logout and using history
+ * of connected devices.
+ */
 class DeviceConnectionTestCase extends DefaultTestCase
 {
 	/**

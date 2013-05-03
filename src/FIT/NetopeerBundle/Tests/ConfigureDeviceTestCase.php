@@ -2,11 +2,11 @@
 require_once 'DefaultTestCase.php';
 
 /**
- * This class test
+ * Configure device test
  *
- * tuje správné
-rozdělení horního menu do modulů, levého sloupce do sekcí, provedení změn ve vypsaném XML stromě --- editace hodnot,
-duplikování uzlů, mazání uzlů, zamykání a odemykání úložiště či zobrazení jedno- a dvou-sloupcového layoutu.
+ * This class tests creating links and dividing them into top menu, left menu,
+ * handling edit config (create, duplicate, delete node), lock and unlock device,
+ * turning on and off double column layout.
  */
 class ConfigureDeviceTestCase extends DefaultTestCase
 {

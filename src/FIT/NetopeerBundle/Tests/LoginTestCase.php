@@ -1,6 +1,9 @@
 <?php
 require_once 'DefaultTestCase.php';
 
+/**
+ * Tests login into secured area of the app.
+ */
 class LoginTestCase extends DefaultTestCase
 {
 	/**

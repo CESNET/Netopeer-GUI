@@ -1,4 +1,7 @@
 <?php
+/**
+ * Parent class for all Selenium test cases.
+ */
 class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 {
 	protected static $browserUrl = "https://sauvignon.liberouter.org/symfony/app.php/";
