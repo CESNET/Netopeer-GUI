@@ -26,14 +26,18 @@ class UserSettings {
 	}
 
 	/**
-	 * @param int $duration   set duration in days for leaving devices in history
+	 * set duration in days for leaving devices in history
+	 *
+	 * @param int $duration
 	 */
 	public function setHistoryDuration($duration) {
 		$this->historyDuration = $duration;
 	}
 
 	/**
-	 * @return int  get duration in days for leaving devices in history
+	 * get duration in days for leaving devices in history
+	 *
+	 * @return int
 	 */
 	public function getHistoryDuration() {
 		return $this->historyDuration;

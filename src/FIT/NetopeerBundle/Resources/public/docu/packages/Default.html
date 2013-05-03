@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>NetconfWebGUI » Default</title>
+<title>NetopeerWebGUI » Default</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -15,12 +15,13 @@
 <body>
 <div class="navbar navbar-fixed-top">
 <div class="navbar-inner"><div class="container">
-<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetconfWebGUI</a><div class="nav-collapse"><ul class="nav">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetopeerWebGUI</a><div class="nav-collapse"><ul class="nav">
 <li class="dropdown">
 <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
                                     API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a>Namespaces</a></li>
 <li><a href="../namespaces/FIT.html"><i class="icon-th"></i> FIT</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
 </ul>
 </li>
 <li class="dropdown" id="charts-menu">
@@ -31,7 +32,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">16</span></a></li>
+                <span class="label label-info">18</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
                 <span class="label label-info">5</span>
@@ -62,13 +63,18 @@
 </li>
 <li class="nav-header">
 <i class="icon-custom icon-class"></i> Classes</li>
+<li><a href="#UserSettings" title="Class with settings of user.">UserSettings</a></li>
 <li><a href="#User" title="Class with Entity of logged user.">User</a></li>
 <li><a href="#BaseConnection" title="Class with Entity of connected device.">BaseConnection</a></li>
 <li><a href="#ConnectionSession" title="Class with Entity of connected device.">ConnectionSession</a></li>
 <li><a href="#NetopeerTwigExtension" title="Registers custom functions, which could be used in templates">NetopeerTwigExtension</a></li>
 <li><a href="#FITNetopeerExtension" title="This is the class that loads and manages your bundle configuration">FITNetopeerExtension</a></li>
 <li><a href="#Configuration" title="This is the class that validates and merges configuration from your app/config files">Configuration</a></li>
-<li><a href="#DefaultControllerTest" title="">DefaultControllerTest</a></li>
+<li><a href="#LoginTestCase" title="Tests login into secured area of the app.">LoginTestCase</a></li>
+<li><a href="#DeviceConnectionTestCase" title="Tests connection to the device, logout and using history
+of connected devices.">DeviceConnectionTestCase</a></li>
+<li><a href="#ConfigureDeviceTestCase" title="Configure device test">ConfigureDeviceTestCase</a></li>
+<li><a href="#DefaultTestCase" title="Parent class for all Selenium test cases.">DefaultTestCase</a></li>
 <li><a href="#FITNetopeerBundle" title="Class of FITNetopeerBundle">FITNetopeerBundle</a></li>
 <li><a href="#XMLoperations" title="">XMLoperations</a></li>
 <li><a href="#AjaxSharedData" title="This class holds shared data for Ajax operations">AjaxSharedData</a></li>
@@ -88,6 +94,28 @@ webGUI.">DefaultController</a></li>
 <div class="package-indent">
 <h3>
 <i class="icon-custom icon-class"></i> Classes and interfaces</h3>
+<div id="ConfigureDeviceTestCase" class="element ajax clickable class">
+<h1>ConfigureDeviceTestCase<a href="../classes/ConfigureDeviceTestCase.html">¶</a>
+</h1>
+<p class="short_description">Configure device test</p>
+<div class="details collapse"></div>
+<a href="../classes/ConfigureDeviceTestCase.html" class="more">« More »</a>
+</div>
+<div id="DefaultTestCase" class="element ajax clickable class">
+<h1>DefaultTestCase<a href="../classes/DefaultTestCase.html">¶</a>
+</h1>
+<p class="short_description">Parent class for all Selenium test cases.</p>
+<div class="details collapse"></div>
+<a href="../classes/DefaultTestCase.html" class="more">« More »</a>
+</div>
+<div id="DeviceConnectionTestCase" class="element ajax clickable class">
+<h1>DeviceConnectionTestCase<a href="../classes/DeviceConnectionTestCase.html">¶</a>
+</h1>
+<p class="short_description">Tests connection to the device, logout and using history
+of connected devices.</p>
+<div class="details collapse"></div>
+<a href="../classes/DeviceConnectionTestCase.html" class="more">« More »</a>
+</div>
 <div id="AjaxController" class="element ajax clickable class">
 <h1>AjaxController<a href="../classes/FIT.NetopeerBundle.Controller.AjaxController.html">¶</a>
 </h1>
@@ -159,6 +187,13 @@ webGUI.</p>
 <div class="details collapse"></div>
 <a href="../classes/FIT.NetopeerBundle.Entity.User.html" class="more">« More »</a>
 </div>
+<div id="UserSettings" class="element ajax clickable class">
+<h1>UserSettings<a href="../classes/FIT.NetopeerBundle.Entity.UserSettings.html">¶</a>
+</h1>
+<p class="short_description">Class with settings of user.</p>
+<div class="details collapse"></div>
+<a href="../classes/FIT.NetopeerBundle.Entity.UserSettings.html" class="more">« More »</a>
+</div>
 <div id="FITNetopeerBundle" class="element ajax clickable class">
 <h1>FITNetopeerBundle<a href="../classes/FIT.NetopeerBundle.FITNetopeerBundle.html">¶</a>
 </h1>
@@ -187,13 +222,6 @@ webGUI.</p>
 <div class="details collapse"></div>
 <a href="../classes/FIT.NetopeerBundle.Models.XMLoperations.html" class="more">« More »</a>
 </div>
-<div id="DefaultControllerTest" class="element ajax clickable class">
-<h1>DefaultControllerTest<a href="../classes/FIT.NetopeerBundle.Tests.Controller.DefaultControllerTest.html">¶</a>
-</h1>
-<p class="short_description"></p>
-<div class="details collapse"></div>
-<a href="../classes/FIT.NetopeerBundle.Tests.Controller.DefaultControllerTest.html" class="more">« More »</a>
-</div>
 <div id="NetopeerTwigExtension" class="element ajax clickable class">
 <h1>NetopeerTwigExtension<a href="../classes/FIT.NetopeerBundle.Twig.NetopeerTwigExtension.html">¶</a>
 </h1>
@@ -201,13 +229,20 @@ webGUI.</p>
 <div class="details collapse"></div>
 <a href="../classes/FIT.NetopeerBundle.Twig.NetopeerTwigExtension.html" class="more">« More »</a>
 </div>
+<div id="LoginTestCase" class="element ajax clickable class">
+<h1>LoginTestCase<a href="../classes/LoginTestCase.html">¶</a>
+</h1>
+<p class="short_description">Tests login into secured area of the app.</p>
+<div class="details collapse"></div>
+<a href="../classes/LoginTestCase.html" class="more">« More »</a>
+</div>
 </div>
 </div>
 </div>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-03-07T19:25:45+01:00.<br></footer></div>
+            generated on 2013-05-03T20:04:36+02:00.<br></footer></div>
 </div>
 </body>
 </html>

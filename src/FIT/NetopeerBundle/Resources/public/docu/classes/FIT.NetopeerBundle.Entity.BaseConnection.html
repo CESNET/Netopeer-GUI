@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>NetconfWebGUI » \FIT\NetopeerBundle\Entity\BaseConnection</title>
+<title>NetopeerWebGUI » \FIT\NetopeerBundle\Entity\BaseConnection</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -15,12 +15,13 @@
 <body>
 <div class="navbar navbar-fixed-top">
 <div class="navbar-inner"><div class="container">
-<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetconfWebGUI</a><div class="nav-collapse"><ul class="nav">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetopeerWebGUI</a><div class="nav-collapse"><ul class="nav">
 <li class="dropdown">
 <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
                                     API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a>Namespaces</a></li>
 <li><a href="../namespaces/FIT.html"><i class="icon-th"></i> FIT</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
 </ul>
 </li>
 <li class="dropdown" id="charts-menu">
@@ -31,7 +32,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">16</span></a></li>
+                <span class="label label-info">18</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
                 <span class="label label-info">5</span>
@@ -65,14 +66,17 @@
 <li class="method public "><a href="#method_getEnabled" title="getEnabled :: Get enabled"><span class="description">Get enabled</span><pre>getEnabled()</pre></a></li>
 <li class="method public "><a href="#method_getHost" title="getHost :: Get host"><span class="description">Get host</span><pre>getHost()</pre></a></li>
 <li class="method public "><a href="#method_getId" title="getId :: Get id"><span class="description">Get id</span><pre>getId()</pre></a></li>
+<li class="method public "><a href="#method_getKind" title="getKind :: Get kind"><span class="description">Get kind</span><pre>getKind()</pre></a></li>
 <li class="method public "><a href="#method_getPort" title="getPort :: Get port"><span class="description">Get port</span><pre>getPort()</pre></a></li>
 <li class="method public "><a href="#method_getUserId" title="getUserId :: Get userId"><span class="description">Get userId</span><pre>getUserId()</pre></a></li>
 <li class="method public "><a href="#method_getUsername" title="getUsername :: Get username"><span class="description">Get username</span><pre>getUsername()</pre></a></li>
+<li class="method public "><a href="#method_removeDeviceWithId" title="removeDeviceWithId :: removes device with id from connection db"><span class="description">removes device with id from connection db</span><pre>removeDeviceWithId()</pre></a></li>
 <li class="method public "><a href="#method_saveConnectionIntoDB" title="saveConnectionIntoDB :: Saves  connection info into DB - for history"><span class="description">Saves  connection info into DB - for history</span><pre>saveConnectionIntoDB()</pre></a></li>
 <li class="method public "><a href="#method_setAccessTime" title="setAccessTime :: Set accessTime"><span class="description">Set accessTime</span><pre>setAccessTime()</pre></a></li>
 <li class="method public "><a href="#method_setCreatedTime" title="setCreatedTime :: Set createdTime"><span class="description">Set createdTime</span><pre>setCreatedTime()</pre></a></li>
 <li class="method public "><a href="#method_setEnabled" title="setEnabled :: Set enabled"><span class="description">Set enabled</span><pre>setEnabled()</pre></a></li>
 <li class="method public "><a href="#method_setHost" title="setHost :: Set host"><span class="description">Set host</span><pre>setHost()</pre></a></li>
+<li class="method public "><a href="#method_setKind" title="setKind :: Set kind"><span class="description">Set kind</span><pre>setKind()</pre></a></li>
 <li class="method public "><a href="#method_setPort" title="setPort :: Set port"><span class="description">Set port</span><pre>setPort()</pre></a></li>
 <li class="method public "><a href="#method_setUserId" title="setUserId :: Set userId"><span class="description">Set userId</span><pre>setUserId()</pre></a></li>
 <li class="method public "><a href="#method_setUsername" title="setUsername :: Set username"><span class="description">Set username</span><pre>setUsername()</pre></a></li>
@@ -80,7 +84,10 @@
 </li>
 <li class="nav-header">
 <i class="icon-custom icon-property"></i> Properties
-                    <ul></ul>
+                    <ul>
+<li class="property public "><a href="#property_kindHistory" title="$kindHistory :: "><span class="description">constant for kind history</span><pre>$kindHistory</pre></a></li>
+<li class="property public "><a href="#property_kindProfile" title="$kindProfile :: "><span class="description">constant for kind profile</span><pre>$kindProfile</pre></a></li>
+</ul>
 </li>
 <li class="nav-header protected">» Protected
                     <ul>
@@ -90,6 +97,7 @@
 <li class="property protected "><a href="#property_enabled" title="$enabled :: "><span class="description">is this connection enabled</span><pre>$enabled</pre></a></li>
 <li class="property protected "><a href="#property_host" title="$host :: "><span class="description">target hostname</span><pre>$host</pre></a></li>
 <li class="property protected "><a href="#property_id" title="$id :: Unique numeric identifier"><span class="description"></span><pre>$id</pre></a></li>
+<li class="property protected "><a href="#property_kind" title="$kind :: "><span class="description">kind of the connection (history or profile)</span><pre>$kind</pre></a></li>
 <li class="property protected "><a href="#property_logger" title="$logger :: "><span class="description">instance of logging class</span><pre>$logger</pre></a></li>
 <li class="property protected "><a href="#property_port" title="$port :: "><span class="description">target port</span><pre>$port</pre></a></li>
 <li class="property protected "><a href="#property_securityContext" title="$securityContext :: "><span class="description"></span><pre>$securityContext</pre></a></li>
@@ -213,6 +221,16 @@
 <div class="subelement response"><code>integer</code></div>
 </div></div>
 </div>
+<a id="method_getKind"></a><div class="element clickable method public method_getKind" data-toggle="collapse" data-target=".method_getKind .collapse">
+<h2>Get kind</h2>
+<pre>getKind() : int</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>int</code></div>
+</div></div>
+</div>
 <a id="method_getPort"></a><div class="element clickable method public method_getPort" data-toggle="collapse" data-target=".method_getPort .collapse">
 <h2>Get port</h2>
 <pre>getPort() : integer</pre>
@@ -243,9 +261,23 @@
 <div class="subelement response"><code>string</code></div>
 </div></div>
 </div>
+<a id="method_removeDeviceWithId"></a><div class="element clickable method public method_removeDeviceWithId" data-toggle="collapse" data-target=".method_removeDeviceWithId .collapse">
+<h2>removes device with id from connection db</h2>
+<pre>removeDeviceWithId($deviceId) : bool</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$deviceId</h4><p>id of connected device</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>bool</code>0 on success, 1 on error</div>
+</div></div>
+</div>
 <a id="method_saveConnectionIntoDB"></a><div class="element clickable method public method_saveConnectionIntoDB" data-toggle="collapse" data-target=".method_saveConnectionIntoDB .collapse">
 <h2>Saves  connection info into DB - for history</h2>
-<pre>saveConnectionIntoDB(string $host, int $port, string $username) : int</pre>
+<pre>saveConnectionIntoDB(string $host, int $port, string $username, int $kind) : int</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -260,6 +292,9 @@
 <h4>$username</h4>
 <code>string</code>
 </div>
+<div class="subelement argument">
+<h4>$kind</h4>
+<code>int</code><p>kind of connection, values available as static variables</p></div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>int</code>0 on success, 1 on fail</div>
@@ -317,6 +352,19 @@
 </div>
 </div></div>
 </div>
+<a id="method_setKind"></a><div class="element clickable method public method_setKind" data-toggle="collapse" data-target=".method_setKind .collapse">
+<h2>Set kind</h2>
+<pre>setKind(integer $kind) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$kind</h4>
+<code>integer</code>
+</div>
+</div></div>
+</div>
 <a id="method_setPort"></a><div class="element clickable method public method_setPort" data-toggle="collapse" data-target=".method_setPort .collapse">
 <h2>Set port</h2>
 <pre>setPort(integer $port) </pre>
@@ -358,6 +406,18 @@
 </div>
 <h3>
 <i class="icon-custom icon-property"></i> Properties</h3>
+<a id="property_kindHistory"> </a><div class="element clickable property public property_kindHistory" data-toggle="collapse" data-target=".property_kindHistory .collapse">
+<h2>constant for kind history</h2>
+<pre>$kindHistory : int</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
+<a id="property_kindProfile"> </a><div class="element clickable property public property_kindProfile" data-toggle="collapse" data-target=".property_kindProfile .collapse">
+<h2>constant for kind profile</h2>
+<pre>$kindProfile : int</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description"><div class="long_description"></div></div></div>
+</div>
 <a id="property_accessTime"> </a><div class="element clickable property protected property_accessTime" data-toggle="collapse" data-target=".property_accessTime .collapse">
 <h2>time of the last access</h2>
 <pre>$accessTime : <a href="http://php.net/manual/en/class.datetime.php">\DateTime</a></pre>
@@ -434,6 +494,18 @@
 </table>
 </div></div>
 </div>
+<a id="property_kind"> </a><div class="element clickable property protected property_kind" data-toggle="collapse" data-target=".property_kind .collapse">
+<h2>kind of the connection (history or profile)</h2>
+<pre>$kind : int</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>ORM\Column</th>
+<td>(type="integer", options={"default" = 1})</td>
+</tr></table>
+</div></div>
+</div>
 <a id="property_logger"> </a><div class="element clickable property protected property_logger" data-toggle="collapse" data-target=".property_logger .collapse">
 <h2>instance of logging class</h2>
 <pre>$logger : \Symfony\Bridge\Monolog\Logger</pre>
@@ -495,7 +567,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-03-07T19:25:46+01:00.<br></footer></div>
+            generated on 2013-05-03T20:04:40+02:00.<br></footer></div>
 </div>
 </body>
 </html>

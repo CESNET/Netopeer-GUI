@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>NetconfWebGUI » \FIT\NetopeerBundle\Controller\DefaultController</title>
+<title>NetopeerWebGUI » \FIT\NetopeerBundle\Controller\DefaultController</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -15,12 +15,13 @@
 <body>
 <div class="navbar navbar-fixed-top">
 <div class="navbar-inner"><div class="container">
-<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetconfWebGUI</a><div class="nav-collapse"><ul class="nav">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetopeerWebGUI</a><div class="nav-collapse"><ul class="nav">
 <li class="dropdown">
 <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
                                     API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a>Namespaces</a></li>
 <li><a href="../namespaces/FIT.html"><i class="icon-th"></i> FIT</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
 </ul>
 </li>
 <li class="dropdown" id="charts-menu">
@@ -31,7 +32,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">16</span></a></li>
+                <span class="label label-info">18</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
                 <span class="label label-info">5</span>
@@ -63,6 +64,7 @@
 <li class="method public "><a href="#method_handleConnectionAction" title="handleConnectionAction :: Handle actions and execute them in Models/Data"><span class="description">Handle actions and execute them in Models/Data</span><pre>handleConnectionAction()</pre></a></li>
 <li class="method public "><a href="#method_indexAction" title="indexAction :: Prepares form for connection to the server and table with active connection list"><span class="description">Prepares form for connection to the server and table with active connection list</span><pre>indexAction()</pre></a></li>
 <li class="method public "><a href="#method_moduleAction" title="moduleAction :: Prepares section, module or subsection action data"><span class="description">Prepares section, module or subsection action data</span><pre>moduleAction()</pre></a></li>
+<li class="method public "><a href="#method_reloadDeviceAction" title="reloadDeviceAction :: Reload current device and invalidate cache"><span class="description">Reload current device and invalidate cache</span><pre>reloadDeviceAction()</pre></a></li>
 <li class="method public "><a href="#method_sessionInfoAction" title="sessionInfoAction :: Shows info page with information"><span class="description">Shows info page with information</span><pre>sessionInfoAction()</pre></a></li>
 <li class="method public inherited"><a href="#method_setActiveSectionKey" title="setActiveSectionKey :: sets current section key"><span class="description">sets current section key</span><pre>setActiveSectionKey()</pre></a></li>
 <li class="method public inherited"><a href="#method_setSubmenuUrl" title="setSubmenuUrl :: sets submenu URL."><span class="description">sets submenu URL.</span><pre>setSubmenuUrl()</pre></a></li>
@@ -150,7 +152,7 @@ webGUI.</p>
 </div>
 <a id="method_changeColumnLayoutAction"></a><div class="element clickable method public method_changeColumnLayoutAction" data-toggle="collapse" data-target=".method_changeColumnLayoutAction .collapse">
 <h2>Change session value for showing single or double column layout</h2>
-<pre>changeColumnLayoutAction(string $newValue) </pre>
+<pre>changeColumnLayoutAction(string $newValue) : array | \Symfony\Component\HttpFoundation\RedirectResponse</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -162,6 +164,10 @@ webGUI.</p>
 <div class="subelement argument">
 <h4>$newValue</h4>
 <code>string</code><p>new value of columns settings</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code><code>\Symfony\Component\HttpFoundation\RedirectResponse</code>
+</div>
 </div></div>
 </div>
 <a id="method_handleConnectionAction"></a><div class="element clickable method public method_handleConnectionAction" data-toggle="collapse" data-target=".method_handleConnectionAction .collapse">
@@ -181,7 +187,7 @@ webGUI.</p>
 </div>
 <div class="subelement argument">
 <h4>$key</h4>
-<code>int</code><p>key of connected server</p></div>
+<code>int</code><p>key of connected device</p></div>
 <div class="subelement argument">
 <h4>$identifier</h4>
 <code>string</code><p>identifier for get-schema</p>
@@ -255,6 +261,26 @@ Prepares subsection = second level of connected server tree</td>
 <div class="subelement argument">
 <h4>$subsection</h4>
 <code>null</code><code>string</code><p>name of the subsection</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code><code>\Symfony\Component\HttpFoundation\RedirectResponse</code>
+</div>
+</div></div>
+</div>
+<a id="method_reloadDeviceAction"></a><div class="element clickable method public method_reloadDeviceAction" data-toggle="collapse" data-target=".method_reloadDeviceAction .collapse">
+<h2>Reload current device and invalidate cache</h2>
+<pre>reloadDeviceAction(int $key) : array | \Symfony\Component\HttpFoundation\RedirectResponse</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>Route</th>
+<td>("/reload/{key}/", name="reloadDevice")</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$key</h4>
+<code>int</code><p>key of connected device</p></div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>array</code><code>\Symfony\Component\HttpFoundation\RedirectResponse</code>
@@ -720,7 +746,7 @@ and sends them to editConfig process</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-03-07T19:25:49+01:00.<br></footer></div>
+            generated on 2013-05-03T20:04:45+02:00.<br></footer></div>
 </div>
 </body>
 </html>

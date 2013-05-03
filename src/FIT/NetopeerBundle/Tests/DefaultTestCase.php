@@ -4,6 +4,9 @@
  */
 class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 {
+	/**
+	 * @var string  default URL for test
+	 */
 	protected static $browserUrl = "https://sauvignon.liberouter.org/symfony/app.php/";
 
 	/**

@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>NetconfWebGUI » \FIT\NetopeerBundle\Models\Data</title>
+<title>NetopeerWebGUI » \FIT\NetopeerBundle\Models\Data</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -15,12 +15,13 @@
 <body>
 <div class="navbar navbar-fixed-top">
 <div class="navbar-inner"><div class="container">
-<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetconfWebGUI</a><div class="nav-collapse"><ul class="nav">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetopeerWebGUI</a><div class="nav-collapse"><ul class="nav">
 <li class="dropdown">
 <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
                                     API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a>Namespaces</a></li>
 <li><a href="../namespaces/FIT.html"><i class="icon-th"></i> FIT</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
 </ul>
 </li>
 <li class="dropdown" id="charts-menu">
@@ -31,7 +32,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">16</span></a></li>
+                <span class="label label-info">18</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
                 <span class="label label-info">5</span>
@@ -64,6 +65,7 @@
 <li class="method public "><a href="#method_getHostFromKey" title="getHostFromKey :: Get host of SessionConnection for key."><span class="description">Get host of SessionConnection for key.</span><pre>getHostFromKey()</pre></a></li>
 <li class="method public "><a href="#method_getModelDirForName" title="getModelDirForName :: gets model dir name for module"><span class="description">gets model dir name for module</span><pre>getModelDirForName()</pre></a></li>
 <li class="method public "><a href="#method_getModelIdentificator" title="getModelIdentificator :: Get identificator (hash) of model - it is used as directory name of model"><span class="description">Get identificator (hash) of model - it is used as directory name of model</span><pre>getModelIdentificator()</pre></a></li>
+<li class="method public "><a href="#method_getModelNamespaces" title="getModelNamespaces :: Get model namespaces."><span class="description">Get model namespaces.</span><pre>getModelNamespaces()</pre></a></li>
 <li class="method public "><a href="#method_getModels" title="getModels :: Get models."><span class="description">Get models.</span><pre>getModels()</pre></a></li>
 <li class="method public "><a href="#method_getModelsDir" title="getModelsDir :: Get path to directory of data models."><span class="description">Get path to directory of data models.</span><pre>getModelsDir()</pre></a></li>
 <li class="method public "><a href="#method_getPathToModels" title="getPathToModels :: get path to models in file system"><span class="description">get path to models in file system</span><pre>getPathToModels()</pre></a></li>
@@ -74,11 +76,13 @@
 <li class="method public "><a href="#method_getUserFromKey" title="getUserFromKey :: Get user of SessionConnection for key."><span class="description">Get user of SessionConnection for key.</span><pre>getUserFromKey()</pre></a></li>
 <li class="method public "><a href="#method_getXMLFromModel" title="getXMLFromModel :: Get XML code of model for creating new node."><span class="description">Get XML code of model for creating new node.</span><pre>getXMLFromModel()</pre></a></li>
 <li class="method public "><a href="#method_handle" title="handle :: handles all actions, which are allowed on socket"><span class="description">handles all actions, which are allowed on socket</span><pre>handle()</pre></a></li>
-<li class="method public "><a href="#method_handle_editconfig" title="handle_editconfig :: handle edit config action"><span class="description">handle edit config action</span><pre>handle_editconfig()</pre></a></li>
 <li class="method public "><a href="#method_handle_get" title="handle_get :: handle get action"><span class="description">handle get action</span><pre>handle_get()</pre></a></li>
 <li class="method public "><a href="#method_handle_getconfig" title="handle_getconfig :: handle get config action"><span class="description">handle get config action</span><pre>handle_getconfig()</pre></a></li>
-<li class="method public "><a href="#method_remove_xml_header" title="remove_xml_header :: Removes &lt;?xml?&gt; header from text."><span class="description">Removes &lt;?xml?&gt; header from text.</span><pre>remove_xml_header()</pre></a></li>
+<li class="method public "><a href="#method_invalidateMenuStructureForKey" title="invalidateMenuStructureForKey :: Invalidates cached files for menu structure"><span class="description">Invalidates cached files for menu structure</span><pre>invalidateMenuStructureForKey()</pre></a></li>
+<li class="method public "><a href="#method_removeXmlHeader" title="removeXmlHeader :: Removes &lt;?xml?&gt; header from text."><span class="description">Removes &lt;?xml?&gt; header from text.</span><pre>removeXmlHeader()</pre></a></li>
 <li class="method public "><a href="#method_setFlashState" title="setFlashState :: Sets current flash state - but only for allowed kinds"><span class="description">Sets current flash state - but only for allowed kinds</span><pre>setFlashState()</pre></a></li>
+<li class="method public "><a href="#method_setModelNamespaces" title="setModelNamespaces :: save model folder structure"><span class="description">save model folder structure</span><pre>setModelNamespaces()</pre></a></li>
+<li class="method public "><a href="#method_setModels" title="setModels :: save model folder structure"><span class="description">save model folder structure</span><pre>setModels()</pre></a></li>
 </ul>
 </li>
 <li class="nav-header private">» Private
@@ -86,21 +90,23 @@
 <li class="method private "><a href="#method_addLog" title="addLog :: Add text to info log."><span class="description">Add text to info log.</span><pre>addLog()</pre></a></li>
 <li class="method private "><a href="#method_buildSubmenu" title="buildSubmenu :: prepares left submenu - modules of current top menu item"><span class="description">prepares left submenu - modules of current top menu item</span><pre>buildSubmenu()</pre></a></li>
 <li class="method private "><a href="#method_checkDecodedData" title="checkDecodedData :: checks decoded data, if there an error occurs"><span class="description">checks decoded data, if there an error occurs</span><pre>checkDecodedData()</pre></a></li>
-<li class="method private "><a href="#method_check_elem_match" title="check_elem_match :: Check if two elements match."><span class="description">Check if two elements match.</span><pre>check_elem_match()</pre></a></li>
-<li class="method private "><a href="#method_check_logged_keys" title="check_logged_keys :: checks, if logged keys are valid"><span class="description">checks, if logged keys are valid</span><pre>check_logged_keys()</pre></a></li>
-<li class="method private "><a href="#method_complete_attributes" title="complete_attributes :: Completes tree structure for target element."><span class="description">Completes tree structure for target element.</span><pre>complete_attributes()</pre></a></li>
+<li class="method private "><a href="#method_checkElemMatch" title="checkElemMatch :: Check if two elements match."><span class="description">Check if two elements match.</span><pre>checkElemMatch()</pre></a></li>
+<li class="method private "><a href="#method_checkLoggedKeys" title="checkLoggedKeys :: checks, if logged keys are valid"><span class="description">checks, if logged keys are valid</span><pre>checkLoggedKeys()</pre></a></li>
+<li class="method private "><a href="#method_completeAttributes" title="completeAttributes :: Completes tree structure for target element."><span class="description">Completes tree structure for target element.</span><pre>completeAttributes()</pre></a></li>
 <li class="method private "><a href="#method_execute_operation" title="execute_operation :: executes operation - sends message into the socket"><span class="description">executes operation - sends message into the socket</span><pre>execute_operation()</pre></a></li>
-<li class="method private "><a href="#method_find_and_complete" title="find_and_complete :: Find corresponding $el in configuration model $model and complete attributes from $model."><span class="description">Find corresponding $el in configuration model $model and complete attributes from $model.</span><pre>find_and_complete()</pre></a></li>
+<li class="method private "><a href="#method_findAndComplete" title="findAndComplete :: Find corresponding $el in configuration model $model and complete attributes from $model."><span class="description">Find corresponding $el in configuration model $model and complete attributes from $model.</span><pre>findAndComplete()</pre></a></li>
 <li class="method private "><a href="#method_getConnFromKey" title="getConnFromKey :: Find instance of SessionConnection.class for key."><span class="description">Find instance of SessionConnection.class for key.</span><pre>getConnFromKey()</pre></a></li>
+<li class="method private "><a href="#method_getElementParent" title="getElementParent :: Get parent for element."><span class="description">Get parent for element.</span><pre>getElementParent()</pre></a></li>
 <li class="method private "><a href="#method_getHashFromKey" title="getHashFromKey :: Get hash for current connection"><span class="description">Get hash for current connection</span><pre>getHashFromKey()</pre></a></li>
 <li class="method private "><a href="#method_getJsonError" title="getJsonError :: Sets error message based on JSON ERROR CODE."><span class="description">Sets error message based on JSON ERROR CODE.</span><pre>getJsonError()</pre></a></li>
 <li class="method private "><a href="#method_getModuleIdentifiersForCurrentDevice" title="getModuleIdentifiersForCurrentDevice :: Find hash identifiers from DB for key"><span class="description">Find hash identifiers from DB for key</span><pre>getModuleIdentifiersForCurrentDevice()</pre></a></li>
 <li class="method private "><a href="#method_getModulePathByRootModuleName" title="getModulePathByRootModuleName :: get path for module name, includes identifier"><span class="description">get path for module name, includes identifier</span><pre>getModulePathByRootModuleName()</pre></a></li>
-<li class="method private "><a href="#method_get_element_parent" title="get_element_parent :: Get parent for element."><span class="description">Get parent for element.</span><pre>get_element_parent()</pre></a></li>
 <li class="method private "><a href="#method_handle_connect" title="handle_connect :: Handles connection to the socket"><span class="description">Handles connection to the socket</span><pre>handle_connect()</pre></a></li>
 <li class="method private "><a href="#method_handle_disconnect" title="handle_disconnect :: handle get config action"><span class="description">handle get config action</span><pre>handle_disconnect()</pre></a></li>
-<li class="method private "><a href="#method_handle_getschema" title="handle_getschema :: handle unlock action"><span class="description">handle unlock action</span><pre>handle_getschema()</pre></a></li>
+<li class="method private "><a href="#method_handle_editconfig" title="handle_editconfig :: handle edit config action"><span class="description">handle edit config action</span><pre>handle_editconfig()</pre></a></li>
+<li class="method private "><a href="#method_handle_getschema" title="handle_getschema :: handle getschema action"><span class="description">handle getschema action</span><pre>handle_getschema()</pre></a></li>
 <li class="method private "><a href="#method_handle_info" title="handle_info :: handle info action"><span class="description">handle info action</span><pre>handle_info()</pre></a></li>
+<li class="method private "><a href="#method_handle_killsession" title="handle_killsession :: handle kill-session action"><span class="description">handle kill-session action</span><pre>handle_killsession()</pre></a></li>
 <li class="method private "><a href="#method_handle_lock" title="handle_lock :: handle lock action"><span class="description">handle lock action</span><pre>handle_lock()</pre></a></li>
 <li class="method private "><a href="#method_handle_unlock" title="handle_unlock :: handle unlock action"><span class="description">handle unlock action</span><pre>handle_unlock()</pre></a></li>
 <li class="method private "><a href="#method_isResponseValid" title="isResponseValid :: Check, if XML response is valid."><span class="description">Check, if XML response is valid.</span><pre>isResponseValid()</pre></a></li>
@@ -108,8 +114,9 @@
 <li class="method private "><a href="#method_mergeWithModel" title="mergeWithModel :: Add attributes from configuration model to response such as config, mandatory, type."><span class="description">Add attributes from configuration model to response such as config, mandatory, type.</span><pre>mergeWithModel()</pre></a></li>
 <li class="method private "><a href="#method_readnetconf" title="readnetconf :: Read response from socket"><span class="description">Read response from socket</span><pre>readnetconf()</pre></a></li>
 <li class="method private "><a href="#method_readnetconf2" title="readnetconf2 :: Read response from socket"><span class="description">Read response from socket</span><pre>readnetconf2()</pre></a></li>
-<li class="method private "><a href="#method_unwrap_rfc6242" title="unwrap_rfc6242 :: Parse $message formatted by Chunked Framing Mechanism (RFC6242)"><span class="description">Parse $message formatted by Chunked Framing Mechanism (RFC6242)</span><pre>unwrap_rfc6242()</pre></a></li>
+<li class="method private "><a href="#method_unwrapRFC6242" title="unwrapRFC6242 :: Parse $message formatted by Chunked Framing Mechanism (RFC6242)"><span class="description">Parse $message formatted by Chunked Framing Mechanism (RFC6242)</span><pre>unwrapRFC6242()</pre></a></li>
 <li class="method private "><a href="#method_updateConnLock" title="updateConnLock :: Updates array of SessionConnections."><span class="description">Updates array of SessionConnections.</span><pre>updateConnLock()</pre></a></li>
+<li class="method private "><a href="#method_validateXml" title="validateXml :: Validates input string against validation files saved in models directory."><span class="description">Validates input string against validation files saved in models directory.</span><pre>validateXml()</pre></a></li>
 <li class="method private "><a href="#method_write2socket" title="write2socket :: Wrap message for Chunked Framing Mechanism (RFC6242) and write it into the socket."><span class="description">Wrap message for Chunked Framing Mechanism (RFC6242) and write it into the socket.</span><pre>write2socket()</pre></a></li>
 </ul>
 </li>
@@ -275,12 +282,32 @@
 <code>string</code>hashed identificator</div>
 </div></div>
 </div>
-<a id="method_getModels"></a><div class="element clickable method public method_getModels" data-toggle="collapse" data-target=".method_getModels .collapse">
-<h2>Get models.</h2>
-<pre>getModels() : array | null</pre>
+<a id="method_getModelNamespaces"></a><div class="element clickable method public method_getModelNamespaces" data-toggle="collapse" data-target=".method_getModelNamespaces .collapse">
+<h2>Get model namespaces.</h2>
+<pre>getModelNamespaces(int $key) : array | null</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$key</h4>
+<code>int</code><p>session key of current connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code><code>null</code>
+</div>
+</div></div>
+</div>
+<a id="method_getModels"></a><div class="element clickable method public method_getModels" data-toggle="collapse" data-target=".method_getModels .collapse">
+<h2>Get models.</h2>
+<pre>getModels(int $key) : array | null</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$key</h4>
+<code>int</code><p>session key of current connection</p></div>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>array</code><code>null</code>
@@ -341,11 +368,14 @@
 </div>
 <a id="method_getSubmenu"></a><div class="element clickable method public method_getSubmenu" data-toggle="collapse" data-target=".method_getSubmenu .collapse">
 <h2>Get submenu for key.</h2>
-<pre>getSubmenu(int $key) : array</pre>
+<pre>getSubmenu(string $index, int $key) : array</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
 <h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$index</h4>
+<code>string</code><p>index in array of submenu structure</p></div>
 <div class="subelement argument">
 <h4>$key</h4>
 <code>int</code><p>session key of current connection</p></div>
@@ -424,26 +454,6 @@
 <code>int</code>0 on success, 1 on error</div>
 </div></div>
 </div>
-<a id="method_handle_editconfig"></a><div class="element clickable method public method_handle_editconfig" data-toggle="collapse" data-target=".method_handle_editconfig .collapse">
-<h2>handle edit config action</h2>
-<pre>handle_editconfig(resource $sock, array $params) : mixed</pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Parameters</h3>
-<div class="subelement argument">
-<h4>$sock</h4>
-<code>resource</code><p>&$sock      socket descriptor</p>
-</div>
-<div class="subelement argument">
-<h4>$params</h4>
-<code>array</code><p>&$params   array of values for mod_netconf (type, params...)</p>
-</div>
-<h3>Returns</h3>
-<div class="subelement response">
-<code>mixed</code>decoded data on success, 1 on error</div>
-</div></div>
-</div>
 <a id="method_handle_get"></a><div class="element clickable method public method_handle_get" data-toggle="collapse" data-target=".method_handle_get .collapse">
 <h2>handle get action</h2>
 <pre>handle_get(resource $sock, array $params) : mixed</pre>
@@ -484,9 +494,21 @@
 <code>mixed</code>decoded data on success, 1 on error</div>
 </div></div>
 </div>
-<a id="method_remove_xml_header"></a><div class="element clickable method public method_remove_xml_header" data-toggle="collapse" data-target=".method_remove_xml_header .collapse">
+<a id="method_invalidateMenuStructureForKey"></a><div class="element clickable method public method_invalidateMenuStructureForKey" data-toggle="collapse" data-target=".method_invalidateMenuStructureForKey .collapse">
+<h2>Invalidates cached files for menu structure</h2>
+<pre>invalidateMenuStructureForKey(int $key) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$key</h4>
+<code>int</code><p>session key of current connection</p></div>
+</div></div>
+</div>
+<a id="method_removeXmlHeader"></a><div class="element clickable method public method_removeXmlHeader" data-toggle="collapse" data-target=".method_removeXmlHeader .collapse">
 <h2>Removes &lt;?xml?&gt; header from text.</h2>
-<pre>remove_xml_header(string $text) : mixed</pre>
+<pre>removeXmlHeader(string $text) : mixed</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -522,6 +544,42 @@
 <h3>Returns</h3>
 <div class="subelement response">
 <code>int</code>0 on error</div>
+</div></div>
+</div>
+<a id="method_setModelNamespaces"></a><div class="element clickable method public method_setModelNamespaces" data-toggle="collapse" data-target=".method_setModelNamespaces .collapse">
+<h2>save model folder structure</h2>
+<pre>setModelNamespaces(int $key, array $namespaces, int $lifetime) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$key</h4>
+<code>int</code><p>session key of current connection</p></div>
+<div class="subelement argument">
+<h4>$namespaces</h4>
+<code>array</code><p>array of namespaces to persist</p></div>
+<div class="subelement argument">
+<h4>$lifetime</h4>
+<code>int</code><p>cache lifetime in seconds</p></div>
+</div></div>
+</div>
+<a id="method_setModels"></a><div class="element clickable method public method_setModels" data-toggle="collapse" data-target=".method_setModels .collapse">
+<h2>save model folder structure</h2>
+<pre>setModels(int $key, array $folders, int $lifetime) </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$key</h4>
+<code>int</code><p>session key of current connection</p></div>
+<div class="subelement argument">
+<h4>$folders</h4>
+<code>array</code><p>array to persist</p></div>
+<div class="subelement argument">
+<h4>$lifetime</h4>
+<code>int</code><p>cache lifetime in seconds</p></div>
 </div></div>
 </div>
 <a id="method_addLog"></a><div class="element clickable method private method_addLog" data-toggle="collapse" data-target=".method_addLog .collapse">
@@ -572,9 +630,9 @@
 <code>mixed</code>decoded data on success, 1 on error</div>
 </div></div>
 </div>
-<a id="method_check_elem_match"></a><div class="element clickable method private method_check_elem_match" data-toggle="collapse" data-target=".method_check_elem_match .collapse">
+<a id="method_checkElemMatch"></a><div class="element clickable method private method_checkElemMatch" data-toggle="collapse" data-target=".method_checkElemMatch .collapse">
 <h2>Check if two elements match.</h2>
-<pre>check_elem_match($model_el, $possible_el) : bool</pre>
+<pre>checkElemMatch($model_el, $possible_el) : bool</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -585,9 +643,9 @@
 <div class="subelement response"><code>bool</code></div>
 </div></div>
 </div>
-<a id="method_check_logged_keys"></a><div class="element clickable method private method_check_logged_keys" data-toggle="collapse" data-target=".method_check_logged_keys .collapse">
+<a id="method_checkLoggedKeys"></a><div class="element clickable method private method_checkLoggedKeys" data-toggle="collapse" data-target=".method_checkLoggedKeys .collapse">
 <h2>checks, if logged keys are valid</h2>
-<pre>check_logged_keys() : int</pre>
+<pre>checkLoggedKeys() : int</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -596,9 +654,9 @@
 <code>int</code>0 on success, 1 on error</div>
 </div></div>
 </div>
-<a id="method_complete_attributes"></a><div class="element clickable method private method_complete_attributes" data-toggle="collapse" data-target=".method_complete_attributes .collapse">
+<a id="method_completeAttributes"></a><div class="element clickable method private method_completeAttributes" data-toggle="collapse" data-target=".method_completeAttributes .collapse">
 <h2>Completes tree structure for target element.</h2>
-<pre>complete_attributes($source, $target) </pre>
+<pre>completeAttributes($source, $target) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -627,9 +685,9 @@
 <code>array</code>response from mod_netconf</div>
 </div></div>
 </div>
-<a id="method_find_and_complete"></a><div class="element clickable method private method_find_and_complete" data-toggle="collapse" data-target=".method_find_and_complete .collapse">
+<a id="method_findAndComplete"></a><div class="element clickable method private method_findAndComplete" data-toggle="collapse" data-target=".method_findAndComplete .collapse">
 <h2>Find corresponding $el in configuration model $model and complete attributes from $model.</h2>
-<pre>find_and_complete(<a href="http://php.net/manual/en/class.simplexmlelement.php">\SimpleXMLElement</a> $model, <a href="http://php.net/manual/en/class.simplexmlelement.php">\SimpleXMLElement</a> $el) </pre>
+<pre>findAndComplete(<a href="http://php.net/manual/en/class.simplexmlelement.php">\SimpleXMLElement</a> $model, <a href="http://php.net/manual/en/class.simplexmlelement.php">\SimpleXMLElement</a> $el) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -656,6 +714,20 @@
 <h3>Returns</h3>
 <div class="subelement response">
 <code>bool</code><code>\ConnectionSession</code>
+</div>
+</div></div>
+</div>
+<a id="method_getElementParent"></a><div class="element clickable method private method_getElementParent" data-toggle="collapse" data-target=".method_getElementParent .collapse">
+<h2>Get parent for element.</h2>
+<pre>getElementParent($element) : bool | <a href="http://php.net/manual/en/class.simplexmlelement.php">\SimpleXMLElement</a></pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument"><h4>$element</h4></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>bool</code><code><a href="http://php.net/manual/en/class.simplexmlelement.php">\SimpleXMLElement</a></code>
 </div>
 </div></div>
 </div>
@@ -717,20 +789,6 @@
 <code>string</code>relative path on success, false on error</div>
 </div></div>
 </div>
-<a id="method_get_element_parent"></a><div class="element clickable method private method_get_element_parent" data-toggle="collapse" data-target=".method_get_element_parent .collapse">
-<h2>Get parent for element.</h2>
-<pre>get_element_parent($element) : bool | <a href="http://php.net/manual/en/class.simplexmlelement.php">\SimpleXMLElement</a></pre>
-<div class="labels"></div>
-<div class="row collapse"><div class="detail-description">
-<div class="long_description"></div>
-<h3>Parameters</h3>
-<div class="subelement argument"><h4>$element</h4></div>
-<h3>Returns</h3>
-<div class="subelement response">
-<code>bool</code><code><a href="http://php.net/manual/en/class.simplexmlelement.php">\SimpleXMLElement</a></code>
-</div>
-</div></div>
-</div>
 <a id="method_handle_connect"></a><div class="element clickable method private method_handle_connect" data-toggle="collapse" data-target=".method_handle_connect .collapse">
 <h2>Handles connection to the socket</h2>
 <pre>handle_connect(resource $sock, array $params, mixed $result) : int</pre>
@@ -775,8 +833,28 @@
 <code>int</code>0 on success, 1 on error</div>
 </div></div>
 </div>
+<a id="method_handle_editconfig"></a><div class="element clickable method private method_handle_editconfig" data-toggle="collapse" data-target=".method_handle_editconfig .collapse">
+<h2>handle edit config action</h2>
+<pre>handle_editconfig(resource $sock, array $params) : mixed</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$sock</h4>
+<code>resource</code><p>&$sock      socket descriptor</p>
+</div>
+<div class="subelement argument">
+<h4>$params</h4>
+<code>array</code><p>&$params   array of values for mod_netconf (type, params...)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>mixed</code>decoded data on success, 1 on error</div>
+</div></div>
+</div>
 <a id="method_handle_getschema"></a><div class="element clickable method private method_handle_getschema" data-toggle="collapse" data-target=".method_handle_getschema .collapse">
-<h2>handle unlock action</h2>
+<h2>handle getschema action</h2>
 <pre>handle_getschema(resource $sock, array $params, mixed $result) : int</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
@@ -813,6 +891,30 @@
 <div class="subelement argument">
 <h4>$params</h4>
 <code>array</code><p>&$params   array of values for mod_netconf (type, params...)</p>
+</div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>int</code>0 on success, 1 on error</div>
+</div></div>
+</div>
+<a id="method_handle_killsession"></a><div class="element clickable method private method_handle_killsession" data-toggle="collapse" data-target=".method_handle_killsession .collapse">
+<h2>handle kill-session action</h2>
+<pre>handle_killsession(resource $sock, array $params, mixed $result) : int</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$sock</h4>
+<code>resource</code><p>&$sock    socket descriptor</p>
+</div>
+<div class="subelement argument">
+<h4>$params</h4>
+<code>array</code><p>&$params   must contain "session-id"</p>
+</div>
+<div class="subelement argument">
+<h4>$result</h4>
+<code>mixed</code><p>&$result  decoded data from response</p>
 </div>
 <h3>Returns</h3>
 <div class="subelement response">
@@ -941,9 +1043,9 @@
 <code>string</code>trimmed string that was read</div>
 </div></div>
 </div>
-<a id="method_unwrap_rfc6242"></a><div class="element clickable method private method_unwrap_rfc6242" data-toggle="collapse" data-target=".method_unwrap_rfc6242 .collapse">
+<a id="method_unwrapRFC6242"></a><div class="element clickable method private method_unwrapRFC6242" data-toggle="collapse" data-target=".method_unwrapRFC6242 .collapse">
 <h2>Parse $message formatted by Chunked Framing Mechanism (RFC6242)</h2>
-<pre>unwrap_rfc6242(string $message) : string</pre>
+<pre>unwrapRFC6242(string $message) : string</pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"></div>
@@ -971,6 +1073,21 @@
 <div class="subelement argument">
 <h4>$key</h4>
 <code>int</code><p>session key</p></div>
+</div></div>
+</div>
+<a id="method_validateXml"></a><div class="element clickable method private method_validateXml" data-toggle="collapse" data-target=".method_validateXml .collapse">
+<h2>Validates input string against validation files saved in models directory.</h2>
+<pre>validateXml(string $xml) : int</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"><p>For now, only two validation step are set up - RelaxNG (<em>.rng) and Schema (</em>.xsd)</p></div>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$xml</h4>
+<code>string</code><p>xml string to validate with RelaxNG and Schema, if available</p></div>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>int</code>0 on success, 1 on error</div>
 </div></div>
 </div>
 <a id="method_write2socket"></a><div class="element clickable method private method_write2socket" data-toggle="collapse" data-target=".method_write2socket .collapse">
@@ -1150,7 +1267,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-03-07T19:25:48+01:00.<br></footer></div>
+            generated on 2013-05-03T20:04:44+02:00.<br></footer></div>
 </div>
 </body>
 </html>

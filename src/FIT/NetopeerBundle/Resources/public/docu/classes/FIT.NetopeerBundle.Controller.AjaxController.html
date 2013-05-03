@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>NetconfWebGUI » \FIT\NetopeerBundle\Controller\AjaxController</title>
+<title>NetopeerWebGUI » \FIT\NetopeerBundle\Controller\AjaxController</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -15,12 +15,13 @@
 <body>
 <div class="navbar navbar-fixed-top">
 <div class="navbar-inner"><div class="container">
-<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetconfWebGUI</a><div class="nav-collapse"><ul class="nav">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetopeerWebGUI</a><div class="nav-collapse"><ul class="nav">
 <li class="dropdown">
 <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
                                     API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a>Namespaces</a></li>
 <li><a href="../namespaces/FIT.html"><i class="icon-th"></i> FIT</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
 </ul>
 </li>
 <li class="dropdown" id="charts-menu">
@@ -31,7 +32,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">16</span></a></li>
+                <span class="label label-info">18</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
                 <span class="label label-info">5</span>
@@ -59,10 +60,13 @@
 <i class="icon-custom icon-method"></i> Methods
                     <ul>
 <li class="method public inherited"><a href="#method___construct" title="__construct :: constructor, which instantiate empty class variables"><span class="description">constructor, which instantiate empty class variables</span><pre>__construct()</pre></a></li>
+<li class="method public "><a href="#method_addFromHistoryToProfilesAction" title="addFromHistoryToProfilesAction :: Add device from history to profiles"><span class="description">Add device from history to profiles</span><pre>addFromHistoryToProfilesAction()</pre></a></li>
 <li class="method public "><a href="#method_connectedDeviceAttrAction" title="connectedDeviceAttrAction :: Get connected device attributes."><span class="description">Get connected device attributes.</span><pre>connectedDeviceAttrAction()</pre></a></li>
 <li class="method public "><a href="#method_getSchemaAction" title="getSchemaAction :: Change session value for showing single or double column layout"><span class="description">Change session value for showing single or double column layout</span><pre>getSchemaAction()</pre></a></li>
 <li class="method public "><a href="#method_getSchemaStatusAction" title="getSchemaStatusAction :: Get status of get-schema operation"><span class="description">Get status of get-schema operation</span><pre>getSchemaStatusAction()</pre></a></li>
 <li class="method public "><a href="#method_historyOfConnectedDevicesAction" title="historyOfConnectedDevicesAction :: Get history of connected devices"><span class="description">Get history of connected devices</span><pre>historyOfConnectedDevicesAction()</pre></a></li>
+<li class="method public "><a href="#method_profilesOfConnectedDevicesAction" title="profilesOfConnectedDevicesAction :: Get saved profiles of connected devices"><span class="description">Get saved profiles of connected devices</span><pre>profilesOfConnectedDevicesAction()</pre></a></li>
+<li class="method public "><a href="#method_removeFromHistoryOrProfileAction" title="removeFromHistoryOrProfileAction :: Remove device from history or profile"><span class="description">Remove device from history or profile</span><pre>removeFromHistoryOrProfileAction()</pre></a></li>
 <li class="method public inherited"><a href="#method_setActiveSectionKey" title="setActiveSectionKey :: sets current section key"><span class="description">sets current section key</span><pre>setActiveSectionKey()</pre></a></li>
 <li class="method public inherited"><a href="#method_setSubmenuUrl" title="setSubmenuUrl :: sets submenu URL."><span class="description">sets submenu URL.</span><pre>setSubmenuUrl()</pre></a></li>
 </ul>
@@ -127,6 +131,24 @@ store them and transform them.</span><pre>updateLocalModels()</pre></a></li>
 <th>inherited_from</th>
 <td>\FIT\NetopeerBundle\Controller\BaseController::__construct()</td>
 </tr></table>
+</div></div>
+</div>
+<a id="method_addFromHistoryToProfilesAction"></a><div class="element clickable method public method_addFromHistoryToProfilesAction" data-toggle="collapse" data-target=".method_addFromHistoryToProfilesAction .collapse">
+<h2>Add device from history to profiles</h2>
+<pre>addFromHistoryToProfilesAction(int $connectionId) : \Symfony\Component\HttpFoundation\Response</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>Route</th>
+<td>("/ajax/add-device-to-profiles/{connectionId}", name="addFromHistoryToProfiles")</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$connectionId</h4>
+<code>int</code><p>ID of connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Symfony\Component\HttpFoundation\Response</code></div>
 </div></div>
 </div>
 <a id="method_connectedDeviceAttrAction"></a><div class="element clickable method public method_connectedDeviceAttrAction" data-toggle="collapse" data-target=".method_connectedDeviceAttrAction .collapse">
@@ -215,6 +237,45 @@ store them and transform them.</span><pre>updateLocalModels()</pre></a></li>
 <h3>Returns</h3>
 <div class="subelement response">
 <code>array</code>$result</div>
+</div></div>
+</div>
+<a id="method_profilesOfConnectedDevicesAction"></a><div class="element clickable method public method_profilesOfConnectedDevicesAction" data-toggle="collapse" data-target=".method_profilesOfConnectedDevicesAction .collapse">
+<h2>Get saved profiles of connected devices</h2>
+<pre>profilesOfConnectedDevicesAction() : array</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>Route</th>
+<td>("/ajax/get-profiles/", name="profilesOfConnectedDevices")</td>
+</tr>
+<tr>
+<th>Template</th>
+<td>("FITNetopeerBundle:Ajax:historyOfConnectedDevices.html.twig")</td>
+</tr>
+</table>
+<h3>Returns</h3>
+<div class="subelement response">
+<code>array</code>$result</div>
+</div></div>
+</div>
+<a id="method_removeFromHistoryOrProfileAction"></a><div class="element clickable method public method_removeFromHistoryOrProfileAction" data-toggle="collapse" data-target=".method_removeFromHistoryOrProfileAction .collapse">
+<h2>Remove device from history or profile</h2>
+<pre>removeFromHistoryOrProfileAction(int $connectionId) : \Symfony\Component\HttpFoundation\Response</pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered"><tr>
+<th>Route</th>
+<td>("/ajax/remove-device/{connectionId}", name="removeFromHistoryOrProfile")</td>
+</tr></table>
+<h3>Parameters</h3>
+<div class="subelement argument">
+<h4>$connectionId</h4>
+<code>int</code><p>ID of connection</p></div>
+<h3>Returns</h3>
+<div class="subelement response"><code>\Symfony\Component\HttpFoundation\Response</code></div>
 </div></div>
 </div>
 <a id="method_setActiveSectionKey"></a><div class="element clickable method public method_setActiveSectionKey" data-toggle="collapse" data-target=".method_setActiveSectionKey .collapse">
@@ -378,7 +439,7 @@ store them and transform them.</h2>
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-03-07T19:25:50+01:00.<br></footer></div>
+            generated on 2013-05-03T20:04:46+02:00.<br></footer></div>
 </div>
 </body>
 </html>

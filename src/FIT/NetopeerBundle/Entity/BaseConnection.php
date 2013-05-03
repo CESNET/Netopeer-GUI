@@ -416,6 +416,7 @@ class BaseConnection {
 	}
 
 	/**
+	 * removes device with id from connection db
 	 * @param $deviceId id of connected device
 	 * @return bool 0 on success, 1 on error
 	 */

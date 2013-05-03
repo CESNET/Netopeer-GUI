@@ -3,7 +3,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 <meta charset="utf-8">
-<title>NetconfWebGUI » \FIT\NetopeerBundle\Controller\SecurityController</title>
+<title>NetopeerWebGUI » \FIT\NetopeerBundle\Controller\SecurityController</title>
 <meta name="author" content="Mike van Riel">
 <meta name="description" content="">
 <link href="../css/template.css" rel="stylesheet" media="all">
@@ -15,12 +15,13 @@
 <body>
 <div class="navbar navbar-fixed-top">
 <div class="navbar-inner"><div class="container">
-<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetconfWebGUI</a><div class="nav-collapse"><ul class="nav">
+<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a><a class="brand" href="../index.html">NetopeerWebGUI</a><div class="nav-collapse"><ul class="nav">
 <li class="dropdown">
 <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
                                     API Documentation <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a>Namespaces</a></li>
 <li><a href="../namespaces/FIT.html"><i class="icon-th"></i> FIT</a></li>
+<li><a href="../namespaces/global.html"><i class="icon-th"></i> global</a></li>
 </ul>
 </li>
 <li class="dropdown" id="charts-menu">
@@ -31,7 +32,7 @@
 <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
                                     Reports <b class="caret"></b></a><ul class="dropdown-menu">
 <li><a href="../errors.html"><i class="icon-remove-sign"></i> Errors 
-                <span class="label label-info">16</span></a></li>
+                <span class="label label-info">18</span></a></li>
 <li><a href="../markers.html"><i class="icon-map-marker"></i> Markers 
                 <ul><li>todo 
                 <span class="label label-info">5</span>
@@ -59,6 +60,7 @@
 <i class="icon-custom icon-method"></i> Methods
                     <ul>
 <li class="method public inherited"><a href="#method___construct" title="__construct :: constructor, which instantiate empty class variables"><span class="description">constructor, which instantiate empty class variables</span><pre>__construct()</pre></a></li>
+<li class="method public "><a href="#method_createUserAction" title="createUserAction :: Create new user."><span class="description">Create new user.</span><pre>createUserAction()</pre></a></li>
 <li class="method public "><a href="#method_loginAction" title="loginAction :: Login page action."><span class="description">Login page action.</span><pre>loginAction()</pre></a></li>
 <li class="method public "><a href="#method_logoutAction" title="logoutAction :: Logout page action."><span class="description">Logout page action.</span><pre>logoutAction()</pre></a></li>
 <li class="method public inherited"><a href="#method_setActiveSectionKey" title="setActiveSectionKey :: sets current section key"><span class="description">sets current section key</span><pre>setActiveSectionKey()</pre></a></li>
@@ -116,6 +118,24 @@
 <th>inherited_from</th>
 <td>\FIT\NetopeerBundle\Controller\BaseController::__construct()</td>
 </tr></table>
+</div></div>
+</div>
+<a id="method_createUserAction"></a><div class="element clickable method public method_createUserAction" data-toggle="collapse" data-target=".method_createUserAction .collapse">
+<h2>Create new user.</h2>
+<pre>createUserAction() </pre>
+<div class="labels"></div>
+<div class="row collapse"><div class="detail-description">
+<div class="long_description"></div>
+<table class="table table-bordered">
+<tr>
+<th>TODO</th>
+<td>: remove as soon as possible, security danger</td>
+</tr>
+<tr>
+<th>Route</th>
+<td>("/create-user-manually/", name="createUser")</td>
+</tr>
+</table>
 </div></div>
 </div>
 <a id="method_loginAction"></a><div class="element clickable method public method_loginAction" data-toggle="collapse" data-target=".method_loginAction .collapse">
@@ -265,7 +285,7 @@
 <div class="row"><footer class="span12">
             Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by <a href="http://glyphicons.com/">Glyphicons</a>.<br>
             Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor 2.0.0a12</a> and<br>
-            generated on 2013-03-07T19:25:50+01:00.<br></footer></div>
+            generated on 2013-05-03T20:04:46+02:00.<br></footer></div>
 </div>
 </body>
 </html>
