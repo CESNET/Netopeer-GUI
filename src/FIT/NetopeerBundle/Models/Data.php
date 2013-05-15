@@ -74,6 +74,7 @@ class Data {
 	const MSG_INFO				= 14;
 	const MSG_GENERIC			= 15;
 	const MSG_GETSCHEMA			= 16;
+	const MSG_RELOADHELLO			= 17;
 
 	/**
 	 * @var ContainerInterface   base bundle container
@@ -700,6 +701,39 @@ class Data {
 	}
 
 	/**
+	 * handle reload info action
+	 *
+	 * Result is the same as from handle_info()
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
+	 * @return int       		      0 on success, 1 on error
+	 */
+	private function handle_reloadhello(&$sock, &$params) {
+		if (isset($params["session"]) && ($params["session"] !== "")) {
+			$sessionKey = $params['session'];
+		} else {
+			if ($this->checkLoggedKeys() != 0) {
+				return 1;
+			}
+			$session = $this->container->get('request')->getSession();
+			$sessionKey = $this->getHashFromKey($params['key']);
+		}
+
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_RELOADHELLO,
+			"session" 	=> $sessionKey
+		));
+
+		if (!$decoded) {
+			/* error occurred, unexpected response */
+			$this->logger->err("Could get session info.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not get session info.");
+		}
+
+		return $decoded;
+	}
+
+	/**
 	 * handle info action
 	 *
 	 * @param  resource &$sock   	socket descriptor
@@ -911,7 +945,7 @@ class Data {
 		if ($res) {
 			return true;
 		}
-		return false;	
+		return false;
 	}
 
 	/**
@@ -1013,6 +1047,9 @@ class Data {
 			case "unlock":
 				$res = $this->handle_unlock($sock, $params);
 				break;
+			case "reloadhello":
+				$res = $this->handle_reloadhello($sock, $params);
+				break;
 			case "info":
 				$res = $this->handle_info($sock, $params);
 				break;
@@ -1030,7 +1067,8 @@ class Data {
 		fclose($sock);
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
-		if ($command === "info") {
+		if ($command === "info" || $command === "reloadhello") {
+			echo "reloadhello";
 			$this->handleResultsArr['info'] = $res;
 			return $res;
 		}

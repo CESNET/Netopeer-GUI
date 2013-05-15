@@ -270,7 +270,7 @@ class DefaultController extends BaseController
 	 * @Template("FITNetopeerBundle:Default:section.html.twig")
 	 *
 	 * @param int     $key          key of connected server
-	 * @param string  $action       name of the action
+	 * @param string  $action       name of the action ("session"|"reload")
 	 * @return array
 	 */
 	public function sessionInfoAction($key, $action)
@@ -287,6 +287,11 @@ class DefaultController extends BaseController
 			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
 
 			$this->assign("stateArr", $xml);
+		} else if ($action == "reload") {
+			echo "Reload info page";
+			$params = array('key' => $key);
+			var_dump($dataClass->handle("reloadhello", $params));
+			die();
 		}
 
 		$this->assign('singleColumnLayout', true);
