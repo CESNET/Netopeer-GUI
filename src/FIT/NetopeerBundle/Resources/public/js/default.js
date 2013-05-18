@@ -43,15 +43,15 @@
 		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
 		$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
 
-		$('.type-list .edit-bar .sibling').click(function() {
+		$(document).on('click', '.type-list .edit-bar .sibling', function() {
 			duplicateNode($(this));
 		});
 
-		$(".edit-bar .remove-child").click(function() {
+		$(document).on('click', ".edit-bar .remove-child", function() {
 			removeNode($(this));
 		});
 
-		$(".edit-bar .create-child").click(function() {
+		$(document).on('click', ".edit-bar .create-child", function() {
 			generateNode($(this));
 		});
 

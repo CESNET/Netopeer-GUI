@@ -172,9 +172,9 @@ if advised of the possibility of such damage.
 	max-width-column
 {% endblock singleContentClass %}
 
-{% block leftColumn %}
+{% block leftColumnAdditional %}
 	<div id="history-and-profiles"></div>
-{% endblock leftColumn %}
+{% endblock leftColumnAdditional %}
 
 {% block state %}
 	<form action="{{ path('_home') }}" method="post" {{ form_enctype(form) }} class="login">
