@@ -85,6 +85,14 @@ class DefaultController extends BaseController
 		// DependencyInjection (DI) - defined in Resources/config/services.yml
 		$dataClass = $this->get('DataModel');
 
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'title');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'additionalTitle');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'alerts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'state');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'config');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
+//		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
+
 		$host = "";
 		$port = "22";
 		$userName = "";
@@ -215,6 +223,10 @@ class DefaultController extends BaseController
 
 		//reconstructs a routing path and gets a routing array called $route_params
 		$url = $this->get('request')->headers->get('referer');
+		if ($this->getRequest()->isXmlHttpRequest()) {
+			$this->getRequest()->getSession()->set('isAjax', true);
+		}
+
 		return new RedirectResponse($url);
 	}
 
@@ -278,6 +290,11 @@ class DefaultController extends BaseController
 		$dataClass = $this->get('DataModel');
 		parent::setActiveSectionKey($key);
 		$dataClass->buildMenuStructure($key);
+
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'singleContent');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
 
 		if ( $action == "session" ) {
 			$session = $this->container->get('request')->getSession();
@@ -343,6 +360,17 @@ class DefaultController extends BaseController
 		// we will prepare filter form in column
 		$this->setSectionFilterForms();
 
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
+
+		if ($this->getRequest()->getSession()->get('isAjax') === true) {
+//			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
+//			TODO: najit chybu, proc sablona generuje prazdne horni menu
+		}
+
 		/* Show the first module we have */
 		if ( $module == null ) {
 			$retArr['key'] = $key;
@@ -403,6 +431,7 @@ class DefaultController extends BaseController
 		if ( $module == null || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
 			try {
 				$dataClass->setFlashState('config');
+				$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'config');
 				// getcofig part
 				if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
 					$xml = simplexml_load_string($xml, 'SimpleXMLIterator');

@@ -46,6 +46,7 @@ namespace FIT\NetopeerBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session;
+use Symfony\Component\HttpFoundation\Response;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -70,6 +71,10 @@ class BaseController extends Controller
 	 * @var array   array of all variables assigned into template
 	 */
 	private $twigArr;
+	/**
+	 * @var array   array of template blocks for ajax requests
+	 */
+	private $ajaxBlocksArr;
 
 	/**
 	 * Assignees variable to array, which will be send to template
@@ -95,6 +100,91 @@ class BaseController extends Controller
 			$this->assign('singleColumnLayout', $this->getRequest()->getSession()->get('singleColumnLayout'));
 		}
 
+		$this->prepareAndAssignFlashes();
+
+		$this->assign("topmenu", array());
+		$this->assign("submenu", array());
+		if ($this->getRequest()->get('_route') !== '_home' &&
+				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
+			$dataClass = $this->get('DataModel');
+			$dataClass->buildMenuStructure($this->activeSectionKey);
+			$this->assign('topmenu', $dataClass->getModels());
+			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
+		}
+
+		try {
+			if ($this->getRequest()->get('key') != "") {
+				$conn = $this->getRequest()->getSession()->get('session-connections');
+				$conn = unserialize($conn[$this->getRequest()->get('key')]);
+				if ($conn !== false) {
+					$this->assign('lockedConn', $conn->locked);
+					$this->assign('sessionStatus', $conn->sessionStatus);
+					$this->assign('sessionHash', $conn->hash);
+				}
+			}
+		} catch (\ErrorException $e) {
+			$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
+			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
+		}
+
+		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->getSession()->get('isAjax') === true) {
+			$this->getRequest()->getSession()->remove('isAjax');
+			return $this->getAjaxBlocksResponse();
+		}
+		$this->getRequest()->getSession()->remove('isAjax');
+
+		return $this->twigArr;
+	}
+
+	/**
+	 * constructor, which instantiate empty class variables
+	 */
+	public function __construct () {
+		$this->twigArr = array();	
+		$this->activeSectionKey = null;
+		$this->ajaxBlocksArr = array();
+	}
+
+	/**
+	 * sets current section key
+	 *
+	 * @param int     $key          key of connected server
+	 */
+	public function setActiveSectionKey($key) {
+		$this->activeSectionKey = $key;
+	}
+
+	/**
+	 * sets submenu URL.
+	 *
+	 * @param string $submenuUrl  URL for submenu
+	 */
+	public function setSubmenuUrl($submenuUrl) {
+		$this->submenuUrl = $submenuUrl;
+	}
+
+	/**
+	 * @param string $templateNamespace     namespace of template, where blockId is defined
+	 * @param string $blockId               block name from template
+	 */
+	protected function addAjaxBlock($templateNamespace, $blockId) {
+		$this->ajaxBlocksArr[$blockId] = array(
+			'template' => $templateNamespace,
+			'blockId' => $blockId,
+		);
+	}
+
+	/**
+	 * @return array    array with definition of ajax blocks
+	 */
+	protected function getAjaxBlocks() {
+		return $this->ajaxBlocksArr;
+	}
+
+	/**
+	 * prepares flashes into right template variables
+	 */
+	protected function prepareAndAssignFlashes() {
 		$session = $this->getRequest()->getSession();
 		$flashes = $session->getFlashes();
 		$stateFlashes = $configFlashes = $leftPaneFlashes = $singleFlashes = $allFlashes = array();
@@ -125,59 +215,31 @@ class BaseController extends Controller
 		$this->assign("allInfoFlashes", array_merge($stateFlashes, $configFlashes));
 		$this->assign("singleFlashes", $singleFlashes);
 		$this->assign("allFlashes", $allFlashes);
+	}
 
-		$this->assign("topmenu", array());
-		$this->assign("submenu", array());
-		if ($this->getRequest()->get('_route') !== '_home' &&
-				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
-			$dataClass = $this->get('DataModel');
-			$dataClass->buildMenuStructure($this->activeSectionKey);
-			$this->assign('topmenu', $dataClass->getModels());
-			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
+	/**
+	 * @return Response   json encoded array of ajax blocks
+	 */
+	protected function getAjaxBlocksResponse() {
+		$retArr = array();
+		foreach ($this->getAjaxBlocks() as $blockId => $arr) {
+			$html = $this->get('twig')->loadTemplate($arr['template'])->renderBlock($arr['blockId'], $this->twigArr);
+			$retArr['block--'.$blockId] = $html;
 		}
 
-		try {
-			if ($this->getRequest()->get('key') != "") {
-				$conn = $session->get('session-connections');
-				$conn = unserialize($conn[$this->getRequest()->get('key')]);
-				if ($conn !== false) {
-					$this->assign('lockedConn', $conn->locked);
-					$this->assign('sessionStatus', $conn->sessionStatus);
-					$this->assign('sessionHash', $conn->hash);
-				}
-			}
-		} catch (\ErrorException $e) {
-			$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
+		if (isset($retArr['block--title']) && isset($retArr['block--additionalTitle'])) {
+			$retArr['block--title'] = $retArr['block--title'].$retArr['block--additionalTitle'];
+			unset($retArr['block--additionalTitle']);
 		}
 
-		return $this->twigArr;
-	}
+		$return = array(
+			'snippets' => $retArr,
+			'redirect' => '',
+			'referer'  => $this->getRequest()->server->get('HTTP_REFERER'),
 
-	/**
-	 * constructor, which instantiate empty class variables
-	 */
-	public function __construct () {
-		$this->twigArr = array();	
-		$this->activeSectionKey = null;	
-	}
+		);
 
-	/**
-	 * sets current section key
-	 *
-	 * @param int     $key          key of connected server
-	 */
-	public function setActiveSectionKey($key) {
-		$this->activeSectionKey = $key;
-	}
-
-	/**
-	 * sets submenu URL.
-	 *
-	 * @param string $submenuUrl  URL for submenu
-	 */
-	public function setSubmenuUrl($submenuUrl) {
-		$this->submenuUrl = $submenuUrl;
+		return new Response(json_encode($return));
 	}
 
 }
