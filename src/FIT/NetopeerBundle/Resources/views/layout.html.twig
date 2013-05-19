@@ -67,7 +67,7 @@ if advised of the possibility of such damage.
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="block--topMenu">
 			{% block topMenu %}
-				<a href="{{ path('_home') }}" title="Home" class="static ico-home header-icon ajaxLink {% if activeAction is defined and activeAction == "home" %}active{% endif %}"><span></span>Connections</a>
+				<a href="{{ path('_home') }}" title="Home" class="static ico-home header-icon ajaxLink {% if activeAction is defined and activeAction == "home" %}active{% endif %}" data-callback="setIndexActions"><span></span>Connections</a>
 				{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
 					{% if lockedConn == false %}
 						<a href="{{ path("handleConnection", {"command": "lock", "key": app.request.get('key')} ) }}" title="Lock" class="static ico-unlock header-icon"><span></span></a>
@@ -82,7 +82,7 @@ if advised of the possibility of such damage.
 							<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="dynamic ajaxLink {% if sectionName is defined and sectionName == section.name %}active{% endif %} nth-{{i}}">{{section.name}}<span class="arrow"></span></a>
 							{% set i = i + 1 %}
 						{% endfor %}
-						<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" class="dynamic {% if sectionName is defined and sectionName|lower == "all" %}active{% endif %}" title="GET all information">All<span class="arrow"></span></a>
+						<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "all" %}active{% endif %}" title="GET all information">All<span class="arrow"></span></a>
 					{% endif %}
 				{% endif %}
 
@@ -117,15 +117,15 @@ if advised of the possibility of such damage.
 		{% block topPart %}
 		{% endblock topPart %}
 
-		{% block alerts %}
 		<div class="alert-cover" id="block--alerts">
-			{% if allFlashes|length %}
-				{% for type, message in allFlashes %}
-						<div class='alert {{type}}'><span class="close">X</span>{{message|raw}}</div>
-					{% endfor %}
-			{% endif %}
+			{% block alerts %}
+				{% if allFlashes|length %}
+					{% for type, message in allFlashes %}
+							<div class='alert {{type}}'><span class="close">X</span>{{message|raw}}</div>
+						{% endfor %}
+				{% endif %}
+			{% endblock alerts %}
 		</div>
-		{% endblock alerts %}
 
 		{% if singleColumnLayout == false %}
 			<section id="block--state" class="column{{addToColumnClass}}">

@@ -228,7 +228,7 @@ class BaseController extends Controller
 		}
 
 		if (isset($retArr['block--title']) && isset($retArr['block--additionalTitle'])) {
-			$retArr['block--title'] = $retArr['block--title'].$retArr['block--additionalTitle'];
+			$retArr['block--title'] = $retArr['block--title'].' '.$retArr['block--additionalTitle'];
 			unset($retArr['block--additionalTitle']);
 		}
 
