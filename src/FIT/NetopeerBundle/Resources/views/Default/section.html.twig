@@ -57,7 +57,7 @@ if advised of the possibility of such damage.
 			{{ form_widget(formState) }}
 		    <input type="submit" value="Get" />
 		</form> #}
-		<form action="#" method="post" name="formConfigData">
+		<form action="" method="post" name="formConfigData" data-disable-history="true">
 			<div class="root">
 				{% set iterator = 1 %}
 				{% for key, element in stateArr %}
@@ -83,7 +83,7 @@ if advised of the possibility of such damage.
 			{{ form_widget(formConfig) }}
 		    <input type="submit" value="Get" />
 		</form> #}
-		<form action="#" method="post" name="formConfigData">
+		<form action="" method="post" name="formConfigData" data-disable-history="true">
 			<div class="root">
 				{% set iterator = 1 %}
 				{% for key, element in configArr %}

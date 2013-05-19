@@ -53,8 +53,7 @@ jQuery.extend({
 					jQuery.nette.updateSnippet(i, payload.snippets[i]);
 				}
 
-				prepareAlertsActions();
-				prepareTooltipActions();
+				initJS();
 			}
 		},
 
@@ -77,7 +76,7 @@ jQuery.extend({
 window.onpopstate = function(o) {
 	if (o.state !== null) {
 		var href = o.state;
-		var $THIS = $("");
+		var $THIS = $("<div></div>");
 
 		if ($('a[href="'+ href +'"]').length) {
 			$THIS = $('a[href="'+ href +'"]');
@@ -97,7 +96,7 @@ window.onpopstate = function(o) {
 			type: 'post',
 			url: href,
 			success: function(data, textStatus, jqXHR) {
-				$THIS.data().disableHistory = true;
+				$THIS.attr('data-disable-history', "true");
 				successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
 			},
 			error: function() {
