@@ -91,7 +91,8 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'state');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'config');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
-//		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'javascripts');
 
 		$host = "";
 		$port = "22";
@@ -174,7 +175,9 @@ class DefaultController extends BaseController
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
 			}
 			$url = $this->get('request')->headers->get('referer');
-			return new RedirectResponse($url);
+			if (!$this->getRequest()->isXmlHttpRequest()) {
+				return new RedirectResponse($url);
+			}
 		}
 		$connArray = $this->getRequest()->getSession()->get('session-connections');
 		$connections = array();
@@ -261,12 +264,17 @@ class DefaultController extends BaseController
 			$params['session-id'] = $identifier;
 		}
 
+		if ($this->getRequest()->isXmlHttpRequest()) {
+			$this->getRequest()->getSession()->set('isAjax', true);
+		}
+
 		$res = $dataClass->handle($command, $params);
-		// if something goes wrong, we will redirect to connections page
+
 		if ( $res != 1 ) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 
+		// if something goes wrong, we will redirect to connections page
 		if ( in_array($command, array("connect", "disconnect", "getschema")) ) {
 			return $this->redirect($this->generateUrl('_home'));
 		} else {
@@ -365,10 +373,10 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
+		$this->assign('historyHref', $this->getRequest()->getRequestUri());
 
 		if ($this->getRequest()->getSession()->get('isAjax') === true) {
-//			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
-//			TODO: najit chybu, proc sablona generuje prazdne horni menu
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
 		}
 
 		/* Show the first module we have */

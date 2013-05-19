@@ -87,10 +87,26 @@ class BaseController extends Controller
 
 	/**
 	 * Prepares variables to template, sort flashes and prepare menu
-	 * @return array					array of assigned variables to template
+
+	 * @return array|Response     array of assigned variables to template or AjaxBlockResponse
 	 */
 	protected function getTwigArr() {
 
+		$this->prepareGlobalTwigVariables();
+
+		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->getSession()->get('isAjax') === true) {
+			$this->getRequest()->getSession()->remove('isAjax');
+			return $this->getAjaxBlocksResponse();
+		}
+		$this->getRequest()->getSession()->remove('isAjax');
+
+		return $this->twigArr;
+	}
+
+	/**
+	 * Prepares global and common variables for twig
+	 */
+	protected function prepareGlobalTwigVariables() {
 		if ( $this->getRequest()->getSession()->get('singleColumnLayout') == null ) {
 			$this->getRequest()->getSession()->set('singleColumnLayout', true);
 		}
@@ -126,14 +142,6 @@ class BaseController extends Controller
 			$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
 			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
 		}
-
-		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->getSession()->get('isAjax') === true) {
-			$this->getRequest()->getSession()->remove('isAjax');
-			return $this->getAjaxBlocksResponse();
-		}
-		$this->getRequest()->getSession()->remove('isAjax');
-
-		return $this->twigArr;
 	}
 
 	/**
@@ -222,8 +230,20 @@ class BaseController extends Controller
 	 */
 	protected function getAjaxBlocksResponse() {
 		$retArr = array();
+
+		$this->prepareGlobalTwigVariables();
+
+		// we have to assign global variables, which are known in Twig, because they are missing now...
+		$app = array(
+			'user' => $this->get('security.context')->getToken()->getUser(),
+			'request' => $this->getRequest(),
+		);
+		$this->assign('app', $app);
+
+
 		foreach ($this->getAjaxBlocks() as $blockId => $arr) {
-			$html = $this->get('twig')->loadTemplate($arr['template'])->renderBlock($arr['blockId'], $this->twigArr);
+			$template = $this->get('twig')->loadTemplate($arr['template']);
+			$html = $template->renderBlock($arr['blockId'], $this->twigArr);
 			$retArr['block--'.$blockId] = $html;
 		}
 
@@ -247,6 +267,8 @@ class BaseController extends Controller
 			'referer'  => $this->getRequest()->server->get('HTTP_REFERER'),
 			'route'    => $this->getRequest()->get('_route'),
 			'treeColumns' => $treeColumns,
+			'historyHref' => isset($this->twigArr['historyHref']) ? $this->twigArr['historyHref'] : "",
+			'dump'     => isset($this->twigArr['dump']) ? $this->twigArr['dump'] : "",
 		);
 
 		return new Response(json_encode($return));
