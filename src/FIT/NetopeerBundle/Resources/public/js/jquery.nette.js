@@ -37,8 +37,6 @@ jQuery.extend({
 				return;
 			}
 
-			l(payload);
-
 			// snippets
 			if (payload.snippets) {
 				if (!("block--config" in payload.snippets) && payload.treeColumns !== true) {
@@ -54,6 +52,8 @@ jQuery.extend({
 				for (var i in payload.snippets) {
 					jQuery.nette.updateSnippet(i, payload.snippets[i]);
 				}
+
+				prepareAlertsActions();
 			}
 		},
 
@@ -95,6 +95,8 @@ jQuery(function($) {
 	$(document).on('click', 'a.ajaxLink', function(e) {
 		e.preventDefault();
 
+		$("#block--alerts").html('');
+
 		/**
 		 * spinner zobrazit az po 100ms
 		 */
@@ -114,13 +116,16 @@ jQuery(function($) {
 				$('#ajax-spinner').fadeOut();
 				clearTimeout($.nette.spinnerTimer);
 
-				l(data);
-
 				$.nette.success(data);
 				$.nette.setActiveLink($('a[href="'+ href +'"]'));
 
 				if ($THIS.data().disableHistory !== true) {
 					history.pushState(href, "", href);
+				}
+
+				if ($THIS.data().callback !== undefined) {
+					var a = $THIS.data().callback;
+					eval(a + '();');
 				}
 			},
 			error: function() {

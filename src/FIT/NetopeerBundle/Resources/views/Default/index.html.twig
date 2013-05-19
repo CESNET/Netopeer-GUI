@@ -71,10 +71,14 @@ if advised of the possibility of such damage.
 	{% endif %}
 	<script type="text/javascript">
 		$(document).ready(function() {
+			setIndexActions();
+		});
+
+		function setIndexActions() {
 			setLeftPaneHeight();
 			reloadHistoryOfConnectedDevices();
 			reloadProfilesOfConnectedDevices();
-		});
+		}
 
 		$(window).resize(function() {
 			setLeftPaneHeight();

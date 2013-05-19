@@ -60,6 +60,10 @@
 		// });
 	}
 
+	 $(document).on('click', '.alert .close', function() {
+		 $(this).parents('.alert').fadeOut('fast');
+	 });
+
 	// tooltip
 	$('.tooltip .icon-help').each(function() {
 		initDefaultTooltip($(this));
@@ -70,15 +74,7 @@
 		$(this).toggleClass("hover");
 	});
 
-	/* hide alerts after some time - only successfull */
-	setTimeout(function() {
-		$('.alert.success').fadeOut();
-	}, 7000); /* 3s animation + 4s visible */
-
-	$(".alert-cover .alert").hide().delay(500).each(function() {
-		$(this).animateAlert();
-	});
-
+	prepareAlertsActions();
 
 	/* when range input type, add number of current value before input */
 	$("input[type='range']").each(function(i, e) {
@@ -101,6 +97,7 @@ $(window).resize(function() {
 	changeSectionHeight();
 	showIconsOnLeafLine();
 	collapseTopNav();
+	prepareAlertsActions();
 });
 
 /**
@@ -116,11 +113,20 @@ $(window).resize(function() {
 
 		$(this).css('top', 0 - $(this).outerHeight() - parseInt($(".alert-cover").css('top'), 10)).show().animate({
 			top: topOffset
-		}, 3000, 'easeOutBack').find('.close').click(function() {
-			$alert.fadeOut('fast');
-		});
+		}, 3000, 'easeOutBack');
 	};
 })( jQuery );
+
+function prepareAlertsActions() {
+	/* hide alerts after some time - only successfull */
+	setTimeout(function() {
+		$('.alert.success').fadeOut();
+	}, 7000); /* 3s animation + 4s visible */
+
+	$(".alert-cover .alert").hide().delay(500).each(function() {
+		$(this).animateAlert();
+	});
+}
 
 function initPopupMenu($cover) {
 	$cover.find('.show-link').unbind('hover');
