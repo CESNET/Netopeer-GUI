@@ -165,7 +165,15 @@ class DefaultController extends BaseController
 					$arr = array(
 						"idForAjaxGetSchema" => $result,
 					);
-					$this->get('session')->set('getSchemaWithAjax', $arr);
+
+					if ($this->getRequest()->isXmlHttpRequest()) {
+						foreach ($arr as $key => $value) {
+							$this->assign($key, $value);
+						}
+						$this->assign("getSchemaWithAjax", true);
+					} else {
+						$this->get('session')->set('getSchemaWithAjax', $arr);
+					}
 					$this->getRequest()->getSession()->setFlash('state success', 'Form has been filled up correctly.');
 
 					$baseConn = $this->get('BaseConnection');
