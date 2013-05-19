@@ -64,17 +64,13 @@
 		 $(this).parents('.alert').fadeOut('fast');
 	 });
 
-	// tooltip
-	$('.tooltip .icon-help').each(function() {
-		initDefaultTooltip($(this));
-	});
-
 	// line of XML output
 	$(".leaf-line").hover(function() {
 		$(this).toggleClass("hover");
 	});
 
 	prepareAlertsActions();
+	prepareTooltipActions();
 
 	/* when range input type, add number of current value before input */
 	$("input[type='range']").each(function(i, e) {
@@ -125,6 +121,13 @@ function prepareAlertsActions() {
 
 	$(".alert-cover .alert").hide().delay(500).each(function() {
 		$(this).animateAlert();
+	});
+}
+
+function prepareTooltipActions() {
+	// tooltip
+	$('.tooltip .icon-help').each(function() {
+		initDefaultTooltip($(this));
 	});
 }
 

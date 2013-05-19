@@ -54,6 +54,7 @@ jQuery.extend({
 				}
 
 				prepareAlertsActions();
+				prepareTooltipActions();
 			}
 		},
 
