@@ -37,9 +37,11 @@ jQuery.extend({
 				return;
 			}
 
+			l(payload);
+
 			// snippets
 			if (payload.snippets) {
-				if (!("block--config" in payload.snippets)) {
+				if (!("block--config" in payload.snippets) && payload.treeColumns !== true) {
 					$("#block--config").remove();
 					$("#block--state").attr('id', 'singleContent');
 				}

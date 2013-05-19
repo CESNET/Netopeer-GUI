@@ -115,6 +115,7 @@ class AjaxController extends BaseController
 	 */
 	public function historyOfConnectedDevicesAction()
 	{
+		$this->addAjaxBlock("FITNetopeerBundle:Ajax:historyOfConnectedDevices.html.twig", "historyOfConnectedDevices");
 		try {
 		/**
 		 * @var \FIT\NetopeerBundle\Entity\User $user
@@ -196,6 +197,8 @@ class AjaxController extends BaseController
 	 */
 	public function profilesOfConnectedDevicesAction()
 	{
+		$this->addAjaxBlock("FITNetopeerBundle:Ajax:historyOfConnectedDevices.html.twig", "profilesOfConnectedDevices");
+
 		try {
 		/**
 		 * @var \FIT\NetopeerBundle\Entity\User $user

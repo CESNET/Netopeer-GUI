@@ -163,9 +163,9 @@ nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa
 	}
 
 	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative; margin-top: 0px;
-		#history-of-connected-devices, #profiles-of-connected-devices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; overflow-y: scroll; @include box-sizing(border-box); }
-		#history-of-connected-devices { height: 50%; padding-top: $sContentPadding; }
-		#profiles-of-connected-devices { border-top: 1px solid #333; padding-top: 5%; height: 50%; }
+		#block--historyOfConnectedDevices, #block--profilesOfConnectedDevices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; overflow-y: scroll; @include box-sizing(border-box); }
+		#block--historyOfConnectedDevices { height: 50%; padding-top: $sContentPadding; }
+		#block--profilesOfConnectedDevices { border-top: 1px solid #333; padding-top: 5%; height: 50%; }
 		a { position: relative; @include ellipsis(); padding-top: 7px; padding-bottom: 7px;
 			&.active { margin-right:  0px; }
 			.icon { width: 18px; height: 18px; padding: 0px; @include border-radius(3px); background: #fff; line-height: 18px; text-align: center; border: 1px solid #aaa; display: none; margin-top: -7px; margin-bottom: -4px; margin-right: -3px;
