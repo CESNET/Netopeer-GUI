@@ -92,6 +92,7 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'config');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'javascripts');
 
 		$host = "";
@@ -377,6 +378,7 @@ class DefaultController extends BaseController
 			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
 			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
 			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topPart');
 			$this->assign('historyHref', $this->getRequest()->getRequestUri());
 		}
 		$this->getRequest()->getSession()->remove('isLocking');
