@@ -35,34 +35,34 @@
 // if advised of the possibility of such damage.
 
  $(document).ready(function() {
-	changeSectionHeight();
+	initJS();
+});
 
+$(window).resize(function() {
+	changeSectionHeight();
+	showIconsOnLeafLine();
+	collapseTopNav();
+	prepareAlertsActions();
+});
+
+function initJS() {
+	changeSectionHeight();
 	collapseTopNav();
 
-	if ( $(".edit-bar").length ) {
-		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
-		$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
+	// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
+	$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
 
-		$(document).on('click', '.type-list .edit-bar .sibling', function() {
-			duplicateNode($(this));
-		});
+	$('.edit-bar').on('click', '.sibling', function() {
+		duplicateNode($(this));
+	}).on('click', ".remove-child", function() {
+				removeNode($(this));
+			}).on('click', ".create-child", function() {
+				generateNode($(this));
+			});
 
-		$(document).on('click', ".edit-bar .remove-child", function() {
-			removeNode($(this));
-		});
-
-		$(document).on('click', ".edit-bar .create-child", function() {
-			generateNode($(this));
-		});
-
-		// $('.edit-bar .child').click(function() {
-		//	createNode($(this));
-		// });
-	}
-
-	 $(document).on('click', '.alert .close', function() {
-		 $(this).parents('.alert').fadeOut('fast');
-	 });
+	$(document).on('click', '.alert .close', function() {
+		$(this).parents('.alert').fadeOut('fast');
+	});
 
 	// line of XML output
 	$(".leaf-line").hover(function() {
@@ -87,14 +87,7 @@
 	});
 
 	showIconsOnLeafLine();
-});
-
-$(window).resize(function() {
-	changeSectionHeight();
-	showIconsOnLeafLine();
-	collapseTopNav();
-	prepareAlertsActions();
-});
+}
 
 /**
  * set animation for alerts in .alert-cover
@@ -349,13 +342,9 @@ function generateNode($elem) {
 
 function createFormUnderlay($elem) {
 	var $cover;
-	// find cover - if we are on state, it would be state column
-	if ($elem.parents('#state').length) {
-		$cover = $("#state");
-
-	// or we are on config
-	} else if ($elem.parents('#config').length) {
-		$cover = $("#config");
+	// find cover - if we are on state, it would be state column, or we could be on config
+	if ($elem.parents('section').length) {
+		$cover = $elem.parents('section');
 
 	// or we have single column layout
 	} else {

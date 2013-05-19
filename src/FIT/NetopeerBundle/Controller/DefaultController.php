@@ -268,6 +268,10 @@ class DefaultController extends BaseController
 			$this->getRequest()->getSession()->set('isAjax', true);
 		}
 
+		if ($command === "lock" || $command === "unlock") {
+			$this->getRequest()->getSession()->set('isLocking', true);
+		}
+
 		$res = $dataClass->handle($command, $params);
 
 		if ( $res != 1 ) {
@@ -368,12 +372,15 @@ class DefaultController extends BaseController
 		// we will prepare filter form in column
 		$this->setSectionFilterForms();
 
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
+		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
+			$this->assign('historyHref', $this->getRequest()->getRequestUri());
+		}
+		$this->getRequest()->getSession()->remove('isLocking');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
-		$this->assign('historyHref', $this->getRequest()->getRequestUri());
 
 		if ($this->getRequest()->getSession()->get('isAjax') === true) {
 			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
@@ -631,6 +638,10 @@ class DefaultController extends BaseController
 		if ( $subsection ) {
 			$retArr['subsection'] = $subsection;
 			$routeName = 'subsection';
+		}
+
+		if ($this->getRequest()->isXmlHttpRequest()) {
+			$this->getRequest()->getSession()->set('isAjax', true);
 		}
 		return $this->redirect($this->generateUrl($routeName, $retArr));
 	}
