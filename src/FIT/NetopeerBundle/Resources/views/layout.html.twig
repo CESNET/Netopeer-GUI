@@ -115,8 +115,10 @@ if advised of the possibility of such damage.
 		{% set addToColumnClass = ' left-nav-defined' %}
 		{# endif #}
 
-		{% block topPart %}
-		{% endblock topPart %}
+		<div id="block--topPart">
+			{% block topPart %}
+			{% endblock topPart %}
+		</div>
 
 		<div class="alert-cover" id="block--alerts">
 			{% block alerts %}
