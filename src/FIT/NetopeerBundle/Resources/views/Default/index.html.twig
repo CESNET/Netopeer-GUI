@@ -60,7 +60,7 @@ if advised of the possibility of such damage.
 						targetConfigure.text("Could not configure device.");
 					}
 					if (dataArr['message']) {
-						var flash = prepareFlashMessage(jsonArr['status'], jsonArr['message']);
+						var flash = prepareFlashMessage(dataArr['status'], dataArr['message']);
 						$(".alert-cover").append($(flash).hide());
 						$(flash).animateAlert();
 					}
@@ -184,7 +184,11 @@ if advised of the possibility of such damage.
 {% endblock singleContentClass %}
 
 {% block leftColumnAdditional %}
-	<div id="history-and-profiles"></div>
+	<div id="history-and-profiles">
+		<script type="text/javascript">
+//			setIndexActions();
+		</script>
+	</div>
 {% endblock leftColumnAdditional %}
 
 {% block state %}
@@ -207,8 +211,8 @@ if advised of the possibility of such damage.
 				<tr id="row-{{ loop.index - 1 }}">
 					<td> {{ key.time }} </td>
 					<td>{{ key.host }}</td>
-					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}'><span id="ico-conf"></span>Configure device</a></td>
-					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}'>disconnect</a></td>
+					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}' class="ajaxLink"><span id="ico-conf"></span>Configure device</a></td>
+					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}' class="ajaxLink">disconnect</a></td>
 				</tr>
 			{% endfor %}
 		</table>

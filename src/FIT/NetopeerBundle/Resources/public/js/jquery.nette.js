@@ -41,7 +41,7 @@ jQuery.extend({
 			if (payload.snippets) {
 				if (!("block--config" in payload.snippets) && payload.treeColumns !== true) {
 					$("#block--config").remove();
-					$("#block--state").attr('id', 'singleContent');
+					$("#block--state").attr('id', 'block--singleContent');
 				}
 				if (("block--config" in payload.snippets) && (("block--state" in payload.snippets) || ("block--singleContent" in payload.snippets))) {
 					$("#block--config, #block--singleContent, #block--state").addClass('column');
@@ -76,24 +76,11 @@ jQuery.extend({
 window.onpopstate = function(o) {
 	if (o.state !== null) {
 		var href = o.state;
-		$.nette.setActiveLink($('a[href="'+ href +'"]'));
+		var $THIS = $("");
 
-		$.ajax({
-			dataType: 'json',
-			type: 'post',
-			url: href,
-			success: function (data) {
-				$.nette.success(data);
-			}
-		});
-	}
-};
-
-jQuery(function($) {
-	$.nette.createSpinner();
-
-	$(document).on('click', 'a.ajaxLink', function(e) {
-		e.preventDefault();
+		if ($('a[href="'+ href +'"]').length) {
+			$THIS = $('a[href="'+ href +'"]');
+		}
 
 		$("#block--alerts").html('');
 
@@ -104,33 +91,84 @@ jQuery(function($) {
 			$('#ajax-spinner').fadeIn();
 		}, 100);
 
-		var $THIS = $(this);
-		var href = $THIS.attr('href');
 		$.ajax({
+			dataType: 'json',
+			type: 'post',
 			url: href,
-			dataType: "json",
 			success: function(data, textStatus, jqXHR) {
-				if ($THIS.data().ajaxRedirect) {
-					data.redirect = href;
-				}
-				$('#ajax-spinner').fadeOut();
-				clearTimeout($.nette.spinnerTimer);
-
-				$.nette.success(data);
-				$.nette.setActiveLink($('a[href="'+ href +'"]'));
-
-				if ($THIS.data().disableHistory !== true) {
-					history.pushState(href, "", href);
-				}
-
-				if ($THIS.data().callback !== undefined) {
-					var a = $THIS.data().callback;
-					eval(a + '();');
-				}
+				$THIS.data().disableHistory = true;
+				successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
 			},
 			error: function() {
 				window.location.href = href;
 			}
 		});
+	}
+};
+
+jQuery(function($) {
+	$.nette.createSpinner();
+
+	$(document).on('click', 'a.ajaxLink', function(e) {
+		loadAjaxLink(e, $(this), $(this).attr('href'), "GET", '');
 	});
+
+	$("section").on('submit', 'form', function(e) {
+		loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
+	})
 });
+
+function loadAjaxLink(e, $THIS, href, type, data) {
+	e.preventDefault();
+
+	$("#block--alerts").html('');
+
+	/**
+	 * spinner zobrazit az po 100ms
+	 */
+	$.nette.spinnerTimer = setTimeout(function() {
+		$('#ajax-spinner').fadeIn();
+	}, 100);
+
+	$.ajax({
+		url: href,
+		dataType: "json",
+		data: data,
+		type: type,
+		success: function(data, textStatus, jqXHR) {
+			successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
+		},
+		error: function() {
+			window.location.href = href;
+		}
+	});
+}
+
+function successAjaxFunction(data, textStatus, jqXHR, href, $elem) {
+	if ($elem.data().ajaxRedirect) {
+		data.redirect = href;
+	}
+	$('#ajax-spinner').fadeOut();
+	clearTimeout($.nette.spinnerTimer);
+
+	l(data);
+	l($elem);
+
+	$.nette.success(data);
+	if ($('a[href="'+ href +'"]').length) {
+		$.nette.setActiveLink($('a[href="'+ href +'"]'));
+	}
+
+	if ($elem.data().disableHistory !== true) {
+		var historyHref = href;
+		if (data.historyHref !== "") {
+			historyHref = data.historyHref;
+		}
+		history.pushState(historyHref, "", historyHref);
+	}
+
+	if ($elem.data().callback !== undefined) {
+		var a = $elem.data().callback;
+		eval(a + '();');
+	}
+}

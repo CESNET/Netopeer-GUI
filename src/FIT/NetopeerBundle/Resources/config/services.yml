@@ -69,3 +69,8 @@ services:
         arguments:
             - file                       # just modify this value to use another cache
             #- {'cache_dir': /tmp/cache } # you can omit this if you don't use FileCache or if the default value is ok for you
+
+    ajaxController:
+        class: FIT\NetopeerBundle\Controller\AjaxController
+        arguments:
+            container: "@service_container"
