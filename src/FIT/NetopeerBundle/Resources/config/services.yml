@@ -74,3 +74,9 @@ services:
         class: FIT\NetopeerBundle\Controller\AjaxController
         arguments:
             container: "@service_container"
+
+    session:
+        class: FIT\NetopeerBundle\Symfony\MySession
+        arguments:
+          - @session.storage
+          - %locale%

@@ -194,7 +194,7 @@ class BaseController extends Controller
 	 */
 	protected function prepareAndAssignFlashes() {
 		$session = $this->getRequest()->getSession();
-		$flashes = $session->getFlashes();
+		$flashes = array_merge($session->getFlashes(), $session->getShortFlashes());
 		$stateFlashes = $configFlashes = $leftPaneFlashes = $singleFlashes = $allFlashes = array();
 
 		// divide flash messages according to key into categories

@@ -292,7 +292,7 @@ class DefaultController extends BaseController
 			return $this->redirect($this->generateUrl('_home'));
 		} else {
 			$url = $this->get('request')->headers->get('referer');
-			return new RedirectResponse($url);
+			return $this->redirect($url);
 		}
 	}
 
