@@ -232,11 +232,21 @@ class BaseController extends Controller
 			unset($retArr['block--additionalTitle']);
 		}
 
+		if (in_array($this->getRequest()->get('_route'), array(
+			'historyOfConnectedDevices',
+			'profilesOfConnectedDevices',
+			'_home',
+		))) {
+			$treeColumns = true;
+		} else {
+			$treeColumns = false;
+		}
 		$return = array(
 			'snippets' => $retArr,
 			'redirect' => '',
 			'referer'  => $this->getRequest()->server->get('HTTP_REFERER'),
-
+			'route'    => $this->getRequest()->get('_route'),
+			'treeColumns' => $treeColumns,
 		);
 
 		return new Response(json_encode($return));
