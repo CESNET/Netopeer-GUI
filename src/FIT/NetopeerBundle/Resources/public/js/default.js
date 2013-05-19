@@ -42,7 +42,6 @@ $(window).resize(function() {
 	changeSectionHeight();
 	showIconsOnLeafLine();
 	collapseTopNav();
-	prepareAlertsActions();
 });
 
 function initJS() {
@@ -412,7 +411,7 @@ function generateFormObject(formName) {
 		// vytvorime formular
 		$form = $("<form>")
 			.attr({
-				action: "#",
+				action: "",
 				method: "POST",
 				name: formName,
 				'class': 'generatedForm'
@@ -480,11 +479,6 @@ function createSubmitButton($form, inputValue) {
 			value: inputValue
 		});
 	$form.append($elementSubmit);
-
-	// bind click function to send form
-	$elementSubmit.bind('click', function() {
-		$form.submit();
-	});
 }
 
 function createCloseButton($cover, $form) {
