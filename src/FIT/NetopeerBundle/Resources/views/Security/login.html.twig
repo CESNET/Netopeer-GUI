@@ -49,6 +49,12 @@ if advised of the possibility of such damage.
 			<legend>Log in is required for this site!</legend>		
 			<p class="desc">[hint: admin,pass; without DB: adminNoDb,pass]</p>
 
+			{% block flashes %}
+				{% for type, message in allFlashes %}
+					<div class='alert {{type}}'>{{message|raw}}</div>
+				{% endfor %}
+			{% endblock flashes %}
+			
 			{% if error %}
 			    <div class="alert error">{{ error.message }}</div>
 			{% endif %}

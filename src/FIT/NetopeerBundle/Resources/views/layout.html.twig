@@ -161,21 +161,13 @@ if advised of the possibility of such damage.
 		{% endif %}
 
 	{% else %}
-		<nav id="top">
-			<a href="{{ path('_home') }}" title="Home" id="ico-home"></a>
+		<nav id="block--topMenu">
+				<a href="{{ path('_home') }}" title="Home" id="ico-home"></a>
 		</nav>
 
-		<article id="content">
-			{% block flashes %}
-				{% for type, message in allFlashes %}
-					<div class='alert {{type}}'>{{message|raw}}</div>
-				{% endfor %}
-			{% endblock flashes %}	
-
+		<article id="block--singleContent">
 			{% block content %}
 			{% endblock content %}
-
-
 		</article>
 	{% endif %}	
 
