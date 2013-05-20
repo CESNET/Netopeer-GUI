@@ -500,7 +500,7 @@ class Data {
 			*/
 			return 0;
 		} else {
-			$this->logger->err("Could not connect.", array("error" => var_export($this->getJsonError(), true)));
+			$this->logger->err("Could not connect.", array("error" => (isset($decoded["error-message"])?" Error: ".$decoded["error-message"] : var_export($this->getJsonError(), true))));
 			$session->setFlash($this->flashState .' error', "Could not connect.".(isset($decoded["error-message"])?" Error: ".$decoded["error-message"]:""));
 			return 1;
 		}
