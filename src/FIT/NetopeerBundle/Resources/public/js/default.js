@@ -184,7 +184,7 @@ function collapseTopNav() {
 }
 
 function changeSectionHeight() {
-	$("body > section, body > section#content").css('min-height', '0%').height($(window).height());
+	$("body > section, body > section#content").css('min-height', '0%').height($(window).height() * 0.9);
 }
 
 function showIconsOnLeafLine() {
