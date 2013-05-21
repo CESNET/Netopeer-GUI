@@ -151,8 +151,8 @@ function successAjaxFunction(data, textStatus, jqXHR, href, $elem) {
 	$('#ajax-spinner').fadeOut();
 	clearTimeout($.nette.spinnerTimer);
 
-	l(data);
-	l($elem);
+//	l(data);
+//	l($elem);
 
 	$.nette.success(data);
 	if ($('a[href="'+ href +'"]').length) {

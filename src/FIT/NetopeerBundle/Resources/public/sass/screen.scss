@@ -61,6 +61,7 @@ $sContentPadding:		15px;
 // fonts
 $fBody: 		Arial, Trebuchet, Verdana, sans-serif;
 $fHeadings:		Arial, Trebuchet, Verdana, sans-serif;
+$fMonospace:	"Courier New", Courier, monospace;
 
 $img:			'../images/';
 
@@ -254,7 +255,7 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 		&.has-tooltip {  }
 	}
 
-	&#block--singleContent { width: 100%; min-height: 100%; font-size: 1.4em; padding: $hNavTop 2 * $sContentPadding 2 * $sContentPadding 2 * $sContentPadding;
+	&#block--singleContent { width: 100%; min-height: 100%; font-size: 1.4em; padding: $sContentPadding 2 * $sContentPadding $sContentPadding / 2 2 * $sContentPadding;
 		&.left-nav-defined { width: 90%; }
 		&.max-width-column { max-width: 800px; width: 100%; float: none; }
 	}
@@ -290,6 +291,11 @@ body > section, #block--singleContent { position: relative; @include box-sizing(
 
 article#block--singleContent { font-size: 1.4em; padding: $hNavTop $sContentPadding; 
 	.alert { clear: both; margin-bottom: -30px; }
+}
+
+#block--notifications { width: 90%; background-color: #333; height: 10%; @include box-sizing(border-box); position: absolute; right: 0px; bottom: 0px; border-top: 1px solid #555; color: #ccc; font-size: 1.2em; padding: 8px $sContentPadding; overflow-y: scroll; font-family: $fMonospace;
+	> div { margin-bottom: 5px; }
+	strong { margin-right: 10px; width: 70px; @include inline-block; }
 }
 
 /* formulare */
@@ -373,6 +379,7 @@ table { width: 100%; margin: 15px 0px;
 			&.left-nav-defined { width: 86%; }
 		}
 	}
+	#block--notifications { width: 86%; }
 }
 
 @media screen and (max-width: 1550px) {
