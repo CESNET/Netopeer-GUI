@@ -184,7 +184,12 @@ function collapseTopNav() {
 }
 
 function changeSectionHeight() {
-	$("body > section, body > section#content").css('min-height', '0%').height($(window).height() * 0.9);
+	if (!notifOutput) {
+		notifInit();
+	}
+	var h = $(window).height() - $(notifOutput).outerHeight();
+	$("body > section, body > section#content").css('min-height', '0%').height(h);
+	$(notifOutput).css('top', h);
 }
 
 function showIconsOnLeafLine() {

@@ -1,18 +1,32 @@
 var wsUri = "ws://sauvignon.liberouter.org:8080/";
+var notifEsteblised = false;
 var notifOutput; 
 var number_notification = 0;
+	var notificationsHeight = 0.1; // in percent
 
 function notifInit() {
 	notifOutput = $("#block--notifications");
+	$(notifOutput).resizable({
+		handles: 'n',
+		minHeight: 10,
+		resize: function(event, ui) {
+			ui.size.width = ui.originalSize.width;
+			ui.position.left = ui.originalPosition.left;
+			notificationsHeight = ui.size.height * 100 / $(window).height();
+			ui.position.top = $(window).height() * (1 - notificationsHeight);
+		}
+	});
 }
 
 function notifWebSocket() {
 	websocket = new WebSocket(wsUri, "notification-protocol");
 	websocket.onopen = function(evt) {
+		notifEsteblised = true;
 		addInfo("Connection establised.");
 	};
 
 	websocket.onclose = function(evt) {
+		notifEsteblised = false;
 		addInfo("Connection closed.");
 	};
 
