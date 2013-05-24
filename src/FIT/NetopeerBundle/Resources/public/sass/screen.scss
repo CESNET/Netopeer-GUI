@@ -293,7 +293,7 @@ article#block--singleContent { font-size: 1.4em; padding: $hNavTop $sContentPadd
 	.alert { clear: both; margin-bottom: -30px; }
 }
 
-#block--notifications { width: 90%; background-color: #333; height: 10%; @include box-sizing(border-box); position: absolute; right: 0px; bottom: 0px; border-top: 1px solid #555; color: #ccc; font-size: 1.2em; padding: 8px $sContentPadding; overflow-y: scroll; font-family: $fMonospace;
+#block--notifications { width: 90%; background-color: #333; height: 10%; @include box-sizing(border-box); position: absolute; right: 0px; top: 100%; border-top: 1px solid #000; color: #ccc; font-size: 1.25em; padding: 8px $sContentPadding; overflow-y: scroll; font-family: $fMonospace;
 	> div { margin-bottom: 5px; }
 	strong { margin-right: 10px; width: 70px; @include inline-block; }
 }
