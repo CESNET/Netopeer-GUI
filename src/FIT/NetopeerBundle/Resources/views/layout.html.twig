@@ -174,17 +174,13 @@ if advised of the possibility of such damage.
 
 	<div id="block--notifications">
 		{% block notifications %}
+			<script type="text/javascript">
+				$("#block--notifications").addClass('hidden');
+				changeSectionHeight();
+			</script>
 		{% endblock notifications %}
+		<div class="notif-cover"></div>
 	</div>
 
-
-{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
-	<script type="text/javascript">
-		if (!notifOutput) {
-			notifWebSocket();
-			doSend('{% if sessionHash is defined %}{{sessionHash}}{% endif %} -10 0');
-		}
-	</script>
-{% endif %}
 </body>
 </html>

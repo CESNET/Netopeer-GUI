@@ -100,3 +100,21 @@ if advised of the possibility of such damage.
 		</div>
 	{% endif %}
 {% endblock config %}
+
+{% block notifications %}
+	{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
+		<script type="text/javascript">
+			if (!notifOutput) {
+				notifInit();
+			}
+			$(notifOutput).removeClass('hidden');
+
+			var socket = new $.fn.notifWebSocket({{ app.request.get('key') }}, "ws://sauvignon.liberouter.org:8080/");
+			setTimeout(function() {
+				if (socket.isActive === true) {
+					socket.doSend('{% if sessionHash is defined %}{{sessionHash}}{% endif %} -10 0');
+				}
+			}, 1000);
+		</script>
+	{% endif %}
+{% endblock notifications %}
