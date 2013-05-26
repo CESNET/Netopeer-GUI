@@ -1,8 +1,6 @@
-var wsUri = "ws://sauvignon.liberouter.org:8080/";
-var notifEsteblised = false;
-var notifOutput; 
-var number_notification = 0;
-	var notificationsHeight = 0.1; // in percent
+var notifOutput;
+var notificationsHeight = 0.1; // in percent
+var notifications = new Array();
 
 function notifInit() {
 	notifOutput = $("#block--notifications");
@@ -18,56 +16,76 @@ function notifInit() {
 	});
 }
 
-function notifWebSocket() {
-	websocket = new WebSocket(wsUri, "notification-protocol");
-	websocket.onopen = function(evt) {
-		notifEsteblised = true;
-		addInfo("Connection establised.");
-	};
-
-	websocket.onclose = function(evt) {
-		notifEsteblised = false;
-		addInfo("Connection closed.");
-	};
-
-	websocket.onmessage = function(evt) {
-		addMessage(evt.data);
-		number_notification++;
-		if (number_notification >= 10) {
-			websocket.close();
-		}
-	};
-	websocket.onerror = function(evt) {
-		addError(evt.data);
-	};
-}
-
-function doSend(message) {
-	addSend(message);
-	websocket.send(message);
-}
-
-function addInfo(mess) {
-	writeToScreen(mess, "info", "Info:");
-}
-
-function addError(mess) {
-	writeToScreen(mess, "error red", "Error:");
-}
-
-function addMessage(mess) {
-	writeToScreen(mess, "message green", "Message:");
-}
-
-function addSend(mess) {
-	writeToScreen(mess, "send", "Sent:");
-}
-
-function writeToScreen(mess, textClass, text) {
-	if (!notifOutput) {
-		notifInit();
+$.fn.notifWebSocket = function(key, wsUri) {
+	this.key = key;
+	if (notifications[key] === undefined) {
+		notifications[key] = new Array();
 	}
-	var output = $("<div></div>").append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(mess));
-	notifOutput.prepend(output);
-}
+	if (!notifications[key].length) {
+		this.websocket = new WebSocket(wsUri, "notification-protocol");
+		notifications[key] = this;
+
+		this.websocket.onopen = function(evt) {
+			notifications[key].isActive = true;
+			notifications[key].addInfo("Connection establised.");
+		};
+
+		this.websocket.onclose = function(evt) {
+			notifications[key].isActive = false;
+			notifications[key].addInfo("Connection closed.");
+		};
+
+		this.websocket.onmessage = function(evt) {
+			notifications[key].addMessage(evt.data);
+		};
+		this.websocket.onerror = function(evt) {
+			notifications[key].addError(evt.data);
+		};
+
+//		this.websocket.send(toSend);
+	}
+
+	this.doSend = function(message) {
+		this.websocket.send(message);
+		this.addSend(message);
+	};
+
+	this.addInfo = function(mess) {
+		this.writeToScreen(mess, "info", "Info:");
+	};
+
+	this.addError = function(mess) {
+		this.writeToScreen(mess, "error red", "Error:");
+	};
+
+	this.addMessage = function(mess) {
+		this.writeToScreen(mess, "message green", "Message:");
+	};
+
+	this.addSend = function(mess) {
+		this.writeToScreen(mess, "send", "Sent:");
+	};
+
+	this.writeToScreen = function(mess, textClass, text) {
+		if (!notifOutput) {
+			notifInit();
+		}
+		var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(mess));
+		var notifCover = notifOutput.find('.notif-cover');
+		notifCover.append(output);
+		notifCover.animate({
+			scrollTop: notifCover.scrollTop() + $(output).offset().top
+		}, 10);
+		notifCover.animate({
+			opacity: 0.3
+		}, 200, function() {
+			notifCover.animate({
+				opacity: 1
+			}, 100);
+		});
+
+	};
+
+	return this;
+};
 

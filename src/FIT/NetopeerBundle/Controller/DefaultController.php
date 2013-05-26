@@ -91,9 +91,13 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'state');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'config');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'notifications');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'javascripts');
+
+		//TODO: delete only session from refferer
+		$this->getRequest()->getSession()->set('activeNotifications', array());
 
 		$host = "";
 		$port = "22";
@@ -391,6 +395,13 @@ class DefaultController extends BaseController
 		}
 		$this->getRequest()->getSession()->remove('isLocking');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
+
+		$activeNotifications = $this->getRequest()->getSession()->get('activeNotifications');
+		if (!is_array($activeNotifications) || $activeNotifications[$key] !== true) {
+			$activeNotifications[$key] = true;
+			$this->getRequest()->getSession()->set('activeNotifications', $activeNotifications);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'notifications');
+		}
 
 		if ($this->getRequest()->getSession()->get('isAjax') === true) {
 			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
