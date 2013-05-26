@@ -397,7 +397,7 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
 
 		$activeNotifications = $this->getRequest()->getSession()->get('activeNotifications');
-		if (!is_array($activeNotifications) || $activeNotifications[$key] !== true) {
+		if ( !isset($activeNotifications[$key]) || $activeNotifications[$key] !== true ) {
 			$activeNotifications[$key] = true;
 			$this->getRequest()->getSession()->set('activeNotifications', $activeNotifications);
 			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'notifications');
