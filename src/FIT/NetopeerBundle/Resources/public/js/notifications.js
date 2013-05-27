@@ -70,7 +70,15 @@ $.fn.notifWebSocket = function(key, wsUri) {
 		if (!notifOutput) {
 			notifInit();
 		}
-		var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(mess));
+
+		var parsed_message = mess;
+		if (mess[0] === '{') {
+			/* TODO sanitize string? handle error? */
+			var parsed = JSON.parse(mess);
+			parsed_message = parsed.eventtime + ": " + parsed.content;
+		}
+
+		var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(parsed_message));
 		var notifCover = notifOutput.find('.notif-cover');
 		notifCover.append(output);
 		notifCover.animate({
