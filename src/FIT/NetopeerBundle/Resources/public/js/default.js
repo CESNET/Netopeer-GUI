@@ -59,8 +59,9 @@ function initJS() {
 				generateNode($(this));
 			});
 
-	$(document).on('click', '.alert .close', function() {
-		$(this).parents('.alert').fadeOut('fast');
+	$(window).on('click', '.alert .close', function(e) {
+		e.preventDefault();
+		$(this).parents('.alert').stop(true,true).fadeOut('fast');
 	});
 
 	// line of XML output
@@ -102,15 +103,18 @@ function initJS() {
 		$(this).css('top', 0 - $(this).outerHeight() - parseInt($(".alert-cover").css('top'), 10)).show().animate({
 			top: topOffset
 		}, 3000, 'easeOutBack');
+
+		/* hide alerts after some time - only successfull */
+		if ($(this).hasClass('success')) {
+			var $flash = $(this);
+			setTimeout(function() {
+				$flash.fadeOut();
+			}, 7000); /* 3s animation + 4s visible */
+		}
 	};
 })( jQuery );
 
 function prepareAlertsActions() {
-	/* hide alerts after some time - only successfull */
-	setTimeout(function() {
-		$('.alert.success').fadeOut();
-	}, 7000); /* 3s animation + 4s visible */
-
 	$(".alert-cover .alert").hide().delay(500).each(function() {
 		$(this).animateAlert();
 	});
@@ -266,7 +270,6 @@ function duplicateNode($elem) {
 
 function scrollToGeneratedForm($elem, $form) {
 	var section = $elem.parents("section");
-	l($form.offset().top - $("nav#top").outerHeight() - 20);
 	$(section).animate({
 		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight() - 20
 	}, 1000);

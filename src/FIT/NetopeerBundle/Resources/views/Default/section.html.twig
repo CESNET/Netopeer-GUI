@@ -109,7 +109,7 @@ if advised of the possibility of such damage.
 			}
 			$(notifOutput).removeClass('hidden');
 
-			var socket = new $.fn.notifWebSocket({{ app.request.get('key') }}, "ws://sauvignon.liberouter.org:8080/");
+			var socket = new $.fn.notifWebSocket({{ app.request.get('key') }}, "ws://{{ app.request.host }}:8080/");
 			setTimeout(function() {
 				if (socket.isActive === true) {
 					socket.doSend('{% if sessionHash is defined %}{{sessionHash}}{% endif %} -10 0');
