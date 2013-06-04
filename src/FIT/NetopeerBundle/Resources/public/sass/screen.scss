@@ -295,8 +295,9 @@ article#block--singleContent { font-size: 1.4em; padding: $hNavTop $sContentPadd
 
 #block--notifications { width: 90%; background-color: #333; height: 10%; @include box-sizing(border-box); position: absolute; right: 0px; top: 100%; border-top: 1px solid #000; color: #ccc; font-size: 1.25em; font-family: $fMonospace;
 	.notif-cover { padding: 8px $sContentPadding; overflow-y: scroll; height: 100%; position: relative; @include box-sizing(border-box); }
-	.notif { margin-bottom: 2px; }
-	strong { margin-right: 10px; width: 70px; @include inline-block; }
+	.notif { margin-bottom: 2px; overflow: hidden; }
+	.time { margin-top: 6px; color: #999; }
+	strong { margin-right: 10px; width: 70px; float: left; }
 	&.hidden { border: 0px none; height: 0px; padding: 0px; top: 100% !important; visibility: hidden; }
 }
 
