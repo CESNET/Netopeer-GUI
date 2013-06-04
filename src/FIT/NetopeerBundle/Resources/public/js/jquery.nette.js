@@ -27,7 +27,12 @@ jQuery.extend({
 				tmp.addClass('left-nav-defined');
 				$afterEl.attr('id', 'block--state').addClass('left-nav-defined');
 			}
-			$("#" + id).html(html);
+			if (id === "block--alerts") {
+				$("#" + id).append(html);
+			} else {
+				$("#" + id).html(html);
+			}
+
 		},
 
 		success: function (payload) {

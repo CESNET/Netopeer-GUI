@@ -212,7 +212,7 @@ if advised of the possibility of such damage.
 					<td> {{ key.time }} </td>
 					<td>{{ key.host }}</td>
 					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}' class="ajaxLink"><span id="ico-conf"></span>Configure device</a></td>
-					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}' class="ajaxLink" data-disable-history="true">disconnect</a></td>
+					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}' class="ajaxLink" data-disable-history="true">Disconnect</a></td>
 				</tr>
 			{% endfor %}
 		</table>

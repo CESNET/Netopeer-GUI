@@ -61,7 +61,9 @@ function initJS() {
 
 	$(window).on('click', '.alert .close', function(e) {
 		e.preventDefault();
-		$(this).parents('.alert').stop(true,true).fadeOut('fast');
+		$(this).parents('.alert').stop(true,true).fadeOut('fast', function() {
+			$(this).remove();
+		});
 	});
 
 	// line of XML output
@@ -108,7 +110,9 @@ function initJS() {
 		if ($(this).hasClass('success')) {
 			var $flash = $(this);
 			setTimeout(function() {
-				$flash.fadeOut();
+				$flash.fadeOut(function() {
+					$flash.remove();
+				});
 			}, 7000); /* 3s animation + 4s visible */
 		}
 	};
