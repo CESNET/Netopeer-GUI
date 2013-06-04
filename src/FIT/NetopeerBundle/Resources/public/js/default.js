@@ -195,7 +195,11 @@ function changeSectionHeight() {
 	if (!notifOutput) {
 		notifInit();
 	}
-	var h = $(window).height() - $(notifOutput).outerHeight();
+	var h = $(window).height();
+	if (!$(notifOutput).hasClass('hidden')) {
+		h -= $(notifOutput).outerHeight();
+	}
+
 	$("body > section, body > section#content").css('min-height', '0%').height(h);
 	$(notifOutput).css('top', h);
 }

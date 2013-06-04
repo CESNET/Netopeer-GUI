@@ -409,13 +409,6 @@ class DefaultController extends BaseController
 		$this->getRequest()->getSession()->remove('isLocking');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
 
-		$activeNotifications = $this->getRequest()->getSession()->get('activeNotifications');
-		if ( !isset($activeNotifications[$key]) || $activeNotifications[$key] !== true ) {
-			$activeNotifications[$key] = true;
-			$this->getRequest()->getSession()->set('activeNotifications', $activeNotifications);
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'notifications');
-		}
-
 		if ($this->getRequest()->getSession()->get('isAjax') === true) {
 			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
 		}
@@ -436,6 +429,13 @@ class DefaultController extends BaseController
 				$retArr['module'] = $module1st["params"]["module"];
 				return $this->redirect($this->generateUrl($routeName, $retArr));
 			}
+		}
+
+		$activeNotifications = $this->getRequest()->getSession()->get('activeNotifications');
+		if ( !isset($activeNotifications[$key]) || $activeNotifications[$key] !== true ) {
+			$activeNotifications[$key] = true;
+			$this->getRequest()->getSession()->set('activeNotifications', $activeNotifications);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'notifications');
 		}
 
 		// if we have module, we are definitely in module or subsection action, so we could load names
