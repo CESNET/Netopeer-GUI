@@ -310,8 +310,16 @@ class AjaxController extends BaseController
 			'filter' => '<netconf-state xmlns="'.$ns.'"><schemas/></netconf-state>',
 		);
 
-		if (($xml = $dataClass->handle('get', $params)) != 1 ) {
+		$xml = $dataClass->handle('get', $params);
+		if (($xml !== 1) && ($xml !== "")) {
 			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+			if ($xml === false) {
+				/* invalid message received */
+				$schemaData->setDataForKey($key, 'isInProgress', false);
+				$schemaData->setDataForKey($key, 'status', "error");
+				$schemaData->setDataForKey($key, 'message', "Getting the list of schemas failed.");
+				return;
+			}
 			$xml->registerXPathNamespace("xmlns", $ns);
 			$schemas = $xml->xpath("//xmlns:schema");
 
