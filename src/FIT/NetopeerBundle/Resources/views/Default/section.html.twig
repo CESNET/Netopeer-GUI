@@ -102,19 +102,23 @@ if advised of the possibility of such damage.
 {% endblock config %}
 
 {% block notifications %}
-	{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
+	{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
 		<script type="text/javascript">
 			if (!notifOutput) {
 				notifInit();
 			}
 			$(notifOutput).removeClass('hidden');
-
 			var socket = new $.fn.notifWebSocket({{ app.request.get('key') }}, "ws://{{ app.request.host }}:8080/");
-			setTimeout(function() {
+
+			var sendInterval = setInterval(function() {
 				if (socket.isActive === true) {
 					socket.doSend('{% if sessionHash is defined %}{{sessionHash}}{% endif %} -10 0');
+					clearInterval(sendInterval);
 				}
 			}, 1000);
+
+			notifResizable();
 		</script>
 	{% endif %}
+	<div class="notif-cover"></div>
 {% endblock notifications %}

@@ -4,6 +4,12 @@ var notifications = new Array();
 
 function notifInit() {
 	notifOutput = $("#block--notifications");
+}
+
+function notifResizable() {
+	if (!notifOutput) {
+		notifInit();
+	}
 	$(notifOutput).resizable({
 		handles: 'n',
 		minHeight: 10,
