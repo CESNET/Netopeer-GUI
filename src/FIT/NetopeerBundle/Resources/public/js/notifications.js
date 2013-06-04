@@ -77,14 +77,19 @@ $.fn.notifWebSocket = function(key, wsUri) {
 			notifInit();
 		}
 
-		var parsed_message = mess;
+		var parsed_text = mess;
+		var parsed_time = '';
 		if (mess[0] === '{') {
 			/* TODO sanitize string? handle error? */
-			var parsed = JSON.parse(mess);
-			parsed_message = parsed.eventtime + ": " + parsed.content;
+			var parsed = $.parseJSON(mess);
+			parsed_text = parsed.content;
+			parsed_time = parsed.eventtime;
 		}
 
-		var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(parsed_message));
+		var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(parsed_text));
+		if (parsed_time !== '') {
+			output.prepend($("<div></div>").addClass('time').text(parsed_time));
+		}
 		var notifCover = notifOutput.find('.notif-cover');
 		notifCover.append(output);
 		notifCover.animate({
