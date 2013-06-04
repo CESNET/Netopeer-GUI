@@ -367,7 +367,15 @@ class DefaultController extends BaseController
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
 		$dataClass = $this->get('DataModel');
-		parent::setActiveSectionKey($key);
+
+		if ($dataClass->checkLoggedKeys() === 1) {
+			$url = $this->get('request')->headers->get('referer');
+			if (!strlen($url)) {
+				$url = $this->generateUrl('_home');
+			}
+			return $this->redirect($url);
+		}
+		$this->setActiveSectionKey($key);
 		$dataClass->buildMenuStructure($key);
 
 		// now, we could set forms params with filter (even if we don't have module or subsection)
