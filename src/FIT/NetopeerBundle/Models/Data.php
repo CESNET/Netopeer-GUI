@@ -204,6 +204,9 @@ class Data {
 	 */
 	private function getModuleIdentifiersForCurrentDevice($key) {
 		$conn = $this->getConnFromKey($key);
+		if (!$conn) {
+			return false;
+		}
 		$sessionStatus = json_decode($conn->sessionStatus);
 		$capabilities = $sessionStatus->capabilities;
 
@@ -222,6 +225,7 @@ class Data {
 				}
 			}
 			$this->moduleIdentifiers = $arr;
+			return $arr;
 		}
 
 		return false;
@@ -844,7 +848,7 @@ class Data {
 	 *
 	 * @return int       		0 on success, 1 on error
 	 */
-	private function checkLoggedKeys() {
+	public function checkLoggedKeys() {
 		$session = $this->container->get('request')->getSession();
 		if ( !count($session->get("session-connections")) ) {
 			$session->setFlash($this->flashState .' error', "Not logged in.");

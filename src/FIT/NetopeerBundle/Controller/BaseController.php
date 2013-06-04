@@ -163,6 +163,15 @@ class BaseController extends Controller
 	}
 
 	/**
+	 * gets current section key
+	 *
+	 * @return int|null   section key
+	 */
+	public function getActiveSectionKey() {
+		return $this->activeSectionKey;
+	}
+
+	/**
 	 * sets submenu URL.
 	 *
 	 * @param string $submenuUrl  URL for submenu
