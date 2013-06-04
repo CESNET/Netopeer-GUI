@@ -235,6 +235,11 @@ class DefaultController extends BaseController
 	public function reloadDeviceAction($key)
 	{
 		$dataClass = $this->get('DataModel');
+
+		/* reload hello message */
+		$params = array('key' => $key);
+		$dataClass->handle("reloadhello", $params);
+
 		$dataClass->invalidateMenuStructureForKey($key);
 
 		//reconstructs a routing path and gets a routing array called $route_params

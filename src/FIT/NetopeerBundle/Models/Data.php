@@ -733,6 +733,18 @@ class Data {
 			$this->logger->err("Could get session info.", array("error" => var_export($decoded, true)));
 			$session->setFlash($this->flashState .' error', "Could not get session info.");
 		}
+		
+		if (!($newconnection = $this->getConnFromKey($params['key']))) {
+			$this->logger->err("Could not decode connection from key. ", array("newConnection" => var_export($newconnection), "key" => $params['key'] ));
+		} else {
+			$newconnection->sessionStatus = json_encode($decoded);
+
+			$session = $this->container->get('request')->getSession();
+			$sessionConnections = $session->get('session-connections');
+
+			$sessionConnections[$params['key']] = serialize($newconnection);
+			$session->set('session-connections', $sessionConnections);
+		}
 
 		return $decoded;
 	}
@@ -1071,10 +1083,8 @@ class Data {
 		fclose($sock);
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
-		if ($command === "info" || $command === "reloadhello") {
-			echo "reloadhello";
+		if ($command === "info") {
 			$this->handleResultsArr['info'] = $res;
-			return $res;
 		}
 
 		if ( isset($res) && $res !== 1 && $res !== -1) {
