@@ -69,7 +69,7 @@ class DeviceConnectionTestCase extends DefaultTestCase
 			// type password (other credentials are from history)
 			$this->type("id=form_password", "seleniumTestPass");
 			$this->click("css=input[type=\"submit\"]");
-			$this->waitForPageToLoad("30000");
+			$this->waitForAjaxPageToLoad("30000");
 			try {
 				$this->assertFalse($this->isTextPresent("Could not connect"));
 			} catch (PHPUnit_Framework_AssertionFailedError $e) {
@@ -77,15 +77,15 @@ class DeviceConnectionTestCase extends DefaultTestCase
 			}
 
 			$this->isTextPresent("Form has been filled up correctly.");
-			sleep(2);
+			sleep(4);
 
 			// add device from history to profiles of connected devices
-			$this->click("//div[@id='history-of-connected-devices']/a/span[2]");
+			$this->click("//div[@id='block--historyOfConnectedDevices']/a/span[2]");
 			$this->isTextPresent("Device has been");
 
 			sleep(2);
 			// delete device from history of connected devices
-			$this->click("//div[@id='profiles-of-connected-devices']/a/span");
+			$this->click("//div[@id='block--profilesOfConnectedDevices']/a/span");
 			sleep(2);
 			$this->isTextPresent("Device has been");
 
@@ -93,12 +93,12 @@ class DeviceConnectionTestCase extends DefaultTestCase
 			$this->click("css=a.device-item");
 			$this->type("id=form_password", "seleniumTestPass");
 			$this->click("css=input[type=\"submit\"]");
-			$this->waitForPageToLoad("30000");
+			$this->waitForAjaxPageToLoad("30000");
 
 			// disconnect from devices
 			for ($i = 0; $i < 2; $i++) {
 				$this->click("link=disconnect");
-				$this->waitForPageToLoad("30000");
+				$this->waitForAjaxPageToLoad("30000");
 				$this->assertTrue($this->isTextPresent("Successfully disconnected."), "Could not disconnect from device.");
 			}
 
@@ -107,7 +107,7 @@ class DeviceConnectionTestCase extends DefaultTestCase
 			sleep(2);
 
 			// delete device from history
-			$this->click("//div[@id='history-of-connected-devices']/a/span");
+			$this->click("//div[@id='block--historyOfConnectedDevices']/a/span");
 			sleep(2);
 			$this->isTextPresent("Device has been");
 		}

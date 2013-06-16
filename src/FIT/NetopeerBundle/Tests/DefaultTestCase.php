@@ -65,6 +65,7 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 	protected function open($url) {
 		$this->windowMaximize();
 		parent::open($url);
+		$this->windowMaximize();
 		$this->checkPageError();
 	}
 
@@ -73,12 +74,12 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 	 */
 	public function checkColumnsChange() {
 		$this->click("link=Double column");
-		$this->waitForPageToLoad("30000");
+		$this->waitForAjaxPageToLoad("30000");
 		$this->checkPageError();
 		$this->assertTrue($this->isTextPresent("Config data only"), "Could not change to double-column layout.");
 
 		$this->click("link=Single column");
-		$this->waitForPageToLoad("30000");
+		$this->waitForAjaxPageToLoad("30000");
 		$this->checkPageError();
 		$this->assertFalse($this->isTextPresent("Config data only"), "Could not change to single-column layout.");
 	}
@@ -96,7 +97,7 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 		$this->type("id=form_user", "seleniumTest");
 		$this->type("id=form_password", "seleniumTestPass");
 		$this->click("css=input[type=\"submit\"]");
-		$this->waitForPageToLoad("30000");
+		$this->waitForAjaxPageToLoad("30000");
 		try {
 			$this->assertFalse($this->isTextPresent("Could not connect"));
 		} catch (PHPUnit_Framework_AssertionFailedError $e) {
@@ -132,6 +133,15 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 	}
 
 	/**
+	 * Waits for ajax request is complete - ajax alternative for waitForPageToLoad
+	 */
+	public function waitForAjaxPageToLoad($time) {
+		$this->waitForCondition("selenium.browserbot.getCurrentWindow().jQuery.active == 0", $time);
+		sleep(5);
+		$this->checkPageError();
+	}
+
+	/**
 	 * checks, if all images are loaded correctly
 	 *
 	 * @throws Exception
@@ -152,7 +162,7 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 				Number(allOk); // getEval returns result of last statement. This statement has value of the variable as result.
 			'));
 		} catch (\Exception $e) {
-			throw new \Exception('Some images were not loaded correctly.');
+			throw new \PHPUnit_Framework_AssertionFailedError('Some images were not loaded correctly.');
 		}
 	}
 
@@ -162,9 +172,8 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 	 * @throws Exception when error, exception appears
 	 */
 	protected function checkPageError()	{
-		$this->checkImages();
-
 		try {
+			$this->checkImages();
 			$this->assertFalse($this->isElementPresent('css=.block_exception_detected'), 'Exception found, error 500.');
 			$this->assertFalse($this->isTextPresent("404 Not Found"), "Error 404");
 			$this->assertFalse($this->isTextPresent("Warning: "), "Warning appears.");
