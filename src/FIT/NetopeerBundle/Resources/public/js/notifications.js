@@ -81,76 +81,74 @@ $.fn.notifWebSocket = function(key, wsUri) {
 			notifications[key].addError(evt.data);
 		};
 
-//		this.websocket.send(toSend);
-	}
+		this.doSend = function(message) {
+			this.websocket.send(message);
+			this.addSend(message);
+		};
 
-	this.doSend = function(message) {
-		this.websocket.send(message);
-		this.addSend(message);
-	};
+		this.addInfo = function(mess) {
+			this.writeToScreen(mess, "info", "Info:");
+		};
 
-	this.addInfo = function(mess) {
-		this.writeToScreen(mess, "info", "Info:");
-	};
+		this.addError = function(mess) {
+			this.writeToScreen(mess, "error red", "Error:");
+		};
 
-	this.addError = function(mess) {
-		this.writeToScreen(mess, "error red", "Error:");
-	};
+		this.addMessage = function(mess) {
+			this.writeToScreen(mess, "message green", "Message:");
+		};
 
-	this.addMessage = function(mess) {
-		this.writeToScreen(mess, "message green", "Message:");
-	};
+		this.addSend = function(mess) {
+			this.writeToScreen(mess, "send", "Sent:");
+		};
 
-	this.addSend = function(mess) {
-		this.writeToScreen(mess, "send", "Sent:");
-	};
+		this.saveMessage = function(mess) {
+			this.messages.push(mess);
+		};
 
-	this.saveMessage = function(mess) {
-		this.messages.push(mess);
-	};
+		this.printSavedMessages = function() {
+			var i = 0;
+			var notifCover = notifOutput.find('.notif-cover');
+			while(i < this.messages.length) {
+				notifCover.append(this.messages[i]);
+				i++;
+			}
+		};
 
-	this.printSavedMessages = function() {
-		var i = 0;
-		var notifCover = notifOutput.find('.notif-cover');
-		while(i < this.messages.length) {
-			notifCover.append(this.messages[i]);
-			i++;
-		}
-	};
+		this.writeToScreen = function(mess, textClass, text) {
+			if (!notifOutput) {
+				notifInit();
+			}
 
-	this.writeToScreen = function(mess, textClass, text) {
-		if (!notifOutput) {
-			notifInit();
-		}
+			var parsed_text = mess;
+			var parsed_time = '';
+			if (mess[0] === '{') {
+				/* TODO sanitize string? handle error? */
+				var parsed = $.parseJSON(mess);
+				parsed_text = parsed.content;
+				parsed_time = parsed.eventtime;
+			}
 
-		var parsed_text = mess;
-		var parsed_time = '';
-		if (mess[0] === '{') {
-			/* TODO sanitize string? handle error? */
-			var parsed = $.parseJSON(mess);
-			parsed_text = parsed.content;
-			parsed_time = parsed.eventtime;
-		}
-
-		var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(parsed_text));
-		if (parsed_time !== '') {
-			output.prepend($("<div></div>").addClass('time').text(parsed_time));
-		}
-		var notifCover = notifOutput.find('.notif-cover');
-		this.saveMessage(output);
-		notifCover.append(output);
-		notifCover.animate({
-			scrollTop: notifCover.scrollTop() + $(output).offset().top
-		}, 10);
-		notifCover.animate({
-			opacity: 0.3
-		}, 200, function() {
+			var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(parsed_text));
+			if (parsed_time !== '') {
+				output.prepend($("<div></div>").addClass('time').text(parsed_time));
+			}
+			var notifCover = notifOutput.find('.notif-cover');
+			this.saveMessage(output);
+			notifCover.append(output);
 			notifCover.animate({
-				opacity: 1
-			}, 100);
-		});
+				scrollTop: notifCover.scrollTop() + $(output).offset().top
+			}, 10);
+			notifCover.animate({
+				opacity: 0.3
+			}, 200, function() {
+				notifCover.animate({
+					opacity: 1
+				}, 100);
+			});
 
-	};
+		};
+	}
 
 	return this;
 };
