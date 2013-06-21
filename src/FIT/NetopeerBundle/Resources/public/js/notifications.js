@@ -10,20 +10,53 @@ function notifResizable() {
 	if (!notifOutput) {
 		notifInit();
 	}
-	$(notifOutput).resizable({
-		handles: 'n',
-		minHeight: 10,
-		resize: function(event, ui) {
-			ui.size.width = ui.originalSize.width;
-			ui.position.left = ui.originalPosition.left;
-			notificationsHeight = ui.size.height * 100 / $(window).height();
-			ui.position.top = $(window).height() * (1 - notificationsHeight);
+
+	if (!$('.ui-resizable-handle').length) {
+		try {
+			if ($(notifOutput).resizable) {
+				$(notifOutput).resizable('destroy');
+			}
+		} catch(err) {
+			// nothing happened, resizable not initialized yet
 		}
-	});
+		$(notifOutput).resizable({
+			handles: 'n',
+			minHeight: 10,
+			resize: function(event, ui) {
+				ui.size.width = ui.originalSize.width;
+				ui.position.left = ui.originalPosition.left;
+				notificationsHeight = ui.size.height * 100 / $(window).height();
+				ui.position.top = $(window).height() * (1 - notificationsHeight);
+			}
+		});
+	}
+}
+
+function getNotifWebSocket(key, hash, wsUri) {
+	notifResizable();
+
+	var socket;
+	if (notifications[key] === undefined) {
+		socket = new $.fn.notifWebSocket(key, wsUri);
+		var sendInterval = setInterval(function() {
+			if (socket.isActive === true) {
+				socket.doSend(hash + ' -10 0');
+				clearInterval(sendInterval);
+			}
+		}, 1000);
+	} else {
+		socket = notifications[key];
+		if (!notifOutput.find('.notif').length) {
+			socket.printSavedMessages();
+		}
+	}
+
+	return socket;
 }
 
 $.fn.notifWebSocket = function(key, wsUri) {
 	this.key = key;
+	this.messages = new Array();
 	if (notifications[key] === undefined) {
 		notifications[key] = new Array();
 	}
@@ -72,6 +105,19 @@ $.fn.notifWebSocket = function(key, wsUri) {
 		this.writeToScreen(mess, "send", "Sent:");
 	};
 
+	this.saveMessage = function(mess) {
+		this.messages.push(mess);
+	};
+
+	this.printSavedMessages = function() {
+		var i = 0;
+		var notifCover = notifOutput.find('.notif-cover');
+		while(i < this.messages.length) {
+			notifCover.append(this.messages[i]);
+			i++;
+		}
+	};
+
 	this.writeToScreen = function(mess, textClass, text) {
 		if (!notifOutput) {
 			notifInit();
@@ -91,6 +137,7 @@ $.fn.notifWebSocket = function(key, wsUri) {
 			output.prepend($("<div></div>").addClass('time').text(parsed_time));
 		}
 		var notifCover = notifOutput.find('.notif-cover');
+		this.saveMessage(output);
 		notifCover.append(output);
 		notifCover.animate({
 			scrollTop: notifCover.scrollTop() + $(output).offset().top
@@ -107,4 +154,3 @@ $.fn.notifWebSocket = function(key, wsUri) {
 
 	return this;
 };
-

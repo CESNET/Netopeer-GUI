@@ -53,6 +53,9 @@ if advised of the possibility of such damage.
 				$.get("{{ path("getSchema", {"key": idForAjaxGetSchema} ) }}", function(data) {
 					var dataArr = $.parseJSON(data);
 					if (dataArr['status'] == "success") {
+
+						getNotifWebSocket(idForAjaxGetSchema, "{{ sessionHash }}", "ws://{{ app.request.host }}:8080/");
+
 						targetConfigure.find(".loading").remove();
 						targetConfigure.find("> a").show();
 					} else {

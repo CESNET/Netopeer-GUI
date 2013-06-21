@@ -83,6 +83,9 @@ class DefaultController extends BaseController
 	public function indexAction($connectedDeviceId = NULL)
 	{
 		// DependencyInjection (DI) - defined in Resources/config/services.yml
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
 		$dataClass = $this->get('DataModel');
 
 		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'title');
@@ -166,9 +169,17 @@ class DefaultController extends BaseController
 
 				// if connection is broken (Could not connect)
 				if ($res == 0) {
-					$arr = array(
-						"idForAjaxGetSchema" => $result,
-					);
+					$conn = $this->getRequest()->getSession()->get('session-connections');
+					$conn = unserialize($conn[$result]);
+					$arr = array();
+					if ($conn !== false) {
+						$arr = array(
+							"idForAjaxGetSchema" => $result,
+//							'lockedConn' => $conn->locked,
+//							'sessionStatus' => $conn->sessionStatus,
+							'sessionHash' => $conn->hash,
+						);
+					}
 
 					if ($this->getRequest()->isXmlHttpRequest()) {
 						foreach ($arr as $key => $value) {

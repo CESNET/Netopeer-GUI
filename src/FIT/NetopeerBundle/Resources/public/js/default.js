@@ -45,7 +45,6 @@ $(window).resize(function() {
 });
 
 function initJS() {
-	changeSectionHeight();
 	collapseTopNav();
 
 	// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
@@ -89,6 +88,7 @@ function initJS() {
 	});
 
 	showIconsOnLeafLine();
+	changeSectionHeight();
 }
 
 /**
@@ -195,6 +195,9 @@ function changeSectionHeight() {
 	if (!notifOutput) {
 		notifInit();
 	}
+
+	notifResizable();
+
 	var h = $(window).height();
 	if (!$(notifOutput).hasClass('hidden')) {
 		h -= $(notifOutput).outerHeight();
