@@ -44,6 +44,11 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 	 * @var string  default URL for test
 	 */
 	protected static $browserUrl = "https://sauvignon.liberouter.org/symfony/app.php/";
+	protected static $login = array(
+		'host' => "sauvignon.liberouter.org",
+		'user' => "seleniumTest",
+		'pass' => "seleniumTestPass"
+	);
 
 	/**
 	 * @inheritdoc
@@ -93,9 +98,9 @@ class DefaultTestCase extends PHPUnit_Extensions_SeleniumTestCase
 		$this->checkPageError();
 
 		// type connection credentials and try to connect to the device
-		$this->type("id=form_host", "sauvignon.liberouter.org");
-		$this->type("id=form_user", "seleniumTest");
-		$this->type("id=form_password", "seleniumTestPass");
+		$this->type("id=form_host", self::$login['host']);
+		$this->type("id=form_user", self::$login['user']);
+		$this->type("id=form_password", self::$login['pass']);
 		$this->click("css=input[type=\"submit\"]");
 		$this->waitForAjaxPageToLoad("30000");
 		try {
