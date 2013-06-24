@@ -243,6 +243,48 @@ class AjaxController extends BaseController
 		}
 	}
 
+	/**
+	 * Process getting history of notifications
+	 *
+	 * @Route("/ajax/get-notifications-history/{connectedDeviceId}/", name="notificationsHistory")
+	 * @Route("/ajax/get-notifications-history/{connectedDeviceId}/{from}/", name="notificationsHistoryFrom")
+	 * @Route("/ajax/get-notifications-history/{connectedDeviceId}/{from}/{to}/", name="notificationsHistoryTo")
+	 * @Route("/ajax/get-notifications-history/{connectedDeviceId}/{from}/{to}/{max}/", name="notificationsHistoryMax")
+	 * @Template()
+	 *
+	 * @param $connectedDeviceId
+	 * @param null|int $from    start time in seconds
+	 * @param int $to           end time in seconds (0 == now)
+	 * @param int $max          max number of notifications
+	 * @return Response
+	 */
+	public function getNotificationsHistoryAction($connectedDeviceId, $from = null, $to = 0, $max = 50)
+	{
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
+		$dataClass = $this->get('DataModel');
+
+		$params['key'] = $connectedDeviceId;
+		$params['from'] = ($from ? $from : time() - 12 * 60 * 60);
+		$params['to'] = $to;
+		$params['max'] = $max;
+
+		$history = $dataClass->handle("notificationsHistory", $params);
+
+		if ($history !== 1) {
+			echo "History: <br/>";
+			echo htmlspecialchars($history);
+			exit;
+//			return new Response(json_encode($result));
+		} else {
+			echo "Error in history: <br />";
+			var_dump($this->getRequest()->getSession()->getFlashes());
+			exit;
+//			return new Response(false);
+		}
+	}
+
 
 	/**
 	* Get one model and process it.

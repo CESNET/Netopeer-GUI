@@ -75,6 +75,7 @@ class Data {
 	const MSG_GENERIC			= 15;
 	const MSG_GETSCHEMA			= 16;
 	const MSG_RELOADHELLO			= 17;
+	const MSG_NTF_GETHISTORY		= 18;
 
 	/**
 	 * @var ContainerInterface   base bundle container
@@ -722,28 +723,35 @@ class Data {
 			$session = $this->container->get('request')->getSession();
 			$sessionKey = $this->getHashFromKey($params['key']);
 		}
+	}
+
+	/**
+	 * handle getting notifications history
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
+	 * @return int       		      0 on success, 1 on error
+	 */
+	private function handle_ntf_gethistory(&$sock, &$params) {
+		if (isset($params["session"]) && ($params["session"] !== "")) {
+			$sessionKey = $params['session'];
+		} else {
+			$session = $this->container->get('request')->getSession();
+			$sessionKey = $this->getHashFromKey($params['key']);
+		}
 
 		$decoded = $this->execute_operation($sock,	array(
-			"type" 		=> self::MSG_RELOADHELLO,
-			"session" 	=> $sessionKey
+			"type" 		=> self::MSG_NTF_GETHISTORY,
+			"session" 	=> $sessionKey,
+			"from" => $params['from'],
+			"to" => $params['to']
 		));
 
 		if (!$decoded) {
 			/* error occurred, unexpected response */
-			$this->logger->err("Could get session info.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not get session info.");
-		}
-		
-		if (!($newconnection = $this->getConnFromKey($params['key']))) {
-			$this->logger->err("Could not decode connection from key. ", array("newConnection" => var_export($newconnection), "key" => $params['key'] ));
-		} else {
-			$newconnection->sessionStatus = json_encode($decoded);
-
-			$session = $this->container->get('request')->getSession();
-			$sessionConnections = $session->get('session-connections');
-
-			$sessionConnections[$params['key']] = serialize($newconnection);
-			$session->set('session-connections', $sessionConnections);
+			$this->logger->err("Could get notifications history.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not get notifications history.");
+			return 1;
 		}
 
 		return $decoded;
@@ -1065,6 +1073,9 @@ class Data {
 				break;
 			case "reloadhello":
 				$res = $this->handle_reloadhello($sock, $params);
+				break;
+			case "notificationsHistory":
+				$res = $this->handle_ntf_gethistory($sock, $params);
 				break;
 			case "info":
 				$res = $this->handle_info($sock, $params);
