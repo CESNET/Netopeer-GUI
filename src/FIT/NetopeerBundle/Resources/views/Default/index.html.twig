@@ -178,6 +178,10 @@ if advised of the possibility of such damage.
 			$("#history-and-profiles").find('a').removeClass('active');
 			$el.addClass('active');
 		}
+
+		function disconnectCallback(key) {
+			unsetNotificationsForKey(key);
+		}
 	</script>
 {% endblock javascripts %}
 
@@ -212,11 +216,12 @@ if advised of the possibility of such damage.
 	{% else %}
 		<table>
 			{% for key in sessionConnections %}
+				{# TODO: opravit logiku prirazovani indexu, protoze po odhlaseni napr. zarizeni c. 2 (z 3) dojde k posunuti indexu pole -> nesedi s indexy v poli notifikaci #}
 				<tr id="row-{{ loop.index - 1 }}">
 					<td> {{ key.time }} </td>
 					<td>{{ key.host }}</td>
 					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}' class="ajaxLink"><span id="ico-conf"></span>Configure device</a></td>
-					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}' class="ajaxLink" data-disable-history="true">Disconnect</a></td>
+					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}' class="ajaxLink" data-disable-history="true" data-callback="disconnectCallback({{ loop.index - 1 }})">Disconnect</a></td>
 				</tr>
 			{% endfor %}
 		</table>

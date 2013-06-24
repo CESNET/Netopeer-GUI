@@ -54,6 +54,10 @@ function getNotifWebSocket(key, hash, wsUri) {
 	return socket;
 }
 
+function unsetNotificationsForKey(key) {
+	notifications.splice(notifications.indexOf(key),1);
+}
+
 $.fn.notifWebSocket = function(key, wsUri) {
 	this.key = key;
 	this.messages = new Array();

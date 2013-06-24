@@ -69,7 +69,7 @@ if advised of the possibility of such damage.
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="block--topMenu">
 			{% block topMenu %}
-				<a href="{{ path('_home') }}" title="Home" class="static ico-home header-icon ajaxLink {% if activeAction is defined and activeAction == "home" %}active{% endif %}" data-callback="setIndexActions"><span></span>Connections</a>
+				<a href="{{ path('_home') }}" title="Home" class="static ico-home header-icon ajaxLink {% if activeAction is defined and activeAction == "home" %}active{% endif %}" data-callback="setIndexActions()"><span></span>Connections</a>
 				{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
 					{% if lockedConn == false %}
 						<a href="{{ path("handleConnection", {"command": "lock", "key": app.request.get('key')} ) }}" title="Lock" class="static ico-unlock header-icon ajaxLink" data-disable-history="true" data-do-not-activate="true"><span></span></a>

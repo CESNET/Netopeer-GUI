@@ -173,7 +173,6 @@ function successAjaxFunction(data, textStatus, jqXHR, href, $elem) {
 	}
 
 	if ($elem.data().callback !== undefined) {
-		var a = $elem.data().callback;
-		eval(a + '();');
+		eval($elem.data().callback + ';');
 	}
 }
