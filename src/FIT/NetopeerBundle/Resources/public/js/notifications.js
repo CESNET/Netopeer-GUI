@@ -79,6 +79,7 @@ $.fn.notifWebSocket = function(key, wsUri) {
 		};
 
 		this.websocket.onmessage = function(evt) {
+			// TODO: rozparsovat zpravu (element: hodnota)
 			notifications[key].addMessage(evt.data);
 		};
 		this.websocket.onerror = function(evt) {

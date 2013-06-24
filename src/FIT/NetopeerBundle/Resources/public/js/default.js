@@ -58,9 +58,9 @@ function initJS() {
 				generateNode($(this));
 			});
 
-	$(window).on('click', '.alert .close', function(e) {
+	$(window).on('click', '.alert', function(e) {
 		e.preventDefault();
-		$(this).parents('.alert').stop(true,true).fadeOut('fast', function() {
+		$(this).stop(true,true).fadeOut('fast', function() {
 			$(this).remove();
 		});
 	});
@@ -104,7 +104,7 @@ function initJS() {
 
 		$(this).css('top', 0 - $(this).outerHeight() - parseInt($(".alert-cover").css('top'), 10)).show().animate({
 			top: topOffset
-		}, 3000, 'easeOutBack');
+		}, 1000, 'easeOutBack');
 
 		/* hide alerts after some time - only successfull */
 		if ($(this).hasClass('success')) {
@@ -113,7 +113,7 @@ function initJS() {
 				$flash.fadeOut(function() {
 					$flash.remove();
 				});
-			}, 7000); /* 3s animation + 4s visible */
+			}, 5000); /* 3s animation + 4s visible */
 		}
 	};
 })( jQuery );
@@ -143,7 +143,7 @@ function initPopupMenu($cover) {
  * double down arrow with popup submenu will appear
  */
 function collapseTopNav() {
-    var $nav = $("nav#top");
+    var $nav = $("nav#block--topMenu");
 	if ( $nav.length ) {
 		var $othersCover = $nav.find('.others-cover');
 		var $others = $othersCover.find(".others");
