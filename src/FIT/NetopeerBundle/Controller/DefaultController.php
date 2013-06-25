@@ -251,6 +251,7 @@ class DefaultController extends BaseController
 		$params = array('key' => $key);
 		$dataClass->handle("reloadhello", $params);
 
+		$dataClass->updateLocalModels($key);
 		$dataClass->invalidateMenuStructureForKey($key);
 
 		//reconstructs a routing path and gets a routing array called $route_params

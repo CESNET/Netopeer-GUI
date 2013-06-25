@@ -66,12 +66,16 @@ class AjaxController extends BaseController
 	 */
 	public function getSchemaAction($key)
 	{
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
+		$dataClass = $this->get('DataModel');
 		$schemaData = AjaxSharedData::getInstance();
 		
 		ob_start();
 		$data = $schemaData->getDataForKey($key);
 		if (!(isset($data['isInProgress']) && $data['isInProgress'] === true)) {
-			$this->updateLocalModels($key);
+			$dataClass->updateLocalModels($key);
 		}
 		$output = ob_get_clean();
 		$result['output'] = $output;
@@ -279,125 +283,11 @@ class AjaxController extends BaseController
 //			return new Response(json_encode($result));
 		} else {
 			echo "Error in history: <br />";
+			var_dump("Decoded: ".$history);
+			echo "<br />";
 			var_dump($this->getRequest()->getSession()->getFlashes());
 			exit;
 //			return new Response(false);
 		}
-	}
-
-
-	/**
-	* Get one model and process it.
-	*
-	* @param array &$schparams  key, identifier, version, format for get-schema
-	* @param string $identifier identifier of folder in /tmp/symfony directory
-	* @return int               0 on success, 1 on error
-	*/
-	private function getschema(&$schparams, $identifier)
-	{
-		$dataClass = $this->get('DataModel');
-		$data = "";
-		$path = "/tmp/symfony/";
-		@mkdir($path, 0700, true);
-		$path .= "/$identifier";
-
-		if (file_exists($path)) {
-			/* already exists */
-			return 1;
-		}
-
-		if ($dataClass->handle("getschema", $schparams, false, $data) == 0) {
-			$schparams["user"] = $dataClass->getUserFromKey($schparams["key"]);
-			file_put_contents($path, $data);
-			$schparams["path"] = $path;
-			return 0;
-		} else {
-			$this->getRequest()->getSession()->setFlash('error', 'Getting model failed.');
-			return 1;
-		}
-		return 0;
-	}
-
-	/**
-	 * Process <get-schema> action based on schparams.
-	 *
-	 * @param array &$schparams   get-schema parameters
-	 * @return int                0 on success, 1 on error
-	 */
-	private function processSchema(&$schparams)
-	{
-		$dataClass = $this->get('DataModel');
-		$path = $schparams["path"];
-
-		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$dataClass->getModelsDir()."\"");
-		return 1;
-	}
-
-	/**
-	* Get available configuration data models,
-	* store them and transform them.
-	*
-	* @param  int   $key 	index of session-connection
-	* @return void
-	*/
-	private function updateLocalModels($key)
-	{
-		$schemaData = AjaxSharedData::getInstance();
-		$schemaData->setDataForKey($key, 'isInProgress', true);
-
-		$dataClass = $this->get('DataModel');
-		$ns = "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
-		$params = array(
-			'key' => $key,
-			'filter' => '<netconf-state xmlns="'.$ns.'"><schemas/></netconf-state>',
-		);
-
-		$xml = $dataClass->handle('get', $params);
-		if (($xml !== 1) && ($xml !== "")) {
-			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-			if ($xml === false) {
-				/* invalid message received */
-				$schemaData->setDataForKey($key, 'isInProgress', false);
-				$schemaData->setDataForKey($key, 'status', "error");
-				$schemaData->setDataForKey($key, 'message', "Getting the list of schemas failed.");
-				return;
-			}
-			$xml->registerXPathNamespace("xmlns", $ns);
-			$schemas = $xml->xpath("//xmlns:schema");
-
-			$this->get('data_logger')->info("Trying to find models for namespaces: ", array('namespaces', var_export($schemas)));
-
-			$list = array();
-			$lock = sem_get(12345678, 1, 0666, 1);
-			sem_acquire($lock); /* critical section */
-			foreach ($schemas as $sch) {
-				$schparams = array("key" => $params["key"],
-					"identifier" => (string)$sch->identifier,
-					"version" => (string)$sch->version,
-					"format" => (string)$sch->format);
-				$ident = $schparams["identifier"]."@".$schparams["version"].".".$schparams["format"];
-				if (file_exists($dataClass->getModelsDir()."/$ident")) {
-					continue;
-				} else if ($this->getschema($schparams, $ident) == 1) {
-					//break; /* not get the rest on error */
-				} else {
-					$list[] = $schparams;
-				}
-			}
-			sem_release($lock);
-
-			$this->get('data_logger')->info("Not found models for namespaces: ", array('namespaces', var_export($list)));
-
-			/* non-critical - only models, that I downloaded will be processed, others already exist */
-			foreach ($list as $schema) {
-				$this->processSchema($schema);
-			}
-			$schemaData->setDataForKey($key, 'status', "success");
-			$schemaData->setDataForKey($key, 'message', "Configuration data models were updated.");
-		} else {
-			$schemaData->setDataForKey($key, 'status', "error");
-			$schemaData->setDataForKey($key, 'message', "Getting the list of schemas failed.");
-		}
-		$schemaData->setDataForKey($key, 'isInProgress', false);
 	}
 }
