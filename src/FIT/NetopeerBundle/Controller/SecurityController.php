@@ -90,26 +90,4 @@ class SecurityController extends BaseController
     {
         // The security layer will intercept this request
     }
-
-		/**
-     * Create new user.
-		 * @TODO: remove as soon as possible, security danger
-     *
-     * @Route("/create-user-manually/", name="createUser")
-     */
-    public function createUserAction()
-    {
-      $user = new User();
-	    $user->setRoles("ROLE_ADMIN");
-	    $user->setUsername("tcejka");
-
-	    $encoder = $this->get('security.encoder_factory')->getEncoder($user);
-	    $password = $encoder->encodePassword('pass', $user->getSalt());
-	    $user->setPassword($password);
-
-	    $em = $this->getDoctrine()->getEntityManager();
-	    $em->persist($user);
-	    $em->flush();
-
-    }
 }
