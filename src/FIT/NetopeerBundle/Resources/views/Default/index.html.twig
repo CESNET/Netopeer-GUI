@@ -57,11 +57,10 @@ if advised of the possibility of such damage.
 						getNotifWebSocket(idForAjaxGetSchema, "{{ sessionHash }}", "ws://{{ app.request.host }}:8080/");
 
 						targetConfigure.find(".loading").remove();
-						targetConfigure.find("> a").show();
 					} else {
 						targetConfigure.find(".loading").remove();
-						targetConfigure.text("Could not configure device.");
 					}
+					targetConfigure.find("> a").show();
 					if (dataArr['message']) {
 						var flash = prepareFlashMessage(dataArr['status'], dataArr['message']);
 						$(".alert-cover").append($(flash).hide());
