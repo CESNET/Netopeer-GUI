@@ -440,6 +440,8 @@ class DefaultController extends BaseController
 				}
 				$retArr['module'] = $module1st["params"]["module"];
 				return $this->redirect($this->generateUrl($routeName, $retArr));
+			} else {
+				return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'All')));
 			}
 		}
 
