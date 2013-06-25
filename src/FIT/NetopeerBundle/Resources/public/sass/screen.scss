@@ -299,6 +299,9 @@ article#block--singleContent { font-size: 1.4em; padding: $hNavTop $sContentPadd
 	.time { margin-top: 6px; color: #999; }
 	strong { margin-right: 10px; width: 70px; float: left; }
 	&.hidden { border: 0px none; height: 0px; padding: 0px; top: 100% !important; visibility: hidden; }
+
+	.root-tag, .tagValue { margin-right: 10px; }
+	.tagName { border-left: 1px solid #999; padding-left: 10px; color: #999; }
 }
 
 /* formulare */

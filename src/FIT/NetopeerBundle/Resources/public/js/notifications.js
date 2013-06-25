@@ -134,7 +134,21 @@ $.fn.notifWebSocket = function(key, wsUri) {
 				parsed_time = parsed.eventtime;
 			}
 
-			var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').text(parsed_text));
+			try {
+				var xml = $($.parseXML(parsed_text));
+				if (xml) {
+					var output = $("<div></div>").append($("<span></span>").addClass('root-tag').text(xml.contents().prop('tagName').toLocaleUpperCase()));
+					xml.contents().children().each(function(i, e) {
+						output.append($("<span></span>").addClass('tagName').text($(e).prop('tagName') + ": "));
+						output.append($("<span></span>").addClass('tagValue').text($(e).text()));
+					});
+					parsed_text = output;
+				}
+			} catch (err) {
+				// we don't care - mess is not probably valid XML string
+			}
+
+			var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').html(parsed_text));
 			if (parsed_time !== '') {
 				output.prepend($("<div></div>").addClass('time').text(parsed_time));
 			}
