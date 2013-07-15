@@ -111,5 +111,7 @@ if advised of the possibility of such damage.
 			}
 		</script>
 	{% endif %}
-	<div class="notif-cover"></div>
+	<div class="notif-cover">
+		<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>
+	</div>
 {% endblock notifications %}

@@ -237,6 +237,15 @@ class BaseController extends Controller
 	/**
 	 * @return Response   json encoded array of ajax blocks
 	 */
+	protected function getAjaxAlertsRespose() {
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
+		$this->prepareAndAssignFlashes();
+		return $this->getAjaxBlocksResponse();
+	}
+
+	/**
+	 * @return Response   json encoded array of ajax blocks
+	 */
 	protected function getAjaxBlocksResponse() {
 		$retArr = array();
 

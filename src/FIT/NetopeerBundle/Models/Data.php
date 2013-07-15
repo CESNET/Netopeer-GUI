@@ -1075,7 +1075,8 @@ class Data {
 				$res = $this->handle_reloadhello($sock, $params);
 				break;
 			case "notificationsHistory":
-				$res = $this->handle_ntf_gethistory($sock, $params);
+				// JSON encoded data OR 1 on error, so we can return it now
+				return $this->handle_ntf_gethistory($sock, $params);
 				break;
 			case "info":
 				$res = $this->handle_info($sock, $params);

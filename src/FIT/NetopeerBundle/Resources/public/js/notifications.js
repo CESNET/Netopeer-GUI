@@ -4,6 +4,12 @@ var notifications = new Array();
 
 function notifInit() {
 	notifOutput = $("#block--notifications");
+
+	notifOutput.on('click', '#js-get-notif-history', function(e) {
+		e.preventDefault();
+
+		processNotifFromHistory($(this).data().key, $(this).attr('href'));
+	});
 }
 
 function notifResizable() {
@@ -52,6 +58,27 @@ function getNotifWebSocket(key, hash, wsUri) {
 	}
 
 	return socket;
+}
+
+function processNotifFromHistory(key, href) {
+	$.ajax({
+		url: href,
+		dataType: "json",
+		success: function(data, textStatus, jqXHR) {
+			if (data['type'] === 2) {
+				notifications[key].addError(data.error-message);
+			} else if (data['snippets'] !== undefined) {
+				$.nette.success(data);
+			} else {
+				$.each(data.notifications, function(i, el) {
+					notifications[key].addMessage(el);
+				});
+			}
+		},
+		error: function() {
+			notifications[key].addError("Could not load notifications history.")
+		}
+	});
 }
 
 function unsetNotificationsForKey(key) {
@@ -125,11 +152,14 @@ $.fn.notifWebSocket = function(key, wsUri) {
 				notifInit();
 			}
 
+			var parsed = mess;
 			var parsed_text = mess;
 			var parsed_time = '';
 			if (mess[0] === '{') {
 				/* TODO sanitize string? handle error? */
-				var parsed = $.parseJSON(mess);
+				parsed = $.parseJSON(mess);
+			}
+			if (typeof parsed == 'object') {
 				parsed_text = parsed.content;
 				parsed_time = parsed.eventtime;
 			}
@@ -150,6 +180,20 @@ $.fn.notifWebSocket = function(key, wsUri) {
 
 			var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').html(parsed_text));
 			if (parsed_time !== '') {
+				if (!isNaN(parsed_time)) {
+					var time = new Date(parsed_time);
+					parsed_time = "";
+					parsed_time += time.getDate();
+					parsed_time += " ";
+					parsed_time += time.getFullYear();
+					parsed_time += " ";
+
+					parsed_time += time.getHours();
+					parsed_time += ":";
+					parsed_time += time.getMinutes();
+					parsed_time += ":";
+					parsed_time += time.getSeconds();
+				}
 				output.prepend($("<div></div>").addClass('time').text(parsed_time));
 			}
 			var notifCover = notifOutput.find('.notif-cover');
@@ -171,3 +215,4 @@ $.fn.notifWebSocket = function(key, wsUri) {
 
 	return this;
 };
+

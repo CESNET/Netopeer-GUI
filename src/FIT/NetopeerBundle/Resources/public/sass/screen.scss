@@ -86,6 +86,9 @@ hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: tra
 	&.red { @include background( linear-gradient($cAlert, darken($cAlert, 5%)) ); border: 1px solid darken($cAlert, 30%); color: #fff; 
 		&:hover { @include background( linear-gradient($cAlert, darken($cAlert, 15%)) ); }
 	}
+	&.grey { @include background( linear-gradient(#555, darken(#555, 5%)) ); border: 1px solid darken(#555, 30%); color: #fff;
+		&:hover { @include background( linear-gradient(#555, darken(#555, 15%)) ); }
+	}
 }
 
 #ajax-spinner { position: absolute; width: 100%; height: 100%; @include background( url($img + 'ajax-loader.gif'), rgba(0,0,0,0.5) ); background-repeat: no-repeat; background-position: center center; top: 0; left: 0; z-index: 30; }

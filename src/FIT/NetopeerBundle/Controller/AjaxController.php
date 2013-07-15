@@ -276,18 +276,11 @@ class AjaxController extends BaseController
 
 		$history = $dataClass->handle("notificationsHistory", $params);
 
+		// $history is 1 on error (we will show flash message) or array on success
 		if ($history !== 1) {
-			echo "History: <br/>";
-			echo htmlspecialchars($history);
-			exit;
-//			return new Response(json_encode($result));
+			return new Response(json_encode($history));
 		} else {
-			echo "Error in history: <br />";
-			var_dump("Decoded: ".$history);
-			echo "<br />";
-			var_dump($this->getRequest()->getSession()->getFlashes());
-			exit;
-//			return new Response(false);
+			return $this->getAjaxAlertsRespose();
 		}
 	}
 }
