@@ -385,6 +385,21 @@ class DefaultController extends BaseController
 	{
 		$dataClass = $this->get('DataModel');
 
+		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topPart');
+			$this->assign('historyHref', $this->getRequest()->getRequestUri());
+		}
+		$this->getRequest()->getSession()->remove('isLocking');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
+
+		if ($this->getRequest()->getSession()->get('isAjax') === true) {
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
+		}
+
 		if ($dataClass->checkLoggedKeys() === 1) {
 			$url = $this->get('request')->headers->get('referer');
 			if (!strlen($url)) {
@@ -409,21 +424,6 @@ class DefaultController extends BaseController
 
 		// we will prepare filter form in column
 		$this->setSectionFilterForms();
-
-		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topPart');
-			$this->assign('historyHref', $this->getRequest()->getRequestUri());
-		}
-		$this->getRequest()->getSession()->remove('isLocking');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
-
-		if ($this->getRequest()->getSession()->get('isAjax') === true) {
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
-		}
 
 		/* Show the first module we have */
 		if ( $module == null ) {

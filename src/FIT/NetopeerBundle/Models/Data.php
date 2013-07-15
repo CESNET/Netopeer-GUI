@@ -1417,7 +1417,7 @@ XML;
 								$namespaces[$nodeKey] = $ns[""];
 							}
 
-							if ( !in_array(array("name" => $nodeKey, 'index' => $i), $allowedModels) ) {
+							if (!in_array(array("name" => $nodeKey, 'index' => $i), $allowedModels) ) {
 								$allowedModels[] = array("name" => $nodeKey, 'index' => $i);
 							}
 
