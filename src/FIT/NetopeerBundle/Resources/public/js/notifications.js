@@ -183,16 +183,19 @@ $.fn.notifWebSocket = function(key, wsUri) {
 				if (!isNaN(parsed_time)) {
 					var time = new Date(parsed_time);
 					parsed_time = "";
-					parsed_time += time.getDate();
-					parsed_time += " ";
-					parsed_time += time.getFullYear();
-					parsed_time += " ";
 
 					parsed_time += time.getHours();
 					parsed_time += ":";
 					parsed_time += time.getMinutes();
 					parsed_time += ":";
 					parsed_time += time.getSeconds();
+
+					parsed_time += " ";
+					parsed_time += time.getDate();
+					parsed_time += ".";
+					parsed_time += time.getMonth();
+					parsed_time += ".";
+					parsed_time += time.getFullYear();
 				}
 				output.prepend($("<div></div>").addClass('time').text(parsed_time));
 			}
