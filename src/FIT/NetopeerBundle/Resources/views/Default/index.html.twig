@@ -52,14 +52,7 @@ if advised of the possibility of such damage.
 				}).appendTo(targetConfigure);
 				$.get("{{ path("getSchema", {"key": idForAjaxGetSchema} ) }}", function(data) {
 					var dataArr = $.parseJSON(data);
-					if (dataArr['status'] == "success") {
-
-						getNotifWebSocket(idForAjaxGetSchema, "{{ sessionHash }}", "ws://{{ app.request.host }}:8080/");
-
-						targetConfigure.find(".loading").remove();
-					} else {
-						targetConfigure.find(".loading").remove();
-					}
+					targetConfigure.find(".loading").remove();
 					targetConfigure.find("> a").show();
 					if (dataArr['message']) {
 						var flash = prepareFlashMessage(dataArr['status'], dataArr['message']);
@@ -67,6 +60,9 @@ if advised of the possibility of such damage.
 						$(flash).animateAlert();
 					}
 					reloadHistoryOfConnectedDevices();
+					if (dataArr['status'] == "success") {
+						getNotifWebSocket(idForAjaxGetSchema, "{{ sessionHash }}", "ws://{{ app.request.host }}:8080/");
+					}
 				});
 			});
 		</script>
@@ -214,13 +210,12 @@ if advised of the possibility of such damage.
 		</div>
 	{% else %}
 		<table>
-			{% for key in sessionConnections %}
-				{# TODO: opravit logiku prirazovani indexu, protoze po odhlaseni napr. zarizeni c. 2 (z 3) dojde k posunuti indexu pole -> nesedi s indexy v poli notifikaci #}
-				<tr id="row-{{ loop.index - 1 }}">
-					<td> {{ key.time }} </td>
+			{% for index,key in sessionConnections %}
+				<tr id="row-{{ index }}">
+					<td>{{ key.time }}</td>
 					<td>{{ key.host }}</td>
-					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}' class="ajaxLink"><span id="ico-conf"></span>Configure device</a></td>
-					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}' class="ajaxLink" data-disable-history="true" data-callback="disconnectCallback({{ loop.index - 1 }})">Disconnect</a></td>
+					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": index } ) }}' class="ajaxLink"><span id="ico-conf"></span>Configure device</a></td>
+					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": index} ) }}' class="ajaxLink" data-disable-history="true" data-callback="disconnectCallback({{ index }})">Disconnect</a></td>
 				</tr>
 			{% endfor %}
 		</table>
