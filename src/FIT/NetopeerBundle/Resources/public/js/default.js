@@ -55,7 +55,8 @@ function initJS() {
 	}).on('click', ".remove-child", function() {
 				removeNode($(this));
 			}).on('click', ".create-child", function() {
-				generateNode($(this));
+//				generateNode($(this));
+				createNode($(this));
 			});
 
 	$(window).on('click', '.alert', function(e) {
@@ -349,7 +350,7 @@ function generateNode($elem) {
 	$form.append($tmpDiv);
 
 	// create submit and close button
-	createSubmitButton($form, "Add new list");
+	createSubmitButton($form, "Add information");
 	createCloseButton($cover, $form);
 
 	// append created form into the parent
@@ -371,34 +372,35 @@ function createFormUnderlay($elem) {
 
 	// if form-underlay already exists, will be removed
 	if ( $cover.find(".form-underlay").length === 0 ) {
-		$cover.find('.form-underlay').remove();
+
+		// append form-underlay to cover
+		$cover.append($("<div>").addClass('form-underlay'));
+		$cover.append($("<div>").addClass('form-cover'));
+
+		// we have to count new dimensions for new form-underlay
+		// and fill it over whole cover part
+		var nWidth = $cover.outerWidth(),
+			nHeight = $cover[0].scrollHeight + $elem.parent().parent().parent().outerHeight() + 150; // 150 px for buttons
+
+		// we have to set form to fill cover (from top)
+		$cover.find(".form-underlay").width(nWidth).height(nHeight).css({
+			'margin-top': 0,
+			'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
+		});
+
+		$cover.find(".form-underlay").click(function() {
+
+		});
 	}
-
-	// append form-underlay to cover
-	$cover.append($("<div>").addClass('form-underlay'));
-	$cover.append($("<div>").addClass('form-cover'));
-
-	// we have to count new dimensions for new form-underlay
-	// and fill it over whole cover part
-	var nWidth = $cover.outerWidth(),
-		nHeight = $cover[0].scrollHeight + $elem.parent().parent().parent().outerHeight() + 150; // 150 px for buttons
-
-	// we have to set form to fill cover (from top)
-	$cover.find(".form-underlay").width(nWidth).height(nHeight).css({
-		'margin-top': 0,
-		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
-	});
-
-	$cover.find(".form-underlay").click(function() {
-
-	});
 
 	return $cover;
 }
 
 function findLevelValue($elem) {
 	var levelRegex = /level-(\d+)/,	// regex for level value
-		level = $elem.parents('.leaf-line').attr('class');	// parent class for level
+		level = $elem.parents('div[class*="level-"]').attr('class');	// parent class for level
+
+	l(level);
 
 	if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
 
@@ -408,16 +410,16 @@ function findLevelValue($elem) {
 			if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
 				level = 0;
 			} else {
-				level = level.match(levelRegex)[1];
+				level = parseInt(level.match(levelRegex)[1], 10);
 			}
 		} else {
 			level = 0;
 		}
 		
 	} else {
-		level = level.match(levelRegex)[1];
+		level = parseInt(level.match(levelRegex)[1], 10);
 	}
-
+	l(level);
 	return level;
 }
 
@@ -502,6 +504,9 @@ function createSubmitButton($form, inputValue) {
 
 function createCloseButton($cover, $form) {
 	// create close button and append at the end of form
+	if ( $form.children("a.close").length ) {
+		$form.children("a.close").remove();
+	}
 	var $closeButton = $("<a href='#' title='Close' class='close red button'>Close</a>");
 	$form.append($closeButton);
 
@@ -529,6 +534,7 @@ function wrapCoverForm($cover, $form) {
 	$form.remove();
 	$('.form-underlay').remove();
 	$('.form-cover').remove();
+	$('.generatedForm').remove();
 }
 
 // unwrap old form (we can't have two forms inside in HTML
@@ -548,119 +554,110 @@ function l (str) {
 
 
 
-
-/*
 function createNode($elem) {
-	var $cover = $cover = createFormUnderlay($elem);
-
-	var xPath = $elem.attr('rel'),	// parent xPath - in anchor attribute rel
-		$editBar = $elem.parent().clone();	// editBar clone - we will modify it below
-
-	level = findLevelValue($elem);
+	var $cover = createFormUnderlay($elem);
 
 	// vytvorime div obalujici inputy
-	level = parseInt(level, 10) + 1;
-	$cover = $("<div>").addClass('leaf-line').addClass('level-' + String(level)).addClass('generated');
+	var level = findLevelValue($elem) + 1;
+	var $coverDiv = $("<div>").addClass('leaf-line');
 
-	$form = generateFormObject('newNodeForm');
+	var xPath = $elem.attr('rel');	// parent XPath - from attribute rel
+	var $currentParent = $elem.parent().parent();
+	var $currentParentLevel = $elem.parents('.level-' + level);
+	var $editBar = $elem.parent().clone();	// editBar clone - we will modify it below
 
-	uniqueId = String(getUniqueId());
+	// generate new form
+	var $form = generateFormObject('newNodeForm');
+
+	var uniqueId = generateUniqueId();
+
 	// input pro nazev elementu
-	$elementName = $("<input>")
+	var $elementName = $("<input>")
 		.attr({
 			name: 'newNodeForm[label_' + uniqueId + '_' + xPath + ']',
 			type: 'text',
 			'class': 'label'
 		});
-	$cover.append($elementName);
-	$elementName.before($("<span>").addClass('dots'));
+	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
+
+	// upravime si naklonovany editBar - pridame tridu pro odliseni vygenerovaneho baru
+	$editBar.addClass('generated');
+	// delegujeme click akci na nove vytvoreny element editBar
+//	$editBar.children("img.sibling").on('click', function() {
+//		duplicateNode($(this));
+//	});
+	$editBar.children("img.sibling").remove();
+	$editBar.children("img.create-child").on('click', function() {
+		createNode($(this));
+	});
+	// ke coveru pripojime editBar
+	$coverDiv.append($editBar);
 
 	// input pro hodnotu elementu
-	$elementValue = $("<input>")
+	var $elementValue = $("<input>")
 		.attr({
 			name: 'newNodeForm[value_' + uniqueId + '_' + xPath + ']',
 			type: 'text',
-			'class': 'value'
+			'class': 'value text'
 		});
-	$cover.append($elementValue);
+	$coverDiv.append($elementValue);
 
-	// upravime si naklonovany editBar - pridame tridu pro odliseni vygenerovaneho baru
-	$editBar.children("img").addClass('generated');
-	// delegujeme click akci na nove vytvoreny element editBar
-	$editBar.children("img.sibling").on('click', function() {
-		createNode($(this));
-	});
 
-	// ke coveru pripojime editBar
-	$cover.prepend($editBar);
-
-	// pokud se jedna o vygenerovanou cast, pridame potomka k rodici (obalujici div)
-	level = level - 1;
-	$currentParent = $elem.parent().parent();
-	$currentParentLevel = $elem.parents('.level-' + level);
-
-	if ( $currentParentLevel.length && $currentParentLevel.hasClass('leaf-line') ) {
-		l ( "ano");
-		// jelikoz pridavame dalsi potomky, musime vlozit aktualni inputy rodice take do coveru leaf-line
-		$leaf = $("<div>").addClass('leaf-line').html($currentParent.html());
-
-		// formular jiz mame vytvoreny, pouze tedy pridame
-		if ( $('.generatedForm').length ) {
-			$currentParent.removeClass('leaf-line').html('').prepend($leaf).append($cover);
-		// jinak se jedna o prvni node, vytvorime tedy formular
-		} else {
-			$currentParent.removeClass('leaf-line').html('').prepend($leaf).append($form);
-			$form.append($cover);
-			$leaf.addClass('active');
-		}
-
-		// jelikoz jsme premistili ikonky do coveru ($leaf), musime jim znova pridat akci click
-		$currentParent.children("form .leaf-line:first-child").children('.edit-bar').children("img").on('click', function() {
-			createNode($(this));
-		});
-
-		l($cover);
-
-	} else {
-		l ( "ne");
-		// formular jiz mame vytvoreny, pouze tedy pridame
-		if ( $('.generatedForm').length ) {
-			if ( $currentParent.parents('.generatedForm').length ) {
-				$currentParent.nextAll(":last").after($cover);
+	// formular jiz mame vytvoreny, pouze tedy pridame
+	var disableScrolling = false;
+	if ( $('.generatedForm').length ) {
+		disableScrolling = true;
+		if ($elem.parent().hasClass('generated')) {
+			if ( $elem.parent().parent().next('.level-'+String(level)).length ) {
+				l("xx");
+				$elem.parent().parent().next('.level-'+String(level)).append($coverDiv);
 			} else {
-				$(".generatedForm").append($cover);
+				l("1");
+				$elem.parent().parent().after($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
 			}
-		// jinak se jedna o prvni node, vytvorime tedy formular
 		} else {
-			$currentParentLevel.append($form);
-			$form.append($cover);
-			$elem.parents('.leaf-line').addClass('active');
+			if ( $form.children('.level-'+String(level)).length ) {
+				l("2");
+				$form.children('.level-'+String(level)).append($coverDiv);
+			} else {
+				l("3");
+				$currentParent.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
+			}
 		}
+	} else {
+		l("4");
+		$form.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
+
+		$elem.parents('.leaf-line').addClass('active');
+		$form.insertAfter($currentParent);
 	}
 
 	// nyni je nutne upravit xPath vygenerovanych inputu a ikonek
-	$originalInput = $cover.children('input.value, input.label');
-	newIndex = $cover.index();
-	if (newIndex < 1) newIndex = 1;
+	var $originalInput = $coverDiv.children('input.value, input.label');
+	newIndex = $coverDiv.index();
+	if (newIndex < 1) newIndex = 0;
+	newIndex++;
+
+//	duplicatedNodeForm[action_-*-*?3!-*?4!-*?4!]
 
 	$originalInput.each(function(i,e) {
-		newXpath = $(e).attr('name') + '[' + newIndex + ']';
+		var s = $(e).attr('name');
+		var newXpath = s.substring(0, s.length - 1) + '-*?' + newIndex + '!]';
 		$(e).attr('name', newXpath);
 	});
 
 	// nesmime zapomenout pridat pozmeneny xPath take k ikonkam pro pridani dalsi node
-	$newRel = $cover.children('.edit-bar').children('img');
-	$newRel.attr('rel', $newRel.attr('rel') + '][' + newIndex);
+	$newRel = $coverDiv.children('.edit-bar').children('img');
+	$newRel.attr('rel', $newRel.attr('rel') + '-*?' + newIndex + '!');
 
-	// nakonec vytvorime submit - pokud existuje, smazeme jej
-	if ( $form.children("input[type=submit]").length ) {
-		$form.children("input[type=submit]").remove();
+	// create submit and close button
+	createSubmitButton($form, "Create new node");
+	createCloseButton($cover, $form);
+
+	unwrapCoverForm($currentParentLevel, $cover);
+	if (!disableScrolling) {
+		scrollToGeneratedForm($elem, $form);
 	}
-	$elementSubmit = $("<input>")
-		.attr({
-			type: 'submit',
-			value: 'Save changes'
-		});
-	$form.append($elementSubmit);
 }
-*/
+
+var generateUniqueId = (function(){var id=0;return function(){if(arguments[0]===0)id=0;return id++;}})();

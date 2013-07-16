@@ -669,6 +669,10 @@ class DefaultController extends BaseController
 		} elseif ( is_array($this->getRequest()->get('generateNodeForm')) ) {
 			$res = $this->handleGenerateNodeForm($key, $moduel, $subsection);
 
+		// processing new node form
+		} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
+			$res = $this->handleNewNodeForm($key, $moduel, $subsection);
+
 		// processing remove node form
 		} elseif ( is_array($this->getRequest()->get('removeNodeForm')) ) {
 			$res = $this->handleRemoveNodeForm($key);
@@ -1073,6 +1077,94 @@ class DefaultController extends BaseController
 		// change values to $_POST ones if XML file has been loaded correctly
 		// generate (completeTree) output XML for edit-config
 
+		return $res;
+	}
+
+	/**
+	 * create new node in config - according to the values in XML model
+	 *
+	 * could be changed by user
+	 *
+	 * @param  int      $key 				  session key of current connection
+	 * @param  string   $module 		  module name
+	 * @param  string   $subsection  	subsection name
+	 * @return int                    result code
+	 */
+	private function handleNewNodeForm(&$key, &$module, &$subsection)	{
+		$post_vals = $this->getRequest()->get('newNodeForm');
+		$res = 0;
+/*
+		try {
+			// load original (not modified) getconfig
+			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
+				$tmpConfigXml = simplexml_load_string($originalXml);
+
+				// save to temp file - for debugging
+				if ($this->container->getParameter('kernel.environment') == 'dev') {
+					file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
+				}
+
+				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
+				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
+				if ( isset($xmlNameSpaces[""]) ) {
+					$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+				}
+			}
+
+			// if we have XML configuration
+			if (isset($tmpConfigXml)) {
+
+				// we will go through all posted values
+				$newLeafs = array();
+
+				// fill values
+				$i = 0;
+				$createString = "";
+
+				foreach ( $post_vals as $postKey => $val ) {
+					$values = $this->divideInputName($postKey);
+					// values[0] - label
+					// values[1] - encoded xPath
+
+					if ($postKey == "parent") {
+						$xpath = $this->decodeXPath($val);
+						// get node according to xPath query
+						$parentNode = $tmpConfigXml->xpath($xpath);
+					} else if ( count($values) != 2 ) {
+						$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
+						throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1! ". var_export(array('values' => $values, 'postKey' => $postKey), true));
+					} else {
+						$xpath = $this->decodeXPath($values[1]);
+						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
+
+						$node = $this->elementValReplace($tmpConfigXml, $values[0], $xpath, $val);
+						try {
+							if ( is_object($node) ) {
+								$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
+							}
+						} catch (\ErrorException $e) {
+							// nothing happened - attribute is already there
+						}
+					}
+				}
+
+				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
+				$createTree = $this->completeRequestTree($parentNode[0], $createString);
+
+				$res = $this->executeEditConfig($key, $createTree->asXml());
+
+				if ($res == 0) {
+					$this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
+				}
+			} else {
+				throw new \ErrorException("Could not load config.");
+			}
+
+		} catch (\ErrorException $e) {
+			$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
+			$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. Error: ".$e->getMessage());
+		}
+*/
 		return $res;
 	}
 
