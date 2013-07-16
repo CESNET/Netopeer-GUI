@@ -574,7 +574,7 @@ function createNode($elem) {
 	// input pro nazev elementu
 	var $elementName = $("<input>")
 		.attr({
-			name: 'newNodeForm[label_' + uniqueId + '_' + xPath + ']',
+			name: 'newNodeForm[label' + uniqueId + '_' + xPath + ']',
 			type: 'text',
 			'class': 'label'
 		});
@@ -596,7 +596,7 @@ function createNode($elem) {
 	// input pro hodnotu elementu
 	var $elementValue = $("<input>")
 		.attr({
-			name: 'newNodeForm[value_' + uniqueId + '_' + xPath + ']',
+			name: 'newNodeForm[value' + uniqueId + '_' + xPath + ']',
 			type: 'text',
 			'class': 'value text'
 		});
@@ -626,6 +626,16 @@ function createNode($elem) {
 		}
 	} else {
 		l("4");
+		// create hidden input with path to the duplicated node
+		var $elementWithParentXpath = $("<input>")
+				.attr({
+					type: 'hidden',
+					name: "newNodeForm[parent]",
+					value: xPath
+				});
+		$form.prepend($elementWithParentXpath);
+
+
 		$form.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
 
 		$elem.parents('.leaf-line').addClass('active');
@@ -633,12 +643,10 @@ function createNode($elem) {
 	}
 
 	// nyni je nutne upravit xPath vygenerovanych inputu a ikonek
-	var $originalInput = $coverDiv.children('input.value, input.label');
+	var $originalInput = $coverDiv.find('input.value, input.label');
 	newIndex = $coverDiv.index();
 	if (newIndex < 1) newIndex = 0;
 	newIndex++;
-
-//	duplicatedNodeForm[action_-*-*?3!-*?4!-*?4!]
 
 	$originalInput.each(function(i,e) {
 		var s = $(e).attr('name');
