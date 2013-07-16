@@ -61,6 +61,7 @@ $sContentPadding:		15px;
 // fonts
 $fBody: 		Arial, Trebuchet, Verdana, sans-serif;
 $fHeadings:		Arial, Trebuchet, Verdana, sans-serif;
+$fMonospace:	"Courier New", Courier, monospace;
 
 $img:			'../images/';
 
@@ -85,10 +86,15 @@ hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: tra
 	&.red { @include background( linear-gradient($cAlert, darken($cAlert, 5%)) ); border: 1px solid darken($cAlert, 30%); color: #fff; 
 		&:hover { @include background( linear-gradient($cAlert, darken($cAlert, 15%)) ); }
 	}
+	&.grey { @include background( linear-gradient(#555, darken(#555, 5%)) ); border: 1px solid darken(#555, 30%); color: #fff;
+		&:hover { @include background( linear-gradient(#555, darken(#555, 15%)) ); }
+	}
 }
 
+#ajax-spinner { position: absolute; width: 100%; height: 100%; @include background( url($img + 'ajax-loader.gif'), rgba(0,0,0,0.5) ); background-repeat: no-repeat; background-position: center center; top: 0; left: 0; z-index: 30; }
+
 /* navigation */
-nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), darken($cBase, 10%))); height: $hNavTop; line-height: $hNavTop; color: #fff; border-bottom: 1px solid #000; @include box-shadow( 0px 0px 7px rgba(0,0,0,0.9)); position: absolute; z-index: 100; top: 0px; width: 100%;
+nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(darken($cBase, 5%), darken($cBase, 10%))); height: $hNavTop; line-height: $hNavTop; color: #fff; border-bottom: 1px solid #000; @include box-shadow( 0px 0px 7px rgba(0,0,0,0.9)); position: absolute; z-index: 100; top: 0px; width: 100%;
 	> a { color: #fff; text-decoration: none; @include text-shadow(1px 1px 2px #000); padding: 0px 20px; border-left: 1px solid $cBase; float: left; font-size: 1.3em; position: relative;
 		&:first-child + a { border-left: 1px solid #000; }
 		&:hover, &.active { background: darken($cBase, 20%); }
@@ -151,7 +157,7 @@ nav#top, div#top { @include background( linear-gradient(darken($cBase, 5%), dark
 	}
 }
 
-nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop 0px 0px 0px; font-size: 1.3em; position: relative; //overflow-y: scroll;
+nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop 0px 0px 0px; font-size: 1.3em; position: relative; //overflow-y: scroll;
 	> *:first-child { margin-top: $sContentPadding; }
 	h3 { padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1.1em; border-bottom: 1px solid #888; margin-bottom: 5px; }
 	a { display: block; padding: 9px $sContentPadding; @include link-colors($cFont, #000); text-decoration: none;
@@ -161,9 +167,9 @@ nav#left { float: left; width: 10%; border-right: 1px solid #bababa; background:
 	}
 
 	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative; margin-top: 0px;
-		#history-of-connected-devices, #profiles-of-connected-devices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; overflow-y: scroll; @include box-sizing(border-box); }
-		#history-of-connected-devices { height: 50%; padding-top: $sContentPadding; }
-		#profiles-of-connected-devices { border-top: 1px solid #333; padding-top: 5%; height: 50%; }
+		#block--historyOfConnectedDevices, #block--profilesOfConnectedDevices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; overflow-y: scroll; @include box-sizing(border-box); }
+		#block--historyOfConnectedDevices { height: 50%; padding-top: $sContentPadding; }
+		#block--profilesOfConnectedDevices { border-top: 1px solid #333; padding-top: 5%; height: 50%; }
 		a { position: relative; @include ellipsis(); padding-top: 7px; padding-bottom: 7px;
 			&.active { margin-right:  0px; }
 			.icon { width: 18px; height: 18px; padding: 0px; @include border-radius(3px); background: #fff; line-height: 18px; text-align: center; border: 1px solid #aaa; display: none; margin-top: -7px; margin-bottom: -4px; margin-right: -3px;
@@ -180,8 +186,8 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 	&.left-nav-defined { width: 45%; }
 
 
-	&#state { border-right: 1px solid #bababa; @include single-box-shadow(darken(#f5f5f5, 5%), -5px, 0px, 5px, false, true); padding-right: 2 * $sContentPadding; }
-	&#config { padding-left: 2 * $sContentPadding; }
+	&#block--state { border-right: 1px solid #bababa; @include single-box-shadow(darken(#f5f5f5, 5%), -5px, 0px, 5px, false, true); padding-right: 2 * $sContentPadding; }
+	&#block--config { padding-left: 2 * $sContentPadding; }
 
 	*[class*='level'] { position: relative; float: left; width: 100%;
 		.dots { background: url($img + 'dot.png') left top repeat transparent; @include inline-block; position: absolute; left: 0px; top: 0px; min-height: 28px; height: 100%; }
@@ -252,7 +258,7 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 		&.has-tooltip {  }
 	}
 
-	&#content { width: 100%; min-height: 100%; font-size: 1.4em; padding: $hNavTop 2 * $sContentPadding 2 * $sContentPadding 2 * $sContentPadding;
+	&#block--singleContent { width: 100%; min-height: 100%; font-size: 1.4em; padding: $sContentPadding 2 * $sContentPadding $sContentPadding / 2 2 * $sContentPadding;
 		&.left-nav-defined { width: 90%; }
 		&.max-width-column { max-width: 800px; width: 100%; float: none; }
 	}
@@ -262,7 +268,7 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 }
 .configure .loading { background: url($img + "loading-bar.gif") repeat-x; display:block; height: 20px; line-height: 20px; color: #fff; padding: 0px 3%; width: 94%; border: 1px solid darken($cBase, 10%); @include border-radius(5px); }
 
-body > section, #content { position: relative; @include box-sizing(border-box);
+body > section, #block--singleContent { position: relative; @include box-sizing(border-box);
 	h1, h2, h3, h4, legend { font-family: $fHeadings; color: $cBase; }
 	h1 { font-size: 1.9em; margin: 20px 0px 15px 0px; }
 	h2 { font-size: 1.7em; margin: 15px 0px 10px 0px; }
@@ -286,8 +292,19 @@ body > section, #content { position: relative; @include box-sizing(border-box);
 	}
 }
 
-article#content { font-size: 1.4em; padding: $hNavTop $sContentPadding; 
+article#block--singleContent { font-size: 1.4em; padding: $hNavTop $sContentPadding; 
 	.alert { clear: both; margin-bottom: -30px; }
+}
+
+#block--notifications { width: 90%; background-color: #333; height: 10%; @include box-sizing(border-box); position: absolute; right: 0px; top: 100%; border-top: 1px solid #000; color: #ccc; font-size: 1.25em; font-family: $fMonospace;
+	.notif-cover { padding: 8px $sContentPadding; overflow-y: scroll; height: 100%; position: relative; @include box-sizing(border-box); }
+	.notif { margin-bottom: 2px; overflow: hidden; }
+	.time { margin-top: 6px; color: #999; }
+	strong { margin-right: 10px; width: 70px; float: left; }
+	&.hidden { border: 0px none; height: 0px; padding: 0px; top: 100% !important; visibility: hidden; }
+
+	.root-tag, .tagValue { margin-right: 10px; }
+	.tagName { border-left: 1px solid #999; padding-left: 10px; color: #999; }
 }
 
 /* formulare */
@@ -338,7 +355,7 @@ form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 
 	.close { float: left; margin-left: 15px; }
 }
 
-article#content #login-hp { padding: 100px 0px 0px 0px;
+article#block--singleContent #login-hp { padding: 100px 0px 0px 0px;
 	.alert { margin-bottom: 0px; }
 }
 
@@ -364,13 +381,14 @@ table { width: 100%; margin: 15px 0px;
 
 /* media queries */
 @media screen and (max-width: 1280px) {
-	nav#left { width: 14%; }
+	nav#block--leftColumn { width: 14%; }
 	body > section { 
 		&.left-nav-defined { width: (100% - 14%)/2; }
-		&#content { 
+		&#block--singleContent { 
 			&.left-nav-defined { width: 86%; }
 		}
 	}
+	#block--notifications { width: 86%; }
 }
 
 @media screen and (max-width: 1550px) {

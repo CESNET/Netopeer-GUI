@@ -1,7 +1,9 @@
 <?php
 /**
- * Handles pages for login and logout.
+ * BaseController as parent of  all controllers in this bundle handles all common functions
+ * such as assigning template variables, menu structure...
  *
+ * @file BaseController.php
  * @author David Alexa <alexa.david@me.com>
  *
  * Copyright (C) 2012-2013 CESNET
@@ -37,57 +39,43 @@
  * in contract, strict liability, or tort (including negligence or
  * otherwise) arising in any way out of the use of this software, even
  * if advised of the possibility of such damage.
+ *
  */
-namespace FIT\NetopeerBundle\Controller;
+namespace FIT\NetopeerBundle\Symfony;
 
-use FIT\NetopeerBundle\Controller\BaseController;
-use Symfony\Component\Security\Core\SecurityContext;
-use FIT\NetopeerBundle\Entity\User;
-
-// these import the "@Route" and "@Template" annotations
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Session;
+use Symfony\Component\HttpFoundation\SessionStorage\SessionStorageInterface;
 
 /**
- * Controller for security pages.
+ * mySession object.
  */
-class SecurityController extends BaseController
+class mySession extends Session
 {
+	protected $shortFlashes;
 
-    /**
-     * Login page action.
-     *
-     * @Route("/login/", name="_login")
-     * @Template()
-     */
-    public function loginAction()
-    {
-        $request = $this->getRequest();
-        $session = $request->getSession();
+	/**
+	 * @inheritdoc
+	 */
+	public function __construct(SessionStorageInterface $storage, $defaultLocale = 'en')
+	{
+		parent::__construct($storage, $defaultLocale);
+		$this->shortFlashes = array();
+	}
 
-        // get the login error if there is one
-        if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
-            $error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
-        } else {
-            $error = $session->get(SecurityContext::AUTHENTICATION_ERROR);
-            $session->remove(SecurityContext::AUTHENTICATION_ERROR);
-        }
+	/**
+	 * @inheritdoc
+	 */
+	public function setFlash($name, $value)
+	{
+		parent::setFlash($name, $value);
+		$this->setShortFlash($name, $value);
+	}
 
-        // last username entered by the user
-        $this->assign('last_username', $session->get(SecurityContext::LAST_USERNAME));
-        $this->assign('error', $error);
-        
-        return $this->getTwigArr($this);
-    }
+	public function setShortFlash($name, $value) {
+		$this->shortFlashes[$name] = $value;
+	}
 
-    /**
-     * Logout page action.
-     *
-     * @Route("/logout/", name="_logout")
-     * @Template()
-     */
-    public function logoutAction()
-    {
-        // The security layer will intercept this request
-    }
+	public function getShortFlashes() {
+		return $this->shortFlashes;
+	}
 }

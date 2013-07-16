@@ -52,29 +52,31 @@ if advised of the possibility of such damage.
 				}).appendTo(targetConfigure);
 				$.get("{{ path("getSchema", {"key": idForAjaxGetSchema} ) }}", function(data) {
 					var dataArr = $.parseJSON(data);
-					if (dataArr['status'] == "success") {
-						targetConfigure.find(".loading").remove();
-						targetConfigure.find("> a").show();
-					} else {
-						targetConfigure.find(".loading").remove();
-						targetConfigure.text("Could not configure device.");
-					}
+					targetConfigure.find(".loading").remove();
+					targetConfigure.find("> a").show();
 					if (dataArr['message']) {
-						var flash = prepareFlashMessage(jsonArr['status'], jsonArr['message']);
+						var flash = prepareFlashMessage(dataArr['status'], dataArr['message']);
 						$(".alert-cover").append($(flash).hide());
 						$(flash).animateAlert();
 					}
 					reloadHistoryOfConnectedDevices();
+					if (dataArr['status'] == "success") {
+						getNotifWebSocket(idForAjaxGetSchema, "{{ sessionHash }}", "ws://{{ app.request.host }}:8080/");
+					}
 				});
 			});
 		</script>
 	{% endif %}
 	<script type="text/javascript">
 		$(document).ready(function() {
+			setIndexActions();
+		});
+
+		function setIndexActions() {
 			setLeftPaneHeight();
 			reloadHistoryOfConnectedDevices();
 			reloadProfilesOfConnectedDevices();
-		});
+		}
 
 		$(window).resize(function() {
 			setLeftPaneHeight();
@@ -86,14 +88,14 @@ if advised of the possibility of such damage.
 			});
 			flashMessage.text(message);
 			flashMessage.prepend($("<span/>").addClass('close').text('X'));
-			setTimeout(function() {
-				flashMessage.fadeOut().remove();
-			}, 3000);
+//			setTimeout(function() {
+//				flashMessage.fadeOut().remove();
+//			}, 3000);
 			return flashMessage;
 		}
 
 		function setLeftPaneHeight() {
-			$("#history-and-profiles").height($(window).height() - parseInt($("#left").css('padding-top'), 10));
+			$("#history-and-profiles").height($(window).height() - parseInt($("#block--leftColumn").css('padding-top'), 10));
 		}
 
 		function delegateAnchorActions($elem) {
@@ -105,7 +107,7 @@ if advised of the possibility of such damage.
 					if (jsonArr['result'] === 0) {
 						if ($target.hasClass('delete')) {
 							$target.parents('a.device-item').unbind('click').remove();
-							if ($elem.attr('id') == "profiles-of-connected-devices") {
+							if ($elem.attr('id') == "block--profilesOfConnectedDevices") {
 								reloadProfilesOfConnectedDevices(true);
 							}
 						} else if ($target.hasClass('addToProfiles')) {
@@ -123,45 +125,57 @@ if advised of the possibility of such damage.
 
 				var $target = $($e.target);
 				if (!$target.hasClass('icon')) {
-					updateConnectFormValues($(this), $(this).data().deviceId);
+					updateConnectFormValues($(this));
 				}
 			})
 		}
 
 		function reloadHistoryOfConnectedDevices(force) {
-			$.get("{{ path("historyOfConnectedDevices") }}", function(data) {
-				if (!$("#history-of-connected-devices").length || force === true) {
-					$("#history-of-connected-devices").remove();
-					$("#history-and-profiles").prepend(data);
-					delegateAnchorActions($("#history-of-connected-devices"));
+			$.ajax({
+				url: "{{ path("historyOfConnectedDevices") }}",
+				dataType: "json",
+				success: function(data) {
+					if (!$("#block--historyOfConnectedDevices").length || force === true) {
+						$("#block--historyOfConnectedDevices").remove();
+						$("#history-and-profiles").prepend($("<div></div>").attr('id', 'block--historyOfConnectedDevices'));
+						$.nette.success(data);
+						delegateAnchorActions($("#block--historyOfConnectedDevices"));
+					}
 				}
 			});
 		}
 
 		function reloadProfilesOfConnectedDevices(force) {
-			$.get("{{ path("profilesOfConnectedDevices") }}", function(data) {
-				if (!$("#profiles-of-connected-devices").length || force === true) {
-					$("#profiles-of-connected-devices").remove();
-					$("#history-and-profiles").append(data);
-					delegateAnchorActions($("#profiles-of-connected-devices"));
+			$.ajax({
+				url: "{{ path("profilesOfConnectedDevices") }}",
+				dataType: "json",
+				success: function(data) {
+					if (!$("#block--profilesOfConnectedDevices").length || force === true) {
+						$("#block--profilesOfConnectedDevices").remove();
+						if (data.snippets['block--profilesOfConnectedDevices'].trim() !== "") {
+							$("#history-and-profiles").append($("<div></div>").attr('id', 'block--profilesOfConnectedDevices'));
+							$.nette.success(data);
+							delegateAnchorActions($("#block--profilesOfConnectedDevices"));
+						}
+					}
 				}
 			});
 		}
 
-		function updateConnectFormValues($el, connectedDeviceId) {
-			var url = "{{ path("connectedDeviceAttr", {"connectedDeviceId": 0}) }}";
-			url = url.replace("0", connectedDeviceId);
-			$.get(url, function(data) {
-				if (data !== false) {
-					var jsonArr = $.parseJSON(data);
-					$("#form_host").val(jsonArr['host']);
-					$("#form_port").val(jsonArr['port']);
-					$("#form_user").val(jsonArr['userName']);
+		function updateConnectFormValues($el) {
+			var data = $el.data();
 
-					$("#history-and-profiles").find('a').removeClass('active');
-					$el.addClass('active');
-				}
-			});
+			$("#form_host").val(data.host);
+			$("#form_port").val(data.port);
+			$("#form_user").val(data.user);
+			$("#form_password").focus();
+
+			$("#history-and-profiles").find('a').removeClass('active');
+			$el.addClass('active');
+		}
+
+		function disconnectCallback(key) {
+			unsetNotificationsForKey(key);
 		}
 	</script>
 {% endblock javascripts %}
@@ -172,9 +186,13 @@ if advised of the possibility of such damage.
 	max-width-column
 {% endblock singleContentClass %}
 
-{% block leftColumn %}
-	<div id="history-and-profiles"></div>
-{% endblock leftColumn %}
+{% block leftColumnAdditional %}
+	<div id="history-and-profiles">
+		<script type="text/javascript">
+//			setIndexActions();
+		</script>
+	</div>
+{% endblock leftColumnAdditional %}
 
 {% block state %}
 	<form action="{{ path('_home') }}" method="post" {{ form_enctype(form) }} class="login">
@@ -192,12 +210,12 @@ if advised of the possibility of such damage.
 		</div>
 	{% else %}
 		<table>
-			{% for key in sessionConnections %}
-				<tr id="row-{{ loop.index - 1 }}">
-					<td> {{ key.time }} </td>
+			{% for index,key in sessionConnections %}
+				<tr id="row-{{ index }}">
+					<td>{{ key.time }}</td>
 					<td>{{ key.host }}</td>
-					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": loop.index - 1} ) }}'><span id="ico-conf"></span>Configure device</a></td>
-					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": loop.index - 1} ) }}'>disconnect</a></td>
+					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": index } ) }}' class="ajaxLink"><span id="ico-conf"></span>Configure device</a></td>
+					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": index} ) }}' class="ajaxLink" data-disable-history="true" data-callback="disconnectCallback({{ index }})">Disconnect</a></td>
 				</tr>
 			{% endfor %}
 		</table>

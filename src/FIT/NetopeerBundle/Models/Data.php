@@ -75,6 +75,7 @@ class Data {
 	const MSG_GENERIC			= 15;
 	const MSG_GETSCHEMA			= 16;
 	const MSG_RELOADHELLO			= 17;
+	const MSG_NTF_GETHISTORY		= 18;
 
 	/**
 	 * @var ContainerInterface   base bundle container
@@ -204,6 +205,9 @@ class Data {
 	 */
 	private function getModuleIdentifiersForCurrentDevice($key) {
 		$conn = $this->getConnFromKey($key);
+		if (!$conn) {
+			return false;
+		}
 		$sessionStatus = json_decode($conn->sessionStatus);
 		$capabilities = $sessionStatus->capabilities;
 
@@ -222,6 +226,7 @@ class Data {
 				}
 			}
 			$this->moduleIdentifiers = $arr;
+			return $arr;
 		}
 
 		return false;
@@ -500,7 +505,7 @@ class Data {
 			*/
 			return 0;
 		} else {
-			$this->logger->err("Could not connect.", array("error" => var_export($this->getJsonError(), true)));
+			$this->logger->err("Could not connect.", array("error" => (isset($decoded["error-message"])?" Error: ".$decoded["error-message"] : var_export($this->getJsonError(), true))));
 			$session->setFlash($this->flashState .' error', "Could not connect.".(isset($decoded["error-message"])?" Error: ".$decoded["error-message"]:""));
 			return 1;
 		}
@@ -718,16 +723,35 @@ class Data {
 			$session = $this->container->get('request')->getSession();
 			$sessionKey = $this->getHashFromKey($params['key']);
 		}
+	}
+
+	/**
+	 * handle getting notifications history
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
+	 * @return int       		      0 on success, 1 on error
+	 */
+	private function handle_ntf_gethistory(&$sock, &$params) {
+		if (isset($params["session"]) && ($params["session"] !== "")) {
+			$sessionKey = $params['session'];
+		} else {
+			$session = $this->container->get('request')->getSession();
+			$sessionKey = $this->getHashFromKey($params['key']);
+		}
 
 		$decoded = $this->execute_operation($sock,	array(
-			"type" 		=> self::MSG_RELOADHELLO,
-			"session" 	=> $sessionKey
+			"type" 		=> self::MSG_NTF_GETHISTORY,
+			"session" 	=> $sessionKey,
+			"from" => $params['from'],
+			"to" => $params['to']
 		));
 
 		if (!$decoded) {
 			/* error occurred, unexpected response */
-			$this->logger->err("Could get session info.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not get session info.");
+			$this->logger->err("Could get notifications history.", array("error" => var_export($decoded, true)));
+			$session->setFlash($this->flashState .' error', "Could not get notifications history.");
+			return 1;
 		}
 
 		return $decoded;
@@ -844,7 +868,7 @@ class Data {
 	 *
 	 * @return int       		0 on success, 1 on error
 	 */
-	private function checkLoggedKeys() {
+	public function checkLoggedKeys() {
 		$session = $this->container->get('request')->getSession();
 		if ( !count($session->get("session-connections")) ) {
 			$session->setFlash($this->flashState .' error', "Not logged in.");
@@ -1050,6 +1074,10 @@ class Data {
 			case "reloadhello":
 				$res = $this->handle_reloadhello($sock, $params);
 				break;
+			case "notificationsHistory":
+				// JSON encoded data OR 1 on error, so we can return it now
+				return $this->handle_ntf_gethistory($sock, $params);
+				break;
 			case "info":
 				$res = $this->handle_info($sock, $params);
 				break;
@@ -1067,10 +1095,8 @@ class Data {
 		fclose($sock);
 		$this->logger->info("Handle result: ".$command, array('response' => $res));
 
-		if ($command === "info" || $command === "reloadhello") {
-			echo "reloadhello";
+		if ($command === "info") {
 			$this->handleResultsArr['info'] = $res;
-			return $res;
 		}
 
 		if ( isset($res) && $res !== 1 && $res !== -1) {
@@ -1391,7 +1417,7 @@ XML;
 								$namespaces[$nodeKey] = $ns[""];
 							}
 
-							if ( !in_array(array("name" => $nodeKey, 'index' => $i), $allowedModels) ) {
+							if (!in_array(array("name" => $nodeKey, 'index' => $i), $allowedModels) ) {
 								$allowedModels[] = array("name" => $nodeKey, 'index' => $i);
 							}
 
@@ -1588,6 +1614,118 @@ XML;
 			$cache->delete('menuStructure_'.$hashedKey);
 		}
 		$cache->deleteDeads();
+	}
+
+	/**
+	 * Get one model and process it.
+	 *
+	 * @param array &$schparams  key, identifier, version, format for get-schema
+	 * @param string $identifier identifier of folder in /tmp/symfony directory
+	 * @return int               0 on success, 1 on error
+	 */
+	private function getschema(&$schparams, $identifier)
+	{
+		$data = "";
+		$path = "/tmp/symfony/";
+		@mkdir($path, 0700, true);
+		$path .= "/$identifier";
+
+		if (file_exists($path)) {
+			/* already exists */
+			return 1;
+		}
+
+		if ($this->handle("getschema", $schparams, false, $data) == 0) {
+			$schparams["user"] = $this->getUserFromKey($schparams["key"]);
+			file_put_contents($path, $data);
+			$schparams["path"] = $path;
+			return 0;
+		} else {
+			$this->container->get('request')->getSession()->setFlash('error', 'Getting model failed.');
+			return 1;
+		}
+		return 0;
+	}
+
+	/**
+	 * Process <get-schema> action based on schparams.
+	 *
+	 * @param array &$schparams   get-schema parameters
+	 * @return int                0 on success, 1 on error
+	 */
+	private function processSchema(&$schparams)
+	{
+		$path = $schparams["path"];
+
+		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$this->getModelsDir()."\"");
+		return 1;
+	}
+
+	/**
+	 * Get available configuration data models,
+	 * store them and transform them.
+	 *
+	 * @param  int   $key 	index of session-connection
+	 * @return void
+	 */
+	public function updateLocalModels($key)
+	{
+		$schemaData = AjaxSharedData::getInstance();
+		$schemaData->setDataForKey($key, 'isInProgress', true);
+
+		$ns = "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
+		$params = array(
+			'key' => $key,
+			'filter' => '<netconf-state xmlns="'.$ns.'"><schemas/></netconf-state>',
+		);
+
+		$xml = $this->handle('get', $params);
+		if (($xml !== 1) && ($xml !== "")) {
+			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+			if ($xml === false) {
+				/* invalid message received */
+				$schemaData->setDataForKey($key, 'isInProgress', false);
+				$schemaData->setDataForKey($key, 'status', "error");
+				$schemaData->setDataForKey($key, 'message', "Getting the list of schemas failed.");
+				return;
+			}
+			$xml->registerXPathNamespace("xmlns", $ns);
+			$schemas = $xml->xpath("//xmlns:schema");
+
+			$this->addLog("Trying to find models for namespaces: ", array('namespaces', var_export($schemas)));
+
+			$list = array();
+			$lock = sem_get(12345678, 1, 0666, 1);
+			sem_acquire($lock); /* critical section */
+			foreach ($schemas as $sch) {
+				$schparams = array("key" => $params["key"],
+					"identifier" => (string)$sch->identifier,
+					"version" => (string)$sch->version,
+					"format" => (string)$sch->format);
+				$ident = $schparams["identifier"]."@".$schparams["version"].".".$schparams["format"];
+				if (file_exists($this->getModelsDir()."/$ident")) {
+					continue;
+				} else if ($this->getschema($schparams, $ident) == 1) {
+					//break; /* not get the rest on error */
+				} else {
+					$list[] = $schparams;
+				}
+			}
+			sem_release($lock);
+
+			$this->addLog("Not found models for namespaces: ", array('namespaces', var_export($list)));
+
+			/* non-critical - only models, that I downloaded will be processed, others already exist */
+			foreach ($list as $schema) {
+				$this->processSchema($schema);
+			}
+			$schemaData->setDataForKey($key, 'status', "success");
+			$schemaData->setDataForKey($key, 'message', "Configuration data models were updated.");
+		} else {
+			$schemaData->setDataForKey($key, 'status', "error");
+			$schemaData->setDataForKey($key, 'message', "Getting the list of schemas failed.");
+		}
+		$schemaData->setDataForKey($key, 'isInProgress', false);
 	}
 
 	/**

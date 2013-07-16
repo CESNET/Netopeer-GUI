@@ -35,34 +35,34 @@
 // if advised of the possibility of such damage.
 
  $(document).ready(function() {
-	changeSectionHeight();
+	initJS();
+});
 
+$(window).resize(function() {
+	changeSectionHeight();
+	showIconsOnLeafLine();
+	collapseTopNav();
+});
+
+function initJS() {
 	collapseTopNav();
 
-	if ( $(".edit-bar").length ) {
-		// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
-		$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
+	// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
+	$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
 
-		$('.type-list .edit-bar .sibling').click(function() {
-			duplicateNode($(this));
+	$('.edit-bar').on('click', '.sibling', function() {
+		duplicateNode($(this));
+	}).on('click', ".remove-child", function() {
+				removeNode($(this));
+			}).on('click', ".create-child", function() {
+				generateNode($(this));
+			});
+
+	$(window).on('click', '.alert', function(e) {
+		e.preventDefault();
+		$(this).stop(true,true).fadeOut('fast', function() {
+			$(this).remove();
 		});
-
-		$(".edit-bar .remove-child").click(function() {
-			removeNode($(this));
-		});
-
-		$(".edit-bar .create-child").click(function() {
-			generateNode($(this));
-		});
-
-		// $('.edit-bar .child').click(function() {
-		//	createNode($(this));
-		// });
-	}
-
-	// tooltip
-	$('.tooltip .icon-help').each(function() {
-		initDefaultTooltip($(this));
 	});
 
 	// line of XML output
@@ -70,15 +70,8 @@
 		$(this).toggleClass("hover");
 	});
 
-	/* hide alerts after some time - only successfull */
-	setTimeout(function() {
-		$('.alert.success').fadeOut();
-	}, 7000); /* 3s animation + 4s visible */
-
-	$(".alert-cover .alert").hide().delay(500).each(function() {
-		$(this).animateAlert();
-	});
-
+	prepareAlertsActions();
+	prepareTooltipActions();
 
 	/* when range input type, add number of current value before input */
 	$("input[type='range']").each(function(i, e) {
@@ -95,13 +88,8 @@
 	});
 
 	showIconsOnLeafLine();
-});
-
-$(window).resize(function() {
 	changeSectionHeight();
-	showIconsOnLeafLine();
-	collapseTopNav();
-});
+}
 
 /**
  * set animation for alerts in .alert-cover
@@ -116,11 +104,32 @@ $(window).resize(function() {
 
 		$(this).css('top', 0 - $(this).outerHeight() - parseInt($(".alert-cover").css('top'), 10)).show().animate({
 			top: topOffset
-		}, 3000, 'easeOutBack').find('.close').click(function() {
-			$alert.fadeOut('fast');
-		});
+		}, 1000, 'easeOutBack');
+
+		/* hide alerts after some time - only successfull */
+		if ($(this).hasClass('success')) {
+			var $flash = $(this);
+			setTimeout(function() {
+				$flash.fadeOut(function() {
+					$flash.remove();
+				});
+			}, 5000); /* 3s animation + 4s visible */
+		}
 	};
 })( jQuery );
+
+function prepareAlertsActions() {
+	$(".alert-cover .alert").hide().delay(500).each(function() {
+		$(this).animateAlert();
+	});
+}
+
+function prepareTooltipActions() {
+	// tooltip
+	$('.tooltip .icon-help').each(function() {
+		initDefaultTooltip($(this));
+	});
+}
 
 function initPopupMenu($cover) {
 	$cover.find('.show-link').unbind('hover');
@@ -134,7 +143,7 @@ function initPopupMenu($cover) {
  * double down arrow with popup submenu will appear
  */
 function collapseTopNav() {
-    var $nav = $("nav#top");
+    var $nav = $("nav#block--topMenu");
 	if ( $nav.length ) {
 		var $othersCover = $nav.find('.others-cover');
 		var $others = $othersCover.find(".others");
@@ -183,7 +192,19 @@ function collapseTopNav() {
 }
 
 function changeSectionHeight() {
-	$("body > section, body > section#content").css('min-height', '0%').height($(window).height());
+	if (!notifOutput) {
+		notifInit();
+	}
+
+	notifResizable();
+
+	var h = $(window).height();
+	if (!$(notifOutput).hasClass('hidden')) {
+		h -= $(notifOutput).outerHeight();
+	}
+
+	$("body > section, body > section#content").css('min-height', '0%').height(h);
+	$(notifOutput).css('top', h);
 }
 
 function showIconsOnLeafLine() {
@@ -260,7 +281,6 @@ function duplicateNode($elem) {
 
 function scrollToGeneratedForm($elem, $form) {
 	var section = $elem.parents("section");
-	l($form.offset().top - $("nav#top").outerHeight() - 20);
 	$(section).animate({
 		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight() - 20
 	}, 1000);
@@ -340,13 +360,9 @@ function generateNode($elem) {
 
 function createFormUnderlay($elem) {
 	var $cover;
-	// find cover - if we are on state, it would be state column
-	if ($elem.parents('#state').length) {
-		$cover = $("#state");
-
-	// or we are on config
-	} else if ($elem.parents('#config').length) {
-		$cover = $("#config");
+	// find cover - if we are on state, it would be state column, or we could be on config
+	if ($elem.parents('section').length) {
+		$cover = $elem.parents('section');
 
 	// or we have single column layout
 	} else {
@@ -414,7 +430,7 @@ function generateFormObject(formName) {
 		// vytvorime formular
 		$form = $("<form>")
 			.attr({
-				action: "#",
+				action: "",
 				method: "POST",
 				name: formName,
 				'class': 'generatedForm'
@@ -482,11 +498,6 @@ function createSubmitButton($form, inputValue) {
 			value: inputValue
 		});
 	$form.append($elementSubmit);
-
-	// bind click function to send form
-	$elementSubmit.bind('click', function() {
-		$form.submit();
-	});
 }
 
 function createCloseButton($cover, $form) {

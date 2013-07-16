@@ -83,7 +83,24 @@ class DefaultController extends BaseController
 	public function indexAction($connectedDeviceId = NULL)
 	{
 		// DependencyInjection (DI) - defined in Resources/config/services.yml
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
 		$dataClass = $this->get('DataModel');
+
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'title');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'additionalTitle');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'alerts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'state');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'config');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'notifications');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'javascripts');
+
+		//TODO: delete only session from refferer
+		$this->getRequest()->getSession()->set('activeNotifications', array());
 
 		$host = "";
 		$port = "22";
@@ -152,10 +169,26 @@ class DefaultController extends BaseController
 
 				// if connection is broken (Could not connect)
 				if ($res == 0) {
-					$arr = array(
-						"idForAjaxGetSchema" => $result,
-					);
-					$this->get('session')->set('getSchemaWithAjax', $arr);
+					$conn = $this->getRequest()->getSession()->get('session-connections');
+					$conn = unserialize($conn[$result]);
+					$arr = array();
+					if ($conn !== false) {
+						$arr = array(
+							"idForAjaxGetSchema" => $result,
+//							'lockedConn' => $conn->locked,
+//							'sessionStatus' => $conn->sessionStatus,
+							'sessionHash' => $conn->hash,
+						);
+					}
+
+					if ($this->getRequest()->isXmlHttpRequest()) {
+						foreach ($arr as $key => $value) {
+							$this->assign($key, $value);
+						}
+						$this->assign("getSchemaWithAjax", true);
+					} else {
+						$this->get('session')->set('getSchemaWithAjax', $arr);
+					}
 					$this->getRequest()->getSession()->setFlash('state success', 'Form has been filled up correctly.');
 
 					$baseConn = $this->get('BaseConnection');
@@ -166,7 +199,9 @@ class DefaultController extends BaseController
 				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
 			}
 			$url = $this->get('request')->headers->get('referer');
-			return new RedirectResponse($url);
+			if (!$this->getRequest()->isXmlHttpRequest()) {
+				return new RedirectResponse($url);
+			}
 		}
 		$connArray = $this->getRequest()->getSession()->get('session-connections');
 		$connections = array();
@@ -211,10 +246,20 @@ class DefaultController extends BaseController
 	public function reloadDeviceAction($key)
 	{
 		$dataClass = $this->get('DataModel');
+
+		/* reload hello message */
+		$params = array('key' => $key);
+		$dataClass->handle("reloadhello", $params);
+
+		$dataClass->updateLocalModels($key);
 		$dataClass->invalidateMenuStructureForKey($key);
 
 		//reconstructs a routing path and gets a routing array called $route_params
 		$url = $this->get('request')->headers->get('referer');
+		if ($this->getRequest()->isXmlHttpRequest()) {
+			$this->getRequest()->getSession()->set('isAjax', true);
+		}
+
 		return new RedirectResponse($url);
 	}
 
@@ -249,17 +294,26 @@ class DefaultController extends BaseController
 			$params['session-id'] = $identifier;
 		}
 
+		if ($this->getRequest()->isXmlHttpRequest()) {
+			$this->getRequest()->getSession()->set('isAjax', true);
+		}
+
+		if ($command === "lock" || $command === "unlock") {
+			$this->getRequest()->getSession()->set('isLocking', true);
+		}
+
 		$res = $dataClass->handle($command, $params);
-		// if something goes wrong, we will redirect to connections page
+
 		if ( $res != 1 ) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 
+		// if something goes wrong, we will redirect to connections page
 		if ( in_array($command, array("connect", "disconnect", "getschema")) ) {
 			return $this->redirect($this->generateUrl('_home'));
 		} else {
 			$url = $this->get('request')->headers->get('referer');
-			return new RedirectResponse($url);
+			return $this->redirect($url);
 		}
 	}
 
@@ -278,6 +332,11 @@ class DefaultController extends BaseController
 		$dataClass = $this->get('DataModel');
 		parent::setActiveSectionKey($key);
 		$dataClass->buildMenuStructure($key);
+
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'singleContent');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
 
 		if ( $action == "session" ) {
 			$session = $this->container->get('request')->getSession();
@@ -325,7 +384,30 @@ class DefaultController extends BaseController
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
 		$dataClass = $this->get('DataModel');
-		parent::setActiveSectionKey($key);
+
+		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topPart');
+			$this->assign('historyHref', $this->getRequest()->getRequestUri());
+		}
+		$this->getRequest()->getSession()->remove('isLocking');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
+
+		if ($this->getRequest()->getSession()->get('isAjax') === true) {
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
+		}
+
+		if ($dataClass->checkLoggedKeys() === 1) {
+			$url = $this->get('request')->headers->get('referer');
+			if (!strlen($url)) {
+				$url = $this->generateUrl('_home');
+			}
+			return $this->redirect($url);
+		}
+		$this->setActiveSectionKey($key);
 		$dataClass->buildMenuStructure($key);
 
 		// now, we could set forms params with filter (even if we don't have module or subsection)
@@ -358,7 +440,16 @@ class DefaultController extends BaseController
 				}
 				$retArr['module'] = $module1st["params"]["module"];
 				return $this->redirect($this->generateUrl($routeName, $retArr));
+			} else {
+				return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'All')));
 			}
+		}
+
+		$activeNotifications = $this->getRequest()->getSession()->get('activeNotifications');
+		if ( !isset($activeNotifications[$key]) || $activeNotifications[$key] !== true ) {
+			$activeNotifications[$key] = true;
+			$this->getRequest()->getSession()->set('activeNotifications', $activeNotifications);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'notifications');
 		}
 
 		// if we have module, we are definitely in module or subsection action, so we could load names
@@ -403,6 +494,7 @@ class DefaultController extends BaseController
 		if ( $module == null || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
 			try {
 				$dataClass->setFlashState('config');
+				$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'config');
 				// getcofig part
 				if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
 					$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
@@ -594,6 +686,10 @@ class DefaultController extends BaseController
 		if ( $subsection ) {
 			$retArr['subsection'] = $subsection;
 			$routeName = 'subsection';
+		}
+
+		if ($this->getRequest()->isXmlHttpRequest()) {
+			$this->getRequest()->getSession()->set('isAjax', true);
 		}
 		return $this->redirect($this->generateUrl($routeName, $retArr));
 	}
