@@ -329,7 +329,7 @@ function generateNode($elem) {
 	$form.append($tmpDiv);
 
 	// create submit and close button
-	createSubmitButton($form, "Add new list");
+	createSubmitButton($form, "Add information");
 	createCloseButton($cover, $form);
 
 	// append created form into the parent
