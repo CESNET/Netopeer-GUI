@@ -557,7 +557,7 @@ function l (str) {
 function createNode($elem) {
 	var $cover = createFormUnderlay($elem);
 
-	// vytvorime div obalujici inputy
+	// we will create cover div
 	var level = findLevelValue($elem) + 1;
 	var $coverDiv = $("<div>").addClass('leaf-line');
 
@@ -571,7 +571,7 @@ function createNode($elem) {
 
 	var uniqueId = generateUniqueId();
 
-	// input pro nazev elementu
+	// input for label name
 	var $elementName = $("<input>")
 		.attr({
 			name: 'newNodeForm[label' + uniqueId + '_' + xPath + ']',
@@ -580,20 +580,16 @@ function createNode($elem) {
 		});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 
-	// upravime si naklonovany editBar - pridame tridu pro odliseni vygenerovaneho baru
+	// necessary edit bar modifications - bind all actions
 	$editBar.addClass('generated');
-	// delegujeme click akci na nove vytvoreny element editBar
-//	$editBar.children("img.sibling").on('click', function() {
-//		duplicateNode($(this));
-//	});
 	$editBar.children("img.sibling").remove();
 	$editBar.children("img.create-child").on('click', function() {
 		createNode($(this));
 	});
-	// ke coveru pripojime editBar
+	// append edit bar to cover
 	$coverDiv.append($editBar);
 
-	// input pro hodnotu elementu
+	// input for value
 	var $elementValue = $("<input>")
 		.attr({
 			name: 'newNodeForm[value' + uniqueId + '_' + xPath + ']',
@@ -603,29 +599,23 @@ function createNode($elem) {
 	$coverDiv.append($elementValue);
 
 
-	// formular jiz mame vytvoreny, pouze tedy pridame
 	var disableScrolling = false;
 	if ( $('.generatedForm').length ) {
 		disableScrolling = true;
 		if ($elem.parent().hasClass('generated')) {
 			if ( $elem.parent().parent().next('.level-'+String(level)).length ) {
-				l("xx");
 				$elem.parent().parent().next('.level-'+String(level)).append($coverDiv);
 			} else {
-				l("1");
 				$elem.parent().parent().after($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
 			}
 		} else {
 			if ( $form.children('.level-'+String(level)).length ) {
-				l("2");
 				$form.children('.level-'+String(level)).append($coverDiv);
 			} else {
-				l("3");
 				$currentParent.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
 			}
 		}
 	} else {
-		l("4");
 		// create hidden input with path to the duplicated node
 		var $elementWithParentXpath = $("<input>")
 				.attr({
@@ -642,9 +632,9 @@ function createNode($elem) {
 		$form.insertAfter($currentParent);
 	}
 
-	// nyni je nutne upravit xPath vygenerovanych inputu a ikonek
+	// we have to modify xpath and rel attributes for generated icons and inputs
 	var $originalInput = $coverDiv.find('input.value, input.label');
-	newIndex = $coverDiv.index();
+	var newIndex = $coverDiv.index();
 	if (newIndex < 1) newIndex = 0;
 	newIndex++;
 
@@ -654,8 +644,7 @@ function createNode($elem) {
 		$(e).attr('name', newXpath);
 	});
 
-	// nesmime zapomenout pridat pozmeneny xPath take k ikonkam pro pridani dalsi node
-	$newRel = $coverDiv.children('.edit-bar').children('img');
+	var $newRel = $coverDiv.children('.edit-bar').children('img');
 	$newRel.attr('rel', $newRel.attr('rel') + '-*?' + newIndex + '!');
 
 	// create submit and close button
@@ -668,4 +657,5 @@ function createNode($elem) {
 	}
 }
 
+// generates unique id (in sequence)
 var generateUniqueId = (function(){var id=0;return function(){if(arguments[0]===0)id=0;return id++;}})();
