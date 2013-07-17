@@ -667,11 +667,11 @@ class DefaultController extends BaseController
 
 		// processing generate node form
 		} elseif ( is_array($this->getRequest()->get('generateNodeForm')) ) {
-			$res = $this->handleGenerateNodeForm($key, $moduel, $subsection);
+			$res = $this->handleGenerateNodeForm($key, $module, $subsection);
 
 		// processing new node form
 		} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
-			$res = $this->handleNewNodeForm($key, $moduel, $subsection);
+			$res = $this->handleNewNodeForm($key);
 
 		// processing remove node form
 		} elseif ( is_array($this->getRequest()->get('removeNodeForm')) ) {
@@ -860,7 +860,7 @@ class DefaultController extends BaseController
 	 */
 	private function handleFilterState(&$key) {
 		$this->get('DataModel')->setFlashState('state');
-		
+
 		$this->filterForms['state']->bindRequest($this->getRequest());
 
 		if ( $this->filterForms['state']->isValid() ) {
@@ -1081,28 +1081,20 @@ class DefaultController extends BaseController
 	}
 
 	/**
-	 * create new node in config - according to the values in XML model
-	 *
-	 * could be changed by user
+	 * create new node
 	 *
 	 * @param  int      $key 				  session key of current connection
-	 * @param  string   $module 		  module name
-	 * @param  string   $subsection  	subsection name
 	 * @return int                    result code
 	 */
-	private function handleNewNodeForm(&$key, &$module, &$subsection)	{
+	private function handleNewNodeForm(&$key)	{
 		$post_vals = $this->getRequest()->get('newNodeForm');
 		$res = 0;
-/*
+
 		try {
 			// load original (not modified) getconfig
 			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
+				/** @var \SimpleXMLElement $tmpConfigXml */
 				$tmpConfigXml = simplexml_load_string($originalXml);
-
-				// save to temp file - for debugging
-				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
-				}
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
 				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
@@ -1112,39 +1104,56 @@ class DefaultController extends BaseController
 			}
 
 			// if we have XML configuration
+			$skipArray = array();
 			if (isset($tmpConfigXml)) {
 
-				// we will go through all posted values
-				$newLeafs = array();
+				// load parent value
+				if (array_key_exists('parent', $post_vals)) {
+					$parentPath = $post_vals['parent'];
 
-				// fill values
-				$i = 0;
-				$createString = "";
+					$xpath = $this->decodeXPath($parentPath);
+					// get node according to xPath query
+					/** @var \SimpleXMLElement $parentNode */
+					$parentNode = $tmpConfigXml->xpath($xpath);
 
-				foreach ( $post_vals as $postKey => $val ) {
-					$values = $this->divideInputName($postKey);
+					array_push($skipArray, 'parent');
+
+					// we have to delete all children from parent node (because of xpath selector for new nodes)
+					$domNode = dom_import_simplexml($parentNode[0]);
+					$domNodeChildren = $domNode->childNodes;
+					while ($domNodeChildren->length > 0) {
+						$domNode->removeChild($domNodeChildren->item(0));
+					}
+				} else {
+					throw new \ErrorException("Could not set parent node for new elements.");
+				}
+
+				// we will go through all post values
+				foreach ( $post_vals as $labelKey => $labelVal ) {
+					if (in_array($labelKey, $skipArray)) continue;
+					$label = $this->divideInputName($labelKey);
 					// values[0] - label
 					// values[1] - encoded xPath
 
-					if ($postKey == "parent") {
-						$xpath = $this->decodeXPath($val);
-						// get node according to xPath query
-						$parentNode = $tmpConfigXml->xpath($xpath);
-					} else if ( count($values) != 2 ) {
-						$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
-						throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1! ". var_export(array('values' => $values, 'postKey' => $postKey), true));
+					// load parent node
+
+
+					if ( count($label) != 2 ) {
+						$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $label, 'postKey' => $labelKey));
+						throw new \ErrorException("Could not proccess all form fields.");
+
 					} else {
-						$xpath = $this->decodeXPath($values[1]);
+						$valueKey = str_replace('label', 'value', $labelKey);
+						$value = $post_vals[$valueKey];
+
+						array_push($skipArray, $labelKey);
+						array_push($skipArray, $valueKey);
+
+						$xpath = $this->decodeXPath($label[1]);
 						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
 
-						$node = $this->elementValReplace($tmpConfigXml, $values[0], $xpath, $val);
-						try {
-							if ( is_object($node) ) {
-								$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
-							}
-						} catch (\ErrorException $e) {
-							// nothing happened - attribute is already there
-						}
+						$node = $this->insertNewElemIntoXMLTree($tmpConfigXml, $xpath, $labelVal, $value);
+
 					}
 				}
 
@@ -1164,8 +1173,36 @@ class DefaultController extends BaseController
 			$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
 			$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. Error: ".$e->getMessage());
 		}
-*/
+
 		return $res;
+	}
+
+	/**
+	 * inserts new element into given XML tree
+	 *
+	 * @param  \SimpleXMLElement $configXml   xml file
+	 * @param  string $xpath       XPath to the element
+	 * @param  string $label       label value
+	 * @param  string $value       new value
+	 * @param  string $xPathPrefix
+	 *
+	 * @return \SimpleXMLElement   modified node
+	 */
+	private function insertNewElemIntoXMLTree(&$configXml, $xpath, $label, $value, $xPathPrefix = "xmlns:")
+	{
+		/**
+		 * get node according to xPath query
+		 * @var \SimpleXMLElement $node
+		 */
+		$node = $configXml->xpath('/'.$xPathPrefix.$xpath);
+		if (!$value || $value === "") {
+			$elem = $node[0]->addChild($label);
+		} else {
+			$elem = $node[0]->addChild($label, $value);
+		}
+		$elem->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
+
+		return $elem;
 	}
 
 	/**
