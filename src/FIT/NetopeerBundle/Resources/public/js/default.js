@@ -583,6 +583,7 @@ function createNode($elem) {
 	// necessary edit bar modifications - bind all actions
 	$editBar.addClass('generated');
 	$editBar.children("img.sibling").remove();
+	$editBar.children("img.remove-child").hide();
 	$editBar.children("img.create-child").on('click', function() {
 		createNode($(this));
 	});
@@ -634,7 +635,7 @@ function createNode($elem) {
 
 	// we have to modify xpath and rel attributes for generated icons and inputs
 	var $originalInput = $coverDiv.find('input.value, input.label');
-	var newIndex = $coverDiv.index();
+	var newIndex = $coverDiv.index() + $currentParent.siblings(".is-key").length;
 	if (newIndex < 1) newIndex = 0;
 	newIndex++;
 

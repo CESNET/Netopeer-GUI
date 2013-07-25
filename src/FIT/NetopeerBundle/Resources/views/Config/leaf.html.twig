@@ -39,6 +39,7 @@ if advised of the possibility of such damage.
 <div class="leaf-line
 	{% if addLevel is defined and addLevel == true %} level-{{level}}{% endif %}
 	{% if hasChildren is defined and hasChildren == true %} has-children{% endif %}
+	{% if element.attributes.iskey is defined and element.attributes.iskey == "true" %} is-key{% endif %}
 	{% if element.attributes.eltype is defined %}
 		type-{{element.attributes.eltype}}
 	{% else %}
@@ -133,6 +134,9 @@ if advised of the possibility of such damage.
 					{% endif %}
 				{% elseif isUrlType(element.attributes.type) %}
 					{% set inputType = "url" %}
+				{% else %}
+				{# todo try to find "typedef" definition in model and substitute it #}
+					{% set inputType = "text" %}
 				{% endif %}
 			{% endif %}
 			{% if element.attributes.iskey is defined and element.attributes.iskey == "true" %}
@@ -148,7 +152,7 @@ if advised of the possibility of such damage.
 				name="{{currentInputName}}" 
 				{{disabledInput}}
 				{{min}} {{max}}
-				{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
+				{% if element.attributes.default is defined %}default="{{element.attributes.default}}" title="Default value: {{element.attributes.default}}"{% endif %}
 			/>
 		{% endif %}
 	{% else %}

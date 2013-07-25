@@ -1092,7 +1092,7 @@ class DefaultController extends BaseController
 
 		try {
 			// load original (not modified) getconfig
-			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
+			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, true)) != 1 ) {
 				/** @var \SimpleXMLElement $tmpConfigXml */
 				$tmpConfigXml = simplexml_load_string($originalXml);
 
@@ -1118,12 +1118,10 @@ class DefaultController extends BaseController
 
 					array_push($skipArray, 'parent');
 
-					// we have to delete all children from parent node (because of xpath selector for new nodes)
+					// we have to delete all children from parent node (because of xpath selector for new nodes), except from key nodes
 					$domNode = dom_import_simplexml($parentNode[0]);
-					$domNodeChildren = $domNode->childNodes;
-					while ($domNodeChildren->length > 0) {
-						$domNode->removeChild($domNodeChildren->item(0));
-					}
+					$this->removeChildrenExceptKey($domNode, $domNode->childNodes);
+
 				} else {
 					throw new \ErrorException("Could not set parent node for new elements.");
 				}
@@ -1175,6 +1173,34 @@ class DefaultController extends BaseController
 		}
 
 		return $res;
+	}
+
+	private function removeChildrenExceptKey($domNode, $domNodeChildren)
+	{
+		$keyElems = 0;
+		while ($domNodeChildren->length > $keyElems) {
+			if (count($domNodeChildren->item($keyElems)->childNodes)) {
+				// $this->removeChildrenExceptKey($domNode, $domNodeChildren->item($keyElems)->childNodes); // TODO: make it recursive
+			}
+			$isKey = false;
+			if ($domNodeChildren->item($keyElems)->hasAttributes()) {
+				foreach ($domNodeChildren->item($keyElems)->attributes as $attr) {
+					if ($attr->nodeName == "iskey" && $attr->nodeValue == "true") {
+						$keyElems++;
+						$isKey = true;
+						break;
+					}
+				}
+			}
+			if (!$isKey) {
+				try {
+					$domNode->removeChild($domNodeChildren->item($keyElems));
+				} catch (\DOMException $e) {
+
+				}
+			}
+		}
+		return;
 	}
 
 	/**
