@@ -400,8 +400,6 @@ function findLevelValue($elem) {
 	var levelRegex = /level-(\d+)/,	// regex for level value
 		level = $elem.parents('div[class*="level-"]').attr('class');	// parent class for level
 
-	l(level);
-
 	if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
 
 		// level does not have to be by first parent, could be on previous level too
@@ -419,7 +417,7 @@ function findLevelValue($elem) {
 	} else {
 		level = parseInt(level.match(levelRegex)[1], 10);
 	}
-	l(level);
+
 	return level;
 }
 
@@ -576,14 +574,45 @@ function createNode($elem) {
 		.attr({
 			name: 'newNodeForm[label' + uniqueId + '_' + xPath + ']',
 			type: 'text',
-			'class': 'label'
+			'class': 'label',
+			'data-unique-id': uniqueId,
+			'data-original-xPath': xPath
 		});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 
 	// necessary edit bar modifications - bind all actions
 	$editBar.addClass('generated');
 	$editBar.children("img.sibling").remove();
-	$editBar.children("img.remove-child").hide();
+	var modifyInputXPath = function($inputs, $coverDiv, newIndex) {
+		$inputs.each(function(i,e) {
+			var s = $(e).attr('name');
+			var newXpath = s.substring(0, s.length - 1) + '-*?' + newIndex + '!]';
+			$(e).attr('name', newXpath);
+		});
+
+		var $newRel = $coverDiv.children('.edit-bar').children('img');
+		$newRel.attr('rel', $newRel.attr('rel') + '-*?' + newIndex + '!');
+	};
+	$editBar.children("img.remove-child").on('click', function() {
+		// remove all children and itself
+		$(this).parents(".leaf-line").next("div[class*='level-']").remove();
+		$(this).parents(".leaf-line").remove();
+
+		$form.find(".leaf-line").each(function() {
+			var $inputs = $(this).find('input.value, input.label');
+			var $labelInput = $(this).find("input.label");
+			var $valueInput = $(this).find("input.value");
+
+			var newIndex = $(this).index() + $(this).siblings(".is-key").length;
+			if (newIndex < 1) newIndex = 0;
+			newIndex++;
+
+			// recover original uniqueId and xPath and generate new input name
+			$labelInput.attr('name', 'newNodeForm[label' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
+			$valueInput.attr('name', 'newNodeForm[value' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
+			modifyInputXPath($inputs, $(this), newIndex);
+		});
+	});
 	$editBar.children("img.create-child").on('click', function() {
 		createNode($(this));
 	});
@@ -639,14 +668,7 @@ function createNode($elem) {
 	if (newIndex < 1) newIndex = 0;
 	newIndex++;
 
-	$originalInput.each(function(i,e) {
-		var s = $(e).attr('name');
-		var newXpath = s.substring(0, s.length - 1) + '-*?' + newIndex + '!]';
-		$(e).attr('name', newXpath);
-	});
-
-	var $newRel = $coverDiv.children('.edit-bar').children('img');
-	$newRel.attr('rel', $newRel.attr('rel') + '-*?' + newIndex + '!');
+	modifyInputXPath($originalInput, $coverDiv, newIndex);
 
 	// create submit and close button
 	createSubmitButton($form, "Create new node");
