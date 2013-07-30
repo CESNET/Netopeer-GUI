@@ -44,7 +44,7 @@
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
-use FIT\NetopeerBundle\Models\XMLoperations;
+use FIT\NetopeerBundle\Models\Array2XML;
 use FIT\NetopeerBundle\Entity\BaseConnection;
 
 // these import the "@Route" and "@Template" annotations
@@ -302,7 +302,7 @@ class DefaultController extends BaseController
 			$this->getRequest()->getSession()->set('isLocking', true);
 		}
 
-		$res = $dataClass->handle($command, $params);
+		$res = $dataClass->handle($command, $params, false);
 
 		if ( $res != 1 ) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
@@ -342,7 +342,7 @@ class DefaultController extends BaseController
 			$session = $this->container->get('request')->getSession();
 			$sessionArr = $session->all();
 
-			$xml = XMLoperations::createXML("session", $sessionArr);
+			$xml = Array2XML::createXML("session", $sessionArr);
 			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
 
 			$this->assign("stateArr", $xml);
@@ -659,23 +659,23 @@ class DefaultController extends BaseController
 
 		// processing form on config - edit Config
 		} elseif ( is_array($this->getRequest()->get('configDataForm')) ) {
-			$res = $this->handleEditConfigForm($key);
+			$res = $this->get('XMLoperations')->handleEditConfigForm($key, $this->paramsConfig);
 
 		// processing duplicate node form
 		} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
-			$res = $this->handleDuplicateNodeForm($key);
+			$res = $this->get('XMLoperations')->handleDuplicateNodeForm($key, $this->paramsConfig);
 
 		// processing generate node form
 		} elseif ( is_array($this->getRequest()->get('generateNodeForm')) ) {
-			$res = $this->handleGenerateNodeForm($key, $module, $subsection);
+			$res = $this->get('XMLoperations')->handleGenerateNodeForm($key, $this->paramsConfig, $module, $subsection);
 
 		// processing new node form
 		} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
-			$res = $this->handleNewNodeForm($key);
+			$res = $this->get('XMLoperations')->handleNewNodeForm($key, $this->paramsConfig);
 
 		// processing remove node form
 		} elseif ( is_array($this->getRequest()->get('removeNodeForm')) ) {
-			$res = $this->handleRemoveNodeForm($key);
+			$res = $this->get('XMLoperations')->handleRemoveNodeForm($key, $this->paramsConfig);
 		}
 
 		// we will redirect page after completion, because we want to load edited get and get-config
@@ -699,164 +699,10 @@ class DefaultController extends BaseController
 	}
 
 	/**
-	 * divides string into the array (name, value) (according to the XML tree node => value)
-	 *
-	 * @param  string $postKey post value
-	 * @return array           modified array
-	 */
-	private function divideInputName($postKey)
-	{
-		$values = explode('_', $postKey);
-		$cnt = count($values);
-		if ($cnt > 2) {
-			$last = $values[$cnt-1];
-			$values = array(implode("_", array_slice($values, 0, $cnt-1)), $last);
-		}
-		return $values;
-	}
-
-	/**
-	 * decodes XPath value
-	 *
-	 * @param  string $value encoded XPath string
-	 * @return string        decoded XPath string
-	 */
-	private function decodeXPath($value) {
-		return str_replace(
-			array('-', '?', '!'),
-			array('/', '[', ']'),
-			$value
-		);
-	}
-
-	/**
-	 * sends modified XML to server
-	 *
-	 * @param  int    $key    	session key of current connection
-	 * @param  string $config 	XML document which will be send
-	 * @param  string $target = "running" target source
-	 * @return int						  return 0 on success, 1 on error
-	 */
-	private function executeEditConfig($key, $config, $target = "running") {
-		$res = 0;
-		$editConfigParams = array(
-				'key' 	 => $key,
-				'target' => $target,
-				'config' => str_replace('<?xml version="1.0"?'.'>', '', $config)
-				);
-
-		// edit-cofig
-		if ( ($merged = $this->get('DataModel')->handle('editconfig', $editConfigParams)) != 1 ) {
-			// for debugging purposes, we will save result into the temp file
-			if ($this->container->getParameter('kernel.environment') == 'dev') {
-				file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/merged.yin', $merged);
-			}
-		} else {
-			$this->get('logger')->err('Edit-config failed.', array('params', $editConfigParams));
-			// throw new \ErrorException('Edit-config failed.');
-			$res = 1;
-		}
-		return $res;
-	}
-
-	/**
-	 * Completes request tree (XML) with necessary nodes (parent nodes).
-	 * Tree must be valid for edit-config action
-	 *
-	 * @param \SimpleXMLElement  $tmpConfigXml
-	 * @param string            $config_string
-	 * @return \SimpleXMLElement
-	 */
-	private function completeRequestTree(&$tmpConfigXml, $config_string) {
-
-		$subroot = simplexml_load_file($this->get('DataModel')->getPathToModels() . 'wrapped.wyin');
-		$xmlNameSpaces = $subroot->getNamespaces();
-
-		if ( isset($xmlNameSpaces[""]) ) {
-			$subroot->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-		}
-		$ns = $subroot->xpath("//xmlns:namespace");
-		$namespace = "";
-		if (sizeof($ns)>0) {
-			$namespace = $ns[0]->attributes()->uri;
-		}
-		$pos_subroot = $subroot->xpath('//xmlns:'.$tmpConfigXml->getName().'/ancestor::*');
-		$config = $config_string;
-		for ($i=sizeof($pos_subroot)-1; $i>0; $i--) {
-			//if ($pos_subroot[$i]->
-			$config .= "</".$pos_subroot[$i]->getName().">\n";
-
-			if ($i == 1) {
-				$config = "<".$pos_subroot[$i]->getName().
-					($namespace!==""?" xmlns=\"$namespace\"":"").
-					" xmlns:xc=\"urn:ietf:params:xml:ns:netconf:base:1.0\"".
-					">\n".$config;
-			} else {
-				$config = "<".$pos_subroot[$i]->getName().
-					">\n".$config;
-			}
-		}
-		$result = simplexml_load_string($config);
-		$result->registerXPathNamespace('xmlns', $namespace);
-
-		return $result;
-	}
-
-	/**
-	 * updates (modifies) value of XML node
-	 *
-	 * @param  string $configXml   xml file
-	 * @param  string $elementName name of the element
-	 * @param  string $xpath       XPath to the element
-	 * @param  string $val         new value
-	 * @param  string $xPathPrefix
-	 * @return \SimpleXMLElement   modified node
-	 */
-	private function elementValReplace(&$configXml, $elementName, $xpath, $val, $xPathPrefix = "xmlns:")
-	{
-		$isAttribute = false;
-
-		// if element is an attribute, it will have prefix at-
-		if ( strrpos($elementName, 'at-') === 0 ) {
-			$elementName = substr($elementName, 3);
-			$isAttribute = true;
-		}
-
-		// get node according to xPath query
-		$node = $configXml->xpath('/'.$xPathPrefix.$xpath);
-
-		if (isset($node[0])) {
-			$node = $node[0];
-		}
-		
-		// set new value for node
-		if ( $isAttribute === true ) {
-			$elem = $node[0];
-			$elem[$elementName] = $val;
-		} else {
-			if (isset($node[0])) {
-				$elem = $node[0];
-			} else {
-				$elem = $node;
-			}
-
-			if (isset($elem->$elementName) && (sizeof($elem->$elementName) > 0)) {
-				$e = $elem->$elementName;
-				$e[0] = str_replace("\r", '', $val); // removes \r from value
-			} else {
-				if ( !is_array($elem) ) {
-					$elem[0] = str_replace("\r", '', $val);
-				}
-			}
-		}
-
-		return $elem;
-	}
-
-	/**
 	 * sets new filter for state part
 	 *
 	 * @param  int $key   session key for current server
+	 * @return int 1 on error, 0 on success
 	 */
 	private function handleFilterState(&$key) {
 		$this->get('DataModel')->setFlashState('state');
@@ -868,8 +714,10 @@ class DefaultController extends BaseController
 				"key" => $key,
 				"filter" => $post_vals["filter"],
 			);
+			return 0;
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
+			return 1;
 		}
 	}
 
@@ -877,6 +725,7 @@ class DefaultController extends BaseController
 	 * sets new filter for config part
 	 *
 	 * @param  int $key     session key for current server
+	 * @return int 1 on error, 0 on success
 	 */
 	private function handleFilterConfig(&$key) {
 		$this->get('DataModel')->setFlashState('config');
@@ -891,401 +740,10 @@ class DefaultController extends BaseController
 				"source" => $post_vals['source'],
 			);
 			$this->get('session')->set('sourceConfig', $post_vals['source']);
+			return 0;
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
+			return  1;
 		}
 	}
-
-	/**
-	 * handles edit config form - changes config values into the $_POST values
-	 * and sends them to editConfig process
-	 *
-	 * @param  int  $key  session key of current connection
-	 * @throws \ErrorException
-	 * @return int        result code
-	 */
-	private function handleEditConfigForm(&$key) {
-		$post_vals = $this->getRequest()->get('configDataForm');
-		$res = 0;
-		$this->get('DataModel')->setFlashState('config');
-
-		try {
-
-			if ( ($configXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
-				$configXml = simplexml_load_string($configXml, 'SimpleXMLIterator');
-
-				// save to temp file - for debugging
-				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $configXml->asXml());
-				}
-
-				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
-				$xmlNameSpaces = $configXml->getNamespaces();
-
-				if ( isset($xmlNameSpaces[""]) ) {
-					$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-					$xPathPrefix = "xmlns:";
-				} else {
-					// we will use this xmlns as backup for XPath request
-					$configXml->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
-					$xPathPrefix = "";
-				}
-
-				// foreach over all post values
-				foreach ( $post_vals as $postKey => $val ) {
-					$values = $this->divideInputName($postKey);
-					$elementName = $values[0];
-					$xpath = $this->decodeXPath($values[1]);
-					$xpath = substr($xpath, 1); // removes slash at the begining
-
-					$this->elementValReplace($configXml, $elementName, $xpath, $val, $xPathPrefix);
-				}
-
-				// for debugging, edited configXml will be saved into temp file
-				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/edited.yin', $configXml->asXml());
-				}
-
-				$res = $this->executeEditConfig($key, $configXml->asXml());
-				if ($res !== 1) {
-					$this->get('session')->setFlash('config success', "Config has been edited successfully.");
-				}
-			} else {
-				throw new \ErrorException("Could not load config.");
-			}
-
-		} catch (\ErrorException $e) {
-			$this->get('logger')->warn('Could not save config correctly.', array('error' => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not save config correctly. Error: ".$e->getMessage());
-		}
-
-		return $res;
-	}
-
-	/**
-	 * duplicates node in config - values of duplicated nodes (elements)
-	 *
-	 * could be changed by user
-	 *
-	 * @param  int  $key  session key of current connection
-	 * @throws \ErrorException
-	 * @return int        result code
-	 */
-	private function handleDuplicateNodeForm(&$key)	{
-		$post_vals = $this->getRequest()->get('duplicatedNodeForm');
-		$res = 0;
-		$this->get('DataModel')->setFlashState('config');
-
-		try {
-			// load original (not modified) getconfig
-			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
-				$tmpConfigXml = simplexml_load_string($originalXml);
-
-				// save to temp file - for debugging
-				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
-				}
-
-				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
-				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
-				if ( isset($xmlNameSpaces[""]) ) {
-					$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-				}
-			}
-
-			// if we have XML configuration
-			if (isset($tmpConfigXml)) {
-
-				// we will go through all posted values
-				$newLeafs = array();
-
-//				$tmpConfigXml = $this->completeRequestTree($tmpConfigXml, $tmpConfigXml->asXml());
-
-				/* fill values */
-				$i = 0;
-				$createString = "";
-
-				foreach ( $post_vals as $postKey => $val ) {
-					$values = $this->divideInputName($postKey);
-					// values[0] - label
-					// values[1] - encoded xPath
-					
-					if ($postKey == "parent") {
-						$xpath = $this->decodeXPath($val);
-						// get node according to xPath query
-						$parentNode = $tmpConfigXml->xpath($xpath);
-					} else if ( count($values) != 2 ) {
-						$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $values, 'postKey' => $postKey));
-						throw new \ErrorException("newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1! ". var_export(array('values' => $values, 'postKey' => $postKey), true));
-					} else {
-						$xpath = $this->decodeXPath($values[1]);
-						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
-
-						$node = $this->elementValReplace($tmpConfigXml, $values[0], $xpath, $val);
-						try {
-							if ( is_object($node) ) {
-								$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
-							}
-						} catch (\ErrorException $e) {
-							// nothing happened - attribute is already there
-						}
-					}
-				}
-
-				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
-				$createTree = $this->completeRequestTree($parentNode[0], $createString);
-
-				// for debugging, edited configXml will be saved into temp file
-				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/newElem.yin', $createTree->asXml());
-				}
-				$res = $this->executeEditConfig($key, $createTree->asXml());
-
-				if ($res == 0) {
-			    $this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
-				}
-			} else {
-				throw new \ErrorException("Could not load config.");
-			}
-
-		} catch (\ErrorException $e) {
-			$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. Error: ".$e->getMessage());
-		}
-
-		return $res;
-	}
-
-	/**
-	 * create new node in config - according to the values in XML model
-	 *
-	 * could be changed by user
-	 *
-	 * @param  int      $key 				  session key of current connection
-	 * @param  string   $module 		  module name
-	 * @param  string   $subsection  	subsection name
-	 * @return int                    result code
-	 */
-	private function handleGenerateNodeForm(&$key, &$module, &$subsection)	{
-		$post_vals = $this->getRequest()->get('generatedNodeForm');
-		$res = 0;
-		$this->get('DataModel')->setFlashState('config');
-
-		// TODO: load XML file - https://sauvignon.liberouter.org/symfony/generate/2/-%252A-%252A%253F1%2521-%252A%253F2%2521-%252A%253F1%2521/0/hanic-probe/exporters/model.xml
-		// this URL should be generated from route (path = generateFromModel, params: '2' = level (whatever, not used in this case); 'xPath' = url_encode($xPath), 'key' = $key, 'module' = $module, 'subsection' = subsection, '_format' = 'xml')
-		//
-		// change values to $_POST ones if XML file has been loaded correctly
-		// generate (completeTree) output XML for edit-config
-
-		return $res;
-	}
-
-	/**
-	 * create new node
-	 *
-	 * @param  int      $key 				  session key of current connection
-	 * @return int                    result code
-	 */
-	private function handleNewNodeForm(&$key)	{
-		$post_vals = $this->getRequest()->get('newNodeForm');
-		$res = 0;
-
-		try {
-			// load original (not modified) getconfig
-			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, true)) != 1 ) {
-				/** @var \SimpleXMLElement $tmpConfigXml */
-				$tmpConfigXml = simplexml_load_string($originalXml);
-
-				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
-				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
-				if ( isset($xmlNameSpaces[""]) ) {
-					$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-				}
-			}
-
-			// if we have XML configuration
-			$skipArray = array();
-			if (isset($tmpConfigXml)) {
-
-				// load parent value
-				if (array_key_exists('parent', $post_vals)) {
-					$parentPath = $post_vals['parent'];
-
-					$xpath = $this->decodeXPath($parentPath);
-					// get node according to xPath query
-					/** @var \SimpleXMLElement $parentNode */
-					$parentNode = $tmpConfigXml->xpath($xpath);
-
-					array_push($skipArray, 'parent');
-
-					// we have to delete all children from parent node (because of xpath selector for new nodes), except from key nodes
-					$domNode = dom_import_simplexml($parentNode[0]);
-					$this->removeChildrenExceptKey($domNode, $domNode->childNodes);
-
-				} else {
-					throw new \ErrorException("Could not set parent node for new elements.");
-				}
-
-				// we will go through all post values
-				foreach ( $post_vals as $labelKey => $labelVal ) {
-					if (in_array($labelKey, $skipArray)) continue;
-					$label = $this->divideInputName($labelKey);
-					// values[0] - label
-					// values[1] - encoded xPath
-
-					// load parent node
-
-
-					if ( count($label) != 2 ) {
-						$this->get('logger')->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $label, 'postKey' => $labelKey));
-						throw new \ErrorException("Could not proccess all form fields.");
-
-					} else {
-						$valueKey = str_replace('label', 'value', $labelKey);
-						$value = $post_vals[$valueKey];
-
-						array_push($skipArray, $labelKey);
-						array_push($skipArray, $valueKey);
-
-						$xpath = $this->decodeXPath($label[1]);
-						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
-
-						$node = $this->insertNewElemIntoXMLTree($tmpConfigXml, $xpath, $labelVal, $value);
-
-					}
-				}
-
-				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
-				$createTree = $this->completeRequestTree($parentNode[0], $createString);
-
-				$res = $this->executeEditConfig($key, $createTree->asXml());
-
-				if ($res == 0) {
-					$this->getRequest()->getSession()->setFlash('config success', "Record has been added.");
-				}
-			} else {
-				throw new \ErrorException("Could not load config.");
-			}
-
-		} catch (\ErrorException $e) {
-			$this->get('logger')->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not save new node correctly. Error: ".$e->getMessage());
-		}
-
-		return $res;
-	}
-
-	private function removeChildrenExceptKey($domNode, $domNodeChildren)
-	{
-		$keyElems = 0;
-		while ($domNodeChildren->length > $keyElems) {
-			if (count($domNodeChildren->item($keyElems)->childNodes)) {
-				// $this->removeChildrenExceptKey($domNode, $domNodeChildren->item($keyElems)->childNodes); // TODO: make it recursive
-			}
-			$isKey = false;
-			if ($domNodeChildren->item($keyElems)->hasAttributes()) {
-				foreach ($domNodeChildren->item($keyElems)->attributes as $attr) {
-					if ($attr->nodeName == "iskey" && $attr->nodeValue == "true") {
-						$keyElems++;
-						$isKey = true;
-						break;
-					}
-				}
-			}
-			if (!$isKey) {
-				try {
-					$domNode->removeChild($domNodeChildren->item($keyElems));
-				} catch (\DOMException $e) {
-
-				}
-			}
-		}
-		return;
-	}
-
-	/**
-	 * inserts new element into given XML tree
-	 *
-	 * @param  \SimpleXMLElement $configXml   xml file
-	 * @param  string $xpath       XPath to the element
-	 * @param  string $label       label value
-	 * @param  string $value       new value
-	 * @param  string $xPathPrefix
-	 *
-	 * @return \SimpleXMLElement   modified node
-	 */
-	private function insertNewElemIntoXMLTree(&$configXml, $xpath, $label, $value, $xPathPrefix = "xmlns:")
-	{
-		/**
-		 * get node according to xPath query
-		 * @var \SimpleXMLElement $node
-		 */
-		$node = $configXml->xpath('/'.$xPathPrefix.$xpath);
-		if (!$value || $value === "") {
-			$elem = $node[0]->addChild($label);
-		} else {
-			$elem = $node[0]->addChild($label, $value);
-		}
-		$elem->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
-
-		return $elem;
-	}
-
-	/**
-	 * removes node from config XML tree
-	 *
-	 * @param  int  $key session key of current connection
-	 * @throws \ErrorException  when get-config could not be loaded
-	 * @return int       result code
-	 */
-	private function handleRemoveNodeForm(&$key) {
-		$post_vals = $this->getRequest()->get('removeNodeForm');
-		$res = 0;
-
-		try {
-			if ( ($originalXml = $this->get('DataModel')->handle('getconfig', $this->paramsConfig, false)) != 1 ) {
-				$tmpConfigXml = simplexml_load_string($originalXml);
-
-				// save to temp file - for debugging
-				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
-				}
-
-				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
-				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
-				if ( isset($xmlNameSpaces[""]) ) {
-					$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-				}
-
-				$xpath = $this->decodeXPath($post_vals["parent"]);
-				$toDelete = $tmpConfigXml->xpath($xpath);
-				$deletestring = "";
-
-				foreach ($toDelete as $td) {
-					//$td->registerXPathNamespace("xc", "urn:ietf:params:xml:ns:netconf:base:1.0");
-					$td->addAttribute("xc:operation", "remove", "urn:ietf:params:xml:ns:netconf:base:1.0");
-					$deletestring .= "\n".str_replace('<?xml version="1.0"?'.'>', '', $td->asXml());
-				}
-
-				$deleteTree = $this->completeRequestTree($toDelete[0], $deletestring);
-
-				// for debugging, edited configXml will be saved into temp file
-				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->get('kernel')->getRootDir().'/logs/tmp-files/removeNode.yin', $tmpConfigXml->asXml());
-				}
-				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml());
-				if ($res == 0) {
-					$this->getRequest()->getSession()->setFlash('config success', "Record has been removed.");
-				}
-			} else {
-				throw new \ErrorException("Could not load config.");
-			}
-		} catch (\ErrorException $e) {
-			$this->get('logger')->warn('Could not remove node correctly.', array('error' => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not remove node correctly. ".$e->getMessage());
-		}
-
-		return $res;
-
-	}	
 }
