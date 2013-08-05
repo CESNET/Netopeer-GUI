@@ -435,6 +435,11 @@ function generateFormObject(formName) {
 				name: formName,
 				'class': 'generatedForm'
 			});
+		$form.append($("<input>").attr({
+			type: 'hidden',
+			name: 'formId',
+			value: new Date().getTime()
+		}));
 	}
 
 	return $form;
@@ -564,6 +569,15 @@ function createNode($elem) {
 	var $currentParentLevel = $elem.parents('.level-' + level);
 	var $editBar = $elem.parent().clone();	// editBar clone - we will modify it below
 
+	// remove last index and replace it with attr name
+	var parentName = "";
+	if ($currentParent.find('.label-cover strong').length) {
+		parentName = $currentParent.find('.label-cover strong').text();
+	} else {
+		parentName = $currentParent.find('input.label').val();
+	}
+	var parentXPath = xPath.substring(0, xPath.lastIndexOf("*?")) + parentName;
+
 	// generate new form
 	var $form = generateFormObject('newNodeForm');
 
@@ -576,7 +590,25 @@ function createNode($elem) {
 			type: 'text',
 			'class': 'label',
 			'data-unique-id': uniqueId,
-			'data-original-xPath': xPath
+			'data-original-xPath': xPath,
+			'data-parrent-xPath': encodeURIComponent(parentXPath),
+			'data-provide': 'typeahead',
+			'data-source': function(query, process) {
+				var urlTemplate = $elem.data().typeaheadPath;
+				var sourceUrl = urlTemplate.replace("FORMID", $form.find("input[name=formId]"));
+				sourceUrl = urlTemplate.replace("XPATH", encodeURIComponent(parentXPath));
+				$.ajax({
+					url: sourceUrl,
+					data: {
+						'typed': query
+					},
+					type: "GET",
+					dataType: "json",
+					success: function(data){
+						return process(data);
+					}
+				});
+			}
 		});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 
@@ -586,12 +618,12 @@ function createNode($elem) {
 	var modifyInputXPath = function($inputs, $coverDiv, newIndex) {
 		$inputs.each(function(i,e) {
 			var s = $(e).attr('name');
-			var newXpath = s.substring(0, s.length - 1) + '-*?' + newIndex + '!]';
+			var newXpath = s.substring(0, s.length - 1) + '--*?' + newIndex + '!]';
 			$(e).attr('name', newXpath);
 		});
 
 		var $newRel = $coverDiv.children('.edit-bar').children('img');
-		$newRel.attr('rel', $newRel.attr('rel') + '-*?' + newIndex + '!');
+		$newRel.attr('rel', $newRel.attr('rel') + '--*?' + newIndex + '!');
 	};
 	$editBar.children("img.remove-child").on('click', function() {
 		// remove all children and itself

@@ -412,7 +412,7 @@ class DefaultController extends BaseController
 
 		// now, we could set forms params with filter (even if we don't have module or subsection)
 		// filter will be empty
-		$filters = $this->loadFilters($module, $subsection);
+		$filters = $dataClass->loadFilters($module, $subsection);
 		$this->setSectionFormsParams($key, $filters['state'], $filters['config']);
 
 		// if form has been send, we well process it
@@ -424,6 +424,9 @@ class DefaultController extends BaseController
 
 		// we will prepare filter form in column
 		$this->setSectionFilterForms();
+
+		// path for creating node typeahead
+		$valuesTypeaheadPath = $this->generateUrl("getValuesForLabel", array('formId' => "FORMID", 'key' => $key, 'xPath' => "XPATH"));
 
 		/* Show the first module we have */
 		if ( $module == null ) {
@@ -461,6 +464,8 @@ class DefaultController extends BaseController
 				$this->assign('subsectionName', $dataClass->getSubsectionName($subsection));
 			}
 
+			$valuesTypeaheadPath = $this->generateUrl("getValuesForLabelWithModule", array('formId' => "FORMID", 'key' => $key, 'module' => $module, 'xPath' => "XPATH"));
+
 		// we are in section
 		} else {
 			$connArray = $this->getRequest()->getSession()->get('session-connections');
@@ -474,6 +479,8 @@ class DefaultController extends BaseController
 
 			// because we do not allow changing layout in section, controls will be hidden
 			$this->assign('hideColumnControl', true);
+
+			$valuesTypeaheadPath = $this->generateUrl("getValuesForLabelWithModule", array('formId' => "FORMID", 'key' => $key, 'module' => $module, 'subsection' => $subsection, 'xPath' => "XPATH"));
 		}
 
 		// loading state part = get Action
@@ -481,7 +488,7 @@ class DefaultController extends BaseController
 		try {
 			$dataClass->setFlashState('state');
 
-			if ( ($xml = $dataClass->handle('get', $this->paramsState)) != 1 ) {
+			if ( ($xml = $dataClass->handle('get', $this->getStateParams())) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 				$this->assign("stateArr", $xml);
 			}
@@ -496,7 +503,7 @@ class DefaultController extends BaseController
 				$dataClass->setFlashState('config');
 				$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'config');
 				// getcofig part
-				if ( ($xml = $dataClass->handle('getconfig', $this->paramsConfig)) != 1 ) {
+				if ( ($xml = $dataClass->handle('getconfig', $this->getConfigParams())) != 1 ) {
 					$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 					$this->assign("configArr", $xml);
 				}
@@ -512,40 +519,9 @@ class DefaultController extends BaseController
 
 		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
 		$this->assign('routeParams', $routeParams);
+		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
 
 		return $this->getTwigArr();
-	}
-
-	/**
-	 * loading file with filter specification for current module or subsection
-	 *
-	 * @param  string $module     module name
-	 * @param  string $subsection subsection name
-	 * @return array              array with config and state filter
-	 */
-	private function loadFilters(&$module, &$subsection) {
-		// if file filter.txt exists in models, we will use it
-		$filterState = $filterConfig = "";
-
-		$dataClass = $this->get('DataModel');
-		$path = $dataClass->getPathToModels($module);
-
-		// if subsection is defined, we will add it to path
-		if ( $subsection ) {
-			$path .= $subsection.'/';
-		}
-
-		$file = $path.'filter.txt';
-
-		// if file with filter does not exist, only empty filter will be returned
-		if ( file_exists($file) ) {
-			$filterState = $filterConfig = file_get_contents($file);
-		}
-
-		return array(
-			'config' => $filterConfig,
-			'state' => $filterState
-		);
 	}
 
 	/**
@@ -558,6 +534,10 @@ class DefaultController extends BaseController
 		$this->paramsState[$key] = $value;
 	}
 
+	public function getStateParams() {
+		return $this->paramsState;
+	}
+
 	/**
 	 * Set values of config array
 	 *
@@ -566,6 +546,10 @@ class DefaultController extends BaseController
 	 */
 	private function setConfigParams($key, $value) {
 		$this->paramsConfig[$key] = $value;
+	}
+
+	public function getConfigParams() {
+		return $this->paramsConfig;
 	}
 
 	/**
@@ -592,7 +576,7 @@ class DefaultController extends BaseController
 
 		$this->setConfigParams('key', $key);
 		$this->setConfigParams('source', $sourceConfig);
-		$this->setConfigParams('filter', $filterState);
+		$this->setConfigParams('filter', $filterConfig);
 	}
 
 	/**
@@ -659,23 +643,23 @@ class DefaultController extends BaseController
 
 		// processing form on config - edit Config
 		} elseif ( is_array($this->getRequest()->get('configDataForm')) ) {
-			$res = $this->get('XMLoperations')->handleEditConfigForm($key, $this->paramsConfig);
+			$res = $this->get('XMLoperations')->handleEditConfigForm($key, $this->getConfigParams());
 
 		// processing duplicate node form
 		} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleDuplicateNodeForm($key, $this->paramsConfig);
+			$res = $this->get('XMLoperations')->handleDuplicateNodeForm($key, $this->getConfigParams());
 
 		// processing generate node form
 		} elseif ( is_array($this->getRequest()->get('generateNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleGenerateNodeForm($key, $this->paramsConfig, $module, $subsection);
+			$res = $this->get('XMLoperations')->handleGenerateNodeForm($key, $this->getConfigParams(), $module, $subsection);
 
 		// processing new node form
 		} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleNewNodeForm($key, $this->paramsConfig);
+			$res = $this->get('XMLoperations')->handleNewNodeForm($key, $this->getConfigParams());
 
 		// processing remove node form
 		} elseif ( is_array($this->getRequest()->get('removeNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleRemoveNodeForm($key, $this->paramsConfig);
+			$res = $this->get('XMLoperations')->handleRemoveNodeForm($key, $this->getConfigParams());
 		}
 
 		// we will redirect page after completion, because we want to load edited get and get-config
@@ -710,10 +694,8 @@ class DefaultController extends BaseController
 		$this->filterForms['state']->bindRequest($this->getRequest());
 
 		if ( $this->filterForms['state']->isValid() ) {
-			$this->paramsState = array(
-				"key" => $key,
-				"filter" => $post_vals["filter"],
-			);
+			$this->setStateParams("key", $key);
+			$this->setStateParams("filter", $post_vals["filter"]);
 			return 0;
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
@@ -734,11 +716,10 @@ class DefaultController extends BaseController
 
 		if ( $this->filterForms['config']->isValid() ) {
 			$post_vals = $this->getRequest()->get("form");
-			$this->filterForms['config'] = array(
-				"key" => $key,
-				"filter" => $post_vals["filter"],
-				"source" => $post_vals['source'],
-			);
+			$this->setConfigParams("key", $key);
+			$this->setConfigParams("filter", $post_vals["filter"]);
+			$this->setConfigParams("source", $post_vals['source']);
+
 			$this->get('session')->set('sourceConfig', $post_vals['source']);
 			return 0;
 		} else {

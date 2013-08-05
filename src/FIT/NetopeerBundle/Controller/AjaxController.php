@@ -248,6 +248,48 @@ class AjaxController extends BaseController
 	}
 
 	/**
+	 * Get available values for label name from model based on xPath selector.
+	 *
+	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{xPath}/", name="getValuesForLabel")
+	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{module}/{xPath}/", name="getValuesForLabelWithModule")
+	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{module}/{subsection}/{xPath}/", name="getValuesForLabelWithSubsection")
+	 * @Template()
+	 *
+	 * @param int $key
+	 * @param string $formId            unique identifier of form
+	 * @param null|string $module       name of the module
+	 * @param null|string $subsection   name of the subsection
+	 * @param string $xPath    encoded xPath selector
+	 * @return Response    $result
+	 */
+	public function getValuesForLabelAction($key, $formId, $module = null, $subsection = null, $xPath = "")
+	{
+		$this->setActiveSectionKey($key);
+		$this->get('DataModel')->buildMenuStructure($key);
+		$formParams = $this->get('DataModel')->loadFilters($module, $subsection);
+
+		$configParams['key'] = $key;
+		$configParams['source'] = 'running';
+		$configParams['filter'] = $formParams['config'];
+
+		$res = $this->get('XMLoperations')->getAvailableLabelValuesForXPath($key, $formId, $xPath, $configParams);
+		$typed = $this->getRequest()->get('typed');
+//		if ($typed !== "" || $typed !== "0") {
+//			foreach ($res as $resKey => $item) {
+//				if (strpos($item, $typed) === false) {
+//					unset($res[$resKey]);
+//				}
+//			}
+//		}
+
+		if (is_array($res)) {
+			return new Response(json_encode($res));
+		} else {
+			return new Response(false);
+		}
+	}
+
+	/**
 	 * Process getting history of notifications
 	 *
 	 * @Route("/ajax/get-notifications-history/{connectedDeviceId}/", name="notificationsHistory")

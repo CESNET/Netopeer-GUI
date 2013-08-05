@@ -101,7 +101,7 @@ class XMLoperations {
 	 */
 	public function decodeXPath($value) {
 		return str_replace(
-			array('-', '?', '!'),
+			array('--', '?', '!'),
 			array('/', '[', ']'),
 			$value
 		);
@@ -852,5 +852,44 @@ class XMLoperations {
 
 		return 0;
 
+	}
+
+	public function getAvailableLabelValuesForXPath($connectedDeviceId, $formId, $xPath, $configParams) {
+
+		/**
+		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
+		 */
+		$cache = $this->container->get('winzou_cache');
+
+		if ($cache->contains('getResponseForFormId_'.$formId)) {
+			$xml = $cache->fetch('getResponseForFormId_'.$formId);
+		} else {
+			$xml = $this->dataModel->handle('getconfig', $configParams);
+			$cache->save('getResponseForFormId_'.$formId, $xml, 5000);
+		}
+
+		$retArr = array();
+		if ($xml != 1) {
+			$dom = new \DOMDocument();
+			$dom->loadXML($xml);
+
+			$decodedXPath = str_replace("/", "/xmlns:", $this->decodeXPath($xPath))."/*";
+			$domXpath = new \DOMXPath($dom);
+
+			$domXpath->registerNamespace("xmlns", "urn:ietf:params:xml:ns:yang:ietf-netconf-acm");
+			$elements = $domXpath->query($decodedXPath);
+
+			if (!is_null($elements)) {
+				foreach ($elements as $element) {
+					array_push($retArr, $element->nodeName);
+
+//					$nodes = $element->childNodes;
+//					foreach ($nodes as $node) {
+//						echo $node->nodeValue. "\n";
+//					}
+				}
+			}
+		}
+		return array_unique($retArr);
 	}
 }

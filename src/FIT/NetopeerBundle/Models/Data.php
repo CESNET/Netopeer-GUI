@@ -1313,6 +1313,37 @@ XML;
 	}
 
 	/**
+	 * loading file with filter specification for current module or subsection
+	 *
+	 * @param  string $module     module name
+	 * @param  string $subsection subsection name
+	 * @return array              array with config and state filter
+	 */
+	public function loadFilters(&$module, &$subsection) {
+		// if file filter.txt exists in models, we will use it
+		$filterState = $filterConfig = "";
+
+		$path = $this->getPathToModels($module);
+
+		// if subsection is defined, we will add it to path
+		if ( $subsection ) {
+			$path .= $subsection.'/';
+		}
+
+		$file = $path.'filter.txt';
+
+		// if file with filter does not exist, only empty filter will be returned
+		if ( file_exists($file) ) {
+			$filterState = $filterConfig = file_get_contents($file);
+		}
+
+		return array(
+			'config' => $filterConfig,
+			'state' => $filterState
+		);
+	}
+
+	/**
 	 * Get models.
 	 *
 	 * @param  int    $key        session key of current connection
