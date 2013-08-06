@@ -283,7 +283,7 @@ function duplicateNode($elem) {
 function scrollToGeneratedForm($elem, $form) {
 	var section = $elem.parents("section");
 	$(section).animate({
-		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight() - 20
+		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight()
 	}, 1000);
 }
 
@@ -538,6 +538,7 @@ function wrapCoverForm($cover, $form) {
 	$('.form-underlay').remove();
 	$('.form-cover').remove();
 	$('.generatedForm').remove();
+	$cover.find('.active').removeClass('active');
 }
 
 // unwrap old form (we can't have two forms inside in HTML
@@ -591,9 +592,11 @@ function createNode($elem) {
 			'class': 'label',
 			'data-unique-id': uniqueId,
 			'data-original-xPath': xPath,
-			'data-parrent-xPath': encodeURIComponent(parentXPath),
-			'data-provide': 'typeahead',
-			'data-source': function(query, process) {
+			'data-parrent-xPath': encodeURIComponent(parentXPath)
+		}).typeahead({
+			minLength: 0,
+			items: 15,
+			source: function(query, process) {
 				var urlTemplate = $elem.data().typeaheadPath;
 				var sourceUrl = urlTemplate.replace("FORMID", $form.find("input[name=formId]"));
 				sourceUrl = urlTemplate.replace("XPATH", encodeURIComponent(parentXPath));
@@ -607,9 +610,9 @@ function createNode($elem) {
 					success: function(data){
 						return process(data);
 					}
-				});
+				})
 			}
-		});
+	});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 
 	// necessary edit bar modifications - bind all actions
@@ -706,7 +709,7 @@ function createNode($elem) {
 	createSubmitButton($form, "Create new node");
 	createCloseButton($cover, $form);
 
-	unwrapCoverForm($currentParentLevel, $cover);
+	unwrapCoverForm($currentParent, $cover);
 	if (!disableScrolling) {
 		scrollToGeneratedForm($elem, $form);
 	}
