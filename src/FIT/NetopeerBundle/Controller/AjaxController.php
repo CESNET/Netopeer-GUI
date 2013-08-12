@@ -273,17 +273,20 @@ class AjaxController extends BaseController
 		$configParams['filter'] = $formParams['config'];
 
 		$res = $this->get('XMLoperations')->getAvailableLabelValuesForXPath($key, $formId, $xPath, $configParams);
-		$typed = $this->getRequest()->get('typed');
-//		if ($typed !== "" || $typed !== "0") {
-//			foreach ($res as $resKey => $item) {
-//				if (strpos($item, $typed) === false) {
-//					unset($res[$resKey]);
-//				}
-//			}
-//		}
 
 		if (is_array($res)) {
-			return new Response(json_encode($res));
+			if (isset($_GET['command']) && isset($_GET['label'])) {
+				switch ($_GET['command']) {
+					case 'attributes':
+						if (isset($res['labelsAttributes'][$_GET['label']])) {
+							return new Response(json_encode($res['labelsAttributes'][$_GET['label']]));
+						}
+					default:
+						return new Response(false);
+				}
+			} else {
+				return new Response(json_encode($res['labels']));
+			}
 		} else {
 			return new Response(false);
 		}

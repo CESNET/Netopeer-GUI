@@ -224,11 +224,17 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 		input.value.text { width: 50%; margin: -4px 0px; border: 1px solid #ccc; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
 		textarea.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
 
+		&.generated {
+			input.value.text, textarea.value { margin-top: 0px; margin-bottom: 0px; }
+			.tooltip { margin-top: 3px; }
+		}
+
 		.edit-bar { width: 80px; min-height: 22px; margin: -3px 0px -5px 2%; float: right; text-align: right;
 			.child { display: none; }
 			img { @include opacity(0.4); cursor: pointer;
 				&:hover { @include opacity(1); }
 			}
+			&.generated { margin-top: 0px; }
 		}
 		+ .leaf { }
 		&.state .edit-bar {	width: auto; }

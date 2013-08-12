@@ -868,7 +868,8 @@ class XMLoperations {
 			$cache->save('getResponseForFormId_'.$formId, $xml, 5000);
 		}
 
-		$retArr = array();
+		$labelsArr = array();
+		$attributesArr = array();
 		if ($xml != 1) {
 			$dom = new \DOMDocument();
 			$dom->loadXML($xml);
@@ -881,7 +882,13 @@ class XMLoperations {
 
 			if (!is_null($elements)) {
 				foreach ($elements as $element) {
-					array_push($retArr, $element->nodeName);
+					array_push($labelsArr, $element->nodeName);
+					if ($element->hasAttributes()) {
+						foreach ($element->attributes as $attr) {
+							$attributesArr[$element->nodeName][$attr->nodeName] = $attr->nodeValue;
+						}
+					}
+
 
 //					$nodes = $element->childNodes;
 //					foreach ($nodes as $node) {
@@ -890,6 +897,10 @@ class XMLoperations {
 				}
 			}
 		}
-		return array_unique($retArr);
+		$labelsArr = array_unique($labelsArr);
+
+		$retArr['labels'] = $labelsArr;
+		$retArr['labelsAttributes'] = $attributesArr;
+		return $retArr;
 	}
 }

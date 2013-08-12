@@ -563,7 +563,7 @@ function createNode($elem) {
 
 	// we will create cover div
 	var level = findLevelValue($elem) + 1;
-	var $coverDiv = $("<div>").addClass('leaf-line');
+	var $coverDiv = $("<div>").addClass('leaf-line').addClass('generated');
 
 	var xPath = $elem.attr('rel');	// parent XPath - from attribute rel
 	var $currentParent = $elem.parent().parent();
@@ -612,6 +612,36 @@ function createNode($elem) {
 					}
 				})
 			}
+	}).change(function() {
+		var urlTemplate = $elem.data().typeaheadPath;
+		var sourceUrl = urlTemplate.replace("FORMID", $form.find("input[name=formId]"));
+		sourceUrl = urlTemplate.replace("XPATH", encodeURIComponent(parentXPath));
+
+		var $currentInput = $(this);
+		$.ajax({
+			url: sourceUrl,
+			data: {
+				'label': $(this).val(),
+				'command': 'attributes'
+			},
+			type: "GET",
+			dataType: "json",
+			success: function(data){
+				if (data !== false) {
+					// remove old tooltip
+					$currentInput.parent().find('.tooltip').remove();
+
+					// if description is defined, show
+					if (data.description != undefined) {
+						var $tooltip = $("<span/>").addClass('tooltip').addClass('help');
+						$tooltip.append($("<span/>").addClass('icon-help').text("?"));
+						$tooltip.append($("<span/>").addClass('tooltip-description').text(data.description));
+						$tooltip.insertBefore($currentInput);
+						initDefaultTooltip($tooltip.find(".icon-help"));
+					}
+				}
+			}
+		})
 	});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 
