@@ -646,18 +646,24 @@ function createNode($elem) {
 					if (data.valueElem !== undefined) {
 						// remove current value element
 						$currentInput.parents('.leaf-line').find("input.value, .config-value-cover").remove();
-						
+
 						var $newHtml = $(data.valueElem);
 						if ($newHtml.prop('tagName') == "INPUT") {
 							$newHtml.attr('name', $currentInput.attr('name').replace('label', 'value'));
 							$newHtml.val('');
+							if ($newHtml.attr('default') != "") {
+								$newHtml.val($newHtml.attr('default'));
+							}
 							$newHtml.removeAttr('disabled');
+							$currentInput.parents('.leaf-line').append($newHtml);
+							$newHtml.focus();
 						} else {
 							$newHtml.find('input, select').attr('name', $currentInput.attr('name').replace('label', 'value')).removeAttr('disabled');
+							$currentInput.parents('.leaf-line').append($newHtml);
+							$newHtml.find('input, select').first().focus();
 						}
-						$currentInput.parents('.leaf-line').append($newHtml);
+						$currentInput.siblings('.typeahead').hide();
 					}
-
 				}
 			}
 		});
