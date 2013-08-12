@@ -276,13 +276,26 @@ class AjaxController extends BaseController
 
 		if (is_array($res)) {
 			if (isset($_GET['command']) && isset($_GET['label'])) {
-				switch ($_GET['command']) {
-					case 'attributes':
-						if (isset($res['labelsAttributes'][$_GET['label']])) {
-							return new Response(json_encode($res['labelsAttributes'][$_GET['label']]));
-						}
-					default:
-						return new Response(false);
+				if ($_GET['command'] == 'attributesAndValueElem') {
+					$retArr = array();
+					if (isset($res['labelsAttributes'][$_GET['label']])) {
+						$retArr['labelAttributes'] = $res['labelsAttributes'][$_GET['label']];
+					}
+
+					$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Config:leaf.html.twig');
+					$twigArr = array();
+
+					$twigArr['key'] = "";
+					$twigArr['xpath'] = "";
+					$twigArr['element'] = $res['elems'][$_GET['label']];
+
+
+					$html = $template->renderBlock('configInputElem', $twigArr);
+					$retArr['valueElem'] = $html;
+
+					return new Response(json_encode($retArr));
+				} else {
+					return new Response(false);
 				}
 			} else {
 				return new Response(json_encode($res['labels']));

@@ -870,6 +870,7 @@ class XMLoperations {
 
 		$labelsArr = array();
 		$attributesArr = array();
+		$elemsArr= array();
 		if ($xml != 1) {
 			$dom = new \DOMDocument();
 			$dom->loadXML($xml);
@@ -883,17 +884,12 @@ class XMLoperations {
 			if (!is_null($elements)) {
 				foreach ($elements as $element) {
 					array_push($labelsArr, $element->nodeName);
+					$elemsArr[$element->nodeName] = simplexml_import_dom($element, 'SimpleXMLIterator');
 					if ($element->hasAttributes()) {
 						foreach ($element->attributes as $attr) {
 							$attributesArr[$element->nodeName][$attr->nodeName] = $attr->nodeValue;
 						}
 					}
-
-
-//					$nodes = $element->childNodes;
-//					foreach ($nodes as $node) {
-//						echo $node->nodeValue. "\n";
-//					}
 				}
 			}
 		}
@@ -901,6 +897,7 @@ class XMLoperations {
 
 		$retArr['labels'] = $labelsArr;
 		$retArr['labelsAttributes'] = $attributesArr;
+		$retArr['elems'] = $elemsArr;
 		return $retArr;
 	}
 }

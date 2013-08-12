@@ -622,26 +622,45 @@ function createNode($elem) {
 			url: sourceUrl,
 			data: {
 				'label': $(this).val(),
-				'command': 'attributes'
+				'command': 'attributesAndValueElem'
 			},
 			type: "GET",
 			dataType: "json",
 			success: function(data){
 				if (data !== false) {
-					// remove old tooltip
-					$currentInput.parent().find('.tooltip').remove();
+					if (data.labelAttributes !== undefined) {
+						// remove old tooltip
+						$currentInput.parent().find('.tooltip').remove();
 
-					// if description is defined, show
-					if (data.description != undefined) {
-						var $tooltip = $("<span/>").addClass('tooltip').addClass('help');
-						$tooltip.append($("<span/>").addClass('icon-help').text("?"));
-						$tooltip.append($("<span/>").addClass('tooltip-description').text(data.description));
-						$tooltip.insertBefore($currentInput);
-						initDefaultTooltip($tooltip.find(".icon-help"));
+						// if description is defined, show tooltip icon
+						if (data.labelAttributes.description != undefined) {
+							var $tooltip = $("<span/>").addClass('tooltip').addClass('help');
+							$tooltip.append($("<span/>").addClass('icon-help').text("?"));
+							$tooltip.append($("<span/>").addClass('tooltip-description').text(data.labelAttributes.description));
+							$tooltip.insertBefore($currentInput);
+							initDefaultTooltip($tooltip.find(".icon-help"));
+						}
 					}
+
+					// replace whole value element and change his name attr
+					if (data.valueElem !== undefined) {
+						// remove current value element
+						$currentInput.parents('.leaf-line').find("input.value, .config-value-cover").remove();
+						
+						var $newHtml = $(data.valueElem);
+						if ($newHtml.prop('tagName') == "INPUT") {
+							$newHtml.attr('name', $currentInput.attr('name').replace('label', 'value'));
+							$newHtml.val('');
+							$newHtml.removeAttr('disabled');
+						} else {
+							$newHtml.find('input, select').attr('name', $currentInput.attr('name').replace('label', 'value')).removeAttr('disabled');
+						}
+						$currentInput.parents('.leaf-line').append($newHtml);
+					}
+
 				}
 			}
-		})
+		});
 	});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 

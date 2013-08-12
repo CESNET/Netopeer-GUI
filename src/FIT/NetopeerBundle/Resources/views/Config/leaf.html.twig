@@ -81,80 +81,81 @@ if advised of the possibility of such damage.
 	{% endif %}
 
 	{% if element.0 is defined and element.0|length == 0 %}
-
-		{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '-', '[': '?', ']': '!'}) ~ "]" %}
-		{% if element.attributes.type is defined and element.attributes.type == 'boolean' %}
-			<span class="config-value-cover">
-				<label>
-					<input 
-						type="radio" 
-						value="true" 
-						name="{{currentInputName}}" 
-						{% if element.0 == "true" %}checked="checked"{% endif %} 
-						{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
-					/>
-					true
-				</label>
-				<label>
-					<input 
-						type="radio" 
-						value="false" 
-						name="{{currentInputName}}" 
-						{% if element.0 == "false" %}checked="checked"{% endif %} 
-						{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
-					/>
-					false
-				</label>
-			</span>
-		{% elseif element.attributes.type is defined and element.attributes.type == 'enumeration' %}
-			<span class="config-value-cover">
-				<select name="{{currentInputName}}">
-					{% for val in explode('|', element.attributes.enumval) %}
-						<option value="{{val}}" {% if element.0 == val %}selected="selected"{% endif %}>{{val}}</option>
-					{% endfor %}
-				</select>
-			</span>
-		{% else %}
-			{% set inputType = "text" %}
-			{% set inputClass = "text" %}
-			{% set min = "" %}
-			{% set max = "" %}
-
-			{% if element.attributes.type is defined %}
-				{% if isNumberType(element.attributes.type) %}
-					{% set inputType = "number" %}
-					{% if element.attributes.range is defined %}
-						{% set minMax = explode("..", element.attributes.range) %}
-						{% if minMax|length == 2 %}
-							{% set min = 'min=' ~ minMax[0] %}
-							{% set max = 'max=' ~ minMax[1] %}
-							{% set inputType = "range" %}
-							{% set inputClass = "range" %}
-						{% endif %}
-					{% endif %}
-				{% elseif isUrlType(element.attributes.type) %}
-					{% set inputType = "url" %}
-				{% else %}
-				{# todo try to find "typedef" definition in model and substitute it #}
-					{% set inputType = "text" %}
-				{% endif %}
-			{% endif %}
-			{% if element.attributes.iskey is defined and element.attributes.iskey == "true" %}
-				{% set disabledInput = 'disabled="true"' %}
+		{% block configInputElem %}
+			{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '-', '[': '?', ']': '!'}) ~ "]" %}
+			{% if element.attributes.type is defined and element.attributes.type == 'boolean' %}
+				<span class="config-value-cover">
+					<label>
+						<input
+							type="radio"
+							value="true"
+							name="{{currentInputName}}"
+							{% if element.0 == "true" %}checked="checked"{% endif %}
+							{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
+						/>
+						true
+					</label>
+					<label>
+						<input
+							type="radio"
+							value="false"
+							name="{{currentInputName}}"
+							{% if element.0 == "false" %}checked="checked"{% endif %}
+							{% if element.attributes.default is defined %}default="{{element.attributes.default}}"{% endif %}
+						/>
+						false
+					</label>
+				</span>
+			{% elseif element.attributes.type is defined and element.attributes.type == 'enumeration' %}
+				<span class="config-value-cover">
+					<select name="{{currentInputName}}">
+						{% for val in explode('|', element.attributes.enumval) %}
+							<option value="{{val}}" {% if element.0 == val %}selected="selected"{% endif %}>{{val}}</option>
+						{% endfor %}
+					</select>
+				</span>
 			{% else %}
-				{% set disabledInput = "" %}
-			{% endif %}
+				{% set inputType = "text" %}
+				{% set inputClass = "text" %}
+				{% set min = "" %}
+				{% set max = "" %}
 
-			<input 
-				type="{{inputType}}" 
-				class="{{inputClass}} value" 
-				value="{{element.0}}" 
-				name="{{currentInputName}}" 
-				{{disabledInput}}
-				{{min}} {{max}}
-				{% if element.attributes.default is defined %}default="{{element.attributes.default}}" title="Default value: {{element.attributes.default}}"{% endif %}
-			/>
+				{% if element.attributes.type is defined %}
+					{% if isNumberType(element.attributes.type) %}
+						{% set inputType = "number" %}
+						{% if element.attributes.range is defined %}
+							{% set minMax = explode("..", element.attributes.range) %}
+							{% if minMax|length == 2 %}
+								{% set min = 'min=' ~ minMax[0] %}
+								{% set max = 'max=' ~ minMax[1] %}
+								{% set inputType = "range" %}
+								{% set inputClass = "range" %}
+							{% endif %}
+						{% endif %}
+					{% elseif isUrlType(element.attributes.type) %}
+						{% set inputType = "url" %}
+					{% else %}
+					{# todo try to find "typedef" definition in model and substitute it #}
+						{% set inputType = "text" %}
+					{% endif %}
+				{% endif %}
+				{% if element.attributes.iskey is defined and element.attributes.iskey == "true" %}
+					{% set disabledInput = 'disabled="true"' %}
+				{% else %}
+					{% set disabledInput = "" %}
+				{% endif %}
+
+				<input
+					type="{{inputType}}"
+					class="{{inputClass}} value"
+					value="{{element.0}}"
+					name="{{currentInputName}}"
+					{{disabledInput}}
+					{{min}} {{max}}
+					{% if element.attributes.default is defined %}default="{{element.attributes.default}}" title="Default value: {{element.attributes.default}}"{% endif %}
+				/>
 		{% endif %}
+		{% endblock configInputElem %}
 	{% else %}
 		<span class="value"></span>
 	{% endif %}
