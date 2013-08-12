@@ -731,14 +731,19 @@ class XMLoperations {
 	public function checkElemMatch($model_el, $possible_el) {
 		$mel = $this->getElementParent($model_el);
 		$pel = $this->getElementParent($possible_el);
-		while ($pel && $mel) {
-			if ($pel->getName() !== $mel->getName()) {
-				return false;
+
+		if ($mel instanceof \SimpleXMLElement && $pel instanceof \SimpleXMLElement) {
+			while ($pel && $mel) {
+				if ($pel->getName() !== $mel->getName()) {
+					return false;
+				}
+				$pel = $this->getElementParent($pel);
+				$mel = $this->getElementParent($mel);
 			}
-			$pel = $this->getElementParent($pel);
-			$mel = $this->getElementParent($mel);
+			return true;
+		} else {
+			return false;
 		}
-		return true;
 	}
 
 	/**

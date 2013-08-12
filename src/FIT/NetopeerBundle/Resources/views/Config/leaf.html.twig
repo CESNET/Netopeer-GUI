@@ -82,7 +82,7 @@ if advised of the possibility of such damage.
 
 	{% if element.0 is defined and element.0|length == 0 %}
 		{% block configInputElem %}
-			{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '-', '[': '?', ']': '!'}) ~ "]" %}
+			{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '--', '[': '?', ']': '!'}) ~ "]" %}
 			{% if element.attributes.type is defined and element.attributes.type == 'boolean' %}
 				<span class="config-value-cover">
 					<label>
