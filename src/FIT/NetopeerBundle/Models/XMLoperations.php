@@ -870,7 +870,7 @@ class XMLoperations {
 			$xml = $cache->fetch('getResponseForFormId_'.$formId);
 		} else {
 			$xml = $this->dataModel->handle('getconfig', $configParams);
-			$cache->save('getResponseForFormId_'.$formId, $xml, 5000);
+			$cache->save('getResponseForFormId_'.$formId, $xml, 1000);
 		}
 
 		$labelsArr = array();
@@ -883,7 +883,11 @@ class XMLoperations {
 			$decodedXPath = str_replace("/", "/xmlns:", $this->decodeXPath($xPath))."/*";
 			$domXpath = new \DOMXPath($dom);
 
-			$domXpath->registerNamespace("xmlns", "urn:ietf:params:xml:ns:yang:ietf-netconf-acm");
+			$context = $dom->documentElement;
+			foreach( $domXpath->query('namespace::*', $context) as $node ) {
+				$domXpath->registerNamespace($node->nodeName, $node->nodeValue);
+			}
+
 			$elements = $domXpath->query($decodedXPath);
 
 			if (!is_null($elements)) {

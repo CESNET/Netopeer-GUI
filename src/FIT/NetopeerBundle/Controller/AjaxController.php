@@ -282,16 +282,18 @@ class AjaxController extends BaseController
 						$retArr['labelAttributes'] = $res['labelsAttributes'][$_GET['label']];
 					}
 
-					$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Config:leaf.html.twig');
-					$twigArr = array();
+					if (isset($res['elems'][$_GET['label']])) {
+						$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Config:leaf.html.twig');
+						$twigArr = array();
 
-					$twigArr['key'] = "";
-					$twigArr['xpath'] = "";
-					$twigArr['element'] = $res['elems'][$_GET['label']];
+						$twigArr['key'] = "";
+						$twigArr['xpath'] = "";
+						$twigArr['element'] = $res['elems'][$_GET['label']];
 
 
-					$html = $template->renderBlock('configInputElem', $twigArr);
-					$retArr['valueElem'] = $html;
+						$html = $template->renderBlock('configInputElem', $twigArr);
+						$retArr['valueElem'] = $html;
+					}
 
 					return new Response(json_encode($retArr));
 				} else {

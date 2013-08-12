@@ -240,7 +240,7 @@ function duplicateNode($elem) {
 	var $newClone = $currentParent.clone();
 	$form.html($newClone);
 	if ($currentParent.is(':first-child')) {
-        $currentParent.nextAll("*").each(function(i, el) {
+			$currentParent.nextAll("*").each(function(i, el) {
 			$form.append($(el).clone());
 		});
 	}
@@ -425,7 +425,7 @@ function generateFormObject(formName) {
 	var $form;
 	// new form object - if is not created, we will create new one
 	if ( $(".generatedForm").length ) {
-		$form = $('.generatedForm');
+		$form = $('.generatedForm').last();
 	} else {
 		// vytvorime formular
 		$form = $("<form>")
