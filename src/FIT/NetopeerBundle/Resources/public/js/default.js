@@ -283,7 +283,7 @@ function duplicateNode($elem) {
 function scrollToGeneratedForm($elem, $form) {
 	var section = $elem.parents("section");
 	$(section).animate({
-		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight()
+		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight() - 100
 	}, 1000);
 }
 
