@@ -424,7 +424,7 @@ function findLevelValue($elem) {
 function generateFormObject(formName) {
 	var $form;
 	// new form object - if is not created, we will create new one
-	if ( $(".generatedForm").length ) {
+	if ( $(".generatedForm").length !== 0 ) {
 		$form = $('.generatedForm').last();
 	} else {
 		// vytvorime formular
@@ -532,8 +532,9 @@ function createCloseButton($cover, $form) {
 
 // wrap unwrapped form back to cover whole tree form
 function wrapCoverForm($cover, $form) {
-	var $originalForm = $cover.children('form');
+	var $originalForm = $(".old-form").removeClass('old-form');
 	$cover.find('.root').wrap($originalForm);
+	$originalForm.remove();
 	$form.remove();
 	$('.form-underlay').remove();
 	$('.form-cover').remove();
@@ -546,7 +547,9 @@ function wrapCoverForm($cover, $form) {
 // alone prepending cover - so we can wrap it always back,
 // for example while close button is clicked
 function unwrapCoverForm($currentParentLevel, $cover) {
-	var $oldForm = $currentParentLevel.parents('form').clone();
+	if ($(".old-form").length) return;
+
+	var $oldForm = $currentParentLevel.parents('form').clone().addClass('old-form');
 	$oldForm.html('');
 	$cover.prepend($oldForm);
 	$currentParentLevel.parents('form').children('.root').unwrap();
