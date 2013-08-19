@@ -927,7 +927,7 @@ class XMLoperations {
 				}
 			}
 		}
-		$labelsArr = array_unique($labelsArr);
+		$labelsArr = array_values(array_unique($labelsArr));
 
 		$retArr['labels'] = $labelsArr;
 		$retArr['labelsAttributes'] = $attributesArr;
