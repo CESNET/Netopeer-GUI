@@ -128,12 +128,18 @@ class XMLoperations {
 		if (sizeof($ns)>0) {
 			$namespace = $ns[0]->attributes()->uri;
 		}
-		$pos_subroot = $subroot->xpath('//xmlns:'.$tmpConfigXml->getName().'/ancestor::*');
+
+		$parent = $tmpConfigXml->xpath("parent::*");
+		while ($parent) {
+			$pos_subroot[] = $parent[0];
+			$parent = $parent[0]->xpath("parent::*");
+		}
 		$config = $config_string;
-		for ($i=sizeof($pos_subroot)-1; $i>0; $i--) {
+		for ($i = 0; $i < sizeof($pos_subroot); $i++) {
+			$tmp = $pos_subroot[$i]->getName();
 			$config .= "</".$pos_subroot[$i]->getName().">\n";
 
-			if ($i == 1) {
+			if ($i == sizeof($pos_subroot) - 1) {
 				$config = "<".$pos_subroot[$i]->getName().
 						($namespace!==""?" xmlns=\"$namespace\"":"").
 						" xmlns:xc=\"urn:ietf:params:xml:ns:netconf:base:1.0\"".
@@ -497,6 +503,15 @@ class XMLoperations {
 			if ($domNodeChildren->item($keyElems)->hasAttributes()) {
 				foreach ($domNodeChildren->item($keyElems)->attributes as $attr) {
 					if ($attr->nodeName == "iskey" && $attr->nodeValue == "true") {
+						if ($domNodeChildren->item($keyElems)->hasAttributes()) {
+							foreach ($domNodeChildren->item($keyElems)->attributes as $attr) {
+								$attributesArr[] = $attr->nodeName;
+							}
+							// remove must be in new foreach, previous deletes only first one
+							foreach ($attributesArr as $attrName) {
+								$domNodeChildren->item($keyElems)->removeAttribute($attrName);
+							}
+						}
 						$keyElems++;
 						$isKey = true;
 						break;
@@ -509,6 +524,16 @@ class XMLoperations {
 				} catch (\DOMException $e) {
 
 				}
+			}
+		}
+
+		if ($domNode->hasAttributes()) {
+			foreach ($domNode->attributes as $attr) {
+				$attributesArr[] = $attr->nodeName;
+			}
+			// remove must be in new foreach, previous deletes only first one
+			foreach ($attributesArr as $attrName) {
+				$domNode->removeAttribute($attrName);
 			}
 		}
 		return;
