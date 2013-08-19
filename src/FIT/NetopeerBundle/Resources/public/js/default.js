@@ -42,6 +42,8 @@ $(window).resize(function() {
 	changeSectionHeight();
 	showIconsOnLeafLine();
 	collapseTopNav();
+}).bind('beforeunload', function() {
+	formInputChangeConfirm();
 });
 
 function initJS() {
@@ -90,6 +92,14 @@ function initJS() {
 
 	showIconsOnLeafLine();
 	changeSectionHeight();
+
+	$("form").on("change", "input, select", function(event){
+		formInputChanged = true;
+	});
+
+	$("form").on("submit", function(event){
+		formInputChanged = false;
+	});
 }
 
 /**
@@ -540,6 +550,8 @@ function wrapCoverForm($cover, $form) {
 	$('.form-cover').remove();
 	$('.generatedForm').remove();
 	$cover.find('.active').removeClass('active');
+
+	formInputChanged = false;
 }
 
 // unwrap old form (we can't have two forms inside in HTML
@@ -773,5 +785,16 @@ function createNode($elem) {
 	}
 }
 
+function formInputChangeConfirm() {
+	if (formInputChanged === true) {
+		if (!confirm('Some of form values has been changed. Do you want discard and go to another page?')) {
+			return;
+		} else {
+			formInputChanged = false;
+		}
+	}
+}
+
 // generates unique id (in sequence)
 var generateUniqueId = (function(){var id=0;return function(){if(arguments[0]===0)id=0;return id++;}})();
+var formInputChanged = false;

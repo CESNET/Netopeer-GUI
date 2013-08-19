@@ -126,6 +126,8 @@ jQuery(function($) {
 function loadAjaxLink(e, $THIS, href, type, data) {
 	e.preventDefault();
 
+	formInputChangeConfirm();
+
 	$("#block--alerts").html('');
 
 	/**
