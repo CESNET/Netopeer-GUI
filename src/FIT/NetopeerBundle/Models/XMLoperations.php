@@ -257,7 +257,7 @@ class XMLoperations {
 					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/edited.yin', $configXml->asXml());
 				}
 
-				$res = $this->executeEditConfig($key, $configXml->asXml());
+				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source']);
 				if ($res !== 1) {
 					$this->container->get('session')->setFlash('config success', "Config has been edited successfully.");
 				}
@@ -351,7 +351,7 @@ class XMLoperations {
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
 					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/newElem.yin', $createTree->asXml());
 				}
-				$res = $this->executeEditConfig($key, $createTree->asXml());
+				$res = $this->executeEditConfig($key, $createTree->asXml(), $configParams['source']);
 
 				if ($res == 0) {
 					$this->container->get('request')->getSession()->setFlash('config success', "Record has been added.");
@@ -471,7 +471,7 @@ class XMLoperations {
 				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
 				$createTree = $this->completeRequestTree($parentNode[0], $createString);
 
-				$res = $this->executeEditConfig($key, $createTree->asXml());
+				$res = $this->executeEditConfig($key, $createTree->asXml(), $configParams['source']);
 
 				if ($res == 0) {
 					$this->container->get('request')->getSession()->setFlash('config success', "Record has been added.");
@@ -610,7 +610,7 @@ class XMLoperations {
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
 					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/removeNode.yin', $tmpConfigXml->asXml());
 				}
-				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml());
+				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml(), $configParams['source']);
 				if ($res == 0) {
 					$this->container->get('request')->getSession()->setFlash('config success', "Record has been removed.");
 				}

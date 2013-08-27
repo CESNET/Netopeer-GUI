@@ -483,6 +483,10 @@ class DefaultController extends BaseController
 			$valuesTypeaheadPath = $this->generateUrl("getValuesForLabelWithModule", array('formId' => "FORMID", 'key' => $key, 'module' => $module, 'subsection' => $subsection, 'xPath' => "XPATH"));
 		}
 
+		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
+		$this->assign('routeParams', $routeParams);
+		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
+
 		// loading state part = get Action
 		// we will load it every time, because state column will we show everytime
 		try {
@@ -498,28 +502,17 @@ class DefaultController extends BaseController
 		}
 
 		// we will load config part only if two column layout is enabled or we are on section (which has two column always)
-		if ( $module == null || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
-			try {
-				$dataClass->setFlashState('config');
-				$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'config');
-				// getcofig part
-				if ( ($xml = $dataClass->handle('getconfig', $this->getConfigParams())) != 1 ) {
-					$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-					$this->assign("configArr", $xml);
-				}
-			} catch (\ErrorException $e) {
-				$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-				$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
-			}
+		$tmp = $this->getConfigParams();
+		if ($module == null || ($module != null && $tmp['source'] !== "running")) {
+			$this->loadConfigArr(false);
+			$this->setOnlyConfigSection();
+		} else if ( $module == null || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
+			$this->loadConfigArr();
 
 			$this->assign('singleColumnLayout', false);
 		} else {
 			$this->assign('singleColumnLayout', true);
 		}
-
-		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
-		$this->assign('routeParams', $routeParams);
-		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
 
 		return $this->getTwigArr();
 	}
@@ -599,10 +592,10 @@ class DefaultController extends BaseController
 			->add('formType', 'hidden', array(
 				'data' => 'formConfig',
 			))
-			->add('filter', 'text', array(
-				'label' => "Filter",
-				'required' => false
-			))
+//			->add('filter', 'text', array(
+//				'label' => "Filter",
+//				'required' => false
+//			))
 			->add('source', 'choice', array(
 				'choices' => array(
 					'running' => 'Running',
@@ -717,14 +710,57 @@ class DefaultController extends BaseController
 		if ( $this->filterForms['config']->isValid() ) {
 			$post_vals = $this->getRequest()->get("form");
 			$this->setConfigParams("key", $key);
-			$this->setConfigParams("filter", $post_vals["filter"]);
+//			$this->setConfigParams("filter", $post_vals["filter"]);
 			$this->setConfigParams("source", $post_vals['source']);
 
 			$this->get('session')->set('sourceConfig', $post_vals['source']);
+			if ($post_vals['source'] !== 'running') {
+				$this->setOnlyConfigSection();
+			}
 			return 0;
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
 			return  1;
 		}
 	}
+
+	/**
+	 * sets all necessary steps for display config part in single column mode
+	 */
+	private function setOnlyConfigSection() {
+		$this->get('session')->set('singleColumnLayout', false);
+		$this->assign('singleColumnLayout', false);
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
+		$this->assign('hideColumnControl', true);
+
+		$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:section.html.twig');
+		$html = $template->renderBlock('config', $this->getTwigArr(true));
+		$this->assign('configSingleContent', $html);
+
+		$this->get('session')->set('singleColumnLayout', true);
+		$this->assign('singleColumnLayout', true);
+	}
+
+	/**
+	 * loads array of config values
+	 */
+	private function loadConfigArr($addConfigSection = true) {
+		try {
+			$dataClass = $this->get('dataModel');
+			$dataClass->setFlashState('config');
+			if ($addConfigSection) {
+				$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'config');
+			}
+
+			// getcofig part
+			if ( ($xml = $dataClass->handle('getconfig', $this->getConfigParams())) != 1 ) {
+				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+				$this->assign("configArr", $xml);
+			}
+		} catch (\ErrorException $e) {
+			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
+			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
+		}
+	}
 }
+

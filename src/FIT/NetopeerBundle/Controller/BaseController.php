@@ -87,18 +87,20 @@ class BaseController extends Controller
 
 	/**
 	 * Prepares variables to template, sort flashes and prepare menu
-
+	 * @param bool $getOnlyArray  if true, no response will be returned - only PHP array of values
 	 * @return array|Response     array of assigned variables to template or AjaxBlockResponse
 	 */
-	protected function getTwigArr() {
+	protected function getTwigArr($getOnlyArray = false) {
 
 		$this->prepareGlobalTwigVariables();
 
-		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->getSession()->get('isAjax') === true) {
+		if (!$getOnlyArray) {
+			if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->getSession()->get('isAjax') === true) {
+				$this->getRequest()->getSession()->remove('isAjax');
+				return $this->getAjaxBlocksResponse();
+			}
 			$this->getRequest()->getSession()->remove('isAjax');
-			return $this->getAjaxBlocksResponse();
 		}
-		$this->getRequest()->getSession()->remove('isAjax');
 
 		return $this->twigArr;
 	}

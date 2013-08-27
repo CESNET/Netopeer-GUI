@@ -51,38 +51,52 @@ if advised of the possibility of such damage.
 
 {% block state %}
 {% block singleContent %}
-	<h1>{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
-	{% if stateArr is defined and not(stateArr is empty) %}
-		{# <form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
-			{{ form_widget(formState) }}
-		    <input type="submit" value="Get" />
-		</form> #}
-		<form action="" method="post" name="formConfigData" data-disable-history="true">
-			<div class="root">
-				{% set iterator = 1 %}
-				{% for key, element in stateArr %}
-					{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
-					{% set iterator = iterator + 1 %}
-				{% endfor %}
-
-				<input type="submit" value="Save config" />
-			</div>
-		</form>
+	{% if configSingleContent is defined %}
+		{{ configSingleContent|raw }}
 	{% else %}
-		<div class="alert info">
-			No results found.
-		</div>
+		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
+		{% if stateArr is defined and not(stateArr is empty) %}
+			{% if configArr is not defined %}
+				<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
+					{{ form_widget(formConfig) }}
+				    <input type="submit" value="Change" class="button small grey left" />
+				</form>
+			{% endif %}
+
+			<hr class="cleaner" />
+			{# <form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
+				{{ form_widget(formState) }}
+			    <input type="submit" value="Get" />
+			</form> #}
+			<form action="" method="post" name="formConfigData" data-disable-history="true">
+				<div class="root">
+					{% set iterator = 1 %}
+					{% for key, element in stateArr %}
+						{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
+						{% set iterator = iterator + 1 %}
+					{% endfor %}
+
+					<input type="submit" value="Save config" />
+				</div>
+			</form>
+		{% else %}
+			<div class="alert info">
+				No results found.
+			</div>
+		{% endif %}
 	{% endif %}
 {% endblock singleContent %}
 {% endblock state %}
 
 {% block config %}
-	<h1>{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
+	<h1 class="left">{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
+	<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
+		{{ form_widget(formConfig) }}
+		<input type="submit" value="Change" class="button small grey left" />
+		<span class="note left">(State informations are not available in this datastore)</span>
+	</form>
+	<hr class="cleaner" />
 	{% if configArr is defined and not(configArr is empty) %}
-	{# <form action="" method="post" {{ form_enctype(formConfig) }} class="filter" name="formConfig">
-			{{ form_widget(formConfig) }}
-		    <input type="submit" value="Get" />
-		</form> #}
 		<form action="" method="post" name="formConfigData" data-disable-history="true">
 			<div class="root">
 				{% set iterator = 1 %}

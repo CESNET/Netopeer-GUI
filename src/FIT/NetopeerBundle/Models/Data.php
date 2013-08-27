@@ -1007,14 +1007,14 @@ class Data {
 		 * return previous response (and not ask again for response from server).
 		 */
 		$hashedParams = sha1(json_encode($params));
-		if (isset($this->handleResultsArr[$command])) {
-
-			if ($merge && isset($this->handleResultsArr[$command][$hashedParams]['merged'])) {
-				return $this->handleResultsArr[$command][$hashedParams]['merged'];
-			} elseif (isset($this->handleResultsArr[$command][$hashedParams]['unmerged'])) {
-				return $this->handleResultsArr[$command][$hashedParams]['unmerged'];
-			}
-		}
+//		if (isset($this->handleResultsArr[$command])) {
+//
+//			if ($merge && isset($this->handleResultsArr[$command][$hashedParams]['merged'])) {
+//				return $this->handleResultsArr[$command][$hashedParams]['merged'];
+//			} elseif (isset($this->handleResultsArr[$command][$hashedParams]['unmerged'])) {
+//				return $this->handleResultsArr[$command][$hashedParams]['unmerged'];
+//			}
+//		}
 
 		try {
 			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);
