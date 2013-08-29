@@ -77,6 +77,28 @@ class Data {
 	const MSG_RELOADHELLO			= 17;
 	const MSG_NTF_GETHISTORY		= 18;
 
+	/* subscription of notifications */
+	const CPBLT_NOTIFICATIONS		= "urn:ietf:params:netconf:capability:notification:1.0";
+	/*
+	when this capability is missing, we cannot execute RPCs before
+	notif subscribe finishes :-/
+	*/
+	const CPBLT_REALTIME_NOTIFICATIONS	= "urn:ietf:params:netconf:capability:interleave:1.0";
+	/* modifications of running config */
+	const CPBLT_WRITABLERUNNING		= "urn:ietf:params:netconf:capability:writable-running:1.0";
+	/* candidate datastore */
+	const CPBLT_CANDIDATE			= "urn:ietf:params:netconf:capability:candidate:1.0";
+	/* startup datastore */
+	const CPBLT_STARTUP			= "urn:ietf:params:netconf:capability:startup:1.0";
+	const CPBLT_NETOPEER			= "urn:cesnet:tmc:netopeer:1.0?module=netopeer-cfgnetopeer";
+	const CPBLT_NETCONF_BASE10		= "urn:ietf:params:netconf:base:1.0";
+	const CPBLT_NETCONF_BASE11		= "urn:ietf:params:netconf:base:1.1";
+
+	//"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&revision=2010-10-04"
+	//"urn:ietf:params:xml:ns:netconf:base:1.0?module=ietf-netconf&revision=2011-03-08"
+
+
+
 	/**
 	 * @var ContainerInterface   base bundle container
 	 */
@@ -320,6 +342,31 @@ class Data {
 			return $con->host;
 		}
 		return "";
+	}
+
+	/**
+	 * Check if capability for feature is available.
+	 *
+	 * @param  int $key      session key
+	 * @param  string $feature      name of feature/capability that is
+	 checked (constants Data::CPBLT_* can be used)
+	 * @return bool
+	 */
+	public function checkCapabilityForKey($key, $feature) {
+		$session = $this->container->get('request')->getSession();
+		$sessionConnections = $session->get('session-connections');
+		if ($key === '' || !isset($sessionConnections[$key])) {
+			/* TODO log error - wrong or no key supplied */
+			return false;
+		}
+		$con = unserialize($sessionConnections[$key]);
+		$cpblts =  json_decode($con->sessionStatus);
+		foreach ($cpblts->capabilities as $cpblt) {
+			if (strpos($cpblt, $feature, 0) === 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

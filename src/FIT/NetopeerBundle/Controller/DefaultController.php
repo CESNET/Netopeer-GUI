@@ -576,6 +576,9 @@ class DefaultController extends BaseController
 	 * prepares filter forms for both sections
 	 */
 	private function setSectionFilterForms() {
+		/* prepareGlobalTwigVariables is needed to init nc_feature
+		array with available datastores... */
+		$this->prepareGlobalTwigVariables();
 		// state part
 		$this->filterForms['state'] = $this->createFormBuilder()
 			->add('formType', 'hidden', array(
@@ -588,6 +591,15 @@ class DefaultController extends BaseController
 			->getForm();
 
 		// config part
+		$datastores = array('running' => 'Running');
+		$twigarr = $this->getTwigArr(true);
+		$nc_features = $twigarr["nc_features"];
+		if (isset($nc_features["nc_feature_startup"])) {
+				$datastores['startup'] = 'Start-up';
+		}
+		if (isset($nc_features["nc_feature_candidate"])) {
+				$datastores['candidate'] = 'Candidate';
+		}
 		$this->filterForms['config'] = $this->createFormBuilder()
 			->add('formType', 'hidden', array(
 				'data' => 'formConfig',
@@ -597,11 +609,7 @@ class DefaultController extends BaseController
 //				'required' => false
 //			))
 			->add('source', 'choice', array(
-				'choices' => array(
-					'running' => 'Running',
-					'startup' => 'Start-up',
-					'candidate' => 'Candidate',
-				),
+				'choices' => $datastores,
 				'data' => $this->get('session')->get('sourceConfig')
 			))
 			->getForm();

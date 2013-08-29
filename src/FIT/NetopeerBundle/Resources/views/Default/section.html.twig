@@ -76,7 +76,10 @@ if advised of the possibility of such damage.
 						{% set iterator = iterator + 1 %}
 					{% endfor %}
 
+
+{% if nc_features is defined and nc_features["nc_feature_writablerunning"] is defined and app.session.get('sourceConfig') == 'running' %}
 					<input type="submit" value="Save config" />
+{% endif %}
 				</div>
 			</form>
 		{% else %}
@@ -105,7 +108,9 @@ if advised of the possibility of such damage.
 					{% set iterator = iterator + 1 %}
 				{% endfor %}
 
+{% if nc_features is defined and nc_features["nc_feature_writablerunning"] is defined and app.session.get('sourceConfig') == 'running' %}
 				<input type="submit" value="Save config" />
+{% endif %}
 			</div>
 		</form>
 	{% else %}
@@ -116,16 +121,19 @@ if advised of the possibility of such damage.
 {% endblock config %}
 
 {% block notifications %}
-	{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
-		<script type="text/javascript">
-			var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");
-			if ($(notifOutput).hasClass('hidden')) {
-				$(notifOutput).removeClass('hidden');
-				notifResizable();
-			}
-		</script>
+	{% if nc_features is defined and nc_features["nc_feature_notification"] is defined %}
+		{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
+			<script type="text/javascript">
+				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");
+				if ($(notifOutput).hasClass('hidden')) {
+					$(notifOutput).removeClass('hidden');
+					notifResizable();
+				}
+			</script>
+		{% endif %}
+		<div class="notif-cover">
+			<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>
+		</div>
 	{% endif %}
-	<div class="notif-cover">
-		<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>
-	</div>
 {% endblock notifications %}
+

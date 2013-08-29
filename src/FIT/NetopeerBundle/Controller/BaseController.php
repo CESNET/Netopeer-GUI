@@ -131,7 +131,8 @@ class BaseController extends Controller
 		}
 
 		try {
-			if ($this->getRequest()->get('key') != "") {
+			$key = $this->getRequest()->get('key');
+			if ($key != "") {
 				$conn = $this->getRequest()->getSession()->get('session-connections');
 				$conn = unserialize($conn[$this->getRequest()->get('key')]);
 				if ($conn !== false) {
@@ -143,6 +144,24 @@ class BaseController extends Controller
 		} catch (\ErrorException $e) {
 			$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
 			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
+		}
+
+		if (isset($dataClass)) {
+			$nc_features = Array();
+			if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_NOTIFICATIONS) === true &&
+				$dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_REALTIME_NOTIFICATIONS) === true) {
+				$nc_features["nc_feature_notification"] = true;
+			}
+			if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_STARTUP) === true) {
+				$nc_features["nc_feature_startup"] = true;
+			}
+			if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_CANDIDATE) === true) {
+				$nc_features["nc_feature_candidate"] = true;
+			}
+			if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_WRITABLERUNNING) === true) {
+				$nc_features["nc_feature_writablerunning"] = true;
+			}
+			$this->assign("nc_features", $nc_features);
 		}
 	}
 
