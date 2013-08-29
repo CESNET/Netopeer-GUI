@@ -56,7 +56,7 @@ if advised of the possibility of such damage.
 	{% else %}
 		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
 		{% if stateArr is defined and not(stateArr is empty) %}
-			{% if configArr is not defined %}
+			{% if configArr is not defined and formConfig is defined %}
 				<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
 					{{ form_widget(formConfig) }}
 				    <input type="submit" value="Change" class="button small grey left" />
