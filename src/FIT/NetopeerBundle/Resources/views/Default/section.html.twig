@@ -62,6 +62,10 @@ if advised of the possibility of such damage.
 				    <input type="submit" value="Change" class="button small grey left" />
 				</form>
 			{% endif %}
+			<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
+				{{ form_widget(formCopyConfig) }}
+			    <input type="submit" value="Copy" class="button small grey left" />
+			</form>
 
 			<hr class="cleaner" />
 			{# <form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
@@ -77,7 +81,7 @@ if advised of the possibility of such damage.
 					{% endfor %}
 
 
-{% if nc_features is defined and nc_features["nc_feature_writablerunning"] is defined and app.session.get('sourceConfig') == 'running' %}
+{% if (nc_features is defined) and (nc_features["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
 					<input type="submit" value="Save config" />
 {% endif %}
 				</div>
@@ -96,7 +100,11 @@ if advised of the possibility of such damage.
 	<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
 		{{ form_widget(formConfig) }}
 		<input type="submit" value="Change" class="button small grey left" />
-		<span class="note left">(State informations are not available in this datastore)</span>
+		{# <span class="note left">(State informations are not available in this datastore)</span> #}
+	</form>
+	<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
+	{{ form_widget(formCopyConfig) }}
+	<input type="submit" value="Copy" class="button small grey left" />
 	</form>
 	<hr class="cleaner" />
 	{% if configArr is defined and not(configArr is empty) %}
@@ -108,7 +116,7 @@ if advised of the possibility of such damage.
 					{% set iterator = iterator + 1 %}
 				{% endfor %}
 
-{% if nc_features is defined and nc_features["nc_feature_writablerunning"] is defined and app.session.get('sourceConfig') == 'running' %}
+{% if (nc_features is defined) and (nc_features["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
 				<input type="submit" value="Save config" />
 {% endif %}
 			</div>

@@ -614,8 +614,21 @@ class DefaultController extends BaseController
 			))
 			->getForm();
 
+		$targets = $datastores;
+		unset($targets[$this->get('session')->get('sourceConfig')]);
+		$this->filterForms['copyConfig'] = $this->createFormBuilder()
+			->add('formType', 'hidden', array(
+				'data' => 'formCopyConfig',
+			))
+			->add('target', 'choice', array(
+				'choices' => $targets,
+			))
+			->getForm();
+
+
 		$this->assign('formState', $this->filterForms['state']->createView());
 		$this->assign('formConfig', $this->filterForms['config']->createView());
+		$this->assign('formCopyConfig', $this->filterForms['copyConfig']->createView());
 	}
 
 	/**
@@ -641,6 +654,10 @@ class DefaultController extends BaseController
 		// processing filter on config part
 		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formConfig" ) {
 			$res = $this->handleFilterConfig($key);
+
+		// processing form on config - edit Config
+		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formCopyConfig" ) {
+			$res = $this->handleCopyConfig($key);
 
 		// processing form on config - edit Config
 		} elseif ( is_array($this->getRequest()->get('configDataForm')) ) {
@@ -725,6 +742,35 @@ class DefaultController extends BaseController
 			if ($post_vals['source'] !== 'running') {
 				$this->setOnlyConfigSection();
 			}
+			return 0;
+		} else {
+			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
+			return  1;
+		}
+	}
+
+	/**
+	 * Execute copy-config
+	 *
+	 * @param  int $key     session key for current server
+	 * @return int 1 on error, 0 on success
+	 */
+	private function handleCopyConfig(&$key) {
+		$dataClass = $this->get('DataModel');
+		$dataClass->setFlashState('config');
+
+		$this->filterForms['copyConfig']->bindRequest($this->getRequest());
+
+		if ( $this->filterForms['copyConfig']->isValid() ) {
+			$post_vals = $this->getRequest()->get("form");
+			$this->setConfigParams("key", $key);
+			$source = $this->get('session')->get('sourceConfig');
+			if ($source === null) {
+				$source = 'running';
+			}
+			$target = $post_vals['target'];
+			$params = array('key' => $key, 'source' => $source, 'target' => $target);
+			$dataClass->handle('copyconfig', $params, false);
 			return 0;
 		} else {
 			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');

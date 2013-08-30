@@ -648,6 +648,29 @@ class Data {
 	}
 
 	/**
+	 * handle copy config action
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
+	 * @return mixed          		decoded data on success, 1 on error
+	 */
+	private function handle_copyconfig(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+		$sessionKey = $this->getHashFromKey($params['key']);
+		/* edit-config to store new values */
+		$params = array(
+			"type" => self::MSG_COPYCONFIG,
+			"session" => $sessionKey,
+			"source" => $params['source'],
+			"target" => $params['target'],
+		);
+		$decoded = $this->execute_operation($sock, $params);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
 	 * handle get config action
 	 *
 	 * @param  resource &$sock   	socket descriptor
@@ -1093,6 +1116,9 @@ class Data {
 				$this->logger->info("Handle editConfig: ", array('configToSend' => $params['config']));
 				$this->container->get('XMLoperations')->validateXml($params['config']);
 				$res = $this->handle_editconfig($sock, $params);
+				break;
+			case "copyconfig":
+				$res = $this->handle_copyconfig($sock, $params);
 				break;
 			case "disconnect":
 				$res = $this->handle_disconnect($sock, $params);
