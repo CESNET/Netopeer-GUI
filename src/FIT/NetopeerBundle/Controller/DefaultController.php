@@ -356,6 +356,50 @@ class DefaultController extends BaseController
 	}
 
 	/**
+	  Create array (with subarrays) of input elements of RPC method
+	*/
+	private function createRPCInputs($root_elem) {
+		switch ($root_elem->getName()) {
+		case "leaf":
+		case "leaf-list":
+			$input_name = (string) $root_elem->attributes()->name; /* toasterDoneness */
+			$input_type = (string) $root_elem->type->attributes()->name; /* uint32 */
+			return array('name' => $input_name, 'type' => $input_type);
+		case "container":
+		case "list":
+			$ch_elems = array();
+			foreach ($root_elem->children() as $ch) {
+
+				$ch_elems[] = $this->createInputs($ch);
+			}
+			return array('children' => $ch_elems);
+		default:
+			echo "unsupported type ".$root_elem->getName();
+		}
+	}
+
+	public function createRPCListFromModel($dataClass, $module, $subsection)
+	{
+		$rpcs = $dataClass->loadRPCsModel($module, $subsection);
+		$rpcxml = simplexml_load_string($rpcs["rpcs"]);
+		$rpcs = array();
+		if ($rpcxml) {
+			foreach ($rpcxml as $rpc) {
+				$name = (string) $rpc->attributes()->name;
+				$inputs = array();
+				if ($rpc->input) {
+					foreach ($rpc->input->children() as $leafs) {
+						$inputs[] = $this->createRPCInputs($leafs);
+					}
+				}
+				$rpcs[] = array('name' => $name,
+					'inputs' => $inputs);
+			}
+		}
+		return $rpcs;
+	}
+
+	/**
 	 * Prepares section, module or subsection action data
 	 *
 	 * @Route("/sections/{key}/", name="section")
@@ -404,6 +448,9 @@ class DefaultController extends BaseController
 		// now, we could set forms params with filter (even if we don't have module or subsection)
 		// filter will be empty
 		$filters = $dataClass->loadFilters($module, $subsection);
+
+		$this->assign('rpcMethods', $this->createRPCListFromModel($dataClass, $module, $subsection));
+
 		$this->setSectionFormsParams($key, $filters['state'], $filters['config']);
 
 		// if form has been send, we well process it

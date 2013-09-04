@@ -114,6 +114,12 @@ if advised of the possibility of such damage.
 				{% block leftColumnAdditional %}
 				{% endblock leftColumnAdditional %}
 			{% endblock leftColumn %}
+			{% if rpcMethods is defined and rpcMethods|length > 0 %}
+			{# TODO improve style #}
+			<h3>RPC methods from model:</h3>
+			{% for rpc in rpcMethods %}
+				<a href="">{{ rpc.name }}</a>
+			{% endfor %} {% endif %}
 		</nav>
 		{% set addToColumnClass = ' left-nav-defined' %}
 		{# endif #}

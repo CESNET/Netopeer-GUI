@@ -1417,6 +1417,33 @@ XML;
 	}
 
 	/**
+	 * loading file with RPCs for current module or subsection
+	 *
+	 * @param  string $module     module name
+	 * @param  string $subsection subsection name
+	 * @return array              array with config and state filter
+	 */
+	public function loadRPCsModel(&$module, &$subsection) {
+		// if file filter.txt exists in models, we will use it
+		$filterState = $filterConfig = "";
+
+		$path = $this->getPathToModels($module);
+
+
+		$file = $path.'rpc.yin';
+
+		$rpcs_model = "";
+		// if file with filter does not exist, only empty filter will be returned
+		if ( file_exists($file) ) {
+			$rpcs_model = file_get_contents($file);
+		}
+
+		return array(
+			'rpcs' => $rpcs_model,
+		);
+	}
+
+	/**
 	 * Get models.
 	 *
 	 * @param  int    $key        session key of current connection
