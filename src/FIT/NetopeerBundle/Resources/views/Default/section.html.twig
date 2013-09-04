@@ -60,6 +60,12 @@ if advised of the possibility of such damage.
 				<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
 					{{ form_widget(formConfig) }}
 				    <input type="submit" value="Change" class="button small grey left" />
+					<script type="text/javascript">
+					$('#form_source').change(function () {
+						$(this).closest('form').submit();
+					});
+					$(formConfig).find('input[type=submit]').hide();
+					</script>
 				</form>
 			{% endif %}
 			{% if formCopyConfig is defined %}
@@ -103,6 +109,12 @@ if advised of the possibility of such damage.
 		{{ form_widget(formConfig) }}
 		<input type="submit" value="Change" class="button small grey left" />
 		{# <span class="note left">(State informations are not available in this datastore)</span> #}
+		<script type="text/javascript">
+		$('#form_source').change(function () {
+			$(this).closest('form').submit();
+		});
+		$(formConfig).find('input[type=submit]').hide();
+		</script>
 	</form>
 	<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
 	{{ form_widget(formCopyConfig) }}
