@@ -2,6 +2,18 @@ var notifOutput;
 var notificationsHeight = 0.1; // in percent
 var notifications = new Array();
 
+function openipdialog() {
+    var link = $(this).attr('href');
+    var dialog = $('<div id="ipdialog"></div>').dialog({
+      autoOpen: false,
+      width: 600,
+      height: 400
+    });
+    alert(link);
+    //$(dialog).load('whois.php?ip=8.8.8.8').dialog('open');
+    return false;
+}
+
 function notifInit() {
 	notifOutput = $("#block--notifications");
 
@@ -169,8 +181,20 @@ $.fn.notifWebSocket = function(key, wsUri) {
 				if (xml) {
 					var output = $("<div></div>").append($("<span></span>").addClass('root-tag').text(xml.contents().prop('tagName').toLocaleUpperCase()));
 					xml.contents().children().each(function(i, e) {
+						var messtext;
+						if ($(e).prop('tagName') == "source-host") {
+							messtext = "<a href='http://ip-whois-lookup.com/lookup.php?ip="+$(e).text()+"' class='tagValue' target='_blank'>"+$(e).text()+"</a>";	
+						} else {
+							messtext = $(e).text();
+						}
 						output.append($("<span></span>").addClass('tagName').text($(e).prop('tagName') + ": "));
-						output.append($("<span></span>").addClass('tagValue').text($(e).text()));
+						value = $("<span></span>").addClass('tagValue');
+						value.html(messtext);
+						//$(value).find('a').click(openipdialog);
+						$(value).find('a').click(function () {
+							return false;
+						});
+						output.append(value);
 					});
 					parsed_text = output;
 				}

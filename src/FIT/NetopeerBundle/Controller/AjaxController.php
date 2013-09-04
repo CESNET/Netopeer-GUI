@@ -343,4 +343,29 @@ class AjaxController extends BaseController
 			return $this->getAjaxAlertsRespose();
 		}
 	}
+
+	/**
+	 * Lookup IP address.
+	 *
+	 * @Route("/ajax/lookupip/{ip}/", name="lookupip")
+	 * @Template()
+	 *
+	 * @var int $connectedDeviceId
+	 * @return array|bool    $result
+	 */
+	public function lookupipAction($ip)
+	{
+		if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/', $ip)) {
+			$output = "<pre>";
+			$output .= "Whois:\n";
+			$output .= system("whois ".$ip);
+			$output .= "nslookup:\n";
+			$output .= system("nslookup ".$ip);
+			$output .= "</pre>";
+			return new Response($output);
+		} else {
+			echo "Bad address format";
+			return new Response(false);
+		}
+	}
 }
