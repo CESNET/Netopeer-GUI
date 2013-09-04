@@ -62,10 +62,12 @@ if advised of the possibility of such damage.
 				    <input type="submit" value="Change" class="button small grey left" />
 				</form>
 			{% endif %}
+			{% if formCopyConfig is defined %}
 			<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
 				{{ form_widget(formCopyConfig) }}
 			    <input type="submit" value="Copy" class="button small grey left" />
 			</form>
+			{% endif %}
 
 			<hr class="cleaner" />
 			{# <form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">

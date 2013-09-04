@@ -653,7 +653,12 @@ class DefaultController extends BaseController
 			->getForm();
 
 		$targets = $datastores;
-		unset($targets[$this->get('session')->get('sourceConfig')]);
+		$current_source = $this->get('session')->get('sourceConfig');
+		if ($current_source !== null && $current_source !== "") {
+			unset($targets[$current_source]);
+		} else {
+			unset($targets["running"]);
+		}
 		$this->filterForms['copyConfig'] = $this->createFormBuilder()
 			->add('formType', 'hidden', array(
 				'data' => 'formCopyConfig',
