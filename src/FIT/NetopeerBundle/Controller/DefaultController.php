@@ -150,15 +150,6 @@ class DefaultController extends BaseController
 					"capabilities" => array( /* TODO make somehow configurable... */
 						"urn:ietf:params:netconf:base:1.0",
 						"urn:ietf:params:netconf:base:1.1",
-						"urn:ietf:params:netconf:capability:startup:1.0",
-						//"urn:ietf:params:netconf:capability:notification:1.0", /* still do not have in libnetconf */
-						"urn:ietf:params:netconf:capability:writable-running:1.0",
-						"urn:ietf:params:netconf:capability:candidate:1.0",
-						"urn:ietf:params:netconf:capability:with-defaults:1.0?basic-mode=explicit&amp;also-supported=report-all,report-all-tagged,trim,explicit",
-						"urn:cesnet:tmc:comet:1.0",
-						"urn:cesnet:tmc:combo:1.0",
-						"urn:cesnet:tmc:hanicprobe:1.0",
-						"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring",
 					),
 				);
 
