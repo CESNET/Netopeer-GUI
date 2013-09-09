@@ -145,6 +145,7 @@ if advised of the possibility of such damage.
 	{% if ncFeatures is defined and ncFeatures["nc_feature_notification"] is defined %}
 		{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
 			<script type="text/javascript">
+				var lookupIpUrl = '{{ path('lookupIp', {"ip": "REPLACE_IP"}) }}';
 				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");
 				if ($(notifOutput).hasClass('hidden')) {
 					$(notifOutput).removeClass('hidden');
@@ -155,6 +156,8 @@ if advised of the possibility of such damage.
 		<div class="notif-cover">
 			<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>
 		</div>
+		<div id="ipModalCover" class="modal hide fade" tabindex="-1" role="dialog"></div>
 	{% endif %}
+
 {% endblock notifications %}
 

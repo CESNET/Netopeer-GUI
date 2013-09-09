@@ -632,11 +632,11 @@ class DefaultController extends BaseController
 		// config part
 		$datastores = array('running' => 'Running');
 		$twigarr = $this->getAssignedVariablesArr();
-		$nc_features = $twigarr["nc_features"];
-		if (isset($nc_features["nc_feature_startup"])) {
+		$ncFeatures = $twigarr["ncFeatures"];
+		if (isset($ncFeatures["nc_feature_startup"])) {
 				$datastores['startup'] = 'Start-up';
 		}
-		if (isset($nc_features["nc_feature_candidate"])) {
+		if (isset($ncFeatures["nc_feature_candidate"])) {
 				$datastores['candidate'] = 'Candidate';
 		}
 		$this->filterForms['config'] = $this->createFormBuilder()

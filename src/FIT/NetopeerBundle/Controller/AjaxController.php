@@ -347,7 +347,7 @@ class AjaxController extends BaseController
 	/**
 	 * Lookup IP address.
 	 *
-	 * @Route("/ajax/lookupip/{ip}/", name="lookupip")
+	 * @Route("/ajax/lookup-ip/{ip}/", name="lookupIp")
 	 * @Template()
 	 *
 	 * @var int $connectedDeviceId
@@ -356,16 +356,53 @@ class AjaxController extends BaseController
 	public function lookupipAction($ip)
 	{
 		if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/', $ip)) {
-			$output = "<pre>";
-			$output .= "Whois:\n";
-			$output .= system("whois ".$ip);
-			$output .= "nslookup:\n";
-			$output .= system("nslookup ".$ip);
-			$output .= "</pre>";
-			return new Response($output);
-		} else {
-			echo "Bad address format";
-			return new Response(false);
+
+			/**
+			 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
+			 */
+			$cache = $this->container->get('winzou_cache');
+			$hashedIp = md5($ip);
+			$cacheArr = array();
+
+			if ($cache->contains('lookupip_'.$hashedIp)) {
+				$cacheArr = $cache->fetch('lookupip_'.$hashedIp);
+			} else {
+				// load lookup HTML content
+				$lookup = file_get_contents('http://ip-whois-lookup.com/lookup.php?ip='.$ip);
+				try {
+					$regex = '/\<p class\=\"maptxt\"\>(.*)\<\/p\>/';
+					// get all necessary information
+					preg_match_all($regex, $lookup, $ipInfoArr);
+					if (count($ipInfoArr) > 1) {
+						$cacheArr['items'] = array();
+						foreach ($ipInfoArr[1] as $item) {
+							$cacheArr['items'][] = strip_tags($item);
+							if (strpos($item, 'Latitude: ') !== false) {
+								$cacheArr['latitude'] = str_replace("Latitude: ", "", $item);
+							}
+							if (strpos($item, 'Longitude: ') !== false) {
+								$cacheArr['longitude'] = str_replace("Longitude: ", "", $item);
+							}
+						}
+					}
+
+					// save to cache (for one day)
+					$cache->save('lookupip_'.$hashedIp, $cacheArr, 24 * 60 * 60);
+				} catch (\ErrorException $e) {
+					return new Response(false);
+				}
+			}
+			if (count($cacheArr)) {
+				$this->assign('latitude', $cacheArr['latitude']);
+				$this->assign('longitude', $cacheArr['longitude']);
+				$tmp = $cacheArr['items'];
+				if (count($tmp)) {
+					$this->assign('lookupTitle', array_shift($tmp));
+					$this->assign('ipInfo', $tmp);
+				}
+			}
+
+			return $this->getAssignedVariablesArr();
 		}
 	}
 }
