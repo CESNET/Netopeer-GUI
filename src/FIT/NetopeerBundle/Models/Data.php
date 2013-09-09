@@ -285,9 +285,9 @@ class Data {
 	 * Find instance of SessionConnection.class for key.
 	 *
 	 * @param  int $key      session key
-	 * @return bool|\ConnectionSession
+	 * @return bool|ConnectionSession
 	 */
-	private function getConnFromKey($key) {
+	public function getConnFromKey($key) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
 		if (isset($sessionConnections[$key]) && $key !== '') {
@@ -348,22 +348,17 @@ class Data {
 	 * Check if capability for feature is available.
 	 *
 	 * @param  int $key      session key
-	 * @param  string $feature      name of feature/capability that is
-	 checked (constants Data::CPBLT_* can be used)
+	 * @param  string $feature      name of feature/capability that is checked (constants Data::CPBLT_* can be used)
 	 * @return bool
 	 */
 	public function checkCapabilityForKey($key, $feature) {
-		$session = $this->container->get('request')->getSession();
-		$sessionConnections = $session->get('session-connections');
-		if ($key === '' || !isset($sessionConnections[$key])) {
-			/* TODO log error - wrong or no key supplied */
-			return false;
-		}
-		$con = unserialize($sessionConnections[$key]);
-		$cpblts =  json_decode($con->sessionStatus);
-		foreach ($cpblts->capabilities as $cpblt) {
-			if (strpos($cpblt, $feature, 0) === 0) {
-				return true;
+		$con = $this->getConnFromKey($key);
+		if ($con) {
+			$cpblts =  json_decode($con->sessionStatus);
+			foreach ($cpblts->capabilities as $cpblt) {
+				if (strpos($cpblt, $feature, 0) === 0) {
+					return true;
+				}
 			}
 		}
 		return false;

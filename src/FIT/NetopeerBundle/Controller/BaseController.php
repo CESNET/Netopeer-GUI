@@ -86,21 +86,41 @@ class BaseController extends Controller
 	}
 
 	/**
+	 * Get all assigned variables in array
+	 *
+	 * @return array|Response     array of assigned variables to template
+	 */
+	protected function getAssignedVariablesArr() {
+		$this->prepareGlobalTwigVariables();
+		return $this->twigArr;
+	}
+
+	/**
+	 * Get value of assigned variable by key
+	 *
+	 * @param string $arrayKey     key of assigned variable
+	 * @return bool|string         value of assigned variable
+	 */
+	protected function getAssignedValueForKey($arrayKey) {
+		if ($arrayKey !== "" && array_key_exists($arrayKey, $this->twigArr)) {
+			return $this->twigArr[$arrayKey];
+		}
+		return false;
+	}
+
+	/**
 	 * Prepares variables to template, sort flashes and prepare menu
-	 * @param bool $getOnlyArray  if true, no response will be returned - only PHP array of values
+	 *
 	 * @return array|Response     array of assigned variables to template or AjaxBlockResponse
 	 */
-	protected function getTwigArr($getOnlyArray = false) {
-
+	protected function getTwigArr() {
 		$this->prepareGlobalTwigVariables();
 
-		if (!$getOnlyArray) {
-			if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->getSession()->get('isAjax') === true) {
-				$this->getRequest()->getSession()->remove('isAjax');
-				return $this->getAjaxBlocksResponse();
-			}
+		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->getSession()->get('isAjax') === true) {
 			$this->getRequest()->getSession()->remove('isAjax');
+			return $this->getAjaxBlocksResponse();
 		}
+		$this->getRequest()->getSession()->remove('isAjax');
 
 		return $this->twigArr;
 	}
@@ -119,12 +139,15 @@ class BaseController extends Controller
 		}
 
 		$this->prepareAndAssignFlashes();
-
 		$this->assign("topmenu", array());
 		$this->assign("submenu", array());
+
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
+		$dataClass = $this->get('DataModel');
 		if ($this->getRequest()->get('_route') !== '_home' &&
 				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
-			$dataClass = $this->get('DataModel');
 			$dataClass->buildMenuStructure($this->activeSectionKey);
 			$this->assign('topmenu', $dataClass->getModels());
 			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
@@ -133,8 +156,7 @@ class BaseController extends Controller
 		try {
 			$key = $this->getRequest()->get('key');
 			if ($key != "") {
-				$conn = $this->getRequest()->getSession()->get('session-connections');
-				$conn = unserialize($conn[$this->getRequest()->get('key')]);
+				$conn = $dataClass->getConnFromKey($key);
 				if ($conn !== false) {
 					$this->assign('lockedConn', $conn->locked);
 					$this->assign('sessionStatus', $conn->sessionStatus);
@@ -146,23 +168,21 @@ class BaseController extends Controller
 			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
 		}
 
-		if (isset($dataClass)) {
-			$nc_features = Array();
-			if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_NOTIFICATIONS) === true &&
-				$dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_REALTIME_NOTIFICATIONS) === true) {
-				$nc_features["nc_feature_notification"] = true;
-			}
-			if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_STARTUP) === true) {
-				$nc_features["nc_feature_startup"] = true;
-			}
-			if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_CANDIDATE) === true) {
-				$nc_features["nc_feature_candidate"] = true;
-			}
-			if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_WRITABLERUNNING) === true) {
-				$nc_features["nc_feature_writablerunning"] = true;
-			}
-			$this->assign("nc_features", $nc_features);
+		$ncFeatures = Array();
+		if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_NOTIFICATIONS) === true &&
+			$dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_REALTIME_NOTIFICATIONS) === true) {
+			$ncFeatures["nc_feature_notification"] = true;
 		}
+		if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_STARTUP) === true) {
+			$ncFeatures["nc_feature_startup"] = true;
+		}
+		if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_CANDIDATE) === true) {
+			$ncFeatures["nc_feature_candidate"] = true;
+		}
+		if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_WRITABLERUNNING) === true) {
+			$ncFeatures["nc_feature_writablerunning"] = true;
+		}
+		$this->assign("ncFeatures", $ncFeatures);
 	}
 
 	/**

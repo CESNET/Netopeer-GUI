@@ -89,7 +89,7 @@ if advised of the possibility of such damage.
 					{% endfor %}
 
 
-{% if (nc_features is defined) and (nc_features["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
+{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
 					<input type="submit" value="Save config" />
 {% endif %}
 				</div>
@@ -130,9 +130,9 @@ if advised of the possibility of such damage.
 					{% set iterator = iterator + 1 %}
 				{% endfor %}
 
-{% if (nc_features is defined) and (nc_features["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
-				<input type="submit" value="Save config" />
-{% endif %}
+				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
+								<input type="submit" value="Save config" />
+				{% endif %}
 			</div>
 		</form>
 	{% else %}
@@ -143,7 +143,7 @@ if advised of the possibility of such damage.
 {% endblock config %}
 
 {% block notifications %}
-	{% if nc_features is defined and nc_features["nc_feature_notification"] is defined %}
+	{% if ncFeatures is defined and ncFeatures["nc_feature_notification"] is defined %}
 		{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
 			<script type="text/javascript">
 				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");

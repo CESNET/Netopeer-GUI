@@ -352,6 +352,7 @@ class DefaultController extends BaseController
 		$this->assign('routeParams', $routeParams);
 		$this->assign('activeAction', $action);
 		$this->assign('stateSectionTitle', "Session info");
+
 		return $this->getTwigArr();
 	}
 
@@ -630,7 +631,7 @@ class DefaultController extends BaseController
 
 		// config part
 		$datastores = array('running' => 'Running');
-		$twigarr = $this->getTwigArr(true);
+		$twigarr = $this->getAssignedVariablesArr();
 		$nc_features = $twigarr["nc_features"];
 		if (isset($nc_features["nc_feature_startup"])) {
 				$datastores['startup'] = 'Start-up';
@@ -647,6 +648,7 @@ class DefaultController extends BaseController
 //				'required' => false
 //			))
 			->add('source', 'choice', array(
+				'label' => "Source:",
 				'choices' => $datastores,
 				'data' => $this->get('session')->get('sourceConfig')
 			))
@@ -831,7 +833,7 @@ class DefaultController extends BaseController
 		$this->assign('hideColumnControl', true);
 
 		$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:section.html.twig');
-		$html = $template->renderBlock('config', $this->getTwigArr(true));
+		$html = $template->renderBlock('config', $this->getAssignedVariablesArr());
 		$this->assign('configSingleContent', $html);
 
 		$this->get('session')->set('singleColumnLayout', true);
