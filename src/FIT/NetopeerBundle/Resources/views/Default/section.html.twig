@@ -59,12 +59,12 @@ if advised of the possibility of such damage.
 			{% if configArr is not defined and formConfig is defined %}
 				<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
 					{{ form_widget(formConfig) }}
-				    <input type="submit" value="Change" class="button small grey left" />
+			    <input type="submit" value="Change" class="button small grey left" />
 					<script type="text/javascript">
-					$('#form_source').change(function () {
-						$(this).closest('form').submit();
-					});
-					$(formConfig).find('input[type=submit]').hide();
+						$('#form_source').change(function () {
+							$(this).closest('form').submit();
+						});
+						$(formConfig).find('input[type=submit]').hide();
 					</script>
 				</form>
 			{% endif %}
@@ -88,10 +88,9 @@ if advised of the possibility of such damage.
 						{% set iterator = iterator + 1 %}
 					{% endfor %}
 
-
-{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
-					<input type="submit" value="Save config" />
-{% endif %}
+					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
+						<input type="submit" value="Save config" />
+					{% endif %}
 				</div>
 			</form>
 		{% else %}
@@ -110,15 +109,15 @@ if advised of the possibility of such damage.
 		<input type="submit" value="Change" class="button small grey left" />
 		{# <span class="note left">(State informations are not available in this datastore)</span> #}
 		<script type="text/javascript">
-		$('#form_source').change(function () {
-			$(this).closest('form').submit();
-		});
-		$(formConfig).find('input[type=submit]').hide();
+			$('#form_source').change(function () {
+				$(this).closest('form').submit();
+			});
+			$(formConfig).find('input[type=submit]').hide();
 		</script>
 	</form>
 	<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
-	{{ form_widget(formCopyConfig) }}
-	<input type="submit" value="Copy" class="button small grey left" />
+		{{ form_widget(formCopyConfig) }}
+		<input type="submit" value="Copy" class="button small grey left" />
 	</form>
 	<hr class="cleaner" />
 	{% if configArr is defined and not(configArr is empty) %}
