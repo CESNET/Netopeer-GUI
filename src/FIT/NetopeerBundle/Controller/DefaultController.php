@@ -333,6 +333,18 @@ class DefaultController extends BaseController
 			$session = $this->container->get('request')->getSession();
 			$sessionArr = $session->all();
 
+			if (isset($sessionArr['session-connections'])) {
+				foreach ($sessionArr['session-connections'] as $connKey => $conn) {
+					$connVarsArr['connection-'.$connKey][$connKey] = (array) unserialize($conn);
+					if ($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']) {
+						$connVarsArr['connection-'.$connKey][$connKey]['sessionStatus'] = (array) json_decode($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']);
+					}
+				}
+				$sessionArr['session-connections'] = $connVarsArr;
+			}
+
+			unset($sessionArr['_security_secured_area']);
+
 			$xml = Array2XML::createXML("session", $sessionArr);
 			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
 
