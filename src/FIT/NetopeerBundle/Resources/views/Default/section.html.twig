@@ -89,7 +89,9 @@ if advised of the possibility of such damage.
 					{% endfor %}
 
 					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
-						<input type="submit" value="Save config" />
+						{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
+							<input type="submit" value="Save config" />
+						{% endif %}
 					{% endif %}
 				</div>
 			</form>
@@ -130,7 +132,9 @@ if advised of the possibility of such damage.
 				{% endfor %}
 
 				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
-								<input type="submit" value="Save config" />
+					{% if (hideConfigSubmitButton is not defined) or hideConfigSubmitButton != true %}
+						<input type="submit" value="Save config" />
+					{% endif %}
 				{% endif %}
 			</div>
 		</form>

@@ -349,6 +349,7 @@ class DefaultController extends BaseController
 			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
 
 			$this->assign("stateArr", $xml);
+			$this->assign('hideStateSubmitButton', true);
 		} else if ($action == "reload") {
 			echo "Reload info page";
 			$params = array('key' => $key);
