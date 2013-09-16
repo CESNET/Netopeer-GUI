@@ -531,7 +531,13 @@ class DefaultController extends BaseController
 		try {
 			$dataClass->setFlashState('state');
 
-			if ( ($xml = $dataClass->handle('get', $this->getStateParams())) != 1 ) {
+			if ($module === 'all') {
+				$merge = false;
+			} else {
+				$merge = true;
+			}
+
+			if ( ($xml = $dataClass->handle('get', $this->getStateParams(), $merge)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 				$this->assign("stateArr", $xml);
 			}
@@ -543,10 +549,10 @@ class DefaultController extends BaseController
 		// we will load config part only if two column layout is enabled or we are on section (which has two column always)
 		$tmp = $this->getConfigParams();
 		if ($module == null || ($module != null && $tmp['source'] !== "running")) {
-			$this->loadConfigArr(false);
+			$this->loadConfigArr(false, $merge);
 			$this->setOnlyConfigSection();
 		} else if ( $module == null || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
-			$this->loadConfigArr();
+			$this->loadConfigArr(true, $merge);
 
 			$this->assign('singleColumnLayout', false);
 		} else {
@@ -843,7 +849,7 @@ class DefaultController extends BaseController
 	/**
 	 * loads array of config values
 	 */
-	private function loadConfigArr($addConfigSection = true) {
+	private function loadConfigArr($addConfigSection = true, $merge = true) {
 		try {
 			$dataClass = $this->get('dataModel');
 			$dataClass->setFlashState('config');
@@ -852,7 +858,7 @@ class DefaultController extends BaseController
 			}
 
 			// getcofig part
-			if ( ($xml = $dataClass->handle('getconfig', $this->getConfigParams())) != 1 ) {
+			if ( ($xml = $dataClass->handle('getconfig', $this->getConfigParams(), $merge)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 				$this->assign("configArr", $xml);
 			}
