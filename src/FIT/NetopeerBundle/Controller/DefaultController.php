@@ -574,10 +574,12 @@ class DefaultController extends BaseController
 		if ($module == null || ($module != null && $tmp['source'] !== "running")) {
 			$this->loadConfigArr(false, $merge);
 			$this->setOnlyConfigSection();
-		} else if ( $module == null || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
+		} else if ( $module == null || $module == 'all' || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
 			$this->loadConfigArr(true, $merge);
-
 			$this->assign('singleColumnLayout', false);
+			if ($module == 'all') {
+				$this->assign('hideColumnControl', true);
+			}
 		} else {
 			$this->assign('singleColumnLayout', true);
 		}
