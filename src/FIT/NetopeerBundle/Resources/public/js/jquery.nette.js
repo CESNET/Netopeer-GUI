@@ -126,7 +126,10 @@ jQuery(function($) {
 function loadAjaxLink(e, $THIS, href, type, data) {
 	e.preventDefault();
 
-	formInputChangeConfirm();
+	var shouldLoadingContinue = formInputChangeConfirm(true);
+	if (!shouldLoadingContinue) {
+		return;
+	}
 
 	$("#block--alerts").html('');
 

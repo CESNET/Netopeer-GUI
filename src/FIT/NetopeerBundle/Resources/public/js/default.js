@@ -34,6 +34,8 @@
 // otherwise) arising in any way out of the use of this software, even
 // if advised of the possibility of such damage.
 
+var formChangeAlert = 'Some of form values has been changed. Do you want discard and go to another page?';
+
  $(document).ready(function() {
 	initJS();
 });
@@ -43,7 +45,10 @@ $(window).resize(function() {
 	showIconsOnLeafLine();
 	collapseTopNav();
 }).bind('beforeunload', function() {
-	formInputChangeConfirm();
+	var shouldLoadingContinue = formInputChangeConfirm(false);
+	if (!shouldLoadingContinue) {
+		return formChangeAlert;
+	}
 });
 
 function initJS() {
@@ -785,14 +790,15 @@ function createNode($elem) {
 	}
 }
 
-function formInputChangeConfirm() {
+function formInputChangeConfirm(showDialog) {
 	if (formInputChanged === true) {
-		if (!confirm('Some of form values has been changed. Do you want discard and go to another page?')) {
-			return;
+		if ( (showDialog && !confirm(formChangeAlert)) || !showDialog) {
+			return false;
 		} else {
 			formInputChanged = false;
 		}
 	}
+	return true;
 }
 
 // generates unique id (in sequence)
