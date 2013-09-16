@@ -51,38 +51,78 @@ if advised of the possibility of such damage.
 
 {% block state %}
 {% block singleContent %}
-	<h1>{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
-	{% if stateArr is defined and not(stateArr is empty) %}
-		{# <form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
-			{{ form_widget(formState) }}
-		    <input type="submit" value="Get" />
-		</form> #}
-		<form action="" method="post" name="formConfigData" data-disable-history="true">
-			<div class="root">
-				{% set iterator = 1 %}
-				{% for key, element in stateArr %}
-					{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
-					{% set iterator = iterator + 1 %}
-				{% endfor %}
-
-				<input type="submit" value="Save config" />
-			</div>
-		</form>
+	{% if configSingleContent is defined %}
+		{{ configSingleContent|raw }}
 	{% else %}
-		<div class="alert info">
-			No results found.
-		</div>
+		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
+		{% if stateArr is defined and not(stateArr is empty) %}
+			{% if configArr is not defined and formConfig is defined %}
+				<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
+					{{ form_widget(formConfig) }}
+			    <input type="submit" value="Change" class="button small grey left" />
+					<script type="text/javascript">
+						$('#form_source').change(function () {
+							$(this).closest('form').submit();
+						});
+						$(formConfig).find('input[type=submit]').hide();
+					</script>
+				</form>
+			{% endif %}
+			{% if formCopyConfig is defined %}
+			<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
+				{{ form_widget(formCopyConfig) }}
+			    <input type="submit" value="Copy" class="button small grey left" />
+			</form>
+			{% endif %}
+
+			<hr class="cleaner" />
+			{# <form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
+				{{ form_widget(formState) }}
+			    <input type="submit" value="Get" />
+			</form> #}
+			<form action="" method="post" name="formConfigData" data-disable-history="true">
+				<div class="root">
+					{% set iterator = 1 %}
+					{% for key, element in stateArr %}
+						{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
+						{% set iterator = iterator + 1 %}
+					{% endfor %}
+
+					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
+						{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
+							<input type="submit" value="Save config" />
+						{% endif %}
+					{% endif %}
+				</div>
+			</form>
+		{% else %}
+			<div class="alert info">
+				No results found.
+			</div>
+		{% endif %}
 	{% endif %}
 {% endblock singleContent %}
 {% endblock state %}
 
 {% block config %}
-	<h1>{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
+	<h1 class="left">{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
+	<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
+		{{ form_widget(formConfig) }}
+		<input type="submit" value="Change" class="button small grey left" />
+		{# <span class="note left">(State informations are not available in this datastore)</span> #}
+		<script type="text/javascript">
+			$('#form_source').change(function () {
+				$(this).closest('form').submit();
+			});
+			$(formConfig).find('input[type=submit]').hide();
+		</script>
+	</form>
+	<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
+		{{ form_widget(formCopyConfig) }}
+		<input type="submit" value="Copy" class="button small grey left" />
+	</form>
+	<hr class="cleaner" />
 	{% if configArr is defined and not(configArr is empty) %}
-	{# <form action="" method="post" {{ form_enctype(formConfig) }} class="filter" name="formConfig">
-			{{ form_widget(formConfig) }}
-		    <input type="submit" value="Get" />
-		</form> #}
 		<form action="" method="post" name="formConfigData" data-disable-history="true">
 			<div class="root">
 				{% set iterator = 1 %}
@@ -91,7 +131,11 @@ if advised of the possibility of such damage.
 					{% set iterator = iterator + 1 %}
 				{% endfor %}
 
-				<input type="submit" value="Save config" />
+				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
+					{% if (hideConfigSubmitButton is not defined) or hideConfigSubmitButton != true %}
+						<input type="submit" value="Save config" />
+					{% endif %}
+				{% endif %}
 			</div>
 		</form>
 	{% else %}
@@ -102,16 +146,22 @@ if advised of the possibility of such damage.
 {% endblock config %}
 
 {% block notifications %}
-	{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
-		<script type="text/javascript">
-			var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");
-			if ($(notifOutput).hasClass('hidden')) {
-				$(notifOutput).removeClass('hidden');
-				notifResizable();
-			}
-		</script>
+	{% if ncFeatures is defined and ncFeatures["nc_feature_notification"] is defined %}
+		{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
+			<script type="text/javascript">
+				var lookupIpUrl = '{{ path('lookupIp', {"ip": "REPLACE_IP"}) }}';
+				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");
+				if ($(notifOutput).hasClass('hidden')) {
+					$(notifOutput).removeClass('hidden');
+					notifResizable();
+				}
+			</script>
+		{% endif %}
+		<div class="notif-cover">
+			<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>
+		</div>
+		<div id="ipModalCover" class="modal hide fade" tabindex="-1" role="dialog"></div>
 	{% endif %}
-	<div class="notif-cover">
-		<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>
-	</div>
+
 {% endblock notifications %}
+

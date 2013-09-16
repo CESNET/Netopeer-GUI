@@ -53,6 +53,10 @@ services:
         class: %netopeer.data.class%
         arguments: [@service_container, @data_logger]
 
+    XMLoperations:
+        class: FIT\NetopeerBundle\Models\XMLoperations
+        arguments: [@service_container, @data_logger, @DataModel]
+
     BaseConnection:
         class: FIT\NetopeerBundle\Entity\BaseConnection
         arguments: [@doctrine.orm.entity_manager, @security.context, @data_logger]

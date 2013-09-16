@@ -86,12 +86,34 @@ class BaseController extends Controller
 	}
 
 	/**
-	 * Prepares variables to template, sort flashes and prepare menu
+	 * Get all assigned variables in array
+	 *
+	 * @return array|Response     array of assigned variables to template
+	 */
+	protected function getAssignedVariablesArr() {
+		$this->prepareGlobalTwigVariables();
+		return $this->twigArr;
+	}
 
+	/**
+	 * Get value of assigned variable by key
+	 *
+	 * @param string $arrayKey     key of assigned variable
+	 * @return bool|string         value of assigned variable
+	 */
+	protected function getAssignedValueForKey($arrayKey) {
+		if ($arrayKey !== "" && array_key_exists($arrayKey, $this->twigArr)) {
+			return $this->twigArr[$arrayKey];
+		}
+		return false;
+	}
+
+	/**
+	 * Prepares variables to template, sort flashes and prepare menu
+	 *
 	 * @return array|Response     array of assigned variables to template or AjaxBlockResponse
 	 */
 	protected function getTwigArr() {
-
 		$this->prepareGlobalTwigVariables();
 
 		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->getSession()->get('isAjax') === true) {
@@ -117,21 +139,24 @@ class BaseController extends Controller
 		}
 
 		$this->prepareAndAssignFlashes();
-
 		$this->assign("topmenu", array());
 		$this->assign("submenu", array());
+
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
+		$dataClass = $this->get('DataModel');
 		if ($this->getRequest()->get('_route') !== '_home' &&
 				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
-			$dataClass = $this->get('DataModel');
 			$dataClass->buildMenuStructure($this->activeSectionKey);
 			$this->assign('topmenu', $dataClass->getModels());
 			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
 		}
 
 		try {
-			if ($this->getRequest()->get('key') != "") {
-				$conn = $this->getRequest()->getSession()->get('session-connections');
-				$conn = unserialize($conn[$this->getRequest()->get('key')]);
+			$key = $this->getRequest()->get('key');
+			if ($key != "") {
+				$conn = $dataClass->getConnFromKey($key);
 				if ($conn !== false) {
 					$this->assign('lockedConn', $conn->locked);
 					$this->assign('sessionStatus', $conn->sessionStatus);
@@ -142,6 +167,8 @@ class BaseController extends Controller
 			$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
 			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
 		}
+
+		$this->assign("ncFeatures", $dataClass->getCapabilitiesArrForKey($key));
 	}
 
 	/**

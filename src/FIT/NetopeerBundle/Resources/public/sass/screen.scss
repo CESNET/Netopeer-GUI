@@ -86,9 +86,10 @@ hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: tra
 	&.red { @include background( linear-gradient($cAlert, darken($cAlert, 5%)) ); border: 1px solid darken($cAlert, 30%); color: #fff; 
 		&:hover { @include background( linear-gradient($cAlert, darken($cAlert, 15%)) ); }
 	}
-	&.grey { @include background( linear-gradient(#555, darken(#555, 5%)) ); border: 1px solid darken(#555, 30%); color: #fff;
+	&.grey { @include background( linear-gradient(#666, darken(#666, 8%)) ); border: 1px solid darken(#555, 30%); color: #fff;
 		&:hover { @include background( linear-gradient(#555, darken(#555, 15%)) ); }
 	}
+	&.small { padding: 4px 6px; font-size: 0.85em; }
 }
 
 #ajax-spinner { position: absolute; width: 100%; height: 100%; @include background( url($img + 'ajax-loader.gif'), rgba(0,0,0,0.5) ); background-repeat: no-repeat; background-position: center center; top: 0; left: 0; z-index: 30; }
@@ -224,11 +225,17 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 		input.value.text { width: 50%; margin: -4px 0px; border: 1px solid #ccc; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
 		textarea.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
 
+		&.generated {
+			input.value.text, textarea.value { margin-top: 0px; margin-bottom: 0px; }
+			.tooltip { margin-top: 3px; }
+		}
+
 		.edit-bar { width: 80px; min-height: 22px; margin: -3px 0px -5px 2%; float: right; text-align: right;
 			.child { display: none; }
 			img { @include opacity(0.4); cursor: pointer;
 				&:hover { @include opacity(1); }
 			}
+			&.generated { margin-top: 0px; }
 		}
 		+ .leaf { }
 		&.state .edit-bar {	width: auto; }
@@ -261,6 +268,14 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 	&#block--singleContent { width: 100%; min-height: 100%; font-size: 1.4em; padding: $sContentPadding 2 * $sContentPadding $sContentPadding / 2 2 * $sContentPadding;
 		&.left-nav-defined { width: 90%; }
 		&.max-width-column { max-width: 800px; width: 100%; float: none; }
+	}
+
+	.filter { margin-top: 20px;
+		> div { float: left; margin-left: 30px; }
+		label { display: none; }
+		select { margin-top: 5px; }
+		.button { margin: 1px 10px; }
+		.note { font-size: 0.8em; font-style: italic; margin-top: 7px; }
 	}
 }
 .top-part { position: absolute; right: 2 * $sContentPadding; top: $hNavTop + $sContentPadding; font-size: 1.2em; @include opacity(0.7); z-index: 10;
@@ -364,6 +379,18 @@ table { width: 100%; margin: 15px 0px;
 	tr:nth-child(even) {
 		th, td { background: #eaeaea; }
 	}
+}
+
+/** ip lookup **/
+#ip-info-cover { width: 100%;
+	> div { width: 47%; }
+	#map-canvas { height: 250px; }
+	p { padding: 5px 0px; }
+}
+.modal-body { font-family: $fBody; color: #333; }
+.modal-header { overflow: hidden;
+	h3 { margin: 0px; padding: 0px; font-family: $fHeadings; color: $cBase; font-size: 1.5em; }
+	.button { margin-top: 0px; margin-bottom: 0px; }
 }
 
 /* tooltip */

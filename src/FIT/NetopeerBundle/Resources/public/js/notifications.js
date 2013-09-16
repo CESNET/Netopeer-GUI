@@ -85,6 +85,17 @@ function unsetNotificationsForKey(key) {
 	notifications.splice(notifications.indexOf(key),1);
 }
 
+function openipdialog() {
+	$.ajax({
+		url: $(this).attr('href'),
+		success: function(data, textStatus, jqXHR) {
+			$('#ipModalCover').html(data);
+			$('#ipModalCover').modal({show:true});
+		}
+	});
+	return false;
+}
+
 $.fn.notifWebSocket = function(key, wsUri) {
 	this.key = key;
 	this.messages = new Array();
@@ -169,8 +180,20 @@ $.fn.notifWebSocket = function(key, wsUri) {
 				if (xml) {
 					var output = $("<div></div>").append($("<span></span>").addClass('root-tag').text(xml.contents().prop('tagName').toLocaleUpperCase()));
 					xml.contents().children().each(function(i, e) {
+						var messtext;
+						if ($(e).prop('tagName') == "source-host") {
+							messtext = $("<a/>").attr({
+								'href': lookupIpUrl.replace("REPLACE_IP", $(e).text()),
+								'class': 'tagValue ipHref'
+							}).text($(e).text());
+						} else {
+							messtext = $(e).text();
+						}
 						output.append($("<span></span>").addClass('tagName').text($(e).prop('tagName') + ": "));
-						output.append($("<span></span>").addClass('tagValue').text($(e).text()));
+						value = $("<span></span>").addClass('tagValue');
+						value.html(messtext);
+						$(value).find('.ipHref').click(openipdialog);
+						output.append(value);
 					});
 					parsed_text = output;
 				}
@@ -181,21 +204,10 @@ $.fn.notifWebSocket = function(key, wsUri) {
 			var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').html(parsed_text));
 			if (parsed_time !== '') {
 				if (!isNaN(parsed_time)) {
-					var time = new Date(parsed_time);
+					var time = new Date();
+					time.setTime(parsed_time * 1000);
 					parsed_time = "";
-
-					parsed_time += time.getHours();
-					parsed_time += ":";
-					parsed_time += time.getMinutes();
-					parsed_time += ":";
-					parsed_time += time.getSeconds();
-
-					parsed_time += " ";
-					parsed_time += time.getDate();
-					parsed_time += ".";
-					parsed_time += time.getMonth();
-					parsed_time += ".";
-					parsed_time += time.getFullYear();
+					parsed_time += time.toUTCString();
 				}
 				output.prepend($("<div></div>").addClass('time').text(parsed_time));
 			}

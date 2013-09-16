@@ -34,6 +34,8 @@
 // otherwise) arising in any way out of the use of this software, even
 // if advised of the possibility of such damage.
 
+var formChangeAlert = 'Some of form values has been changed. Do you want discard and go to another page?';
+
  $(document).ready(function() {
 	initJS();
 });
@@ -42,6 +44,11 @@ $(window).resize(function() {
 	changeSectionHeight();
 	showIconsOnLeafLine();
 	collapseTopNav();
+}).bind('beforeunload', function() {
+	var shouldLoadingContinue = formInputChangeConfirm(false);
+	if (!shouldLoadingContinue) {
+		return formChangeAlert;
+	}
 });
 
 function initJS() {
@@ -55,7 +62,8 @@ function initJS() {
 	}).on('click', ".remove-child", function() {
 				removeNode($(this));
 			}).on('click', ".create-child", function() {
-				generateNode($(this));
+//				generateNode($(this));
+				createNode($(this));
 			});
 
 	$(window).on('click', '.alert', function(e) {
@@ -89,6 +97,14 @@ function initJS() {
 
 	showIconsOnLeafLine();
 	changeSectionHeight();
+
+	$("form").on("change", "input, select", function(event){
+		formInputChanged = true;
+	});
+
+	$("form").on("submit", function(event){
+		formInputChanged = false;
+	});
 }
 
 /**
@@ -239,7 +255,7 @@ function duplicateNode($elem) {
 	var $newClone = $currentParent.clone();
 	$form.html($newClone);
 	if ($currentParent.is(':first-child')) {
-        $currentParent.nextAll("*").each(function(i, el) {
+			$currentParent.nextAll("*").each(function(i, el) {
 			$form.append($(el).clone());
 		});
 	}
@@ -282,7 +298,7 @@ function duplicateNode($elem) {
 function scrollToGeneratedForm($elem, $form) {
 	var section = $elem.parents("section");
 	$(section).animate({
-		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight() - 20
+		scrollTop: $(section).scrollTop() + $form.offset().top - $("nav#top").outerHeight() - 100
 	}, 1000);
 }
 
@@ -371,34 +387,33 @@ function createFormUnderlay($elem) {
 
 	// if form-underlay already exists, will be removed
 	if ( $cover.find(".form-underlay").length === 0 ) {
-		$cover.find('.form-underlay').remove();
+
+		// append form-underlay to cover
+		$cover.append($("<div>").addClass('form-underlay'));
+		$cover.append($("<div>").addClass('form-cover'));
+
+		// we have to count new dimensions for new form-underlay
+		// and fill it over whole cover part
+		var nWidth = $cover.outerWidth(),
+			nHeight = $cover[0].scrollHeight + $elem.parent().parent().parent().outerHeight() + 150; // 150 px for buttons
+
+		// we have to set form to fill cover (from top)
+		$cover.find(".form-underlay").width(nWidth).height(nHeight).css({
+			'margin-top': 0,
+			'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
+		});
+
+		$cover.find(".form-underlay").click(function() {
+
+		});
 	}
-
-	// append form-underlay to cover
-	$cover.append($("<div>").addClass('form-underlay'));
-	$cover.append($("<div>").addClass('form-cover'));
-
-	// we have to count new dimensions for new form-underlay
-	// and fill it over whole cover part
-	var nWidth = $cover.outerWidth(),
-		nHeight = $cover[0].scrollHeight + $elem.parent().parent().parent().outerHeight() + 150; // 150 px for buttons
-
-	// we have to set form to fill cover (from top)
-	$cover.find(".form-underlay").width(nWidth).height(nHeight).css({
-		'margin-top': 0,
-		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
-	});
-
-	$cover.find(".form-underlay").click(function() {
-
-	});
 
 	return $cover;
 }
 
 function findLevelValue($elem) {
 	var levelRegex = /level-(\d+)/,	// regex for level value
-		level = $elem.parents('.leaf-line').attr('class');	// parent class for level
+		level = $elem.parents('div[class*="level-"]').attr('class');	// parent class for level
 
 	if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
 
@@ -408,14 +423,14 @@ function findLevelValue($elem) {
 			if ( level.match(levelRegex) === null || ( level.match(levelRegex) !== null && isNaN(level.match(levelRegex)[1]) ) ) {
 				level = 0;
 			} else {
-				level = level.match(levelRegex)[1];
+				level = parseInt(level.match(levelRegex)[1], 10);
 			}
 		} else {
 			level = 0;
 		}
 		
 	} else {
-		level = level.match(levelRegex)[1];
+		level = parseInt(level.match(levelRegex)[1], 10);
 	}
 
 	return level;
@@ -424,8 +439,8 @@ function findLevelValue($elem) {
 function generateFormObject(formName) {
 	var $form;
 	// new form object - if is not created, we will create new one
-	if ( $(".generatedForm").length ) {
-		$form = $('.generatedForm');
+	if ( $(".generatedForm").length !== 0 ) {
+		$form = $('.generatedForm').last();
 	} else {
 		// vytvorime formular
 		$form = $("<form>")
@@ -435,6 +450,11 @@ function generateFormObject(formName) {
 				name: formName,
 				'class': 'generatedForm'
 			});
+		$form.append($("<input>").attr({
+			type: 'hidden',
+			name: 'formId',
+			value: new Date().getTime()
+		}));
 	}
 
 	return $form;
@@ -502,6 +522,9 @@ function createSubmitButton($form, inputValue) {
 
 function createCloseButton($cover, $form) {
 	// create close button and append at the end of form
+	if ( $form.children("a.close").length ) {
+		$form.children("a.close").remove();
+	}
 	var $closeButton = $("<a href='#' title='Close' class='close red button'>Close</a>");
 	$form.append($closeButton);
 
@@ -524,11 +547,16 @@ function createCloseButton($cover, $form) {
 
 // wrap unwrapped form back to cover whole tree form
 function wrapCoverForm($cover, $form) {
-	var $originalForm = $cover.children('form');
+	var $originalForm = $(".old-form").removeClass('old-form');
 	$cover.find('.root').wrap($originalForm);
+	$originalForm.remove();
 	$form.remove();
 	$('.form-underlay').remove();
 	$('.form-cover').remove();
+	$('.generatedForm').remove();
+	$cover.find('.active').removeClass('active');
+
+	formInputChanged = false;
 }
 
 // unwrap old form (we can't have two forms inside in HTML
@@ -536,7 +564,9 @@ function wrapCoverForm($cover, $form) {
 // alone prepending cover - so we can wrap it always back,
 // for example while close button is clicked
 function unwrapCoverForm($currentParentLevel, $cover) {
-	var $oldForm = $currentParentLevel.parents('form').clone();
+	if ($(".old-form").length) return;
+
+	var $oldForm = $currentParentLevel.parents('form').clone().addClass('old-form');
 	$oldForm.html('');
 	$cover.prepend($oldForm);
 	$currentParentLevel.parents('form').children('.root').unwrap();
@@ -548,119 +578,229 @@ function l (str) {
 
 
 
-
-/*
 function createNode($elem) {
-	var $cover = $cover = createFormUnderlay($elem);
+	var $cover = createFormUnderlay($elem);
 
-	var xPath = $elem.attr('rel'),	// parent xPath - in anchor attribute rel
-		$editBar = $elem.parent().clone();	// editBar clone - we will modify it below
+	// we will create cover div
+	var level = findLevelValue($elem) + 1;
+	var $coverDiv = $("<div>").addClass('leaf-line').addClass('generated');
 
-	level = findLevelValue($elem);
+	var xPath = $elem.attr('rel');	// parent XPath - from attribute rel
+	var $currentParent = $elem.parent().parent();
+	var $currentParentLevel = $elem.parents('.level-' + level);
+	var $editBar = $elem.parent().clone();	// editBar clone - we will modify it below
 
-	// vytvorime div obalujici inputy
-	level = parseInt(level, 10) + 1;
-	$cover = $("<div>").addClass('leaf-line').addClass('level-' + String(level)).addClass('generated');
+	// remove last index and replace it with attr name
+	var parentName = "";
+	if ($currentParent.find('.label-cover strong').length) {
+		parentName = $currentParent.find('.label-cover strong').text();
+	} else {
+		parentName = $currentParent.find('input.label').val();
+	}
+	var parentXPath = xPath.substring(0, xPath.lastIndexOf("*?")) + parentName;
 
-	$form = generateFormObject('newNodeForm');
+	// generate new form
+	var $form = generateFormObject('newNodeForm');
 
-	uniqueId = String(getUniqueId());
-	// input pro nazev elementu
-	$elementName = $("<input>")
+	var uniqueId = generateUniqueId();
+
+	// input for label name
+	var $elementName = $("<input>")
 		.attr({
-			name: 'newNodeForm[label_' + uniqueId + '_' + xPath + ']',
+			name: 'newNodeForm[label' + uniqueId + '_' + xPath + ']',
 			type: 'text',
-			'class': 'label'
-		});
-	$cover.append($elementName);
-	$elementName.before($("<span>").addClass('dots'));
+			'class': 'label',
+			'data-unique-id': uniqueId,
+			'data-original-xPath': xPath,
+			'data-parrent-xPath': encodeURIComponent(parentXPath)
+		}).typeahead({
+			minLength: 0,
+			items: 15,
+			source: function(query, process) {
+				var urlTemplate = $elem.data().typeaheadPath;
+				var sourceUrl = urlTemplate.replace("FORMID", $form.find("input[name=formId]"));
+				sourceUrl = urlTemplate.replace("XPATH", encodeURIComponent(parentXPath));
+				$.ajax({
+					url: sourceUrl,
+					data: {
+						'typed': query
+					},
+					type: "GET",
+					dataType: "json",
+					success: function(data){
+						return process(data);
+					}
+				})
+			}
+	}).change(function() {
+		var urlTemplate = $elem.data().typeaheadPath;
+		var sourceUrl = urlTemplate.replace("FORMID", $form.find("input[name=formId]"));
+		sourceUrl = urlTemplate.replace("XPATH", encodeURIComponent(parentXPath));
 
-	// input pro hodnotu elementu
-	$elementValue = $("<input>")
-		.attr({
-			name: 'newNodeForm[value_' + uniqueId + '_' + xPath + ']',
-			type: 'text',
-			'class': 'value'
-		});
-	$cover.append($elementValue);
+		var $currentInput = $(this);
+		$.ajax({
+			url: sourceUrl,
+			data: {
+				'label': $(this).val(),
+				'command': 'attributesAndValueElem'
+			},
+			type: "GET",
+			dataType: "json",
+			success: function(data){
+				if (data !== false) {
+					if (data.labelAttributes !== undefined) {
+						// remove old tooltip
+						$currentInput.parent().find('.tooltip').remove();
 
-	// upravime si naklonovany editBar - pridame tridu pro odliseni vygenerovaneho baru
-	$editBar.children("img").addClass('generated');
-	// delegujeme click akci na nove vytvoreny element editBar
-	$editBar.children("img.sibling").on('click', function() {
+						// if description is defined, show tooltip icon
+						if (data.labelAttributes.description != undefined) {
+							var $tooltip = $("<span/>").addClass('tooltip').addClass('help');
+							$tooltip.append($("<span/>").addClass('icon-help').text("?"));
+							$tooltip.append($("<span/>").addClass('tooltip-description').text(data.labelAttributes.description));
+							$tooltip.insertBefore($currentInput);
+							initDefaultTooltip($tooltip.find(".icon-help"));
+						}
+					}
+
+					// replace whole value element and change his name attr
+					if (data.valueElem !== undefined) {
+						// remove current value element
+						$currentInput.parents('.leaf-line').find("input.value, .config-value-cover").remove();
+
+						var $newHtml = $(data.valueElem);
+						if ($newHtml.prop('tagName') == "INPUT") {
+							$newHtml.attr('name', $currentInput.attr('name').replace('label', 'value'));
+							$newHtml.val('');
+							if ($newHtml.attr('default') != "") {
+								$newHtml.val($newHtml.attr('default'));
+							}
+							$newHtml.removeAttr('disabled');
+							$currentInput.parents('.leaf-line').append($newHtml);
+							$newHtml.focus();
+						} else {
+							$newHtml.find('input, select').attr('name', $currentInput.attr('name').replace('label', 'value')).removeAttr('disabled');
+							$currentInput.parents('.leaf-line').append($newHtml);
+							$newHtml.find('input, select').first().focus();
+						}
+						$currentInput.siblings('.typeahead').hide();
+					}
+				}
+			}
+		});
+	});
+	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
+
+	// necessary edit bar modifications - bind all actions
+	$editBar.addClass('generated');
+	$editBar.children("img.sibling").remove();
+	var modifyInputXPath = function($inputs, $coverDiv, newIndex) {
+		$inputs.each(function(i,e) {
+			var s = $(e).attr('name');
+			var newXpath = s.substring(0, s.length - 1) + '--*?' + newIndex + '!]';
+			$(e).attr('name', newXpath);
+		});
+
+		var $newRel = $coverDiv.children('.edit-bar').children('img');
+		$newRel.attr('rel', $newRel.attr('rel') + '--*?' + newIndex + '!');
+	};
+	$editBar.children("img.remove-child").on('click', function() {
+		// remove all children and itself
+		$(this).parents(".leaf-line").next("div[class*='level-']").remove();
+		$(this).parents(".leaf-line").remove();
+
+		$form.find(".leaf-line").each(function() {
+			var $inputs = $(this).find('input.value, input.label');
+			var $labelInput = $(this).find("input.label");
+			var $valueInput = $(this).find("input.value");
+
+			var newIndex = $(this).index() + $(this).siblings(".is-key").length;
+			if (newIndex < 1) newIndex = 0;
+			newIndex++;
+
+			// recover original uniqueId and xPath and generate new input name
+			$labelInput.attr('name', 'newNodeForm[label' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
+			$valueInput.attr('name', 'newNodeForm[value' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
+			modifyInputXPath($inputs, $(this), newIndex);
+		});
+	});
+	$editBar.children("img.create-child").on('click', function() {
 		createNode($(this));
 	});
+	// append edit bar to cover
+	$coverDiv.append($editBar);
 
-	// ke coveru pripojime editBar
-	$cover.prepend($editBar);
-
-	// pokud se jedna o vygenerovanou cast, pridame potomka k rodici (obalujici div)
-	level = level - 1;
-	$currentParent = $elem.parent().parent();
-	$currentParentLevel = $elem.parents('.level-' + level);
-
-	if ( $currentParentLevel.length && $currentParentLevel.hasClass('leaf-line') ) {
-		l ( "ano");
-		// jelikoz pridavame dalsi potomky, musime vlozit aktualni inputy rodice take do coveru leaf-line
-		$leaf = $("<div>").addClass('leaf-line').html($currentParent.html());
-
-		// formular jiz mame vytvoreny, pouze tedy pridame
-		if ( $('.generatedForm').length ) {
-			$currentParent.removeClass('leaf-line').html('').prepend($leaf).append($cover);
-		// jinak se jedna o prvni node, vytvorime tedy formular
-		} else {
-			$currentParent.removeClass('leaf-line').html('').prepend($leaf).append($form);
-			$form.append($cover);
-			$leaf.addClass('active');
-		}
-
-		// jelikoz jsme premistili ikonky do coveru ($leaf), musime jim znova pridat akci click
-		$currentParent.children("form .leaf-line:first-child").children('.edit-bar').children("img").on('click', function() {
-			createNode($(this));
-		});
-
-		l($cover);
-
-	} else {
-		l ( "ne");
-		// formular jiz mame vytvoreny, pouze tedy pridame
-		if ( $('.generatedForm').length ) {
-			if ( $currentParent.parents('.generatedForm').length ) {
-				$currentParent.nextAll(":last").after($cover);
-			} else {
-				$(".generatedForm").append($cover);
-			}
-		// jinak se jedna o prvni node, vytvorime tedy formular
-		} else {
-			$currentParentLevel.append($form);
-			$form.append($cover);
-			$elem.parents('.leaf-line').addClass('active');
-		}
-	}
-
-	// nyni je nutne upravit xPath vygenerovanych inputu a ikonek
-	$originalInput = $cover.children('input.value, input.label');
-	newIndex = $cover.index();
-	if (newIndex < 1) newIndex = 1;
-
-	$originalInput.each(function(i,e) {
-		newXpath = $(e).attr('name') + '[' + newIndex + ']';
-		$(e).attr('name', newXpath);
-	});
-
-	// nesmime zapomenout pridat pozmeneny xPath take k ikonkam pro pridani dalsi node
-	$newRel = $cover.children('.edit-bar').children('img');
-	$newRel.attr('rel', $newRel.attr('rel') + '][' + newIndex);
-
-	// nakonec vytvorime submit - pokud existuje, smazeme jej
-	if ( $form.children("input[type=submit]").length ) {
-		$form.children("input[type=submit]").remove();
-	}
-	$elementSubmit = $("<input>")
+	// input for value
+	var $elementValue = $("<input>")
 		.attr({
-			type: 'submit',
-			value: 'Save changes'
+			name: 'newNodeForm[value' + uniqueId + '_' + xPath + ']',
+			type: 'text',
+			'class': 'value text'
 		});
-	$form.append($elementSubmit);
+	$coverDiv.append($elementValue);
+
+
+	var disableScrolling = false;
+	if ( $('.generatedForm').length ) {
+		disableScrolling = true;
+		if ($elem.parent().hasClass('generated')) {
+			if ( $elem.parent().parent().next('.level-'+String(level)).length ) {
+				$elem.parent().parent().next('.level-'+String(level)).append($coverDiv);
+			} else {
+				$elem.parent().parent().after($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
+			}
+		} else {
+			if ( $form.children('.level-'+String(level)).length ) {
+				$form.children('.level-'+String(level)).append($coverDiv);
+			} else {
+				$currentParent.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
+			}
+		}
+	} else {
+		// create hidden input with path to the duplicated node
+		var $elementWithParentXpath = $("<input>")
+				.attr({
+					type: 'hidden',
+					name: "newNodeForm[parent]",
+					value: xPath
+				});
+		$form.prepend($elementWithParentXpath);
+
+
+		$form.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
+
+		$elem.parents('.leaf-line').addClass('active');
+		$form.insertAfter($currentParent);
+	}
+
+	// we have to modify xpath and rel attributes for generated icons and inputs
+	var $originalInput = $coverDiv.find('input.value, input.label');
+	var newIndex = $coverDiv.index() + $currentParent.siblings(".is-key").length;
+	if (newIndex < 1) newIndex = 0;
+	newIndex++;
+
+	modifyInputXPath($originalInput, $coverDiv, newIndex);
+
+	// create submit and close button
+	createSubmitButton($form, "Create new node");
+	createCloseButton($cover, $form);
+
+	unwrapCoverForm($currentParent, $cover);
+	if (!disableScrolling) {
+		scrollToGeneratedForm($elem, $form);
+	}
 }
-*/
+
+function formInputChangeConfirm(showDialog) {
+	if (formInputChanged === true) {
+		if ( (showDialog && !confirm(formChangeAlert)) || !showDialog) {
+			return false;
+		} else {
+			formInputChanged = false;
+		}
+	}
+	return true;
+}
+
+// generates unique id (in sequence)
+var generateUniqueId = (function(){var id=0;return function(){if(arguments[0]===0)id=0;return id++;}})();
+var formInputChanged = false;

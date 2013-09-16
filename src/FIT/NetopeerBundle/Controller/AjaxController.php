@@ -248,6 +248,66 @@ class AjaxController extends BaseController
 	}
 
 	/**
+	 * Get available values for label name from model based on xPath selector.
+	 *
+	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{xPath}/", name="getValuesForLabel")
+	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{module}/{xPath}/", name="getValuesForLabelWithModule")
+	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{module}/{subsection}/{xPath}/", name="getValuesForLabelWithSubsection")
+	 * @Template()
+	 *
+	 * @param int $key
+	 * @param string $formId            unique identifier of form
+	 * @param null|string $module       name of the module
+	 * @param null|string $subsection   name of the subsection
+	 * @param string $xPath    encoded xPath selector
+	 * @return Response    $result
+	 */
+	public function getValuesForLabelAction($key, $formId, $module = null, $subsection = null, $xPath = "")
+	{
+		$this->setActiveSectionKey($key);
+		$this->get('DataModel')->buildMenuStructure($key);
+		$formParams = $this->get('DataModel')->loadFilters($module, $subsection);
+
+		$configParams['key'] = $key;
+		$configParams['source'] = 'running';
+		$configParams['filter'] = $formParams['config'];
+
+		$res = $this->get('XMLoperations')->getAvailableLabelValuesForXPath($key, $formId, $xPath, $configParams);
+
+		if (is_array($res)) {
+			if (isset($_GET['command']) && isset($_GET['label'])) {
+				if ($_GET['command'] == 'attributesAndValueElem') {
+					$retArr = array();
+					if (isset($res['labelsAttributes'][$_GET['label']])) {
+						$retArr['labelAttributes'] = $res['labelsAttributes'][$_GET['label']];
+					}
+
+					if (isset($res['elems'][$_GET['label']])) {
+						$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Config:leaf.html.twig');
+						$twigArr = array();
+
+						$twigArr['key'] = "";
+						$twigArr['xpath'] = "";
+						$twigArr['element'] = $res['elems'][$_GET['label']];
+
+
+						$html = $template->renderBlock('configInputElem', $twigArr);
+						$retArr['valueElem'] = $html;
+					}
+
+					return new Response(json_encode($retArr));
+				} else {
+					return new Response(false);
+				}
+			} else {
+				return new Response(json_encode($res['labels']));
+			}
+		} else {
+			return new Response(false);
+		}
+	}
+
+	/**
 	 * Process getting history of notifications
 	 *
 	 * @Route("/ajax/get-notifications-history/{connectedDeviceId}/", name="notificationsHistory")
@@ -281,6 +341,68 @@ class AjaxController extends BaseController
 			return new Response(json_encode($history));
 		} else {
 			return $this->getAjaxAlertsRespose();
+		}
+	}
+
+	/**
+	 * Lookup IP address.
+	 *
+	 * @Route("/ajax/lookup-ip/{ip}/", name="lookupIp")
+	 * @Template()
+	 *
+	 * @var int $connectedDeviceId
+	 * @return array|bool    $result
+	 */
+	public function lookupipAction($ip)
+	{
+		if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\z/', $ip)) {
+
+			/**
+			 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
+			 */
+			$cache = $this->container->get('winzou_cache');
+			$hashedIp = md5($ip);
+			$cacheArr = array();
+
+			if ($cache->contains('lookupip_'.$hashedIp)) {
+				$cacheArr = $cache->fetch('lookupip_'.$hashedIp);
+			} else {
+				// load lookup HTML content
+				$lookup = file_get_contents('http://ip-whois-lookup.com/lookup.php?ip='.$ip);
+				try {
+					$regex = '/\<p class\=\"maptxt\"\>(.*)\<\/p\>/';
+					// get all necessary information
+					preg_match_all($regex, $lookup, $ipInfoArr);
+					if (count($ipInfoArr) > 1) {
+						$cacheArr['items'] = array();
+						foreach ($ipInfoArr[1] as $item) {
+							$cacheArr['items'][] = strip_tags($item);
+							if (strpos($item, 'Latitude: ') !== false) {
+								$cacheArr['latitude'] = str_replace("Latitude: ", "", $item);
+							}
+							if (strpos($item, 'Longitude: ') !== false) {
+								$cacheArr['longitude'] = str_replace("Longitude: ", "", $item);
+							}
+						}
+					}
+
+					// save to cache (for one day)
+					$cache->save('lookupip_'.$hashedIp, $cacheArr, 24 * 60 * 60);
+				} catch (\ErrorException $e) {
+					return new Response(false);
+				}
+			}
+			if (count($cacheArr)) {
+				$this->assign('latitude', $cacheArr['latitude']);
+				$this->assign('longitude', $cacheArr['longitude']);
+				$tmp = $cacheArr['items'];
+				if (count($tmp)) {
+					$this->assign('lookupTitle', array_shift($tmp));
+					$this->assign('ipInfo', $tmp);
+				}
+			}
+
+			return $this->getAssignedVariablesArr();
 		}
 	}
 }

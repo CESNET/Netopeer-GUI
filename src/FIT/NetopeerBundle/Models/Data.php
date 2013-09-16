@@ -77,6 +77,28 @@ class Data {
 	const MSG_RELOADHELLO			= 17;
 	const MSG_NTF_GETHISTORY		= 18;
 
+	/* subscription of notifications */
+	const CPBLT_NOTIFICATIONS		= "urn:ietf:params:netconf:capability:notification:1.0";
+	/*
+	when this capability is missing, we cannot execute RPCs before
+	notif subscribe finishes :-/
+	*/
+	const CPBLT_REALTIME_NOTIFICATIONS	= "urn:ietf:params:netconf:capability:interleave:1.0";
+	/* modifications of running config */
+	const CPBLT_WRITABLERUNNING		= "urn:ietf:params:netconf:capability:writable-running:1.0";
+	/* candidate datastore */
+	const CPBLT_CANDIDATE			= "urn:ietf:params:netconf:capability:candidate:1.0";
+	/* startup datastore */
+	const CPBLT_STARTUP			= "urn:ietf:params:netconf:capability:startup:1.0";
+	const CPBLT_NETOPEER			= "urn:cesnet:tmc:netopeer:1.0?module=netopeer-cfgnetopeer";
+	const CPBLT_NETCONF_BASE10		= "urn:ietf:params:netconf:base:1.0";
+	const CPBLT_NETCONF_BASE11		= "urn:ietf:params:netconf:base:1.1";
+
+	//"urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring&revision=2010-10-04"
+	//"urn:ietf:params:xml:ns:netconf:base:1.0?module=ietf-netconf&revision=2011-03-08"
+
+
+
 	/**
 	 * @var ContainerInterface   base bundle container
 	 */
@@ -263,9 +285,9 @@ class Data {
 	 * Find instance of SessionConnection.class for key.
 	 *
 	 * @param  int $key      session key
-	 * @return bool|\ConnectionSession
+	 * @return bool|ConnectionSession
 	 */
-	private function getConnFromKey($key) {
+	public function getConnFromKey($key) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
 		if (isset($sessionConnections[$key]) && $key !== '') {
@@ -320,6 +342,51 @@ class Data {
 			return $con->host;
 		}
 		return "";
+	}
+
+	/**
+	 * Check if capability for feature is available.
+	 *
+	 * @param  int $key      session key
+	 * @param  string $feature      name of feature/capability that is checked (constants Data::CPBLT_* can be used)
+	 * @return bool
+	 */
+	protected function checkCapabilityForKey($key, $feature) {
+		$con = $this->getConnFromKey($key);
+		if ($con) {
+			$cpblts =  json_decode($con->sessionStatus);
+			foreach ($cpblts->capabilities as $cpblt) {
+				if (strpos($cpblt, $feature, 0) === 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Gets array of available capabilities for all features.
+	 *
+	 * @param int $key      session key
+	 * @return array        array of nc features
+	 */
+	public function getCapabilitiesArrForKey($key) {
+		$ncFeatures = Array();
+		if ($this->checkCapabilityForKey($key, $this::CPBLT_NOTIFICATIONS) === true &&
+				$this->checkCapabilityForKey($key, $this::CPBLT_REALTIME_NOTIFICATIONS) === true) {
+			$ncFeatures["nc_feature_notification"] = true;
+		}
+		if ($this->checkCapabilityForKey($key, $this::CPBLT_STARTUP) === true) {
+			$ncFeatures["nc_feature_startup"] = true;
+		}
+		if ($this->checkCapabilityForKey($key, $this::CPBLT_CANDIDATE) === true) {
+			$ncFeatures["nc_feature_candidate"] = true;
+		}
+		if ($this->checkCapabilityForKey($key, $this::CPBLT_WRITABLERUNNING) === true) {
+			$ncFeatures["nc_feature_writablerunning"] = true;
+		}
+
+		return $ncFeatures;
 	}
 
 	/**
@@ -512,21 +579,6 @@ class Data {
 	}
 
 	/**
-	 * Removes <?xml?> header from text.
-	 *
-	 * @param   string &$text  string to remove XML header in
-	 * @return  mixed         returns an array if the subject parameter
-	 *                        is an array, or a string otherwise.	If matches
-	 *                        are found, the new subject will be returned,
-	 *                        otherwise subject will be returned unchanged
-	 *                        or null if an error occurred.
-	 */
-	public function removeXmlHeader(&$text)
-	{
-		return preg_replace("/<\?xml .*\?".">/i", "n", $text);
-	}
-
-	/**
 	 * handle get action
 	 *
 	 * @param  resource &$sock   	socket descriptor
@@ -610,6 +662,29 @@ class Data {
 			"session" => $sessionKey,
 			"target" => $params['target'],
 			"config" => $params['config']
+		);
+		$decoded = $this->execute_operation($sock, $params);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * handle copy config action
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params   array of values for mod_netconf (type, params...)
+	 * @return mixed          		decoded data on success, 1 on error
+	 */
+	private function handle_copyconfig(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+		$sessionKey = $this->getHashFromKey($params['key']);
+		/* edit-config to store new values */
+		$params = array(
+			"type" => self::MSG_COPYCONFIG,
+			"session" => $sessionKey,
+			"source" => $params['source'],
+			"target" => $params['target'],
 		);
 		$decoded = $this->execute_operation($sock, $params);
 		return $this->checkDecodedData($decoded);
@@ -1022,14 +1097,14 @@ class Data {
 		 * return previous response (and not ask again for response from server).
 		 */
 		$hashedParams = sha1(json_encode($params));
-		if (isset($this->handleResultsArr[$command])) {
-
-			if ($merge && isset($this->handleResultsArr[$command][$hashedParams]['merged'])) {
-				return $this->handleResultsArr[$command][$hashedParams]['merged'];
-			} elseif (isset($this->handleResultsArr[$command][$hashedParams]['unmerged'])) {
-				return $this->handleResultsArr[$command][$hashedParams]['unmerged'];
-			}
-		}
+//		if (isset($this->handleResultsArr[$command])) {
+//
+//			if ($merge && isset($this->handleResultsArr[$command][$hashedParams]['merged'])) {
+//				return $this->handleResultsArr[$command][$hashedParams]['merged'];
+//			} elseif (isset($this->handleResultsArr[$command][$hashedParams]['unmerged'])) {
+//				return $this->handleResultsArr[$command][$hashedParams]['unmerged'];
+//			}
+//		}
 
 		try {
 			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);
@@ -1059,8 +1134,11 @@ class Data {
 				break;
 			case "editconfig":
 				$this->logger->info("Handle editConfig: ", array('configToSend' => $params['config']));
-				$this->validateXml($params['config']);
+				$this->container->get('XMLoperations')->validateXml($params['config']);
 				$res = $this->handle_editconfig($sock, $params);
+				break;
+			case "copyconfig":
+				$res = $this->handle_copyconfig($sock, $params);
 				break;
 			case "disconnect":
 				$res = $this->handle_disconnect($sock, $params);
@@ -1100,40 +1178,18 @@ class Data {
 		}
 
 		if ( isset($res) && $res !== 1 && $res !== -1) {
-			if (!$this->isResponseValid($res)) {
+			if (!$this->container->get('XMLoperations')->isResponseValidXML($res)) {
 				$this->container->get('request')->getSession()->setFlash($this->flashState . ' error', "Requested XML from server is not valid.");
 				return 0;
 			}
 
-			// echo $this->removeXmlHeader($a);
-			//die();
 			if ($merge) {
-				// load model
-				$notEditedPath = $this->getModelsDir();
-				$path = $this->getPathToModels();
-				$modelFile = $path . 'wrapped.wyin';
-
-				$this->logger->info("Trying to find model in ", array('pathToFile' => $modelFile));
-
-				if ( file_exists($modelFile) ) {
-					$this->logger->info("Model found in ", array('pathToFile' => $modelFile));
-					if ( $path != $notEditedPath ) {
-						$model = simplexml_load_file($modelFile);
-						try {
-							$res = $this->mergeWithModel($model, $res);
-						} catch (\ErrorException $e) {
-							// TODO
-							$this->logger->err("Could not merge with model");
-						}
-					} else {
-						// TODO: if is not set module direcotory, we have to set model to merge with
-						// problem: we have to load all models (for example combo, comet-tester...)
-						$this->logger->warn("Could not find model in ", array('pathToFile' => $modelFile));
-					}
+				$res = $this->container->get('XMLoperations')->mergeXMLWithModel($res);
+				if ($res !== -1) {
+					$this->handleResultsArr[$command][$hashedParams]['merged'] = $res;
 				} else {
-					$this->logger->warn("Could not find model in ", array('pathToFile' => $modelFile));
+					return $res;
 				}
-				$this->handleResultsArr[$command][$hashedParams]['merged'] = $res;
 			} else {
 				$this->handleResultsArr[$command][$hashedParams]['unmerged'] = $res;
 			}
@@ -1145,175 +1201,6 @@ class Data {
 		return 0;
 	}
 
-	/**
-	 * Check, if XML response is valid.
-	 *
-	 * @param string            &$xmlString       xml response
-	 * @return int  1 on success, 0 on error
-	 */
-	private function isResponseValid(&$xmlString) {
-		try {
-			$simpleXMLRes = simplexml_load_string($xmlString);
-		} catch (\ErrorException $e) {
-			// sometimes is exactly one root node missing
-			// we will check, if is not XML valid with root node
-			$xmlString = "<root>".$xmlString."</root>";
-			try {
-				$simpleXMLRes = simplexml_load_string($xmlString);
-			} catch (\ErrorException $e) {
-				return 0;
-			}
-			return 1;
-		}
-		return 1;
-	}
-
-	/**
-	 * Get parent for element.
-	 *
-	 * @param $element
-	 * @return bool|\SimpleXMLElement
-	 */
-	private function getElementParent($element) {
-		$parents = $element->xpath("parent::*");
-		if ($parents) {
-			return $parents[0];
-		}
-		return false;
-	}
-
-	/**
-	 * Check if two elements match.
-	 *
-	 * @param $model_el
-	 * @param $possible_el
-	 * @return bool
-	 */
-	private function checkElemMatch($model_el, $possible_el) {
-		$mel = $this->getElementParent($model_el);
-		$pel = $this->getElementParent($possible_el);
-		while ($pel && $mel) {
-			if ($pel->getName() !== $mel->getName()) {
-				return false;
-			}
-			$pel = $this->getElementParent($pel);
-			$mel = $this->getElementParent($mel);
-		}
-		return true;
-	}
-
-	/**
-	 * Completes tree structure for target element.
-	 *
-	 * @param $source
-	 * @param $target
-	 */
-	private function completeAttributes(&$source, &$target) {
-		if ($source->attributes()) {
-			$attrs = $source->attributes();
-			if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
-				foreach ($source->attributes() as $key => $val) {
-					$target->addAttribute($key, $val);
-				}
-			}
-		}
-	}
-
-	/**
-	 * Find corresponding $el in configuration model $model and complete attributes from $model.
-	 *
-	 * @param  \SimpleXMLElement &$model with data model
-	 * @param  \SimpleXMLElement $el     with element of response
-	 */
-	private function findAndComplete(&$model, $el) {
-		$modelns = $model->getNamespaces();
-		$model->registerXPathNamespace("c", $modelns[""]);
-		$found = $model->xpath("//c:". $el->getName());
-		if (sizeof($found) == 1) {
-			$this->completeAttributes($found[0], $el);
-		} else {
-			//echo "Not found unique<br>";
-			foreach ($found as $found_el) {
-				if ($this->checkElemMatch($el, $found_el)) {
-					$this->completeAttributes($found_el, $el);
-					break;
-				}
-			}
-		}
-	}
-
-	/**
-	 * Go through $root_el tree that represents the response from Netconf server.
-	 *
-	 * @param  \SimpleXMLElement &$model  with data model
-	 * @param  \SimpleXMLElement $root_el with element of response
-	 */
-	private function mergeRecursive(&$model, $root_el) {
-		foreach ($root_el as $ch) {
-			$this->findAndComplete($model, $ch);
-			$this->mergeRecursive($model, $ch);
-		}
-
-		foreach ($root_el->children as $ch) {
-			$this->findAndComplete($model, $ch);
-			$this->mergeRecursive($model, $ch);
-		}
-	}
-
-	/**
-	 * Add attributes from configuration model to response such as config, mandatory, type.
-	 *
-	 * @param  \SimpleXMLElement  $model 	data configuration model
-	 * @param  string             $result data from netconf server
-	 * @return string								      the result of merge
-	 */
-	private function mergeWithModel($model, $result) {
-		if ($result) {
-			$resxml = simplexml_load_string($result);
-
-			$this->mergeRecursive($model, $resxml);
-
-			return $resxml->asXML();
-		} else {
-			return $result;
-		}
-	}
-
-	/**
-	 * Validates input string against validation files saved in models directory.
-	 * For now, only two validation step are set up - RelaxNG (*.rng) and Schema (*.xsd)
-	 *
-	 * @param string $xml   xml string to validate with RelaxNG and Schema, if available
-	 * @return int          0 on success, 1 on error
-	 */
-	private function validateXml($xml) {
-		$finder = new Finder();
-		$domDoc = new \DOMDocument();
-		$xml = "<mynetconfbase:data  xmlns:mynetconfbase='urn:ietf:params:xml:ns:netconf:base:1.0'>".$xml."</mynetconfbase:data>";
-		$domDoc->loadXML($xml);
-
-		$iterator = $finder
-				->files()
-				->name("/.*data\.(rng|xsd)$/")
-				->in($this->getPathToModels());
-
-		try {
-			foreach ($iterator as $file) {
-				$path = $file->getRealPath();
-				if (strpos($path, "rng")) {
-					$domDoc->relaxNGValidate($path);
-				} else if (strpos($path, "xsd")) {
-					$domDoc->schemaValidate($path);
-				}
-			}
-		} catch (\ErrorException $e) {
-			$this->logger->warn("XML is not valid.", array('error' => $e->getMessage(), 'xml' => $xml, 'RNGfile' => $path));
-			return 1;
-		}
-
-		return 0;
-
-	}
 
 	/**
 	 * Get XML code of model for creating new node.
@@ -1519,6 +1406,64 @@ XML;
 	}
 
 	/**
+	 * loading file with filter specification for current module or subsection
+	 *
+	 * @param  string $module     module name
+	 * @param  string $subsection subsection name
+	 * @return array              array with config and state filter
+	 */
+	public function loadFilters(&$module, &$subsection) {
+		// if file filter.txt exists in models, we will use it
+		$filterState = $filterConfig = "";
+
+		$path = $this->getPathToModels($module);
+
+		// if subsection is defined, we will add it to path
+		if ( $subsection ) {
+			$path .= $subsection.'/';
+		}
+
+		$file = $path.'filter.txt';
+
+		// if file with filter does not exist, only empty filter will be returned
+		if ( file_exists($file) ) {
+			$filterState = $filterConfig = file_get_contents($file);
+		}
+
+		return array(
+			'config' => $filterConfig,
+			'state' => $filterState
+		);
+	}
+
+	/**
+	 * loading file with RPCs for current module or subsection
+	 *
+	 * @param  string $module     module name
+	 * @param  string $subsection subsection name
+	 * @return array              array with config and state filter
+	 */
+	public function loadRPCsModel(&$module, &$subsection) {
+		// if file filter.txt exists in models, we will use it
+		$filterState = $filterConfig = "";
+
+		$path = $this->getPathToModels($module);
+
+
+		$file = $path.'rpc.yin';
+
+		$rpcs_model = "";
+		// if file with filter does not exist, only empty filter will be returned
+		if ( file_exists($file) ) {
+			$rpcs_model = file_get_contents($file);
+		}
+
+		return array(
+			'rpcs' => $rpcs_model,
+		);
+	}
+
+	/**
 	 * Get models.
 	 *
 	 * @param  int    $key        session key of current connection
@@ -1679,7 +1624,7 @@ XML;
 			'filter' => '<netconf-state xmlns="'.$ns.'"><schemas/></netconf-state>',
 		);
 
-		$xml = $this->handle('get', $params);
+		$xml = $this->handle('get', $params, false);
 		if (($xml !== 1) && ($xml !== "")) {
 			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 			if ($xml === false) {
@@ -1704,6 +1649,7 @@ XML;
 					"format" => (string)$sch->format);
 				$ident = $schparams["identifier"]."@".$schparams["version"].".".$schparams["format"];
 				if (file_exists($this->getModelsDir()."/$ident")) {
+					$this->addLog("Model found, skipping: ", array('ident', $ident));
 					continue;
 				} else if ($this->getschema($schparams, $ident) == 1) {
 					//break; /* not get the rest on error */
