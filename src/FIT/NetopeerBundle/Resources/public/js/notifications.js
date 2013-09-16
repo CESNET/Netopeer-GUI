@@ -89,8 +89,11 @@ function openipdialog() {
 	$.ajax({
 		url: $(this).attr('href'),
 		success: function(data, textStatus, jqXHR) {
-			$('#ipModalCover').html(data);
-			$('#ipModalCover').modal({show:true});
+			$('#ipModalCover').html(data)
+												.modal({show:true})
+												.on('hidden.bs.modal', function () {
+				$("#ipModalCover").html('');
+			})
 		}
 	});
 	return false;

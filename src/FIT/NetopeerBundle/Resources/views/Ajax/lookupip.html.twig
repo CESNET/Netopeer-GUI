@@ -26,16 +26,21 @@
 {% if (latitude is defined) and (longitude is defined) %}
 	<script type="text/javascript">
 		var map;
+		var myLatLng;
 
+		var scriptUrl = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyCzyJnAH28AQIc9MZijruHfxJtWmFcKjMk&sensor=true&callback=initialize';
 		function loadScript() {
+			if (!$("script[src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCzyJnAH28AQIc9MZijruHfxJtWmFcKjMk&sensor=true&callback=initialize']").length) {
+				$("script[src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCzyJnAH28AQIc9MZijruHfxJtWmFcKjMk&sensor=true&callback=initialize']").remove();
+			}
 			var script = document.createElement("script");
 			script.type = "text/javascript";
-			script.src = "http://maps.googleapis.com/maps/api/js?key=AIzaSyCzyJnAH28AQIc9MZijruHfxJtWmFcKjMk&sensor=true&callback=initialize";
+			script.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyCzyJnAH28AQIc9MZijruHfxJtWmFcKjMk&sensor=true&callback=initialize";
 			document.body.appendChild(script);
 		}
 
 		function initialize() {
-			var myLatLng = new google.maps.LatLng({{ latitude }}, {{ longitude }});
+			myLatLng = new google.maps.LatLng({{ latitude }}, {{ longitude }});
 			var mapOptions = {
 				zoom: 12,
 				center: myLatLng,
@@ -54,6 +59,4 @@
 			loadScript();
 		});
 	</script>
-
-	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCzyJnAH28AQIc9MZijruHfxJtWmFcKjMk&sensor=true"></script>
 {% endif %}
