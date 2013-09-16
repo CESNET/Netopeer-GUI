@@ -351,7 +351,7 @@ class Data {
 	 * @param  string $feature      name of feature/capability that is checked (constants Data::CPBLT_* can be used)
 	 * @return bool
 	 */
-	public function checkCapabilityForKey($key, $feature) {
+	protected function checkCapabilityForKey($key, $feature) {
 		$con = $this->getConnFromKey($key);
 		if ($con) {
 			$cpblts =  json_decode($con->sessionStatus);
@@ -362,6 +362,31 @@ class Data {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Gets array of available capabilities for all features.
+	 *
+	 * @param int $key      session key
+	 * @return array        array of nc features
+	 */
+	public function getCapabilitiesArrForKey($key) {
+		$ncFeatures = Array();
+		if ($this->checkCapabilityForKey($key, $this::CPBLT_NOTIFICATIONS) === true &&
+				$this->checkCapabilityForKey($key, $this::CPBLT_REALTIME_NOTIFICATIONS) === true) {
+			$ncFeatures["nc_feature_notification"] = true;
+		}
+		if ($this->checkCapabilityForKey($key, $this::CPBLT_STARTUP) === true) {
+			$ncFeatures["nc_feature_startup"] = true;
+		}
+		if ($this->checkCapabilityForKey($key, $this::CPBLT_CANDIDATE) === true) {
+			$ncFeatures["nc_feature_candidate"] = true;
+		}
+		if ($this->checkCapabilityForKey($key, $this::CPBLT_WRITABLERUNNING) === true) {
+			$ncFeatures["nc_feature_writablerunning"] = true;
+		}
+
+		return $ncFeatures;
 	}
 
 	/**

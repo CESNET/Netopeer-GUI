@@ -84,7 +84,7 @@ if advised of the possibility of such damage.
 	{% endif %}
 
 	{% if element.0 is defined %}
-		<span class="value">{{element.0}}</span>
+		<span class="value">{{element.0|trim|nl2br}}</span>
 	{% else %}
 		<span class="value"></span>
 	{% endif %}

@@ -320,6 +320,9 @@ class DefaultController extends BaseController
 	 */
 	public function sessionInfoAction($key, $action)
 	{
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
 		$dataClass = $this->get('DataModel');
 		parent::setActiveSectionKey($key);
 		$dataClass->buildMenuStructure($key);
@@ -333,12 +336,19 @@ class DefaultController extends BaseController
 			$session = $this->container->get('request')->getSession();
 			$sessionArr = $session->all();
 
+			// format session info output (unserialize object, convert JSON into array)
 			if (isset($sessionArr['session-connections'])) {
+				$connVarsArr = array();
 				foreach ($sessionArr['session-connections'] as $connKey => $conn) {
 					$connVarsArr['connection-'.$connKey][$connKey] = (array) unserialize($conn);
 					if ($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']) {
 						$connVarsArr['connection-'.$connKey][$connKey]['sessionStatus'] = (array) json_decode($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']);
+						if (isset($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']['capabilities'])) {
+							$connVarsArr['connection-'.$connKey][$connKey]['capabilities'] = implode("\n", $connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']['capabilities']);
+							unset($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']['capabilities']);
+						}
 					}
+					$connVarsArr['connection-'.$connKey][$connKey]['nc_features'] = $dataClass->getCapabilitiesArrForKey($connKey);
 				}
 				$sessionArr['session-connections'] = $connVarsArr;
 			}

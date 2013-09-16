@@ -168,21 +168,7 @@ class BaseController extends Controller
 			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
 		}
 
-		$ncFeatures = Array();
-		if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_NOTIFICATIONS) === true &&
-			$dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_REALTIME_NOTIFICATIONS) === true) {
-			$ncFeatures["nc_feature_notification"] = true;
-		}
-		if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_STARTUP) === true) {
-			$ncFeatures["nc_feature_startup"] = true;
-		}
-		if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_CANDIDATE) === true) {
-			$ncFeatures["nc_feature_candidate"] = true;
-		}
-		if ($dataClass->checkCapabilityForKey($key, $dataClass::CPBLT_WRITABLERUNNING) === true) {
-			$ncFeatures["nc_feature_writablerunning"] = true;
-		}
-		$this->assign("ncFeatures", $ncFeatures);
+		$this->assign("ncFeatures", $dataClass->getCapabilitiesArrForKey($key));
 	}
 
 	/**
