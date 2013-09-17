@@ -1,0 +1,41 @@
+<module xmlns="urn:ietf:params:xml:ns:yang:yin:1" xmlns:quick="http://test/test-list" xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types" name="test-list">
+    <namespace uri="http://test/test-list"/>
+    <prefix value="lv"/>
+    <organization>
+      <text>Test.</text>
+    </organization>
+    <contact>
+      <text>email@test</text>
+    </contact>
+    <description>
+      <text>Test module for list changes.</text>
+    </description>
+    <revision date="2013-09-06">
+      <description>
+        <text>First revision.</text>
+      </description>
+    </revision>
+    <container name="container">
+      <leaf name="test_leaf">
+        <type name="string"/>
+      </leaf>
+      <list name="lst1">
+        <key value="key"/>
+        <leaf name="key">
+          <type name="string"/>
+        </leaf>
+      </list>
+      <list name="lst2">
+        <key value="key"/>
+        <leaf name="key">
+          <type name="string"/>
+        </leaf>
+      </list>
+      <list name="lst3">
+        <key value="key"/>
+        <leaf name="key">
+          <type name="string"/>
+        </leaf>
+      </list>
+    </container>
+  </module>

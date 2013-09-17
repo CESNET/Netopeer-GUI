@@ -1,0 +1,315 @@
+<module xmlns="urn:ietf:params:xml:ns:yang:yin:1" xmlns:iptables="urn:cesnet:yang:packet-filter" xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types" name="cesnet-packet-filter">
+    <namespace uri="urn:cesnet:yang:packet-filter"/>
+    <prefix value="iptables"/>
+    <import module="ietf-inet-types">
+      <prefix value="inet"/>
+    </import>
+    <organization>
+      <text>CESNET, z. s. p. o.</text>
+    </organization>
+    <contact>
+      <text>Radek Krejci &lt;rkrejci@cesnet.cz&gt;</text>
+    </contact>
+    <description>
+      <text>This module contains a data model for the configuration of a generic
+packet filter (such as iptables serving as an interface for Linux kernel
+packet filter).
+
+Copyright (C) 2013 CESNET, z.s.p.o.
+
+TODO: License
+</text>
+    </description>
+    <revision date="2013-03-29">
+      <description>
+        <text>Initial revision.</text>
+      </description>
+    </revision>
+    <feature name="state-filter">
+      <description>
+        <text>If supported, packet filter is able to keeping state of the network
+connection.</text>
+      </description>
+    </feature>
+    <typedef name="filter-action">
+      <type name="enumeration">
+        <enum name="accept">
+          <value value="0"/>
+          <description>
+            <text>Allow packet</text>
+          </description>
+        </enum>
+        <enum name="reject">
+          <value value="1"/>
+          <description>
+            <text>Drop the packet and send an error message to remote host.</text>
+          </description>
+        </enum>
+        <enum name="drop">
+          <value value="2"/>
+          <description>
+            <text>Drop the packet and do not send an error message to remote host
+or sending host.</text>
+          </description>
+        </enum>
+        <enum name="log">
+          <value value="3"/>
+          <description>
+            <text>Log the packet, and continue processing following rules.</text>
+          </description>
+        </enum>
+      </type>
+      <description>
+        <text>Action that will be applied on a rule matching packet.</text>
+      </description>
+    </typedef>
+    <typedef name="chain-action">
+      <type name="enumeration">
+        <enum name="accept">
+          <value value="0"/>
+          <description>
+            <text>Let the packet through.</text>
+          </description>
+        </enum>
+        <enum name="drop">
+          <value value="1"/>
+          <description>
+            <text>Drop the packet.</text>
+          </description>
+        </enum>
+        <enum name="queue">
+          <value value="2"/>
+          <description>
+            <text>Pass the packet to userspace.</text>
+          </description>
+        </enum>
+        <enum name="return">
+          <value value="3"/>
+          <description>
+            <text>Return from this chain and continue traversing the calling chain.</text>
+          </description>
+        </enum>
+      </type>
+      <description>
+        <text>The policy of a chain.</text>
+      </description>
+    </typedef>
+    <typedef name="connection-state">
+      <type name="enumeration">
+        <enum name="new">
+          <value value="0"/>
+          <description>
+            <text>The connection has not yet been seen.</text>
+          </description>
+        </enum>
+        <enum name="related">
+          <value value="1"/>
+          <description>
+            <text>The connection is new, but is related to another connection
+already permitted.</text>
+          </description>
+        </enum>
+        <enum name="established">
+          <value value="2"/>
+          <description>
+            <text>The connection is already established.</text>
+          </description>
+        </enum>
+        <enum name="invalid">
+          <value value="3"/>
+          <description>
+            <text>The traffic is not identified for some reason.</text>
+          </description>
+        </enum>
+      </type>
+      <description>
+        <text>x</text>
+      </description>
+    </typedef>
+    <typedef name="matchall-string-type">
+      <type name="string">
+        <pattern value="\*"/>
+      </type>
+      <description>
+        <text>The string containing a single asterisk '*' is used
+to conceptually represent all possible values
+for the particular leaf using this data type.</text>
+      </description>
+    </typedef>
+    <container name="packet-filter">
+      <description>
+        <text>Configuration parameters for packet filter in the Linux kernel.</text>
+      </description>
+      <leaf name="enabled">
+        <type name="boolean"/>
+        <config value="true"/>
+        <default value="true"/>
+      </leaf>
+      <list name="chain">
+        <key value="name"/>
+        <leaf name="name">
+          <type name="string"/>
+        </leaf>
+        <choice name="default-action-choice">
+          <leaf name="default-action">
+            <type name="chain-action"/>
+          </leaf>
+          <leaf name="default-chain">
+            <type name="leafref">
+              <path value="../../chain/name"/>
+            </type>
+          </leaf>
+          <description>
+            <text>Default action for the chain.</text>
+          </description>
+        </choice>
+        <list name="rule">
+          <key value="name"/>
+          <ordered-by value="user"/>
+          <description>
+            <text>Packet filter matching rule.</text>
+          </description>
+          <leaf name="name">
+            <type name="string"/>
+          </leaf>
+          <leaf-list name="state">
+            <if-feature name="state-filter"/>
+            <type name="connection-state"/>
+            <description>
+              <text>Rule will match if the packet belongs to a connection with the
+specified state.</text>
+            </description>
+          </leaf-list>
+          <leaf name="proto">
+            <type name="union">
+              <type name="matchall-string-type"/>
+              <type name="uint8">
+                <range value="0..255"/>
+              </type>
+            </type>
+            <default value="*"/>
+            <description>
+              <text>In the Internet Protocol version 4 (IPv4) [RFC791] there is
+a field called 'Protocol' to identify the next level protocol.
+This is an 8 bit field (values 0 to 255). In Internet Protocol
+version 6 (IPv6) [RFC2460], this field is called the 'Next Header'
+field.</text>
+            </description>
+            <reference>
+              <text>IANA Protocol Numbers
+RFC5237 IANA Allocation Guidelines for the Protocol Field</text>
+            </reference>
+          </leaf>
+          <leaf name="input-if">
+            <type name="string"/>
+            <description>
+              <text>Name of an interface via which a packet was received.</text>
+            </description>
+          </leaf>
+          <leaf name="output-if">
+            <type name="string"/>
+            <description>
+              <text>Name of an interface via which a packet is going to be sent.</text>
+            </description>
+          </leaf>
+          <leaf-list name="src-port">
+            <type name="union">
+              <type name="inet:port-number"/>
+              <type name="matchall-string-type"/>
+            </type>
+            <description>
+              <text>Source port</text>
+            </description>
+          </leaf-list>
+          <list name="src-port-range">
+            <key value="start end"/>
+            <leaf name="start">
+              <type name="inet:port-number"/>
+              <description>
+                <text>Start source port of the ports range.</text>
+              </description>
+            </leaf>
+            <leaf name="end">
+              <type name="inet:port-number"/>
+              <description>
+                <text>End source port of the ports range.</text>
+              </description>
+            </leaf>
+            <description>
+              <text>Match a port range from start to end, inclusive.</text>
+            </description>
+          </list>
+          <leaf-list name="dst-port">
+            <type name="union">
+              <type name="inet:port-number"/>
+              <type name="matchall-string-type"/>
+            </type>
+            <description>
+              <text>Destination port</text>
+            </description>
+          </leaf-list>
+          <list name="dst-port-range">
+            <key value="start end"/>
+            <leaf name="start">
+              <type name="inet:port-number"/>
+              <description>
+                <text>Start destination port of the ports range.</text>
+              </description>
+            </leaf>
+            <leaf name="end">
+              <type name="inet:port-number"/>
+              <description>
+                <text>End destination port of the ports range.</text>
+              </description>
+            </leaf>
+            <description>
+              <text>Match a port range from start to end, inclusive.</text>
+            </description>
+          </list>
+          <leaf name="source">
+            <type name="union">
+              <type name="inet:ip-address"/>
+              <type name="inet:ip-prefix"/>
+              <type name="inet:domain-name"/>
+              <type name="matchall-string-type"/>
+            </type>
+            <default value="*"/>
+            <description>
+              <text>Destination address.</text>
+            </description>
+          </leaf>
+          <leaf name="destination">
+            <type name="union">
+              <type name="inet:ip-address"/>
+              <type name="inet:ip-prefix"/>
+              <type name="inet:domain-name"/>
+              <type name="matchall-string-type"/>
+            </type>
+            <default value="*"/>
+            <description>
+              <text>Source address.</text>
+            </description>
+          </leaf>
+          <choice name="action-choice">
+            <leaf name="action">
+              <type name="filter-action"/>
+            </leaf>
+            <leaf name="chain">
+              <type name="leafref">
+                <path value="../../../chain/name"/>
+              </type>
+            </leaf>
+            <description>
+              <text>Action that will be applied on a rule matching packet.</text>
+            </description>
+          </choice>
+          <leaf name="description">
+            <type name="string"/>
+            <description>
+              <text>Human readable description of the rule meaning.</text>
+            </description>
+          </leaf>
+        </list>
+      </list>
+    </container>
+  </module>

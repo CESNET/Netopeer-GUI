@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="ietf-netconf"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0"
+        xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types">
+ <namespace uri="urn:ietf:params:xml:ns:netconf:base:1.0"/>
+ <prefix value="nc"/>
+ <import module="ietf-inet-types" iskey="false">
+  <prefix value="inet"/>
+ </import>
+ <organization>
+  <text>IETF NETCONF (Network Configuration) Working Group</text>
+ </organization>
+ <contact>
+  <text>WG Web:   &lt;http://tools.ietf.org/wg/netconf/&gt;
+WG List:  &lt;mailto:netconf@ietf.org&gt;
+
+WG Chair: Bert Wijnen
+          &lt;mailto:bertietf@bwijnen.net&gt;
+
+WG Chair: Mehmet Ersue
+          &lt;mailto:mehmet.ersue@nsn.com&gt;
+
+Editor:   Martin Bjorklund
+          &lt;mailto:mbj@tail-f.com&gt;
+
+Editor:   Juergen Schoenwaelder
+          &lt;mailto:j.schoenwaelder@jacobs-university.de&gt;
+
+Editor:   Andy Bierman
+          &lt;mailto:andy.bierman@brocade.com&gt;</text>
+ </contact>
+ <description>
+  <text>NETCONF Protocol Data Types and Protocol Operations.
+
+Copyright (c) 2010 IETF Trust and the persons identified as
+the document authors.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or
+without modification, is permitted pursuant to, and subject
+to the license terms contained in, the Simplified BSD License
+set forth in Section 4.c of the IETF Trust's Legal Provisions
+Relating to IETF Documents
+(http://trustee.ietf.org/license-info).
+
+This version of this YANG module is part of RFC XXXX; see
+the RFC itself for full legal notices.</text>
+ </description>
+ <revision date="2011-03-08" description="Initial revision" iskey="false">
+  <reference>
+   <text>RFC XXXX: Network Configuration Protocol</text>
+  </reference>
+ </revision>
+ <get-filter-element-attributes eltype="extension" description="If this extension is present within the
+an &apos;anyxml&apos; statement named &apos;filter&apos;, which must be
+conceptually defined within the RPC input section
+for the &apos;get&apos; and &apos;get-config&apos; protocol operations,
+then the following unqualified XML attribute is
+supported within the &apos;filter&apos; element, within
+a &apos;get&apos; or &apos;get-config&apos; protocol operation:
+
+  type : optional attribute with allowed
+         value strings &apos;subtree&apos; and &apos;xpath&apos;.
+         If missing, the default value is &apos;subtree&apos;.
+
+If the &apos;xpath&apos; feature is supported, then the
+following unqualified XML attribute is
+also supported:
+
+  select: optional attribute containing a
+          string representing an XPath expression.
+          The &apos;type&apos; attribute must be equal to &apos;xpath&apos;
+          if this attribute is present." iskey="false"/>
+ <writable-running eltype="feature" description="NETCONF :writable-running capability;
+If the server advertises the :writable-running
+capability for a session, then this feature must
+also be enabled for that session.  Otherwise,
+this feature must not be enabled." iskey="false">
+  <reference>
+   <text>RFC XXXX, section 8.2.</text>
+  </reference>
+ </writable-running> <candidate eltype="feature" description="NETCONF :candidate capability;
+If the server advertises the :candidate
+capability for a session, then this feature must
+also be enabled for that session.  Otherwise,
+this feature must not be enabled." iskey="false">
+  <reference>
+   <text>RFC XXXX, section 8.3.</text>
+  </reference>
+ </candidate> <confirmed-commit eltype="feature" description="NETCONF :confirmed-commit:1.1 capability;
+If the server advertises the :confirmed-commit:1.1
+capability for a session, then this feature must
+also be enabled for that session.  Otherwise,
+this feature must not be enabled." iskey="false">
+  <if-feature name="candidate"/>
+  <reference>
+   <text>RFC XXXX, section 8.4.</text>
+  </reference>
+ </confirmed-commit> <rollback-on-error eltype="feature" description="NETCONF :rollback-on-error capability;
+If the server advertises the :rollback-on-error
+capability for a session, then this feature must
+also be enabled for that session.  Otherwise,
+this feature must not be enabled." iskey="false">
+  <reference>
+   <text>RFC XXXX, section 8.5.</text>
+  </reference>
+ </rollback-on-error> <validate eltype="feature" description="NETCONF :validate:1.1 capability;
+If the server advertises the :validate:1.1
+capability for a session, then this feature must
+also be enabled for that session.  Otherwise,
+this feature must not be enabled." iskey="false">
+  <reference>
+   <text>RFC XXXX, section 8.6.</text>
+  </reference>
+ </validate> <startup eltype="feature" description="NETCONF :startup capability;
+If the server advertises the :startup
+capability for a session, then this feature must
+also be enabled for that session.  Otherwise,
+this feature must not be enabled." iskey="false">
+  <reference>
+   <text>RFC XXXX, section 8.7.</text>
+  </reference>
+ </startup> <url eltype="feature" description="NETCONF :url capability;
+If the server advertises the :url
+capability for a session, then this feature must
+also be enabled for that session.  Otherwise,
+this feature must not be enabled." iskey="false">
+  <reference>
+   <text>RFC XXXX, section 8.8.</text>
+  </reference>
+ </url> <xpath eltype="feature" description="NETCONF :xpath capability;
+If the server advertises the :xpath
+capability for a session, then this feature must
+also be enabled for that session.  Otherwise,
+this feature must not be enabled." iskey="false">
+  <reference>
+   <text>RFC XXXX, section 8.9.</text>
+  </reference>
+ </xpath> <session-id-type eltype="typedef" type="uint32" range="1..max" description="NETCONF Session Id" iskey="false"/>
+ <session-id-or-zero-type eltype="typedef" type="uint32" description="NETCONF Session Id or Zero to indicate none" iskey="false"/>
+ <error-tag-type eltype="typedef" type="enumeration" enumval="in-use|invalid-value|too-big|missing-attribute|bad-attribute|unknown-attribute|missing-element|bad-element|unknown-element|unknown-namespace|access-denied|lock-denied|resource-denied|rollback-failed|data-exists|data-missing|operation-not-supported|operation-failed|partial-operation|malformed-message" description="NETCONF Error Tag" iskey="false">
+  <reference>
+   <text>RFC XXXX, Appendix A.</text>
+  </reference>
+ </error-tag-type> <error-severity-type eltype="typedef" type="enumeration" enumval="error|warning" description="NETCONF Error Severity" iskey="false">
+  <reference>
+   <text>RFC XXXX, section 4.3.</text>
+  </reference>
+ </error-severity-type> <edit-operation-type eltype="typedef" type="enumeration" enumval="merge|replace|create|delete|remove" default="merge" description="NETCONF &apos;operation&apos; attribute values" iskey="false">
+  <reference>
+   <text>RFC XXXX, section 7.2.</text>
+  </reference>
+ </edit-operation-type></module>

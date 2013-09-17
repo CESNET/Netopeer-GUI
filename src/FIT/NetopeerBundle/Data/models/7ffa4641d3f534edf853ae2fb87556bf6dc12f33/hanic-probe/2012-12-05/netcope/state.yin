@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container name="netcope"
+           xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <list name="ibuf">
+    <key value="id"/>
+    <leaf name="enabled">
+      <config value="false"/>
+      <type name="boolean"/>
+      <default value="true"/>
+      <description>
+        <text>Input buffer state.</text>
+      </description>
+    </leaf>
+    <leaf name="pacodag-overflow-occurred">
+      <config value="false"/>
+      <type name="boolean"/>
+      <description>
+        <text>PACODAG FIFO overflow occurred.</text>
+      </description>
+    </leaf>
+    <leaf name="dfifo-overflow-occurred">
+      <config value="false"/>
+      <type name="boolean"/>
+      <description>
+        <text>DFIFO overflow occured.</text>
+      </description>
+    </leaf>
+    <leaf name="total-packets">
+      <config value="false"/>
+      <type name="yang:zero-based-counter64"/>
+      <description>
+        <text>Total number of packets arrived. Correct? (Viktor)</text>
+      </description>
+    </leaf>
+    <leaf name="received-packets">
+      <config value="false"/>
+      <type name="yang:zero-based-counter64"/>
+      <description>
+        <text>Number of packets received.</text>
+      </description>
+    </leaf>
+    <leaf name="discarded-packets">
+      <config value="false"/>
+      <type name="yang:zero-based-counter64"/>
+      <description>
+        <text>Number of packets discarded.</text>
+      </description>
+    </leaf>
+    <leaf name="buffer-overflow">
+      <config value="false"/>
+      <type name="yang:zero-based-counter64"/>
+      <description>
+        <text>Number of packets rejected because of the full buffer.</text>
+      </description>
+    </leaf>
+    <leaf name="error-packets">
+      <config value="false"/>
+      <type name="yang:zero-based-counter64"/>
+      <description>
+        <text>Number of ivalid packets arrived.</text>
+      </description>
+    </leaf>
+    <container name="error-checks">
+      <leaf name="gmii">
+        <config value="false"/>
+        <type name="boolean"/>
+        <description>
+          <text>GMII error detection enabled.</text>
+        </description>
+      </leaf>
+      <leaf name="minimum-frame-length">
+        <config value="false"/>
+        <type name="boolean"/>
+        <description>
+          <text>Minimum frame length check enabled.</text>
+        </description>
+      </leaf>
+      <leaf name="mtu-frame-length">
+        <config value="false"/>
+        <type name="boolean"/>
+        <description>
+          <text>Maximum frame length check enabled.</text>
+        </description>
+      </leaf>
+      <leaf name="mac-address">
+        <config value="false"/>
+        <type name="boolean"/>
+        <default value="true"/>
+        <description>
+          <text>MAC address (according to mac-mode) check enabled.</text>
+        </description>
+      </leaf>
+    </container>
+    <container name="mac-address">
+      <when condition="./error-checks/mac-address='true'"/>
+      <config value="false"/>
+      <description>
+        <text>MAC addresses list.</text>
+      </description>
+      <leaf-list name="value">
+        <type name="yang:mac-address"/>
+        <max-elements value="16"/>
+        <description>
+          <text>MAC address.</text>
+        </description>
+      </leaf-list>
+    </container>
+    <leaf name="mac-mode">
+      <when condition="./error-checks/mac-address='true'"/>
+      <config value="false"/>
+      <type name="enumeration">
+        <enum name="promisc"/>
+        <enum name="mac-only"/>
+        <enum name="mac-with-broadcast"/>
+        <enum name="non-promisc"/>
+      </type>
+      <description>
+        <text>Interface mode. Promisc receives all packets. Mac-only receives 
+only packets for set MAC addresses. Mac-with-broadcast receives 
+packets for set MAC addresses as well as broadcasted packets. 
+Non-promisc mode receives packets for set MAC addresses, 
+broadcasted packets and multicasted packets.</text>
+      </description>
+    </leaf>
+  </list>
+  <list name="obuf">
+    <key value="id"/>
+    <leaf name="total-packets">
+      <config value="false"/>
+      <type name="yang:zero-based-counter64"/>
+      <description>
+        <text>Total number of packets attempted to transmit.</text>
+      </description>
+    </leaf>
+    <leaf name="transmited-packets">
+      <config value="false"/>
+      <type name="yang:zero-based-counter64"/>
+      <description>
+        <text>Number of packets actually transmited.</text>
+      </description>
+    </leaf>
+    <leaf name="error-packets">
+      <config value="false"/>
+      <type name="yang:zero-based-counter64"/>
+      <description>
+        <text>Number of ivalid packets attempted to transmit.</text>
+      </description>
+    </leaf>
+  </list>
+</container>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rpc-operations>
+<rpc name="make-toast"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>Make some toast.
+  The toastDone notification will be sent when 
+  the toast is finished.
+  An 'in-use' error will be returned if toast
+  is already being made.
+  A 'resource-denied' error will be returned 
+  if the toaster service is disabled.</text>
+  </description>
+  <input>
+    <leaf name="toasterDoneness">
+      <type name="uint32">
+        <range value="1 .. 10"/>
+      </type>
+      <default value="5"/>
+      <description>
+        <text>This variable controls how well-done is the 
+      ensuing toast. It should be on a scale of 1 to 10.
+      Toast made at 10 generally is considered unfit 
+      for human consumption; toast made at 1 is warmed 
+      lightly.</text>
+      </description>
+    </leaf>
+    <leaf name="toasterToastType">
+      <type name="identityref">
+        <base name="toast:toast-type"/>
+      </type>
+      <default value="wheat-bread"/>
+      <description>
+        <text>This variable informs the toaster of the type of 
+      material that is being toasted. The toaster 
+      uses this information, combined with 
+      toasterDoneness, to compute for how 
+      long the material must be toasted to achieve 
+      the required doneness.</text>
+      </description>
+    </leaf>
+  </input>
+</rpc>
+<rpc name="cancel-toast"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>Stop making toast, if any is being made.
+  A 'resource-denied' error will be returned 
+  if the toaster service is disabled.</text>
+  </description>
+</rpc>
+</rpc-operations>

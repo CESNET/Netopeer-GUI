@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list name="hanic"
+      xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <key value="id"/>
+  <leaf name="round-robin-enabled">
+    <config value="false"/>
+    <type name="boolean"/>
+    <description>
+      <text>Use Round Robin packet distribution instead hash based.</text>
+    </description>
+  </leaf>
+  <leaf name="unified-header-enabled">
+    <config value="false"/>
+    <type name="boolean"/>
+    <description>
+      <text>Forward packets in unified header format.</text>
+    </description>
+  </leaf>
+  <leaf name="filtered-packets">
+    <config value="false"/>
+    <type name="yang:zero-based-counter64"/>
+    <description>
+      <text>Number of filtered out and sampled packets.</text>
+    </description>
+  </leaf>
+  <container name="dma-discarded-packets">
+    <config value="false"/>
+    <description>
+      <text>Number of discarded packets for the specific DMA channel.</text>
+    </description>
+    <leaf-list name="value">
+      <type name="yang:zero-based-counter64"/>
+    </leaf-list>
+  </container>
+</list>

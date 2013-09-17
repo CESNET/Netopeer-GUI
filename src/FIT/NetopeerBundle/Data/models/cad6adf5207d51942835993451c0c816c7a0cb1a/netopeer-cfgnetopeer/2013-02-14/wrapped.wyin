@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="netopeer-cfgnetopeer"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:cfgnetopeer="urn:cesnet:tmc:netopeer:1.0">
+ <namespace uri="urn:cesnet:tmc:netopeer:1.0"/>
+ <prefix value="cfgnetopeer"/>
+ <organization>
+  <text>CESNET, z.s.p.o.</text>
+ </organization>
+ <contact>
+  <text>dkupka@cesnet.cz</text>
+ </contact>
+ <description>
+  <text>Module specifying Netopeer module data model and RPC operation.</text>
+ </description>
+ <revision date="2013-02-14" description="Modules are now configurable. Except implemented-rpcs which depends on module data model." iskey="false"/>
+ <revision date="2012-11-13" description="Removed parts implemented by library (RFC6022)." iskey="false"/>
+ <revision date="2011-10-20" description="Initial revision" iskey="false"/>
+<netopeer eltype="container" config="true" iskey="false"><modules eltype="container" config="true" iskey="false"><module eltype="list" config="true" key="module-name" iskey="false"><module-name eltype="leaf" config="true" type="string" description="Name of module" iskey="true"/>
+<module-allowed eltype="leaf" config="true" type="boolean" description="Specify whether or not the module is allowed to be managed over server." iskey="false"/>
+<implemented-rpc eltype="leaf-list" config="false" type="string" iskey="false"/>
+</module>
+</modules>
+</netopeer>
+</module>

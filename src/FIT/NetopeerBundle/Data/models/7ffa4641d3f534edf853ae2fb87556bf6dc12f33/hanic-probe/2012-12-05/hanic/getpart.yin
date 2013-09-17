@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list name="hanic"
+      xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <key value="id"/>
+  <leaf name="id">
+    <type name="uint8"/>
+    <description>
+      <text>hanic ID</text>
+    </description>
+  </leaf>
+  <container name="hash-fields">
+    <description>
+      <text>List of fields to use as hash input.</text>
+    </description>
+    <leaf name="IPVersion">
+      <type name="boolean"/>
+      <default value="false"/>
+    </leaf>
+    <leaf name="SrcIP">
+      <type name="boolean"/>
+      <default value="true"/>
+    </leaf>
+    <leaf name="DstIP">
+      <type name="boolean"/>
+      <default value="true"/>
+    </leaf>
+    <leaf name="L4Protocol">
+      <type name="boolean"/>
+      <default value="false"/>
+    </leaf>
+    <leaf name="SrcPort">
+      <type name="boolean"/>
+      <default value="false"/>
+    </leaf>
+    <leaf name="DstPort">
+      <type name="boolean"/>
+      <default value="false"/>
+    </leaf>
+  </container>
+  <leaf name="sampling">
+    <type name="uint8">
+      <range value="1..16"/>
+    </type>
+    <default value="1"/>
+    <description>
+      <text>Sampling unit ratio.</text>
+    </description>
+  </leaf>
+  <leaf name="round-robin-enabled">
+    <config value="false"/>
+    <type name="boolean"/>
+    <description>
+      <text>Use Round Robin packet distribution instead hash based.</text>
+    </description>
+  </leaf>
+  <leaf name="unified-header-enabled">
+    <config value="false"/>
+    <type name="boolean"/>
+    <description>
+      <text>Forward packets in unified header format.</text>
+    </description>
+  </leaf>
+  <container name="hash-filter">
+    <leaf name="low">
+      <type name="uint16"/>
+      <description>
+        <text>Minimal accepted hash value for hash-based sampling.</text>
+      </description>
+    </leaf>
+    <leaf name="high">
+      <type name="uint16"/>
+      <description>
+        <text>Maximal accepted hash value for hash-based sampling.</text>
+      </description>
+    </leaf>
+  </container>
+  <leaf name="opposite-direction-enable">
+    <type name="boolean"/>
+    <default value="false"/>
+    <description>
+      <text>Compute hash for opposite direction packet (swap Src and Dst IP).</text>
+    </description>
+  </leaf>
+  <leaf name="filtered-packets">
+    <config value="false"/>
+    <type name="yang:zero-based-counter64"/>
+    <description>
+      <text>Number of filtered out and sampled packets.</text>
+    </description>
+  </leaf>
+  <container name="dma-discarded-packets">
+    <config value="false"/>
+    <description>
+      <text>Number of discarded packets for the specific DMA channel.</text>
+    </description>
+    <leaf-list name="value">
+      <type name="yang:zero-based-counter64"/>
+    </leaf-list>
+  </container>
+</list>

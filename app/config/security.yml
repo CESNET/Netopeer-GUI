@@ -9,13 +9,15 @@ security:
 
     providers:
         chain_provider:
-            providers:          [user_db, in_memory]
+            chain:
+                providers:          [user_db, in_memory]
         user_db:
-            entity: { class: FIT\NetopeerBundle\Entity\User, property: username }
+            entity: { class: FITNetopeerBundle:User, property: username }
         in_memory:
-            users:
-                user:           { password: pass,    roles: [ 'ROLE_USER' ] }
-                adminNoDb:    { password: pass,    roles: [ 'ROLE_ADMIN' ] }
+            memory:
+                users:
+                    user:           { password: pass,    roles: [ 'ROLE_USER' ] }
+                    adminNoDb:      { password: pass,    roles: [ 'ROLE_ADMIN' ] }
 
     firewalls:
         dev:
@@ -35,4 +37,4 @@ security:
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY}
         - { path: ^/, roles: ROLE_USER}
-        #- { path: ^/_internal, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
+        #- { path: ^/_internal/secure, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }

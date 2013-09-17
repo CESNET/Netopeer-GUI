@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<container name="R"
+           xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <leaf name="L">
+    <type name="string"/>
+  </leaf>
+  <leaf name="C">
+    <type name="string"/>
+  </leaf>
+  <leaf name="R">
+    <type name="string"/>
+  </leaf>
+</container>

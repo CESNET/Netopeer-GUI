@@ -44,6 +44,7 @@ namespace FIT\NetopeerBundle\Entity;
 
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Doctrine\ORM\Mapping as ORM;
 use FIT\NetopeerBundle\Entity\BaseConnection as BaseConnection;
 use FIT\NetopeerBundle\Entity\UserSettings as UserSettings;
@@ -54,7 +55,7 @@ use FIT\NetopeerBundle\Entity\UserSettings as UserSettings;
  * @ORM\Entity
  * @ORM\Table(name="user")
  */
-class User implements UserInterface {
+class User implements UserInterface, EquatableInterface {
 
 	/**
 	 * @var int unique identifier
@@ -68,20 +69,20 @@ class User implements UserInterface {
 	/**
 	 * @var string unique username
 	 *
-	 * @ORM\Column(type="string", length="64", nullable="true", unique="true")
+	 * @ORM\Column(type="string", length=64, nullable=true, unique=true)
 	 * @ORM\JoinColumn(onDelete="cascade")
 	 */
 	protected $username;
 
 	/**
 	 * @var string  salted password
-	 * @ORM\Column(type="string", nullable="true")
+	 * @ORM\Column(type="string", nullable=true)
 	 */
 	protected $password;
 
 	/**
 	 * @var string  string of user roles
-	 * @ORM\Column(type="string", nullable="true")
+	 * @ORM\Column(type="string", nullable=true)
 	 */
 	protected $roles;
 
@@ -158,7 +159,7 @@ class User implements UserInterface {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function equals(UserInterface $user) {
+	public function isEqualTo(UserInterface $user) {
 		if (!$user instanceof User) {
 			return false;
 		}

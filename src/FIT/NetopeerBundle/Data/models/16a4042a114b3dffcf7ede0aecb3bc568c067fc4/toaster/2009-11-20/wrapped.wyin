@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="toaster"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:toast="http://netconfcentral.org/ns/toaster">
+ <yang-version value="1"/>
+ <namespace uri="http://netconfcentral.org/ns/toaster"/>
+ <prefix value="toast"/>
+ <organization>
+  <text>Netconf Central</text>
+ </organization>
+ <contact>
+  <text>Andy Bierman &lt;andy@netconfcentral.org&gt;</text>
+ </contact>
+ <description>
+  <text>YANG version of the TOASTER-MIB.</text>
+ </description>
+ <revision date="2009-11-20" description="Toaster module in progress." iskey="false"/>
+ <toast-type eltype="identity" description="Base for all bread types supported by the toaster.
+  New bread types not listed here nay be added in the 
+  future." iskey="false"/>
+ <white-bread eltype="identity" description="White bread." iskey="false">
+  <base name="toast:toast-type"/>
+ </white-bread> <wheat-bread eltype="identity" description="Wheat bread." iskey="false">
+  <base name="toast-type"/>
+ </wheat-bread> <wonder-bread eltype="identity" description="Wonder bread." iskey="false">
+  <base name="toast-type"/>
+ </wonder-bread> <frozen-waffle eltype="identity" description="Frozen waffle." iskey="false">
+  <base name="toast-type"/>
+ </frozen-waffle> <frozen-bagel eltype="identity" description="Frozen bagel." iskey="false">
+  <base name="toast-type"/>
+ </frozen-bagel> <hash-brown eltype="identity" description="Hash browned potatos." iskey="false">
+  <base name="toast-type"/>
+ </hash-brown> <DisplayString eltype="typedef" type="string" description="YANG version of the SMIv2 DisplayString TEXTUAL-CONVENTION." iskey="false">
+  <reference>
+   <text>RFC 2579, section 2.</text>
+  </reference>
+ </DisplayString><toaster eltype="container" config="true" description="Top-level container for all toaster database objects." iskey="false"><test eltype="container" config="true" iskey="false"><L eltype="container" config="true" iskey="false"><L eltype="leaf" config="true" type="string" iskey="false"/>
+<C eltype="leaf" config="true" type="string" iskey="false"/>
+<R eltype="leaf" config="true" type="string" iskey="false"/>
+</L>
+<C eltype="container" config="true" iskey="false"><L eltype="leaf" config="true" type="string" iskey="false"/>
+<C eltype="leaf" config="true" type="string" iskey="false"/>
+<R eltype="leaf" config="true" type="string" iskey="false"/>
+</C>
+<R eltype="container" config="true" iskey="false"><L eltype="leaf" config="true" type="string" iskey="false"/>
+<C eltype="leaf" config="true" type="string" iskey="false"/>
+<R eltype="leaf" config="true" type="string" iskey="false"/>
+</R>
+</test>
+<toasterManufacturer eltype="leaf" config="false" type="DisplayString" description="The name of the toaster&apos;s manufacturer. For instance, 
+     Microsoft Toaster." mandatory="true" iskey="false"/>
+<toasterModelNumber eltype="leaf" config="false" type="DisplayString" description="The name of the toaster&apos;s model. For instance,
+    Radiant Automatic." mandatory="true" iskey="false"/>
+<toasterStatus eltype="leaf" config="false" type="enumeration" description="This variable indicates the current state of 
+    the toaster." mandatory="true" enumval="up|down" iskey="false"/>
+</toaster>
+</module>

@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<list name="rule"
+      xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <key value="name"/>
+  <ordered-by value="user"/>
+  <description>
+    <text>Packet filter matching rule.</text>
+  </description>
+  <leaf name="name">
+    <type name="string"/>
+  </leaf>
+  <leaf-list name="state">
+    <if-feature name="state-filter"/>
+    <type name="connection-state"/>
+    <description>
+      <text>Rule will match if the packet belongs to a connection with the
+specified state.</text>
+    </description>
+  </leaf-list>
+  <leaf name="proto">
+    <type name="union">
+      <type name="matchall-string-type"/>
+      <type name="uint8">
+        <range value="0..255"/>
+      </type>
+    </type>
+    <default value="*"/>
+    <description>
+      <text>In the Internet Protocol version 4 (IPv4) [RFC791] there is
+a field called 'Protocol' to identify the next level protocol.
+This is an 8 bit field (values 0 to 255). In Internet Protocol
+version 6 (IPv6) [RFC2460], this field is called the 'Next Header'
+field.</text>
+    </description>
+    <reference>
+      <text>IANA Protocol Numbers
+RFC5237 IANA Allocation Guidelines for the Protocol Field</text>
+    </reference>
+  </leaf>
+  <leaf name="input-if">
+    <type name="string"/>
+    <description>
+      <text>Name of an interface via which a packet was received.</text>
+    </description>
+  </leaf>
+  <leaf name="output-if">
+    <type name="string"/>
+    <description>
+      <text>Name of an interface via which a packet is going to be sent.</text>
+    </description>
+  </leaf>
+  <leaf-list name="src-port">
+    <type name="union">
+      <type name="inet:port-number"/>
+      <type name="matchall-string-type"/>
+    </type>
+    <description>
+      <text>Source port</text>
+    </description>
+  </leaf-list>
+  <list name="src-port-range">
+    <key value="start end"/>
+    <leaf name="start">
+      <type name="inet:port-number"/>
+      <description>
+        <text>Start source port of the ports range.</text>
+      </description>
+    </leaf>
+    <leaf name="end">
+      <type name="inet:port-number"/>
+      <description>
+        <text>End source port of the ports range.</text>
+      </description>
+    </leaf>
+    <description>
+      <text>Match a port range from start to end, inclusive.</text>
+    </description>
+  </list>
+  <leaf-list name="dst-port">
+    <type name="union">
+      <type name="inet:port-number"/>
+      <type name="matchall-string-type"/>
+    </type>
+    <description>
+      <text>Destination port</text>
+    </description>
+  </leaf-list>
+  <list name="dst-port-range">
+    <key value="start end"/>
+    <leaf name="start">
+      <type name="inet:port-number"/>
+      <description>
+        <text>Start destination port of the ports range.</text>
+      </description>
+    </leaf>
+    <leaf name="end">
+      <type name="inet:port-number"/>
+      <description>
+        <text>End destination port of the ports range.</text>
+      </description>
+    </leaf>
+    <description>
+      <text>Match a port range from start to end, inclusive.</text>
+    </description>
+  </list>
+  <leaf name="source">
+    <type name="union">
+      <type name="inet:ip-address"/>
+      <type name="inet:ip-prefix"/>
+      <type name="inet:domain-name"/>
+      <type name="matchall-string-type"/>
+    </type>
+    <default value="*"/>
+    <description>
+      <text>Destination address.</text>
+    </description>
+  </leaf>
+  <leaf name="destination">
+    <type name="union">
+      <type name="inet:ip-address"/>
+      <type name="inet:ip-prefix"/>
+      <type name="inet:domain-name"/>
+      <type name="matchall-string-type"/>
+    </type>
+    <default value="*"/>
+    <description>
+      <text>Source address.</text>
+    </description>
+  </leaf>
+  <choice name="action-choice">
+    <leaf name="action">
+      <type name="filter-action"/>
+    </leaf>
+    <leaf name="chain">
+      <type name="leafref">
+        <path value="../../../chain/name"/>
+      </type>
+    </leaf>
+    <description>
+      <text>Action that will be applied on a rule matching packet.</text>
+    </description>
+  </choice>
+  <leaf name="description">
+    <type name="string"/>
+    <description>
+      <text>Human readable description of the rule meaning.</text>
+    </description>
+  </leaf>
+</list>

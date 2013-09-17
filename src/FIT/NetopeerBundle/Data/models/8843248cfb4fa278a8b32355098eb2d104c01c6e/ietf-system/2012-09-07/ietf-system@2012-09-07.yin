@@ -1,0 +1,140 @@
+<module xmlns="urn:ietf:params:xml:ns:yang:yin:1" xmlns:sys="urn:ietf:params:xml:ns:yang:ietf-system" xmlns:yang="urn:ietf:params:xml:ns:yang:ietf-yang-types" name="ietf-system">
+    <namespace uri="urn:ietf:params:xml:ns:yang:ietf-system"/>
+    <prefix value="sys"/>
+    <import module="ietf-yang-types">
+      <prefix value="yang"/>
+    </import>
+    <organization>
+      <text>IETF NETMOD (NETCONF Data Modeling Language) Working Group</text>
+    </organization>
+    <contact>
+      <text>WG Web:   &lt;http://tools.ietf.org/wg/netmod/&gt;
+WG List:  &lt;mailto:netmod@ietf.org&gt;
+
+WG Chair: David Kessens
+          &lt;mailto:david.kessens@nsn.com&gt;
+
+WG Chair: Juergen Schoenwaelder
+          &lt;mailto:j.schoenwaelder@jacobs-university.de&gt;
+
+Editor:   Andy Bierman
+          &lt;mailto:andy@yumaworks.com&gt;
+
+Editor:   Martin Bjorklund
+          &lt;mailto:mbj@tail-f.com&gt;</text>
+    </contact>
+    <description>
+      <text>This module contains a collection of YANG definitions for the
+configuration and identification of the management system of a
+device.
+
+Copyright (c) 2012 IETF Trust and the persons identified as
+authors of the code.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or
+without modification, is permitted pursuant to, and subject
+to the license terms contained in, the Simplified BSD License
+set forth in Section 4.c of the IETF Trust's Legal Provisions
+Relating to IETF Documents
+(http://trustee.ietf.org/license-info).
+
+This version of this YANG module is part of RFC XXXX; see
+the RFC itself for full legal notices.</text>
+    </description>
+    <revision date="2012-09-07">
+      <description>
+        <text>Initial revision.</text>
+      </description>
+      <reference>
+        <text>RFC XXXX: A YANG Data Model for System Management</text>
+      </reference>
+    </revision>
+    <container name="system">
+      <description>
+        <text>System group configuration.</text>
+      </description>
+      <container name="platform">
+        <config value="false"/>
+        <description>
+          <text>Contains vendor-specific information for
+identifying the system platform and operating system.</text>
+        </description>
+        <reference>
+          <text>IEEE Std 1003.1-2008 - sys/utsname.h</text>
+        </reference>
+        <leaf name="os-name">
+          <type name="string"/>
+          <description>
+            <text>The name of the operating system in use,
+for example 'Linux'</text>
+          </description>
+          <reference>
+            <text>IEEE Std 1003.1-2008 - utsname.sysname</text>
+          </reference>
+        </leaf>
+        <leaf name="os-release">
+          <type name="string"/>
+          <description>
+            <text>The current release level of the operating
+system in use.  This string MAY indicate
+the OS source code revision.</text>
+          </description>
+          <reference>
+            <text>IEEE Std 1003.1-2008 - utsname.release</text>
+          </reference>
+        </leaf>
+        <leaf name="os-version">
+          <type name="string"/>
+          <description>
+            <text>The current version level of the operating
+system in use.  This string MAY indicate
+the specific OS build date and target variant
+information.</text>
+          </description>
+          <reference>
+            <text>IEEE Std 1003.1-2008 - utsname.version</text>
+          </reference>
+        </leaf>
+        <leaf name="machine">
+          <type name="string"/>
+          <description>
+            <text>A vendor-specific identifier string representing
+the hardware in use.</text>
+          </description>
+          <reference>
+            <text>IEEE Std 1003.1-2008 - utsname.machine</text>
+          </reference>
+        </leaf>
+        <leaf name="nodename">
+          <type name="string"/>
+          <description>
+            <text>The host name of this system.</text>
+          </description>
+          <reference>
+            <text>IEEE Std 1003.1-2008 - utsname.nodename</text>
+          </reference>
+        </leaf>
+      </container>
+      <container name="clock">
+        <description>
+          <text>Configuration and monitoring of the system
+date and time properties.</text>
+        </description>
+        <leaf name="current-datetime">
+          <type name="yang:date-and-time"/>
+          <config value="false"/>
+          <description>
+            <text>The current system date and time.</text>
+          </description>
+        </leaf>
+        <leaf name="boot-datetime">
+          <type name="yang:date-and-time"/>
+          <config value="false"/>
+          <description>
+            <text>The system date and time when the NETCONF
+server last restarted.</text>
+          </description>
+        </leaf>
+      </container>
+    </container>
+  </module>

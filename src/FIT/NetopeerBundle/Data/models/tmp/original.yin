@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<netopeer xmlns="urn:cesnet:tmc:netopeer:1.0">
+    <modules>
+      <module>
+        <module-name>Netopeer</module-name>
+        <module-allowed>true</module-allowed>
+      </module>
+      <module>
+        <module-name>Combo</module-name>
+        <module-allowed>true</module-allowed>
+      </module>
+      <module>
+        <module-name>Hanic</module-name>
+        <module-allowed>true</module-allowed>
+      </module>
+    </modules>
+  </netopeer>

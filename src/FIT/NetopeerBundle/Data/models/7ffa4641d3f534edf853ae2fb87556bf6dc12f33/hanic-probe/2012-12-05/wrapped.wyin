@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="hanic-probe"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:hanicprobe="urn:cesnet:tmc:hanicprobe:1.0"
+        xmlns:yang="urn:ietf:params:xml:ns:yang:ietf-yang-types">
+ <namespace uri="urn:cesnet:tmc:hanicprobe:1.0"/>
+ <prefix value="hanicprobe"/>
+ <import module="ietf-yang-types" iskey="false">
+  <prefix value="yang"/>
+ </import>
+ <organization>
+  <text>CESNET, z.s.p.o.</text>
+ </organization>
+ <contact>
+  <text>rkrejci@cesnet.cz</text>
+ </contact>
+ <description>
+  <text>Module specifying configuration model and RPC operations for
+network traffic flow probe using HANIC.</text>
+ </description>
+ <revision date="2012-12-05" description="Added constraint on minimal number of collectors for each exporter." iskey="false"/>
+ <revision date="2012-10-16" description="Allow multiple collectors for a single exporter." iskey="false"/>
+ <revision date="2012-04-13" description="Initial revision" iskey="false"/>
+ <decimal eltype="typedef" type="string" description="Simple decimal numbers type definition" iskey="false"/>
+<hanic-probes eltype="container" config="true" iskey="false"><hanic-probe eltype="list" config="true" key="combo-card-device" iskey="false"><combo-card-device eltype="leaf" config="true" type="string" description="Combo card device file. Connects the flow probe with the specific Combo card." iskey="true"/>
+<netcope eltype="container" config="true" iskey="false"><ibuf eltype="list" config="true" key="id" iskey="false"><id eltype="leaf" config="true" type="uint8" description="IBUF ID." iskey="true"/>
+<enabled eltype="leaf" config="false" type="boolean" description="Input buffer state." default="True" iskey="false"/>
+<pacodag-overflow-occurred eltype="leaf" config="false" type="boolean" description="PACODAG FIFO overflow occurred." iskey="false"/>
+<dfifo-overflow-occurred eltype="leaf" config="false" type="boolean" description="DFIFO overflow occured." iskey="false"/>
+<total-packets eltype="leaf" config="false" type="yang:zero-based-counter64" description="Total number of packets arrived. Correct? (Viktor)" iskey="false"/>
+<received-packets eltype="leaf" config="false" type="yang:zero-based-counter64" description="Number of packets received." iskey="false"/>
+<discarded-packets eltype="leaf" config="false" type="yang:zero-based-counter64" description="Number of packets discarded." iskey="false"/>
+<buffer-overflow eltype="leaf" config="false" type="yang:zero-based-counter64" description="Number of packets rejected because of the full buffer." iskey="false"/>
+<error-packets eltype="leaf" config="false" type="yang:zero-based-counter64" description="Number of ivalid packets arrived." iskey="false"/>
+<error-checks eltype="container" config="true" iskey="false"><gmii eltype="leaf" config="false" type="boolean" description="GMII error detection enabled." iskey="false"/>
+<crc eltype="leaf" config="true" type="boolean" description="CRC check enabled." default="True" iskey="false"/>
+<minimum-frame-length eltype="leaf" config="false" type="boolean" description="Minimum frame length check enabled." iskey="false"/>
+<mtu-frame-length eltype="leaf" config="false" type="boolean" description="Maximum frame length check enabled." iskey="false"/>
+<mac-address eltype="leaf" config="false" type="boolean" description="MAC address (according to mac-mode) check enabled." default="True" iskey="false"/>
+</error-checks>
+<minimum-frame-length eltype="leaf" config="true" type="uint32" description="Minimum frame length value. If not set, the minimum frame length
+check is disabled." default="64" iskey="false"/>
+<mtu-frame-length eltype="leaf" config="true" type="uint32" description="Maximum frame length set. If not set, the MTU frame length check
+is disabled." iskey="false"/>
+<mac-address eltype="container" config="false" description="MAC addresses list." iskey="false"><value eltype="leaf-list" config="false" type="yang:mac-address" description="MAC address." iskey="false"/>
+</mac-address>
+<mac-mode eltype="leaf" config="false" type="enumeration" description="Interface mode. Promisc receives all packets. Mac-only receives 
+only packets for set MAC addresses. Mac-with-broadcast receives 
+packets for set MAC addresses as well as broadcasted packets. 
+Non-promisc mode receives packets for set MAC addresses, 
+broadcasted packets and multicasted packets." enumval="promisc|mac-only|mac-with-broadcast|non-promisc" iskey="false"/>
+</ibuf>
+<obuf eltype="list" config="true" key="id" iskey="false"><id eltype="leaf" config="true" type="uint8" description="OBUF ID." iskey="true"/>
+<enabled eltype="leaf" config="true" type="boolean" description="Output buffer state." default="True" iskey="false"/>
+<total-packets eltype="leaf" config="false" type="yang:zero-based-counter64" description="Total number of packets attempted to transmit." iskey="false"/>
+<transmited-packets eltype="leaf" config="false" type="yang:zero-based-counter64" description="Number of packets actually transmited." iskey="false"/>
+<error-packets eltype="leaf" config="false" type="yang:zero-based-counter64" description="Number of ivalid packets attempted to transmit." iskey="false"/>
+<repeater-mode eltype="leaf" config="true" type="enumeration" description="Port repeater status. In obuf state, interface transmits normal
+output data controlled by OBUF. In repeater mode, the received
+traffic is retransmitted. In idle mode, any output is disabled.
+The last off mode turns off the transceiver." default="obuf" enumval="obuf|repeater|idle|off" iskey="false"/>
+</obuf>
+</netcope>
+<hanic eltype="list" config="true" key="id" iskey="false"><id eltype="leaf" config="true" type="uint8" description="hanic ID" iskey="true"/>
+<hash-fields eltype="container" config="true" description="List of fields to use as hash input." iskey="false"><IPVersion eltype="leaf" config="true" type="boolean" iskey="false"/>
+<SrcIP eltype="leaf" config="true" type="boolean" default="True" iskey="false"/>
+<DstIP eltype="leaf" config="true" type="boolean" default="True" iskey="false"/>
+<L4Protocol eltype="leaf" config="true" type="boolean" iskey="false"/>
+<SrcPort eltype="leaf" config="true" type="boolean" iskey="false"/>
+<DstPort eltype="leaf" config="true" type="boolean" iskey="false"/>
+</hash-fields>
+<sampling eltype="leaf" config="true" type="uint8" description="Sampling unit ratio." default="1" iskey="false"/>
+<round-robin-enabled eltype="leaf" config="false" type="boolean" description="Use Round Robin packet distribution instead hash based." iskey="false"/>
+<unified-header-enabled eltype="leaf" config="false" type="boolean" description="Forward packets in unified header format." iskey="false"/>
+<hash-filter eltype="container" config="true" iskey="false"><low eltype="leaf" config="true" type="uint16" description="Minimal accepted hash value for hash-based sampling." iskey="false"/>
+<high eltype="leaf" config="true" type="uint16" description="Maximal accepted hash value for hash-based sampling." iskey="false"/>
+</hash-filter>
+<opposite-direction-enable eltype="leaf" config="true" type="boolean" description="Compute hash for opposite direction packet (swap Src and Dst IP)." iskey="false"/>
+<filtered-packets eltype="leaf" config="false" type="yang:zero-based-counter64" description="Number of filtered out and sampled packets." iskey="false"/>
+<dma-discarded-packets eltype="container" config="false" description="Number of discarded packets for the specific DMA channel." iskey="false"><value eltype="leaf-list" config="false" type="yang:zero-based-counter64" iskey="false"/>
+</dma-discarded-packets>
+</hanic>
+<exporters eltype="container" config="true" iskey="false"><exporter eltype="list" config="true" key="id" iskey="false"><id eltype="leaf" config="true" type="uint8" description="Exporter unique identifier in the configuration data." iskey="true"/>
+<collector eltype="list" config="true" key="host port id" iskey="false"><id eltype="leaf" config="true" type="uint8" description="Flow data source identification sent to the collector" iskey="true"/>
+<host eltype="leaf" config="true" type="string" description="Hostname (or IPv4/6 address) of the collector where to send data." iskey="true"/>
+<port eltype="leaf" config="true" type="uint16" description="Port of the collector where to send data." iskey="true"/>
+<protocol_export eltype="leaf" config="true" type="enumeration" description="Flow information export protocol." default="NetFlow v9" enumval="NetFlow v5|NetFlow v9|IPFIX" iskey="false"/>
+<protocol_ip eltype="leaf" config="true" type="enumeration" description="Force IP protocol when connecting to the collector." default="IPv4" enumval="IPv4|IPv6" iskey="false"/>
+<protocol_transport eltype="leaf" config="true" type="enumeration" description="Transport protocol for the IPFIX protocol." default="TCP" enumval="UDP|TCP|SCTP" iskey="false"/>
+<filter eltype="leaf" config="true" type="string" description="Name of the filter applied to the exported data going to this collector." iskey="false"/>
+<filter-params eltype="leaf" config="true" type="string" description="Specific parameters for the specified filter." iskey="false"/>
+</collector>
+<interface_mask eltype="leaf" config="true" type="uint8" description="Mask for input interfaces." default="255" iskey="false"/>
+<timeout_active eltype="leaf" config="true" type="uint16" default="180" iskey="false"/>
+<timeout_inactive eltype="leaf" config="true" type="uint8" default="10" iskey="false"/>
+<cpu_mask eltype="leaf" config="true" type="uint8" description="Mask of allowed CPUs." default="1" iskey="false"/>
+<flowcache_size eltype="leaf" config="true" type="uint8" description="Queue (flowcache) size in power of 2." default="19" iskey="false"/>
+</exporter>
+</exporters>
+</hanic-probe>
+</hanic-probes>
+</module>

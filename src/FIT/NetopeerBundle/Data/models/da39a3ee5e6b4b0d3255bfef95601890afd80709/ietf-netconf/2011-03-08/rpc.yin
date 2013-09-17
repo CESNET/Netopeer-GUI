@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rpc-operations>
+<rpc name="get-config"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>Retrieve all or part of a specified configuration.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.1.</text>
+  </reference>
+  <input>
+    <container name="source">
+      <description>
+        <text>Particular configuration to retrieve.</text>
+      </description>
+      <choice name="config-source">
+        <mandatory value="true"/>
+        <description>
+          <text>The configuration to retrieve.</text>
+        </description>
+        <leaf name="candidate">
+          <if-feature name="candidate"/>
+          <type name="empty"/>
+          <description>
+            <text>The candidate configuration is the config source.</text>
+          </description>
+        </leaf>
+        <leaf name="running">
+          <type name="empty"/>
+          <description>
+            <text>The running configuration is the config source.</text>
+          </description>
+        </leaf>
+        <leaf name="startup">
+          <if-feature name="startup"/>
+          <type name="empty"/>
+          <description>
+            <text>The startup configuration is the config source.
+This is optional-to-implement on the server because
+not all servers will support filtering for this
+datastore.</text>
+          </description>
+        </leaf>
+      </choice>
+    </container>
+    <anyxml name="filter">
+      <description>
+        <text>Subtree or XPath filter to use.</text>
+      </description>
+      <nc:get-filter-element-attributes/>
+    </anyxml>
+  </input>
+  <output>
+    <anyxml name="data">
+      <description>
+        <text>Copy of the source datastore subset which matched
+the filter criteria (if any).  An empty data container
+indicates that the request did not produce any results.</text>
+      </description>
+    </anyxml>
+  </output>
+</rpc>
+<rpc name="edit-config"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>The 'edit-config' operation loads all or part of a specified
+configuration to the specified target configuration.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.2.</text>
+  </reference>
+  <input>
+    <container name="target">
+      <description>
+        <text>Particular configuration to edit.</text>
+      </description>
+      <choice name="config-target">
+        <mandatory value="true"/>
+        <description>
+          <text>The configuration target.</text>
+        </description>
+        <leaf name="candidate">
+          <if-feature name="candidate"/>
+          <type name="empty"/>
+          <description>
+            <text>The candidate configuration is the config target.</text>
+          </description>
+        </leaf>
+        <leaf name="running">
+          <if-feature name="writable-running"/>
+          <type name="empty"/>
+          <description>
+            <text>The running configuration is the config source.</text>
+          </description>
+        </leaf>
+      </choice>
+    </container>
+    <leaf name="default-operation">
+      <type name="enumeration">
+        <enum name="merge">
+          <description>
+            <text>The default operation is merge.</text>
+          </description>
+        </enum>
+        <enum name="replace">
+          <description>
+            <text>The default operation is replace.</text>
+          </description>
+        </enum>
+        <enum name="none">
+          <description>
+            <text>There is no default operation.</text>
+          </description>
+        </enum>
+      </type>
+      <default value="merge"/>
+      <description>
+        <text>The default operation to use.</text>
+      </description>
+    </leaf>
+    <leaf name="test-option">
+      <if-feature name="validate"/>
+      <type name="enumeration">
+        <enum name="test-then-set">
+          <description>
+            <text>The server will test and then set if no errors.</text>
+          </description>
+        </enum>
+        <enum name="set">
+          <description>
+            <text>The server will set without a test first.</text>
+          </description>
+        </enum>
+        <enum name="test-only">
+          <description>
+            <text>The server will only test and not set, even
+if there are no errors.</text>
+          </description>
+        </enum>
+      </type>
+      <default value="test-then-set"/>
+      <description>
+        <text>The test option to use.</text>
+      </description>
+    </leaf>
+    <leaf name="error-option">
+      <type name="enumeration">
+        <enum name="stop-on-error">
+          <description>
+            <text>The server will stop on errors.</text>
+          </description>
+        </enum>
+        <enum name="continue-on-error">
+          <description>
+            <text>The server may continue on errors.</text>
+          </description>
+        </enum>
+        <enum name="rollback-on-error">
+          <description>
+            <text>The server will rollback on errors.
+This value can only be used if the 'rollback-on-error'
+feature is supported.</text>
+          </description>
+        </enum>
+      </type>
+      <default value="stop-on-error"/>
+      <description>
+        <text>The error option to use.</text>
+      </description>
+    </leaf>
+    <choice name="edit-content">
+      <mandatory value="true"/>
+      <description>
+        <text>The content for the edit operation</text>
+      </description>
+      <anyxml name="config">
+        <description>
+          <text>Inline Config content.</text>
+        </description>
+      </anyxml>
+      <leaf name="url">
+        <if-feature name="url"/>
+        <type name="inet:uri"/>
+        <description>
+          <text>URL based config content.</text>
+        </description>
+      </leaf>
+    </choice>
+  </input>
+</rpc>
+<rpc name="copy-config"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>Create or replace an entire configuration datastore with the
+contents of another complete configuration datastore.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.3.</text>
+  </reference>
+  <input>
+    <container name="target">
+      <description>
+        <text>Particular configuration to copy to.</text>
+      </description>
+      <choice name="config-target">
+        <mandatory value="true"/>
+        <description>
+          <text>The configuration target of the copy operation.</text>
+        </description>
+        <leaf name="candidate">
+          <if-feature name="candidate"/>
+          <type name="empty"/>
+          <description>
+            <text>The candidate configuration is the config target.</text>
+          </description>
+        </leaf>
+        <leaf name="running">
+          <if-feature name="writable-running"/>
+          <type name="empty"/>
+          <description>
+            <text>The running configuration is the config target.
+This is optional-to-implement on the server.</text>
+          </description>
+        </leaf>
+        <leaf name="startup">
+          <if-feature name="startup"/>
+          <type name="empty"/>
+          <description>
+            <text>The startup configuration is the config target.</text>
+          </description>
+        </leaf>
+        <leaf name="url">
+          <if-feature name="url"/>
+          <type name="inet:uri"/>
+          <description>
+            <text>The URL-based configuration is the config target.</text>
+          </description>
+        </leaf>
+      </choice>
+    </container>
+    <container name="source">
+      <description>
+        <text>Particular configuration to copy from.</text>
+      </description>
+      <choice name="config-source">
+        <mandatory value="true"/>
+        <description>
+          <text>The configuration source for the copy operation.</text>
+        </description>
+        <leaf name="candidate">
+          <if-feature name="candidate"/>
+          <type name="empty"/>
+          <description>
+            <text>The candidate configuration is the config source.</text>
+          </description>
+        </leaf>
+        <leaf name="running">
+          <type name="empty"/>
+          <description>
+            <text>The running configuration is the config source.</text>
+          </description>
+        </leaf>
+        <leaf name="startup">
+          <if-feature name="startup"/>
+          <type name="empty"/>
+          <description>
+            <text>The startup configuration is the config source.</text>
+          </description>
+        </leaf>
+        <leaf name="url">
+          <if-feature name="url"/>
+          <type name="inet:uri"/>
+          <description>
+            <text>The URL-based configuration is the config source.</text>
+          </description>
+        </leaf>
+        <anyxml name="config">
+          <description>
+            <text>Inline Config content: 'config' element.  Represents
+an entire configuration datastore, not
+a subset of the running datastore.</text>
+          </description>
+        </anyxml>
+      </choice>
+    </container>
+  </input>
+</rpc>
+<rpc name="delete-config"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>Delete a configuration datastore.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.4.</text>
+  </reference>
+  <input>
+    <container name="target">
+      <description>
+        <text>Particular configuration to delete.</text>
+      </description>
+      <choice name="config-target">
+        <mandatory value="true"/>
+        <description>
+          <text>The configuration target to delete.</text>
+        </description>
+        <leaf name="startup">
+          <if-feature name="startup"/>
+          <type name="empty"/>
+          <description>
+            <text>The startup configuration is the config target.</text>
+          </description>
+        </leaf>
+        <leaf name="url">
+          <if-feature name="url"/>
+          <type name="inet:uri"/>
+          <description>
+            <text>The URL-based configuration is the config target.</text>
+          </description>
+        </leaf>
+      </choice>
+    </container>
+  </input>
+</rpc>
+<rpc name="lock"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>The lock operation allows the client to lock the configuration
+system of a device.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.5.</text>
+  </reference>
+  <input>
+    <container name="target">
+      <description>
+        <text>Particular configuration to lock</text>
+      </description>
+      <choice name="config-target">
+        <mandatory value="true"/>
+        <description>
+          <text>The configuration target to lock.</text>
+        </description>
+        <leaf name="candidate">
+          <if-feature name="candidate"/>
+          <type name="empty"/>
+          <description>
+            <text>The candidate configuration is the config target.</text>
+          </description>
+        </leaf>
+        <leaf name="running">
+          <type name="empty"/>
+          <description>
+            <text>The running configuration is the config target.</text>
+          </description>
+        </leaf>
+        <leaf name="startup">
+          <if-feature name="startup"/>
+          <type name="empty"/>
+          <description>
+            <text>The startup configuration is the config target.</text>
+          </description>
+        </leaf>
+      </choice>
+    </container>
+  </input>
+</rpc>
+<rpc name="unlock"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>The unlock operation is used to release a configuration lock,
+previously obtained with the 'lock' operation.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.6.</text>
+  </reference>
+  <input>
+    <container name="target">
+      <description>
+        <text>Particular configuration to unlock.</text>
+      </description>
+      <choice name="config-target">
+        <mandatory value="true"/>
+        <description>
+          <text>The configuration target to unlock.</text>
+        </description>
+        <leaf name="candidate">
+          <if-feature name="candidate"/>
+          <type name="empty"/>
+          <description>
+            <text>The candidate configuration is the config target.</text>
+          </description>
+        </leaf>
+        <leaf name="running">
+          <type name="empty"/>
+          <description>
+            <text>The running configuration is the config target.</text>
+          </description>
+        </leaf>
+        <leaf name="startup">
+          <if-feature name="startup"/>
+          <type name="empty"/>
+          <description>
+            <text>The startup configuration is the config target.</text>
+          </description>
+        </leaf>
+      </choice>
+    </container>
+  </input>
+</rpc>
+<rpc name="get"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>Retrieve running configuration and device state information.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.7.</text>
+  </reference>
+  <input>
+    <anyxml name="filter">
+      <description>
+        <text>This parameter specifies the portion of the system
+configuration and state data to retrieve.</text>
+      </description>
+      <nc:get-filter-element-attributes/>
+    </anyxml>
+  </input>
+  <output>
+    <anyxml name="data">
+      <description>
+        <text>Copy of the running datastore subset and/or state
+data which matched the filter criteria (if any).
+An empty data container indicates that the request did not
+produce any results.</text>
+      </description>
+    </anyxml>
+  </output>
+</rpc>
+<rpc name="close-session"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>Request graceful termination of a NETCONF session.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.8.</text>
+  </reference>
+</rpc>
+<rpc name="kill-session"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <description>
+    <text>Force the termination of a NETCONF session.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 7.9.</text>
+  </reference>
+  <input>
+    <leaf name="session-id">
+      <type name="session-id-type"/>
+      <mandatory value="true"/>
+      <description>
+        <text>Particular session to kill.</text>
+      </description>
+    </leaf>
+  </input>
+</rpc>
+<rpc name="commit"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <if-feature name="candidate"/>
+  <description>
+    <text>Commit the candidate configuration as the device's new
+current configuration</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 8.3.4.1.</text>
+  </reference>
+  <input>
+    <leaf name="confirmed">
+      <if-feature name="confirmed-commit"/>
+      <type name="empty"/>
+      <description>
+        <text>Requests a confirmed commit.</text>
+      </description>
+      <reference>
+        <text>RFC XXXX, section 8.3.4.1.</text>
+      </reference>
+    </leaf>
+    <leaf name="confirm-timeout">
+      <if-feature name="confirmed-commit"/>
+      <type name="uint32">
+        <range value="1..max"/>
+      </type>
+      <units name="seconds"/>
+      <default value="600"/>
+      <description>
+        <text>The timeout interval for a confirmed commit.</text>
+      </description>
+      <reference>
+        <text>RFC XXXX, section 8.3.4.1.</text>
+      </reference>
+    </leaf>
+    <leaf name="persist">
+      <if-feature name="confirmed-commit"/>
+      <type name="string"/>
+      <description>
+        <text>This parameter is used to make a confirmed commit
+persistent.  A persistent confirmed commit is not aborted
+if the NETCONF session terminates.  The only way to abort a
+persistent confirmed commit it to let the timer expire, or
+to use the cancel-commit operation.
+
+The value of this parameter is a token that must be given
+in the 'persist-id' parameter of commit or cancel-commit in
+order to confirm or cancel the persistent confirmed commit.
+
+The token should be a random string.</text>
+      </description>
+      <reference>
+        <text>RFC XXXX, section 8.3.4.1.</text>
+      </reference>
+    </leaf>
+    <leaf name="persist-id">
+      <if-feature name="confirmed-commit"/>
+      <type name="string"/>
+      <description>
+        <text>This parameter is given in order to commit a persistent
+confirmed commit.  The value must be equal to the value
+given in the 'persist' parameter to the commit operation.
+If it does not match, the operation fails with an
+'invalid-value' error.</text>
+      </description>
+      <reference>
+        <text>RFC XXXX, section 8.3.4.1.</text>
+      </reference>
+    </leaf>
+  </input>
+</rpc>
+<rpc name="discard-changes"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <if-feature name="candidate"/>
+  <description>
+    <text>Revert the candidate configuration to the current
+running configuration.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 8.3.4.2.</text>
+  </reference>
+</rpc>
+<rpc name="cancel-commit"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <if-feature name="confirmed-commit"/>
+  <description>
+    <text>This operation is used to cancel an ongoing confirmed commit.
+If the confirmed commit is persistent, the parameter
+'persist-id' must be given, and it must match the value of the
+'persist' parameter.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 8.4.4.1.</text>
+  </reference>
+  <input>
+    <leaf name="persist-id">
+      <type name="string"/>
+      <description>
+        <text>This parameter is given in order to cancel a persistent
+confirmed commit.  The value must be equal to the value
+given in the 'persist' parameter to the commit operation.
+If it does not match, the operation fails with an
+'invalid-value' error.</text>
+      </description>
+    </leaf>
+  </input>
+</rpc>
+<rpc name="validate"
+     xmlns="urn:ietf:params:xml:ns:yang:yin:1">
+  <if-feature name="validate"/>
+  <description>
+    <text>Validates the contents of the specified configuration.</text>
+  </description>
+  <reference>
+    <text>RFC XXXX, section 8.6.4.1.</text>
+  </reference>
+  <input>
+    <container name="source">
+      <description>
+        <text>Particular configuration to validate.</text>
+      </description>
+      <choice name="config-source">
+        <mandatory value="true"/>
+        <description>
+          <text>The configuration source to validate.</text>
+        </description>
+        <leaf name="candidate">
+          <if-feature name="candidate"/>
+          <type name="empty"/>
+          <description>
+            <text>The candidate configuration is the config source.</text>
+          </description>
+        </leaf>
+        <leaf name="running">
+          <type name="empty"/>
+          <description>
+            <text>The running configuration is the config source.</text>
+          </description>
+        </leaf>
+        <leaf name="startup">
+          <if-feature name="startup"/>
+          <type name="empty"/>
+          <description>
+            <text>The startup configuration is the config source.</text>
+          </description>
+        </leaf>
+        <leaf name="url">
+          <if-feature name="url"/>
+          <type name="inet:uri"/>
+          <description>
+            <text>The URL-based configuration is the config source.</text>
+          </description>
+        </leaf>
+        <anyxml name="config">
+          <description>
+            <text>Inline Config content: 'config' element.  Represents
+an entire configuration datastore, not
+a subset of the running datastore.</text>
+          </description>
+        </anyxml>
+      </choice>
+    </container>
+  </input>
+</rpc>
+</rpc-operations>

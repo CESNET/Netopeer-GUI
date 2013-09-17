@@ -1,0 +1,1 @@
+<packet-filter xmlns="urn:cesnet:yang:packet-filter"><chain><name/><rule/></chain></packet-filter>

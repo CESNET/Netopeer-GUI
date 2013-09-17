@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="ietf-netconf-acm"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:nacm="urn:ietf:params:xml:ns:yang:ietf-netconf-acm"
+        xmlns:yang="urn:ietf:params:xml:ns:yang:ietf-yang-types">
+ <namespace uri="urn:ietf:params:xml:ns:yang:ietf-netconf-acm"/>
+ <prefix value="nacm"/>
+ <import module="ietf-yang-types" iskey="false">
+  <prefix value="yang"/>
+ </import>
+ <organization>
+  <text>IETF NETCONF (Network Configuration) Working Group</text>
+ </organization>
+ <contact>
+  <text>WG Web:   &lt;http://tools.ietf.org/wg/netconf/&gt;
+WG List:  &lt;mailto:netconf@ietf.org&gt;
+
+WG Chair: Mehmet Ersue
+          &lt;mailto:mehmet.ersue@nsn.com&gt;
+
+WG Chair: Bert Wijnen
+          &lt;mailto:bertietf@bwijnen.net&gt;
+
+Editor:   Andy Bierman
+          &lt;mailto:andy@yumaworks.com&gt;
+
+Editor:   Martin Bjorklund
+          &lt;mailto:mbj@tail-f.com&gt;</text>
+ </contact>
+ <description>
+  <text>NETCONF Access Control Model.
+
+Copyright (c) 2012 IETF Trust and the persons identified as
+authors of the code.  All rights reserved.
+
+Redistribution and use in source and binary forms, with or
+without modification, is permitted pursuant to, and subject
+to the license terms contained in, the Simplified BSD
+License set forth in Section 4.c of the IETF Trust's
+Legal Provisions Relating to IETF Documents
+(http://trustee.ietf.org/license-info).
+
+This version of this YANG module is part of RFC 6536; see
+the RFC itself for full legal notices.</text>
+ </description>
+ <revision date="2012-02-22" description="Initial version" iskey="false">
+  <reference>
+   <text>RFC 6536: Network Configuration Protocol (NETCONF)
+          Access Control Model</text>
+  </reference>
+ </revision>
+ <default-deny-write eltype="extension" description="Used to indicate that the data model node
+represents a sensitive security system parameter.
+
+If present, and the NACM module is enabled (i.e.,
+/nacm/enable-nacm object equals &apos;true&apos;), the NETCONF server
+will only allow the designated &apos;recovery session&apos; to have
+write access to the node.  An explicit access control rule is
+required for all other users.
+
+The &apos;default-deny-write&apos; extension MAY appear within a data
+definition statement.  It is ignored otherwise." iskey="false"/>
+ <default-deny-all eltype="extension" description="Used to indicate that the data model node
+controls a very sensitive security system parameter.
+
+If present, and the NACM module is enabled (i.e.,
+/nacm/enable-nacm object equals &apos;true&apos;), the NETCONF server
+will only allow the designated &apos;recovery session&apos; to have
+read, write, or execute access to the node.  An explicit
+access control rule is required for all other users.
+
+The &apos;default-deny-all&apos; extension MAY appear within a data
+definition statement, &apos;rpc&apos; statement, or &apos;notification&apos;
+statement.  It is ignored otherwise." iskey="false"/>
+ <user-name-type eltype="typedef" type="string" description="General Purpose Username string." iskey="false"/>
+ <matchall-string-type eltype="typedef" type="string" description="The string containing a single asterisk &apos;*&apos; is used
+to conceptually represent all possible values
+for the particular leaf using this data type." iskey="false"/>
+ <access-operations-type eltype="typedef" type="bits" description="NETCONF Access Operation." iskey="false"/>
+ <group-name-type eltype="typedef" type="string" description="Name of administrative group to which
+users can be assigned." iskey="false"/>
+ <action-type eltype="typedef" type="enumeration" enumval="permit|deny" description="Action taken by the server when a particular
+rule matches." iskey="false"/>
+ <node-instance-identifier eltype="typedef" type="yang:xpath1.0" description="Path expression used to represent a special
+data node instance identifier string.
+
+A node-instance-identifier value is an
+unrestricted YANG instance-identifier expression.
+All the same rules as an instance-identifier apply
+except predicates for keys are optional.  If a key
+predicate is missing, then the node-instance-identifier
+represents all possible server instances for that key.
+
+This XPath expression is evaluated in the following context:
+
+ o  The set of namespace declarations are those in scope on
+    the leaf element where this type is used.
+
+ o  The set of variable bindings contains one variable,
+    &apos;USER&apos;, which contains the name of the user of the current
+     session.
+
+ o  The function library is the core function library, but
+    note that due to the syntax restrictions of an
+    instance-identifier, no functions are allowed.
+
+ o  The context node is the root node in the data tree." iskey="false"/>
+<nacm eltype="container" config="true" description="Parameters for NETCONF Access Control Model." iskey="false"><enable-nacm eltype="leaf" config="true" type="boolean" description="Enables or disables all NETCONF access control
+enforcement.  If &apos;true&apos;, then enforcement
+is enabled.  If &apos;false&apos;, then enforcement
+is disabled." default="True" iskey="false"/>
+<read-default eltype="leaf" config="true" type="action-type" description="Controls whether read access is granted if
+no appropriate rule is found for a
+particular read request." default="permit" iskey="false"/>
+<write-default eltype="leaf" config="true" type="action-type" description="Controls whether create, update, or delete access
+is granted if no appropriate rule is found for a
+particular write request." default="deny" iskey="false"/>
+<exec-default eltype="leaf" config="true" type="action-type" description="Controls whether exec access is granted if no appropriate
+rule is found for a particular protocol operation request." default="permit" iskey="false"/>
+<enable-external-groups eltype="leaf" config="true" type="boolean" description="Controls whether the server uses the groups reported by the
+NETCONF transport layer when it assigns the user to a set of
+NACM groups.  If this leaf has the value &apos;false&apos;, any group
+names reported by the transport layer are ignored by the
+server." default="True" iskey="false"/>
+<denied-operations eltype="leaf" config="false" type="yang:zero-based-counter32" description="Number of times since the server last restarted that a
+protocol operation request was denied." mandatory="true" iskey="false"/>
+<denied-data-writes eltype="leaf" config="false" type="yang:zero-based-counter32" description="Number of times since the server last restarted that a
+protocol operation request to alter
+a configuration datastore was denied." mandatory="true" iskey="false"/>
+<denied-notifications eltype="leaf" config="false" type="yang:zero-based-counter32" description="Number of times since the server last restarted that
+a notification was dropped for a subscription because
+access to the event type was denied." mandatory="true" iskey="false"/>
+<groups eltype="container" config="true" description="NETCONF Access Control Groups." iskey="false"><group eltype="list" config="true" description="One NACM Group Entry.  This list will only contain
+configured entries, not any entries learned from
+any transport protocols." key="name" iskey="false"><name eltype="leaf" config="true" type="group-name-type" description="Group name associated with this entry." iskey="true"/>
+<user-name eltype="leaf-list" config="true" type="user-name-type" description="Each entry identifies the username of
+a member of the group associated with
+this entry." iskey="false"/>
+</group>
+</groups>
+<rule-list eltype="list" config="true" description="An ordered collection of access control rules." key="name" iskey="false"><name eltype="leaf" config="true" type="string" description="Arbitrary name assigned to the rule-list." iskey="true"/>
+<group eltype="leaf-list" config="true" type="union" description="List of administrative groups that will be
+assigned the associated access rights
+defined by the &apos;rule&apos; list.
+
+The string &apos;*&apos; indicates that all groups apply to the
+entry." iskey="false"/>
+<rule eltype="list" config="true" description="One access control rule.
+
+Rules are processed in user-defined order until a match is
+found.  A rule matches if &apos;module-name&apos;, &apos;rule-type&apos;, and
+&apos;access-operations&apos; match the request.  If a rule
+matches, the &apos;action&apos; leaf determines if access is granted
+or not." key="name" iskey="false"><name eltype="leaf" config="true" type="string" description="Arbitrary name assigned to the rule." iskey="true"/>
+<module-name eltype="leaf" config="true" type="union" description="Name of the module associated with this rule.
+
+This leaf matches if it has the value &apos;*&apos; or if the
+object being accessed is defined in the module with the
+specified module name." default="*" iskey="false"/>
+<rule-type eltype="choice" config="true" description="This choice matches if all leafs present in the rule
+match the request.  If no leafs are present, the
+choice matches all requests." iskey="false"><protocol-operation eltype="case" config="true" iskey="false"><rpc-name eltype="leaf" config="true" type="union" description="This leaf matches if it has the value &apos;*&apos; or if
+its value equals the requested protocol operation
+name." iskey="false"/>
+</protocol-operation>
+<notification eltype="case" config="true" iskey="false"><notification-name eltype="leaf" config="true" type="union" description="This leaf matches if it has the value &apos;*&apos; or if its
+value equals the requested notification name." iskey="false"/>
+</notification>
+<data-node eltype="case" config="true" iskey="false"><path eltype="leaf" config="true" type="node-instance-identifier" description="Data Node Instance Identifier associated with the
+data node controlled by this rule.
+
+Configuration data or state data instance
+identifiers start with a top-level data node.  A
+complete instance identifier is required for this
+type of path value.
+
+The special value &apos;/&apos; refers to all possible
+datastore contents." mandatory="true" iskey="false"/>
+</data-node>
+</rule-type>
+<access-operations eltype="leaf" config="true" type="union" description="Access operations associated with this rule.
+
+This leaf matches if it has the value &apos;*&apos; or if the
+bit corresponding to the requested operation is set." default="*" iskey="false"/>
+<action eltype="leaf" config="true" type="action-type" description="The access control action associated with the
+rule.  If a rule is determined to match a
+particular request, then this object is used
+to determine whether to permit or deny the
+request." mandatory="true" iskey="false"/>
+<comment eltype="leaf" config="true" type="string" description="A textual description of the access rule." iskey="false"/>
+</rule>
+</rule-list>
+</nacm>
+</module>

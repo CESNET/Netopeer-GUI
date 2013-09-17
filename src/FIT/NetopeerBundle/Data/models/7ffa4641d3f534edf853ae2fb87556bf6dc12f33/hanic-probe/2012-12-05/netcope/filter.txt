@@ -1,0 +1,1 @@
+<hanic-probes xmlns="urn:cesnet:tmc:hanicprobe:1.0"><hanic-probe><combo-card-device/><netcope/></hanic-probe></hanic-probes>
