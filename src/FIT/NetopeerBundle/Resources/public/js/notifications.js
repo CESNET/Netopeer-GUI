@@ -66,12 +66,12 @@ function processNotifFromHistory(key, href) {
 		dataType: "json",
 		success: function(data, textStatus, jqXHR) {
 			if (data['type'] === 2) {
-				notifications[key].addError(data.error-message);
+				notifications[key].addError(data.error-message, true);
 			} else if (data['snippets'] !== undefined) {
 				$.nette.success(data);
 			} else {
 				$.each(data.notifications, function(i, el) {
-					notifications[key].addMessage(el);
+					notifications[key].addMessage(el, true);
 				});
 			}
 		},
@@ -132,20 +132,20 @@ $.fn.notifWebSocket = function(key, wsUri) {
 			this.addSend(message);
 		};
 
-		this.addInfo = function(mess) {
-			this.writeToScreen(mess, "info", "Info:");
+		this.addInfo = function(mess, fromHistory) {
+			this.writeToScreen(mess, "info", "Info:", fromHistory);
 		};
 
-		this.addError = function(mess) {
-			this.writeToScreen(mess, "error red", "Error:");
+		this.addError = function(mess, fromHistory) {
+			this.writeToScreen(mess, "error red", "Error:", fromHistory);
 		};
 
-		this.addMessage = function(mess) {
-			this.writeToScreen(mess, "message green", "Message:");
+		this.addMessage = function(mess, fromHistory) {
+			this.writeToScreen(mess, "message green", "Message:", fromHistory);
 		};
 
-		this.addSend = function(mess) {
-			this.writeToScreen(mess, "send", "Sent:");
+		this.addSend = function(mess, fromHistory) {
+			this.writeToScreen(mess, "send", "Sent:", fromHistory);
 		};
 
 		this.saveMessage = function(mess) {
@@ -161,7 +161,7 @@ $.fn.notifWebSocket = function(key, wsUri) {
 			}
 		};
 
-		this.writeToScreen = function(mess, textClass, text) {
+		this.writeToScreen = function(mess, textClass, text, fromHistory) {
 			if (!notifOutput) {
 				notifInit();
 			}
@@ -178,10 +178,11 @@ $.fn.notifWebSocket = function(key, wsUri) {
 				parsed_time = parsed.eventtime;
 			}
 
+			var output;
 			try {
 				var xml = $($.parseXML(parsed_text));
 				if (xml) {
-					var output = $("<div></div>").append($("<span></span>").addClass('root-tag').text(xml.contents().prop('tagName').toLocaleUpperCase()));
+					output = $("<div></div>").append($("<span></span>").addClass('root-tag').text(xml.contents().prop('tagName').toLocaleUpperCase()));
 					xml.contents().children().each(function(i, e) {
 						var messtext;
 						if ($(e).prop('tagName') == "source-host") {
@@ -193,7 +194,7 @@ $.fn.notifWebSocket = function(key, wsUri) {
 							messtext = $(e).text();
 						}
 						output.append($("<span></span>").addClass('tagName').text($(e).prop('tagName') + ": "));
-						value = $("<span></span>").addClass('tagValue');
+						var value = $("<span></span>").addClass('tagValue');
 						value.html(messtext);
 						$(value).find('.ipHref').click(openipdialog);
 						output.append(value);
@@ -204,7 +205,7 @@ $.fn.notifWebSocket = function(key, wsUri) {
 				// we don't care - mess is not probably valid XML string
 			}
 
-			var output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').html(parsed_text));
+			output = $("<div></div>").addClass('notif').append($("<strong></strong>").addClass(textClass).text(text)).append($('<span></span>').addClass('mess').html(parsed_text));
 			if (parsed_time !== '') {
 				if (!isNaN(parsed_time)) {
 					var time = new Date();
@@ -214,8 +215,14 @@ $.fn.notifWebSocket = function(key, wsUri) {
 				}
 				output.prepend($("<div></div>").addClass('time').text(parsed_time));
 			}
-			var notifCover = notifOutput.find('.notif-cover');
-			this.saveMessage(output);
+			var notifCover;
+			if (fromHistory === true) {
+				notifCover = notifOutput.find('.notif-history-cover');
+			} else {
+				notifCover = notifOutput.find('.notif-cover');
+				this.saveMessage(output);
+			}
+
 			notifCover.append(output);
 			notifCover.animate({
 				scrollTop: notifCover.scrollTop() + $(output).offset().top

@@ -313,6 +313,13 @@ article#block--singleContent { font-size: 1.4em; padding: $hNavTop $sContentPadd
 
 #block--notifications { width: 90%; background-color: #333; height: 10%; @include box-sizing(border-box); position: absolute; right: 0px; top: 100%; border-top: 1px solid #000; color: #ccc; font-size: 1.25em; font-family: $fMonospace;
 	.notif-cover { padding: 8px $sContentPadding; overflow-y: scroll; height: 100%; position: relative; @include box-sizing(border-box); }
+	.notif-history-cover { @include box-sizing(border-box); margin: -8px 0px - $sContentPadding 8px 0px - $sContentPadding; background-color: #444; border-bottom: 1px solid #000; padding: 0px $sContentPadding;
+		> .notif {
+			&:first-child { margin-top: 8px; }
+			&:last-child { margin-bottom: 8px; }
+			.green, .red { color: #fff; }
+		}
+	}
 	.notif { margin-bottom: 2px; overflow: hidden; }
 	.time { margin-top: 6px; color: #999; }
 	strong { margin-right: 10px; width: 70px; float: left; }
@@ -320,6 +327,7 @@ article#block--singleContent { font-size: 1.4em; padding: $hNavTop $sContentPadd
 
 	.root-tag, .tagValue { margin-right: 10px; }
 	.tagName { border-left: 1px solid #999; padding-left: 10px; color: #999; }
+	a { color: #fff; }
 }
 
 /* formulare */
