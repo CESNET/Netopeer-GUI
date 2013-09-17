@@ -108,10 +108,6 @@ class Data {
 	 */
 	protected $logger;
 	/**
-	 * @var string    current state of flash messages
-	 */
-	private $flashState;
-	/**
 	 * @var array     array of namespaces for module name
 	 */
 	private $modelNamespaces;
@@ -145,7 +141,6 @@ class Data {
 		$this->logger = $logger;
 		$this->models = null;
 		$this->modelNamespaces = array();
-		$this->setFlashState('single');
 	}
 
 	/**
@@ -429,13 +424,13 @@ class Data {
 		} while ($tmp != "");
 		$status = stream_get_meta_data($sock);
 		if (!$response && $status["timed_out"] == true) {
-			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Reached timeout for reading response.");
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Reached timeout for reading response.");
 		}
 		/* "unchunk" frames (RFC6242) */
 		try {
 			$response = $this->unwrapRFC6242($response);
 		} catch (\ErrorException $e) {
-			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not read NetConf. Error: ".$e->getMessage());
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not read NetConf. Error: ".$e->getMessage());
 			return 1;
 		}
 
@@ -452,7 +447,7 @@ class Data {
 		$tmp = "";
 		$tmp = fread($sock, 1024);
 		if ($tmp === false) {
-			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Reading failure.");
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Reading failure.");
 		}
 
 		$response = $tmp;
@@ -469,7 +464,7 @@ class Data {
 			$tmp = "";
 			$tmp = fread($sock, $size - strlen($response));
 			if ($tmp === false) {
-				$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Reading failure.");
+				$this->container->get('request')->getSession()->getFlashBag()->add('error', "Reading failure.");
 				break;
 			}
 			$response .= $tmp;
@@ -477,14 +472,14 @@ class Data {
 		}
 		$status = stream_get_meta_data($sock);
 		if (!$response && $status["timed_out"] == true) {
-			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Reached timeout for reading response.");
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Reached timeout for reading response.");
 			//echo "Reached timeout for reading response.";
 		}
 		/* "unchunk" frames (RFC6242) */
 		try {
 			$response = $this->unwrapRFC6242($response);
 		} catch (\ErrorException $e) {
-			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not read NetConf. Error: ".$e->getMessage());
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not read NetConf. Error: ".$e->getMessage());
 			//echo "unwrap exception";
 			return 1;
 		}
@@ -562,10 +557,10 @@ class Data {
 				$session->set("session-connections", $sessionConnections);
 			}
 
-			$session->setFlash($this->flashState .' success', "Successfully connected.");
+			$session->getFlashBag()->add('success', "Successfully connected.");
 			$result = array_search($newconnection, $session->get("session-connections"));
 			/*
-			$session->setFlash($this->flashState .' success', "Successfully connected.".
+			$session->getFlashBag()->add('success', "Successfully connected.".
 			"--".var_export($decoded).
 			"--".var_export($newconnection, true).
 			"--".var_export($sessionConnections, true));
@@ -573,7 +568,7 @@ class Data {
 			return 0;
 		} else {
 			$this->logger->err("Could not connect.", array("error" => (isset($decoded["error-message"])?" Error: ".$decoded["error-message"] : var_export($this->getJsonError(), true))));
-			$session->setFlash($this->flashState .' error', "Could not connect.".(isset($decoded["error-message"])?" Error: ".$decoded["error-message"]:""));
+			$session->getFlashBag()->add('error', "Could not connect.".(isset($decoded["error-message"])?" Error: ".$decoded["error-message"]:""));
 			return 1;
 		}
 	}
@@ -712,10 +707,10 @@ class Data {
 		));
 
 		if ($decoded["type"] === self::REPLY_OK) {
-			$session->setFlash($this->flashState .' success', "Successfully disconnected.");
+			$session->getFlashBag()->add('success', "Successfully disconnected.");
 		} else {
 			$this->logger->err("Could not disconnecd.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not disconnect from server. ");
+			$session->getFlashBag()->add('error', "Could not disconnect from server. ");
 		}
 
 		unset( $sessionConnections[ $requestKey] );
@@ -743,11 +738,11 @@ class Data {
 		));
 
 		if ($decoded["type"] === self::REPLY_OK) {
-			$session->setFlash($this->flashState .' success', "Successfully locked.");
+			$session->getFlashBag()->add('success', "Successfully locked.");
 			$this->updateConnLock($params['key']);
 		} else {
 			$this->logger->err("Could not lock.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not lock datastore. ");
+			$session->getFlashBag()->add('error', "Could not lock datastore. ");
 		}
 	}
 
@@ -772,11 +767,11 @@ class Data {
 		));
 
 		if ($decoded["type"] === self::REPLY_OK) {
-			$session->setFlash($this->flashState .' success', "Successfully unlocked.");
+			$session->getFlashBag()->add('success', "Successfully unlocked.");
 			$this->updateConnLock($params['key']);
 		} else {
 			$this->logger->err("Could not unlock.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not unlock datastore. ");
+			$session->getFlashBag()->add('error', "Could not unlock datastore. ");
 		}
 	}
 
@@ -825,7 +820,7 @@ class Data {
 		if (!$decoded) {
 			/* error occurred, unexpected response */
 			$this->logger->err("Could get notifications history.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not get notifications history.");
+			$session->getFlashBag()->add('error', "Could not get notifications history.");
 			return 1;
 		}
 
@@ -858,7 +853,7 @@ class Data {
 		if (!$decoded) {
 			/* error occurred, unexpected response */
 			$this->logger->err("Could get session info.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not get session info.");
+			$session->getFlashBag()->add('error', "Could not get session info.");
 		}
 
 		return $decoded;
@@ -898,7 +893,7 @@ class Data {
 			return 0;
 		} else {
 			$this->logger->err("Get-schema failed.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Get-schema failed."
+			$session->getFlashBag()->add('error', "Get-schema failed."
 				. (isset($decoded["error-message"])?" Reason: ".$decoded["error-message"]:"")
 				. (isset($decoded["bad-element"])?" (".  $decoded["bad-element"]  .")":"")
 			);
@@ -930,11 +925,11 @@ class Data {
 		$decoded = $this->execute_operation($sock, $arguments);
 
 		if ($decoded["type"] === self::REPLY_OK) {
-			$session->setFlash($this->flashState .' success', "Session successfully killed.");
+			$session->getFlashBag()->add('success', "Session successfully killed.");
 			$this->updateConnLock($params['key']);
 		} else {
 			$this->logger->err("Could not kill session.", array("error" => var_export($decoded, true)));
-			$session->setFlash($this->flashState .' error', "Could not kill session.");
+			$session->getFlashBag()->add('error', "Could not kill session.");
 		}
 	}
 
@@ -946,13 +941,13 @@ class Data {
 	public function checkLoggedKeys() {
 		$session = $this->container->get('request')->getSession();
 		if ( !count($session->get("session-connections")) ) {
-			$session->setFlash($this->flashState .' error', "Not logged in.");
+			$session->getFlashBag()->add('error', "Not logged in.");
 			return 1;
 		}
 		$req = $this->container->get('request');
 
 		if ( !in_array( $req->get('key'), array_keys($session->get("session-connections")) ) ) {
-			$session->setFlash($this->flashState .' error', "You are not allow to see this connection. Bad Index of key.");
+			$session->getFlashBag()->add('error', "You are not allow to see this connection. Bad Index of key.");
 			return 1;
 		}
 		return 0;
@@ -970,15 +965,15 @@ class Data {
 
 		if ( $status['errorCode'] ) {
 			$this->logger->warn('Checking decoded data:', array('error' => $status['message']));
-			$session->setFlash($this->flashState .' error', $status['message']);
+			$session->getFlashBag()->add('error', $status['message']);
 			return 1;
 		//} elseif ( $decoded == null ) {
 		//	$this->logger->err('Could not decode response from socket', array('error' => "Empty response."));
-		//	$session->setFlash($this->flashState .' error', "Could not decode response from socket. Error: Empty response.");
+		//	$session->getFlashBag()->add('error', "Could not decode response from socket. Error: Empty response.");
 		//	return 1;
 		} elseif (($decoded['type'] != self::REPLY_OK) && ($decoded['type'] != self::REPLY_DATA)) {
 			$this->logger->warn('Error: ', array('error' => $decoded['error-message']));
-			$session->setFlash($this->flashState .' error', "Error: " . $decoded['error-message']);
+			$session->getFlashBag()->add('error', "Error: " . $decoded['error-message']);
 			// throw new \ErrorException($decoded['error-message']);
 			return 1;
 		}
@@ -1110,13 +1105,13 @@ class Data {
 			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);
 		} catch (\ErrorException $e) {
 			$this->logger->err('Could not connect to socket.', array($errstr));
-			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not connect to socket. Error: $errstr");
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not connect to socket. Error: $errstr");
 			return 1;
 		}
 
 		if ($errno != 0) {
 			$this->logger->err('Could not connect to socket.', array($errstr));
-			$this->container->get('request')->getSession()->setFlash($this->flashState .' error', "Could not connect to socket. Error: $errstr");
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not connect to socket. Error: $errstr");
 			return 1;
 		}
 		//stream_set_timeout($sock, 5, 500);
@@ -1166,7 +1161,7 @@ class Data {
 				$res = $this->handle_killsession($sock, $params, $result);
 				break;
 			default:
-				$this->container->get('request')->getSession()->setFlash($this->flashState .' info', printf("Command not implemented yet. (%s)", $command));
+				$this->container->get('request')->getSession()->getFlashBag()->add('info', printf("Command not implemented yet. (%s)", $command));
 				return 1;
 		}
 
@@ -1179,7 +1174,7 @@ class Data {
 
 		if ( isset($res) && $res !== 1 && $res !== -1) {
 			if (!$this->container->get('XMLoperations')->isResponseValidXML($res)) {
-				$this->container->get('request')->getSession()->setFlash($this->flashState . ' error', "Requested XML from server is not valid.");
+				$this->container->get('request')->getSession()->getFlashBag()->add( 'error', "Requested XML from server is not valid.");
 				return 0;
 			}
 
@@ -1233,24 +1228,6 @@ class Data {
 XML;
 
 		return $xml;
-	}
-
-	/**
-	 * Sets current flash state - but only for allowed kinds
-	 *
-	 * @param   string  $state    kind of flash state
-	 * @throws  \ErrorException   if flash state is not in allowedState array
-	 * @return  int               0 on error
-	 */
-	public function setFlashState($state) {
-		$allowedState = array("config", "state", "single");
-
-		if ( !in_array($state, $allowedState) ) {
-			$this->logger->notice("Wrong flash state.", array($state));
-			throw new \ErrorException("Wrong flash state.");
-		}
-		$this->flashState = $state;
-		return 0;
 	}
 
 	/**
@@ -1586,7 +1563,7 @@ XML;
 			$schparams["path"] = $path;
 			return 0;
 		} else {
-			$this->container->get('request')->getSession()->setFlash('error', 'Getting model failed.');
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', 'Getting model failed.');
 			return 1;
 		}
 		return 0;

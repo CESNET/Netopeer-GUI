@@ -45,7 +45,7 @@ namespace FIT\NetopeerBundle\Entity;
 /**
  * Class with settings of user.
  */
-class UserSettings {
+class UserSettings implements \Serializable {
 
 	/**
 	 * @var int duration in days for leaving devices in history
@@ -57,6 +57,26 @@ class UserSettings {
 	 */
 	public function __construct() {
 		$this->historyDuration = 30;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function serialize() {
+		return serialize(
+			array(
+				'historyDuration' => $this->getHistoryDuration(),
+			)
+		);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function unserialize($serialized) {
+		$data = unserialize($serialized);
+
+		$this->setHistoryDuration($data['historyDuration']);
 	}
 
 	/**

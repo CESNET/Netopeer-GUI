@@ -93,8 +93,8 @@ class User implements UserInterface, EquatableInterface {
 	protected $salt;
 
 	/**
-	 * @var string  serialized object of UserSettings class
-	 * @ORM\Column(type="object")
+	 * @var string  serialized array of UserSettings class
+	 * @ORM\Column(type="array")
 	 */
 	protected $settings;
 
@@ -347,4 +347,50 @@ class User implements UserInterface, EquatableInterface {
 		}
 		return $arr;
 	}
+
+    /**
+     * Add connectedDevicesInHistory
+     *
+     * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory
+     * @return User
+     */
+    public function addConnectedDevicesInHistory(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
+    {
+        $this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
+    
+        return $this;
+    }
+
+    /**
+     * Remove connectedDevicesInHistory
+     *
+     * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory
+     */
+    public function removeConnectedDevicesInHistory(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
+    {
+        $this->connectedDevicesInHistory->removeElement($connectedDevicesInHistory);
+    }
+
+    /**
+     * Add connectedDevicesInProfiles
+     *
+     * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles
+     * @return User
+     */
+    public function addConnectedDevicesInProfile(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles)
+    {
+        $this->connectedDevicesInProfiles[] = $connectedDevicesInProfiles;
+    
+        return $this;
+    }
+
+    /**
+     * Remove connectedDevicesInProfiles
+     *
+     * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles
+     */
+    public function removeConnectedDevicesInProfile(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles)
+    {
+        $this->connectedDevicesInProfiles->removeElement($connectedDevicesInProfiles);
+    }
 }

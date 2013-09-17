@@ -138,7 +138,7 @@ class DefaultController extends BaseController
 		}
 		// process form for connection to the server
 		if ($this->getRequest()->getMethod() == 'POST') {
-			$form->bindRequest($this->getRequest());
+			$form->bind($this->getRequest());
 
 			if ($form->isValid()) {
 				$post_vals = $this->getRequest()->get("form");
@@ -154,7 +154,6 @@ class DefaultController extends BaseController
 				);
 
 				// state flash = state -> left column in the layout
-				$dataClass->setFlashState('state');
 				$result = "";
 				$res = $dataClass->handle("connect", $params, false, $result);
 
@@ -180,14 +179,14 @@ class DefaultController extends BaseController
 					} else {
 						$this->get('session')->set('getSchemaWithAjax', $arr);
 					}
-					$this->getRequest()->getSession()->setFlash('state success', 'Form has been filled up correctly.');
+					$this->getRequest()->getSession()->getFlashBag()->add('state success', 'Form has been filled up correctly.');
 
 					$baseConn = $this->get('BaseConnection');
 					$baseConn->saveConnectionIntoDB($post_vals['host'], $post_vals['port'], $post_vals['user']);
 
 				}
 			} else {
-				$this->getRequest()->getSession()->setFlash('state error', 'You have not filled up form correctly.');
+				$this->getRequest()->getSession()->getFlashBag()->add('state error', 'You have not filled up form correctly.');
 			}
 			$url = $this->get('request')->headers->get('referer');
 			if (!$this->getRequest()->isXmlHttpRequest()) {
@@ -271,12 +270,6 @@ class DefaultController extends BaseController
 			'key' => $key,
 			'filter' => '',
 		);
-
-		if ( ($command === "get") || ($command  === "info") ) {
-			$dataClass->setFlashState('state');
-		} else {
-			$dataClass->setFlashState('config');
-		}
 
 		if ($command === "getschema") {
 			$params['identifier'] = $identifier;
@@ -535,7 +528,7 @@ class DefaultController extends BaseController
 				$host = unserialize($connArray[$key]);
 				$this->assign('sectionName', $host->host);
 			} else {
-				$this->getRequest()->getSession()->setFlash('state error', "You try to load device you are not connected to.");
+				$this->getRequest()->getSession()->getFlashBag()->add('state error', "You try to load device you are not connected to.");
 				return $this->redirect($this->generateUrl("_home", array()));
 			}
 
@@ -552,7 +545,6 @@ class DefaultController extends BaseController
 		// loading state part = get Action
 		// we will load it every time, because state column will we show everytime
 		try {
-			$dataClass->setFlashState('state');
 
 			if ($module === 'all') {
 				$merge = false;
@@ -566,7 +558,7 @@ class DefaultController extends BaseController
 			}
 		} catch (\ErrorException $e) {
 			$this->get('data_logger')->err("State: Could not parse filter correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('state error', "Could not parse filter correctly. ");
+			$this->getRequest()->getSession()->getFlashBag()->add('state error', "Could not parse filter correctly. ");
 		}
 
 		// we will load config part only if two column layout is enabled or we are on section (which has two column always)
@@ -783,7 +775,6 @@ class DefaultController extends BaseController
 	 * @return int 1 on error, 0 on success
 	 */
 	private function handleFilterState(&$key) {
-		$this->get('DataModel')->setFlashState('state');
 
 		$this->filterForms['state']->bindRequest($this->getRequest());
 
@@ -792,7 +783,7 @@ class DefaultController extends BaseController
 			$this->setStateParams("filter", $post_vals["filter"]);
 			return 0;
 		} else {
-			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
+			$this->getRequest()->getSession()->getFlashBag()->add('error', 'You have not filled up form correctly.');
 			return 1;
 		}
 	}
@@ -804,7 +795,6 @@ class DefaultController extends BaseController
 	 * @return int 1 on error, 0 on success
 	 */
 	private function handleFilterConfig(&$key) {
-		$this->get('DataModel')->setFlashState('config');
 
 		$this->filterForms['config']->bindRequest($this->getRequest());
 
@@ -820,7 +810,7 @@ class DefaultController extends BaseController
 			}
 			return 0;
 		} else {
-			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
+			$this->getRequest()->getSession()->getFlashBag()->add('error', 'You have not filled up form correctly.');
 			return  1;
 		}
 	}
@@ -833,7 +823,6 @@ class DefaultController extends BaseController
 	 */
 	private function handleCopyConfig(&$key) {
 		$dataClass = $this->get('DataModel');
-		$dataClass->setFlashState('config');
 
 		$this->filterForms['copyConfig']->bindRequest($this->getRequest());
 
@@ -849,7 +838,7 @@ class DefaultController extends BaseController
 			$dataClass->handle('copyconfig', $params, false);
 			return 0;
 		} else {
-			$this->getRequest()->getSession()->setFlash('error', 'You have not filled up form correctly.');
+			$this->getRequest()->getSession()->getFlashBag()->add('error', 'You have not filled up form correctly.');
 			return  1;
 		}
 	}
@@ -877,7 +866,6 @@ class DefaultController extends BaseController
 	private function loadConfigArr($addConfigSection = true, $merge = true) {
 		try {
 			$dataClass = $this->get('dataModel');
-			$dataClass->setFlashState('config');
 			if ($addConfigSection) {
 				$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'config');
 			}
@@ -889,7 +877,7 @@ class DefaultController extends BaseController
 			}
 		} catch (\ErrorException $e) {
 			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('config error', "Could not parse XML file correctly. ");
+			$this->getRequest()->getSession()->getFlashBag()->add('config error', "Could not parse XML file correctly. ");
 		}
 	}
 }

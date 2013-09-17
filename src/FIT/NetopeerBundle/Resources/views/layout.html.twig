@@ -59,6 +59,7 @@ if advised of the possibility of such damage.
 
 	{% javascripts
 		'@FITNetopeerBundle/Resources/public/js/jquery-1.7.2.min.js'
+		'@FITNetopeerBundle/Resources/public/js/tooltip/gips.js'
 		'@FITNetopeerBundle/Resources/public/js/*'
 		'@FITNetopeerBundle/Resources/public/js/bootstrap/js/bootstrap.js'
 	%}
@@ -134,39 +135,28 @@ if advised of the possibility of such damage.
 
 		<div class="alert-cover" id="block--alerts">
 			{% block alerts %}
-				{% if allFlashes|length %}
-					{% for type, message in allFlashes %}
-							<div class='alert {{type}}'><span class="close">X</span>{{message|raw}}</div>
-						{% endfor %}
-				{% endif %}
+				{% for type, flashMessages in app.session.flashbag.all() %}
+					{% for flashMessage in flashMessages %}
+						<div class="alert {{ type }}">
+							<span class="close">X</span>
+							{{ flashMessage|raw }}
+						</div>
+					{% endfor %}
+				{% endfor %}
 			{% endblock alerts %}
 		</div>
 
 		{% if singleColumnLayout == false %}
 			<section id="block--state" class="column{{addToColumnClass}}">
-				{% for type, message in stateInfoFlashes %}
-				    <div class='alert {{type}}'>{{message|raw}}</div>
-				{% endfor %}
-
 				{% block state %}
 				{% endblock state %}
 			</section>
 			<section id="block--config" class="column{{addToColumnClass}}">
-
-				{% for type, message in configInfoFlashes %}
-				    <div class='alert {{type}}'>{{message|raw}}</div>
-				{% endfor %}
-
 				{% block config %}
 				{% endblock config %}
 			</section>
 		{% else %}
 			<section id="block--singleContent" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %}">
-
-				{% for type, message in allInfoFlashes %}
-					<div class='alert {{type}}'>{{message|raw}}</div>
-				{% endfor %}
-
 				{% block singleContent %}
 				{% endblock singleContent %}
 			</section>

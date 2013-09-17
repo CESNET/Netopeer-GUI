@@ -45,7 +45,7 @@ namespace FIT\NetopeerBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Response;
 
 // these import the "@Route" and "@Template" annotations
@@ -138,7 +138,6 @@ class BaseController extends Controller
 			$this->assign('singleColumnLayout', $this->getRequest()->getSession()->get('singleColumnLayout'));
 		}
 
-		$this->prepareAndAssignFlashes();
 		$this->assign("topmenu", array());
 		$this->assign("submenu", array());
 
@@ -226,47 +225,10 @@ class BaseController extends Controller
 	}
 
 	/**
-	 * prepares flashes into right template variables
-	 */
-	protected function prepareAndAssignFlashes() {
-		$session = $this->getRequest()->getSession();
-		$flashes = array_merge($session->getFlashes(), $session->getShortFlashes());
-		$stateFlashes = $configFlashes = $leftPaneFlashes = $singleFlashes = $allFlashes = array();
-
-		// divide flash messages according to key into categories
-		foreach ($flashes as $key => $message) {
-			$isInfoMessage = false;
-
-			// a little bit tricky - if key contains word state, condition will be pass
-			if ( strpos($key, 'tate') && strpos($key, "info") ) { // key contains word state
-				$stateFlashes[$key] = $message;
-				$isInfoMessage = true;
-			} elseif ( strpos($key, 'onfig') && strpos($key, "info") ) { // key contains word config
-				$configFlashes[$key] = $message;
-				$isInfoMessage = true;
-			} elseif ( strpos($key, 'eftPane') ) { // key contains word leftPane
-				$leftPaneFlashes[$key] = $message;
-			} else { // key contains word single
-				$singleFlashes[$key] = $message;
-			}
-
-			if (!$isInfoMessage) $allFlashes[$key] = $message;
-			$session->removeFlash($key);
-		}
-
-		$this->assign("stateInfoFlashes", $stateFlashes);
-		$this->assign("configInfoFlashes", $configFlashes);
-		$this->assign("allInfoFlashes", array_merge($stateFlashes, $configFlashes));
-		$this->assign("singleFlashes", $singleFlashes);
-		$this->assign("allFlashes", $allFlashes);
-	}
-
-	/**
 	 * @return Response   json encoded array of ajax blocks
 	 */
 	protected function getAjaxAlertsRespose() {
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
-		$this->prepareAndAssignFlashes();
 		return $this->getAjaxBlocksResponse();
 	}
 

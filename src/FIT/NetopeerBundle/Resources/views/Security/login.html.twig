@@ -50,8 +50,12 @@ if advised of the possibility of such damage.
 			<p class="desc">[hint: admin,pass; without DB: adminNoDb,pass]</p>
 
 			{% block flashes %}
-				{% for type, message in allFlashes %}
-					<div class='alert {{type}}'>{{message|raw}}</div>
+				{% for type, flashMessages in app.session.flashbag.all() %}
+					{% for flashMessage in flashMessages %}
+						<div class="alert {{ type }}">
+							{{ flashMessage|raw }}
+						</div>
+					{% endfor %}
 				{% endfor %}
 			{% endblock flashes %}
 			
