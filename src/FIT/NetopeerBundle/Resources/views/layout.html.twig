@@ -46,21 +46,24 @@ if advised of the possibility of such damage.
 	<meta name="author" content="David Alexa - alexadav@fit.cvut.cz" />
 	<meta name="robots" content="noindex, nofollow" /> 
 
-	<link href="{{ asset('bundles/netopeer/style/pie.css') }}" rel="stylesheet" type="text/css" />
-	<link rel="stylesheet" href="{{ asset('bundles/netopeer/style/ui-lightness/jquery-ui-1.10.3.custom.css') }}" type="text/css" media="all" />
-	<link rel="stylesheet" href="{{ asset('bundles/netopeer/style/screen.css') }}" type="text/css" media="all" />
-	<link rel="stylesheet" href="{{ asset('bundles/netopeer/js/bootstrap/css/bootstrap.min.css') }}" type="text/css" media="all" />
+	{% stylesheets
+		'bundles/netopeer/style/ui-lightness/jquery-ui-1.10.3.custom.css'
+		'bundles/netopeer/style/pie.css'
+		'bundles/netopeer/style/screen.css'
+		'bundles/netopeer/js/bootstrap/css/bootstrap.min.css'
+		filter='cssrewrite'
+	%}
+	<link rel="stylesheet" href="{{ asset_url }}" />
+	{% endstylesheets %}
 	{% block stylesheet %}{% endblock stylesheet %}
 
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/jquery-1.7.2.min.js')}} "></script>
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/jquery.nette.js')}} "></script>
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/jquery-ui-1.10.3.custom.min.js')}} "></script>
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/modernizr.custom.43627.js')}} "></script>
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/selectivizr-min.js')}} "></script>
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/tooltip/gips.js')}} "></script>
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/default.js')}} "></script>
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/notifications.js')}} "></script>
-	<script type="text/javascript" src="{{ asset('bundles/netopeer/js/bootstrap/js/bootstrap.js')}} "></script>
+	{% javascripts
+		'@FITNetopeerBundle/Resources/public/js/jquery-1.7.2.min.js'
+		'@FITNetopeerBundle/Resources/public/js/*'
+		'@FITNetopeerBundle/Resources/public/js/bootstrap/js/bootstrap.js'
+	%}
+	<script src="{{ asset_url }}"></script>
+	{% endjavascripts %}
 	{% block javascripts %}{% endblock javascripts %}
 
 	<title id="block--title">{% block title %}{% endblock title %} {% block additionalTitle %}| NetopeerWebGUI{% endblock additionalTitle %}</title>
