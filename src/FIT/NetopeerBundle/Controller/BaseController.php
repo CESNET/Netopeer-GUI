@@ -244,6 +244,7 @@ class BaseController extends Controller
 		$app = array(
 			'user' => $this->get('security.context')->getToken()->getUser(),
 			'request' => $this->getRequest(),
+			'session' => $this->getRequest()->getSession(),
 		);
 		$this->assign('app', $app);
 

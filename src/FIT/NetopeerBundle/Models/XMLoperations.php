@@ -218,7 +218,6 @@ class XMLoperations {
 	public function handleEditConfigForm(&$key, $configParams) {
 		$post_vals = $this->container->get('request')->get('configDataForm');
 		$res = 0;
-		$this->dataModel->setFlashState('config');
 
 		try {
 
@@ -259,7 +258,7 @@ class XMLoperations {
 
 				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source']);
 				if ($res !== 1) {
-					$this->container->get('session')->setFlash('config success', "Config has been edited successfully.");
+					$this->container->get('session')->getFlashBag()->add('success', "Config has been edited successfully.");
 				}
 			} else {
 				throw new \ErrorException("Could not load config.");
@@ -267,7 +266,7 @@ class XMLoperations {
 
 		} catch (\ErrorException $e) {
 			$this->logger->warn('Could not save config correctly.', array('error' => $e->getMessage()));
-			$this->container->get('request')->getSession()->setFlash('config error', "Could not save config correctly. Error: ".$e->getMessage());
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not save config correctly. Error: ".$e->getMessage());
 		}
 
 		return $res;
@@ -286,7 +285,6 @@ class XMLoperations {
 	public function handleDuplicateNodeForm(&$key, $configParams)	{
 		$post_vals = $this->container->get('request')->get('duplicatedNodeForm');
 		$res = 0;
-		$this->dataModel->setFlashState('config');
 
 		try {
 			// load original (not modified) getconfig
@@ -354,7 +352,7 @@ class XMLoperations {
 				$res = $this->executeEditConfig($key, $createTree->asXml(), $configParams['source']);
 
 				if ($res == 0) {
-					$this->container->get('request')->getSession()->setFlash('config success', "Record has been added.");
+					$this->container->get('request')->getSession()->getFlashBag()->add('success', "Record has been added.");
 				}
 			} else {
 				throw new \ErrorException("Could not load config.");
@@ -362,7 +360,7 @@ class XMLoperations {
 
 		} catch (\ErrorException $e) {
 			$this->logger->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
-			$this->container->get('request')->getSession()->setFlash('config error', "Could not save new node correctly. Error: ".$e->getMessage());
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not save new node correctly. Error: ".$e->getMessage());
 		}
 
 		return $res;
@@ -381,7 +379,6 @@ class XMLoperations {
 	public function handleGenerateNodeForm(&$key, &$module, &$subsection)	{
 		$post_vals = $this->container->get('request')->get('generatedNodeForm');
 		$res = 0;
-		$this->dataModel->setFlashState('config');
 
 		// TODO: load XML file - https://sauvignon.liberouter.org/symfony/generate/2/-%252A-%252A%253F1%2521-%252A%253F2%2521-%252A%253F1%2521/0/hanic-probe/exporters/model.xml
 		// this URL should be generated from route (path = generateFromModel, params: '2' = level (whatever, not used in this case); 'xPath' = url_encode($xPath), 'key' = $key, 'module' = $module, 'subsection' = subsection, '_format' = 'xml')
@@ -474,7 +471,7 @@ class XMLoperations {
 				$res = $this->executeEditConfig($key, $createTree->asXml(), $configParams['source']);
 
 				if ($res == 0) {
-					$this->container->get('request')->getSession()->setFlash('config success', "Record has been added.");
+					$this->container->get('request')->getSession()->getFlashBag()->add('success', "Record has been added.");
 				}
 			} else {
 				throw new \ErrorException("Could not load config.");
@@ -482,7 +479,7 @@ class XMLoperations {
 
 		} catch (\ErrorException $e) {
 			$this->logger->warn('Could not save new node correctly.', array('error' => $e->getMessage()));
-			$this->container->get('request')->getSession()->setFlash('config error', "Could not save new node correctly. Error: ".$e->getMessage());
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not save new node correctly. Error: ".$e->getMessage());
 		}
 
 		return $res;
@@ -612,14 +609,14 @@ class XMLoperations {
 				}
 				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml(), $configParams['source']);
 				if ($res == 0) {
-					$this->container->get('request')->getSession()->setFlash('config success', "Record has been removed.");
+					$this->container->get('request')->getSession()->getFlashBag()->add('success', "Record has been removed.");
 				}
 			} else {
 				throw new \ErrorException("Could not load config.");
 			}
 		} catch (\ErrorException $e) {
 			$this->logger->warn('Could not remove node correctly.', array('error' => $e->getMessage()));
-			$this->container->get('request')->getSession()->setFlash('config error', "Could not remove node correctly. ".$e->getMessage());
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not remove node correctly. ".$e->getMessage());
 		}
 
 		return $res;
