@@ -47,11 +47,12 @@ if advised of the possibility of such damage.
 	<meta name="robots" content="noindex, nofollow" /> 
 
 	{% stylesheets
-		'bundles/netopeer/style/ui-lightness/jquery-ui-1.10.3.custom.css'
-		'bundles/netopeer/style/pie.css'
-		'bundles/netopeer/style/screen.css'
-		'bundles/netopeer/js/bootstrap/css/bootstrap.min.css'
+		'bundles/fitnetopeer/style/ui-lightness/jquery-ui-1.10.3.custom.css'
+		'bundles/fitnetopeer/style/pie.css'
+		'bundles/fitnetopeer/style/screen.css'
+		'bundles/fitnetopeer/js/bootstrap/css/bootstrap.min.css'
 		filter='cssrewrite'
+		output='css/stylesheet.css'
 	%}
 	<link rel="stylesheet" href="{{ asset_url }}" />
 	{% endstylesheets %}
@@ -62,6 +63,7 @@ if advised of the possibility of such damage.
 		'@FITNetopeerBundle/Resources/public/js/tooltip/gips.js'
 		'@FITNetopeerBundle/Resources/public/js/*'
 		'@FITNetopeerBundle/Resources/public/js/bootstrap/js/bootstrap.js'
+		output='js/compiled/default.js'
 	%}
 	<script src="{{ asset_url }}"></script>
 	{% endjavascripts %}

@@ -105,7 +105,7 @@ window.onpopstate = function(o) {
 				successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
 			},
 			error: function() {
-				window.location.href = href;
+//				window.location.href = href;
 			}
 		});
 	}

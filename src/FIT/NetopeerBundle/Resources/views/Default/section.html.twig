@@ -88,7 +88,7 @@ if advised of the possibility of such damage.
 						{% set iterator = iterator + 1 %}
 					{% endfor %}
 
-					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
+					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
 						{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
 							<input type="submit" value="Save config" />
 						{% endif %}
@@ -130,11 +130,10 @@ if advised of the possibility of such damage.
 					{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
 					{% set iterator = iterator + 1 %}
 				{% endfor %}
-
-				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) and ((app.session.get('sourceConfig') is not defined) or (app.session.get('sourceConfig') == 'running')) %}
-					{% if (hideConfigSubmitButton is not defined) or hideConfigSubmitButton != true %}
+				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
+					{# if (hideConfigSubmitButton is not defined) or hideConfigSubmitButton != true #}
 						<input type="submit" value="Save config" />
-					{% endif %}
+					{# endif #}
 				{% endif %}
 			</div>
 		</form>

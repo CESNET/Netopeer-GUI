@@ -5,5 +5,7 @@
 /src/FIT/NetopeerBundle/Resources/public/.sass-cache/
 /web/phpinfo.php
 /web/adminer.php
+/web/css
+/web/js
 .idea
 /src/FIT/NetopeerBundle/Entity/*~
