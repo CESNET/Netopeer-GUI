@@ -145,7 +145,7 @@ class BaseController extends Controller
 		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
 		 */
 		$dataClass = $this->get('DataModel');
-		if ($this->getRequest()->get('_route') !== '_home' &&
+		if (!in_array($this->getRequest()->get('_route'), array('_home', '_login')) &&
 				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
 			$dataClass->buildMenuStructure($this->activeSectionKey);
 			$this->assign('topmenu', $dataClass->getModels());

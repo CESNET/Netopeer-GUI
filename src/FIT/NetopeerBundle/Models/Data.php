@@ -567,7 +567,7 @@ class Data {
 			*/
 			return 0;
 		} else {
-			$this->logger->err("Could not connect.", array("error" => (isset($decoded["error-message"])?" Error: ".$decoded["error-message"] : var_export($this->getJsonError(), true))));
+			$this->logger->addError("Could not connect.", array("error" => (isset($decoded["error-message"])?" Error: ".$decoded["error-message"] : var_export($this->getJsonError(), true))));
 			$session->getFlashBag()->add('error', "Could not connect.".(isset($decoded["error-message"])?" Error: ".$decoded["error-message"]:""));
 			return 1;
 		}
@@ -709,7 +709,7 @@ class Data {
 		if ($decoded["type"] === self::REPLY_OK) {
 			$session->getFlashBag()->add('success', "Successfully disconnected.");
 		} else {
-			$this->logger->err("Could not disconnecd.", array("error" => var_export($decoded, true)));
+			$this->logger->addError("Could not disconnecd.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not disconnect from server. ");
 		}
 
@@ -741,7 +741,7 @@ class Data {
 			$session->getFlashBag()->add('success', "Successfully locked.");
 			$this->updateConnLock($params['key']);
 		} else {
-			$this->logger->err("Could not lock.", array("error" => var_export($decoded, true)));
+			$this->logger->addError("Could not lock.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not lock datastore. ");
 		}
 	}
@@ -770,7 +770,7 @@ class Data {
 			$session->getFlashBag()->add('success', "Successfully unlocked.");
 			$this->updateConnLock($params['key']);
 		} else {
-			$this->logger->err("Could not unlock.", array("error" => var_export($decoded, true)));
+			$this->logger->addError("Could not unlock.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not unlock datastore. ");
 		}
 	}
@@ -819,7 +819,7 @@ class Data {
 
 		if (!$decoded) {
 			/* error occurred, unexpected response */
-			$this->logger->err("Could get notifications history.", array("error" => var_export($decoded, true)));
+			$this->logger->addError("Could get notifications history.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not get notifications history.");
 			return 1;
 		}
@@ -852,7 +852,7 @@ class Data {
 
 		if (!$decoded) {
 			/* error occurred, unexpected response */
-			$this->logger->err("Could get session info.", array("error" => var_export($decoded, true)));
+			$this->logger->addError("Could get session info.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not get session info.");
 		}
 
@@ -892,7 +892,7 @@ class Data {
 			$result = $decoded["data"];
 			return 0;
 		} else {
-			$this->logger->err("Get-schema failed.", array("error" => var_export($decoded, true)));
+			$this->logger->addError("Get-schema failed.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Get-schema failed."
 				. (isset($decoded["error-message"])?" Reason: ".$decoded["error-message"]:"")
 				. (isset($decoded["bad-element"])?" (".  $decoded["bad-element"]  .")":"")
@@ -928,7 +928,7 @@ class Data {
 			$session->getFlashBag()->add('success', "Session successfully killed.");
 			$this->updateConnLock($params['key']);
 		} else {
-			$this->logger->err("Could not kill session.", array("error" => var_export($decoded, true)));
+			$this->logger->addError("Could not kill session.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not kill session.");
 		}
 	}
@@ -968,7 +968,7 @@ class Data {
 			$session->getFlashBag()->add('error', $status['message']);
 			return 1;
 		//} elseif ( $decoded == null ) {
-		//	$this->logger->err('Could not decode response from socket', array('error' => "Empty response."));
+		//	$this->logger->addError('Could not decode response from socket', array('error' => "Empty response."));
 		//	$session->getFlashBag()->add('error', "Could not decode response from socket. Error: Empty response.");
 		//	return 1;
 		} elseif (($decoded['type'] != self::REPLY_OK) && ($decoded['type'] != self::REPLY_DATA)) {
@@ -1104,13 +1104,13 @@ class Data {
 		try {
 			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);
 		} catch (\ErrorException $e) {
-			$this->logger->err('Could not connect to socket.', array($errstr));
+			$this->logger->addError('Could not connect to socket.', array($errstr));
 			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not connect to socket. Error: $errstr");
 			return 1;
 		}
 
 		if ($errno != 0) {
-			$this->logger->err('Could not connect to socket.', array($errstr));
+			$this->logger->addError('Could not connect to socket.', array($errstr));
 			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not connect to socket. Error: $errstr");
 			return 1;
 		}
@@ -1299,7 +1299,7 @@ XML;
 					}
 				}
 			} catch (\ErrorException $e) {
-				$this->logger->err("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
+				$this->logger->addError("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
 				// nothing
 			}
 			$this->setModelNamespaces($key, $namespaces);
