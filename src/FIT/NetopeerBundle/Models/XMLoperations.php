@@ -713,9 +713,13 @@ class XMLoperations {
 	 * @return int  1 on success, 0 on error
 	 */
 	public function isResponseValidXML(&$xmlString) {
+		$e = false;
 		try {
 			$simpleXMLRes = simplexml_load_string($xmlString);
 		} catch (\ErrorException $e) {
+			// Exception will be handled bellow
+		}
+		if ($simpleXMLRes === false || $e !== false) {
 			// sometimes is exactly one root node missing
 			// we will check, if is not XML valid with root node
 			$xmlString = "<root>".$xmlString."</root>";
@@ -724,7 +728,6 @@ class XMLoperations {
 			} catch (\ErrorException $e) {
 				return 0;
 			}
-			return 1;
 		}
 		return 1;
 	}
