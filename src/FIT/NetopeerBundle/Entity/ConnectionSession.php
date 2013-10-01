@@ -75,7 +75,12 @@ class ConnectionSession {
 	/**
 	 * @var bool locked by us
 	 */
-	public $locked = false;
+	public $locked;
+
+	/**
+	 * @var string  selected data store
+	 */
+	public $currentDatastore;
 
 	/**
 	 * @var string session info
@@ -98,6 +103,52 @@ class ConnectionSession {
 		$this->user = $user;
 		$newtime = new \DateTime();
 		$this->time = $newtime->format("d.m.Y H:i:s");
-		$this->locked = false;
+		$this->locked = array();
+		$this->setCurrentDatastore("running");
+	}
+
+	/**
+	 * toggles datastore lock
+	 *
+	 * @param string $datastore   if not defined, current data store is used
+	 */
+	public function toggleLockOfDatastore($datastore = "currentDatastore") {
+		if ($datastore === "currentDatastore") {
+			$datastore = $this->getCurrentDatastore();
+		}
+		if (!isset($this->locked[$datastore])) {
+			$this->locked[$datastore] = false;
+		}
+		$this->locked[$datastore] = !$this->locked[$datastore];
+	}
+
+	/**
+	 * returns datastore lock status
+	 *
+	 * @param string $datastore   if not defined, current data store is used
+	 * @return bool
+	 */
+	public function getLockForDatastore($datastore = "currentDatastore") {
+		if ($datastore === "currentDatastore") {
+			$datastore = $this->getCurrentDatastore();
+		}
+		if (!isset($this->locked[$datastore])) {
+			$this->locked[$datastore] = false;
+		}
+		return $this->locked[$datastore];
+	}
+
+	/**
+	 * @param string $datastore    datastore identifier
+	 */
+	public function setCurrentDatastore($datastore) {
+		$this->currentDatastore = $datastore;
+	}
+
+	/**
+	 * @return string   current datastore identifier, which is used
+	 */
+	public function getCurrentDatastore() {
+		return $this->currentDatastore;
 	}
 }

@@ -283,6 +283,7 @@ class DefaultController extends BaseController
 		}
 
 		if ($command === "lock" || $command === "unlock") {
+			$params['target'] = $this->getCurrentDatastoreForKey($key);
 			$this->getRequest()->getSession()->set('isLocking', true);
 		}
 
@@ -324,6 +325,7 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'singleContent');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
 
 		if ( $action == "session" ) {
 			$session = $this->container->get('request')->getSession();
@@ -341,6 +343,7 @@ class DefaultController extends BaseController
 							unset($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']['capabilities']);
 						}
 					}
+					
 					$connVarsArr['connection-'.$connKey][$connKey]['nc_features'] = $dataClass->getCapabilitiesArrForKey($connKey);
 				}
 				$sessionArr['session-connections'] = $connVarsArr;
@@ -478,7 +481,7 @@ class DefaultController extends BaseController
 		}
 
 		// we will prepare filter form in column
-		$this->setSectionFilterForms();
+		$this->setSectionFilterForms($key);
 
 		// path for creating node typeahead
 		$valuesTypeaheadPath = $this->generateUrl("getValuesForLabel", array('formId' => "FORMID", 'key' => $key, 'xPath' => "XPATH"));
@@ -616,28 +619,30 @@ class DefaultController extends BaseController
 	 * @param string  $sourceConfig source param of config
 	 */
 	private function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = "") {
+		/**
+		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
+		 */
+		$dataClass = $this->get('DataModel');
+		$conn = $dataClass->getConnFromKey($key);
 
-		// if is set sourceConfig in session and we haven't set it in method call
-		// we will use value from session
-		if ( $this->get('session')->get('sourceConfig') != null && $sourceConfig == "") {
-			$sourceConfig = $this->get('session')->get('sourceConfig');
-		// else we will use default value running
-		} else if ( $sourceConfig == "" ) {
-			$sourceConfig = 'running';
+		if ($sourceConfig !== "") {
+			$conn->setCurrentDatastore($sourceConfig);
 		}
 
 		$this->setStateParams('key', $key);
 		$this->setStateParams('filter', $filterState);
 
 		$this->setConfigParams('key', $key);
-		$this->setConfigParams('source', $sourceConfig);
+		$this->setConfigParams('source', $conn->getCurrentDatastore());
 		$this->setConfigParams('filter', $filterConfig);
 	}
 
 	/**
 	 * prepares filter forms for both sections
+	 *
+	 * @param int     $key          key of connected server
 	 */
-	private function setSectionFilterForms() {
+	private function setSectionFilterForms($key) {
 		/* prepareGlobalTwigVariables is needed to init nc_feature
 		array with available datastores... */
 		$this->prepareGlobalTwigVariables();
@@ -673,12 +678,12 @@ class DefaultController extends BaseController
 			->add('source', 'choice', array(
 				'label' => "Source:",
 				'choices' => $datastores,
-				'data' => $this->get('session')->get('sourceConfig')
+				'data' => $this->getCurrentDatastoreForKey($key)
 			))
 			->getForm();
 
 		$targets = $datastores;
-		$current_source = $this->get('session')->get('sourceConfig');
+		$current_source = $this->getCurrentDatastoreForKey($key);
 		if ($current_source !== null && $current_source !== "") {
 			unset($targets[$current_source]);
 		} else {
@@ -712,7 +717,7 @@ class DefaultController extends BaseController
 		$post_vals = $this->getRequest()->get("form");
 
 		if ( !isset($this->filterForms['state']) || !isset($this->filterForms['config']) ) {
-			$this->setSectionFilterForms();
+			$this->setSectionFilterForms($key);
 		}
 
 		// processing filter on state part
@@ -776,7 +781,7 @@ class DefaultController extends BaseController
 	 */
 	private function handleFilterState(&$key) {
 
-		$this->filterForms['state']->bindRequest($this->getRequest());
+		$this->filterForms['state']->bind($this->getRequest());
 
 		if ( $this->filterForms['state']->isValid() ) {
 			$this->setStateParams("key", $key);
@@ -795,16 +800,25 @@ class DefaultController extends BaseController
 	 * @return int 1 on error, 0 on success
 	 */
 	private function handleFilterConfig(&$key) {
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
 
-		$this->filterForms['config']->bindRequest($this->getRequest());
+		$this->filterForms['config']->bind($this->getRequest());
 
 		if ( $this->filterForms['config']->isValid() ) {
 			$post_vals = $this->getRequest()->get("form");
 			$this->setConfigParams("key", $key);
 //			$this->setConfigParams("filter", $post_vals["filter"]);
+
+			/**
+			 * @var $dataClass \FIT\NetopeerBundle\Models\Data
+			 */
+			$dataClass = $this->get('DataModel');
+			$conn = $dataClass->getConnFromKey($key);
+			$conn->setCurrentDatastore($post_vals['source']);
+			$dataClass->persistConnectionForKey($key, $conn);
+
 			$this->setConfigParams("source", $post_vals['source']);
 
-			$this->get('session')->set('sourceConfig', $post_vals['source']);
 			if ($post_vals['source'] !== 'running') {
 				$this->setOnlyConfigSection();
 			}
@@ -824,12 +838,12 @@ class DefaultController extends BaseController
 	private function handleCopyConfig(&$key) {
 		$dataClass = $this->get('DataModel');
 
-		$this->filterForms['copyConfig']->bindRequest($this->getRequest());
+		$this->filterForms['copyConfig']->bind($this->getRequest());
 
 		if ( $this->filterForms['copyConfig']->isValid() ) {
 			$post_vals = $this->getRequest()->get("form");
 			$this->setConfigParams("key", $key);
-			$source = $this->get('session')->get('sourceConfig');
+			$source = $this->getCurrentDatastoreForKey($key);
 			if ($source === null) {
 				$source = 'running';
 			}
@@ -879,6 +893,15 @@ class DefaultController extends BaseController
 			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
 			$this->getRequest()->getSession()->getFlashBag()->add('config error', "Could not parse XML file correctly. ");
 		}
+	}
+
+	private function getCurrentDatastoreForKey($key) {
+		/**
+		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
+		 */
+		$dataClass = $this->get('DataModel');
+		$conn = $dataClass->getConnFromKey($key);
+		return $conn->getCurrentDatastore();
 	}
 }
 

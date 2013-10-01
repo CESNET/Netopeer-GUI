@@ -388,19 +388,26 @@ class Data {
 	 * Updates array of SessionConnections.
 	 *
 	 * @param  int $key      session key
+	 * @param  string $targetDataStore    target datastore identifier
 	 */
-	private function updateConnLock($key) {
+	private function updateConnLock($key, $targetDataStore) {
 		$conn = $this->getConnFromKey($key);
 
 		if ($conn == false) {
 			return;
 		}
 
+		$conn->toggleLockOfDatastore($targetDataStore);
+		$this->persistConnectionForKey($key, $conn);
+	}
+
+	/**
+	 * @param  int $key      session key
+	 * @param  ConnectionSession $conn
+	 */
+	public function persistConnectionForKey($key, $conn) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
-
-		$conn->locked = !$conn->locked;
-
 		$sessionConnections[$key] = serialize($conn);
 		$session->set('session-connections', $sessionConnections);
 	}
@@ -725,6 +732,7 @@ class Data {
 	 * @return int       		      0 on success, 1 on error
 	 */
 	private function handle_lock(&$sock, &$params) {
+
 		if ($this->checkLoggedKeys() != 0) {
 			return 1;
 		}
@@ -733,13 +741,13 @@ class Data {
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_LOCK,
-			"target"	=> "running", /*TODO let user decide */
+			"target"	=> $params['target'],
 			"session" 	=> $sessionKey
 		));
 
 		if ($decoded["type"] === self::REPLY_OK) {
 			$session->getFlashBag()->add('success', "Successfully locked.");
-			$this->updateConnLock($params['key']);
+			$this->updateConnLock($params['key'], $params['target']);
 		} else {
 			$this->logger->addError("Could not lock.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not lock datastore. ");
@@ -762,13 +770,13 @@ class Data {
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_UNLOCK,
-			"target"	=> "running", /*TODO let user decide */
+			"target"	=> $params['target'],
 			"session" 	=> $sessionKey
 		));
 
 		if ($decoded["type"] === self::REPLY_OK) {
 			$session->getFlashBag()->add('success', "Successfully unlocked.");
-			$this->updateConnLock($params['key']);
+			$this->updateConnLock($params['key'], $params['target']);
 		} else {
 			$this->logger->addError("Could not unlock.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not unlock datastore. ");

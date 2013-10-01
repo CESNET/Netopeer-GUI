@@ -157,14 +157,14 @@ class BaseController extends Controller
 			if ($key != "") {
 				$conn = $dataClass->getConnFromKey($key);
 				if ($conn !== false) {
-					$this->assign('lockedConn', $conn->locked);
+					$this->assign('lockedConn', $conn->getLockForDatastore());
 					$this->assign('sessionStatus', $conn->sessionStatus);
 					$this->assign('sessionHash', $conn->hash);
 				}
 			}
 		} catch (\ErrorException $e) {
 			$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
-			$this->getRequest()->getSession()->setFlash('error', "Trying to use unknown connection. Please, connect to the device.");
+			$this->getRequest()->getSession()->getFlashBag()->add('error', "Trying to use unknown connection. Please, connect to the device.");
 		}
 
 		$this->assign("ncFeatures", $dataClass->getCapabilitiesArrForKey($key));
