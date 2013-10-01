@@ -78,7 +78,7 @@ if advised of the possibility of such damage.
 	{% if element.name == "session-id" %}
 		<span class="edit-bar">
 				<a href="{{ path("handleConnection", {"command": "killsession", "key": app.request.get('key'), "identifier": element.0} ) }}" title="Kill this session" class="ajaxLink" data-disable-history="true">
-					<img src="{{ asset('bundles/netopeer/images/ico/16_kill.png') }}" alt="Kill this session" title="Kill this session">
+					<img src="{{ asset('bundles/fitnetopeer/images/ico/16_kill.png') }}" alt="Kill this session" title="Kill this session">
 				</a>
 			</span>
 	{% endif %}
