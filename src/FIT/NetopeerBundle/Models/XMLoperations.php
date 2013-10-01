@@ -719,7 +719,7 @@ class XMLoperations {
 		} catch (\ErrorException $e) {
 			// Exception will be handled bellow
 		}
-		if ($simpleXMLRes === false || $e !== false) {
+		if ( (isset($simpleXMLRes) && $simpleXMLRes === false) || $e !== false) {
 			// sometimes is exactly one root node missing
 			// we will check, if is not XML valid with root node
 			$xmlString = "<root>".$xmlString."</root>";
