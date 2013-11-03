@@ -66,7 +66,11 @@ function processNotifFromHistory(key, href) {
 		dataType: "json",
 		success: function(data, textStatus, jqXHR) {
 			if (data['type'] === 2) {
-				notifications[key].addError(data.error-message, true);
+				if (data.errors.length) {
+					$.each(data.errors, function(i,e) {
+						notifications[key].addError(e, true);
+					});
+				}
 			} else if (data['snippets'] !== undefined) {
 				$.nette.success(data);
 			} else {

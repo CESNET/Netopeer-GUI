@@ -566,16 +566,15 @@ class Data {
 
 			$session->getFlashBag()->add('success', "Successfully connected.");
 			$result = array_search($newconnection, $session->get("session-connections"));
-			/*
-			$session->getFlashBag()->add('success', "Successfully connected.".
-			"--".var_export($decoded).
-			"--".var_export($newconnection, true).
-			"--".var_export($sessionConnections, true));
-			*/
+
 			return 0;
 		} else {
-			$this->logger->addError("Could not connect.", array("error" => (isset($decoded["error-message"])?" Error: ".$decoded["error-message"] : var_export($this->getJsonError(), true))));
-			$session->getFlashBag()->add('error', "Could not connect.".(isset($decoded["error-message"])?" Error: ".$decoded["error-message"]:""));
+			$this->logger->addError("Could not connect.", array("error" => (isset($decoded["errors"])?" Error: ".var_export($decoded["errors"], true) : var_export($this->getJsonError(), true))));
+			if (sizeof($decoded['errors'])) {
+				foreach ($decoded['errors'] as $error) {
+					$session->getFlashBag()->add('error', $error);
+				}
+			}
 			return 1;
 		}
 	}
@@ -792,15 +791,29 @@ class Data {
 	 * @return int       		      0 on success, 1 on error
 	 */
 	private function handle_reloadhello(&$sock, &$params) {
+		$session = $this->container->get('request')->getSession();
+
 		if (isset($params["session"]) && ($params["session"] !== "")) {
 			$sessionKey = $params['session'];
 		} else {
 			if ($this->checkLoggedKeys() != 0) {
 				return 1;
 			}
-			$session = $this->container->get('request')->getSession();
 			$sessionKey = $this->getHashFromKey($params['key']);
 		}
+
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_RELOADHELLO,
+			"session" 	=> $sessionKey
+		));
+
+		if (!$decoded) {
+			/* error occurred, unexpected response */
+			$this->logger->addError("Could get reload hello.", array("error" => var_export($decoded, true)));
+			$session->getFlashBag()->add('error', "Could not reload device informations.");
+		}
+
+		return $decoded;
 	}
 
 	/**
@@ -902,7 +915,7 @@ class Data {
 		} else {
 			$this->logger->addError("Get-schema failed.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Get-schema failed."
-				. (isset($decoded["error-message"])?" Reason: ".$decoded["error-message"]:"")
+				. ((isset($decoded["errors"]) && sizeof($decoded['errors'])) ? " Reason: ".$decoded["errors"][0] : "")
 				. (isset($decoded["bad-element"])?" (".  $decoded["bad-element"]  .")":"")
 			);
 			return 1;
@@ -980,8 +993,12 @@ class Data {
 		//	$session->getFlashBag()->add('error', "Could not decode response from socket. Error: Empty response.");
 		//	return 1;
 		} elseif (($decoded['type'] != self::REPLY_OK) && ($decoded['type'] != self::REPLY_DATA)) {
-			$this->logger->warn('Error: ', array('error' => $decoded['error-message']));
-			$session->getFlashBag()->add('error', "Error: " . $decoded['error-message']);
+			$this->logger->warn('Error: ', array('errors' => $decoded['errors']));
+			if (sizeof($decoded['errors'])) {
+				foreach ($decoded['errors'] as $error) {
+					$session->getFlashBag()->add('error', $error);
+				}
+			}
 			// throw new \ErrorException($decoded['error-message']);
 			return 1;
 		}
