@@ -93,6 +93,7 @@ hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: tra
 	}
 	&.small { padding: 4px 6px; font-size: 0.85em; }
 }
+.bubble { background: #ddd; @include inline-block; padding: 6px 10px; @include border-radius(5px); }
 
 #ajax-spinner { position: absolute; width: 100%; height: 100%; @include background( url($img + 'ajax-loader.gif'), rgba(0,0,0,0.5) ); background-repeat: no-repeat; background-position: center center; top: 0; left: 0; z-index: 30; }
 
@@ -307,10 +308,16 @@ body section { float: left; width: 50%; min-height: 100%; padding: $sContentPadd
 
 	.filter { margin-top: 20px;
 		> div { float: left; margin-left: 30px; }
-		label { display: none; }
-		select { margin-top: 5px; }
+		label { @include inline-block; margin: 0px 10px 0px 0px; width: auto; height: auto; line-height: 1em;
+			&.required:after { content: " "; }
+		}
+		select { margin-top: 5px; width: 100px; }
 		.button { margin: 1px 10px; }
 		.note { font-size: 0.8em; font-style: italic; margin-top: 7px; }
+	}
+
+	#block--sourceValidation { float: left; margin: 29px 0px 0px 7px; font-size: 0.9em;
+		.source-validation { margin-top: -6px; }
 	}
 }
 .top-part { position: absolute; right: 2 * $sContentPadding; top: $hNavTop + $sContentPadding; font-size: 1.2em; @include opacity(0.7); z-index: 10;

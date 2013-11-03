@@ -347,6 +347,34 @@ class AjaxController extends BaseController
 	}
 
 	/**
+	 * @Route("/ajax/validate-source/{key}/{target}/{module}", name="validateSource")
+	 *
+	 * @param $key
+	 * @param $target
+	 * @param $module
+	 */
+	public function validateSource($key, $target, $module)
+	{
+		$dataClass = $this->get('DataModel');
+
+		$subsection = null;
+		$filters = $dataClass->loadFilters($module, $subsection);
+
+		$params = array(
+			'key' => $key,
+			'filter' => $filters['state'],
+			'target' => $target
+		);
+
+		$res = $dataClass->handle('validate', $params, false);
+
+		$this->assign('dataStore', $target);
+		$this->assign('isSourceValid', !$res);
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'sourceValidation');
+		return $this->getTwigArr();
+	}
+
+	/**
 	 * Lookup IP address.
 	 *
 	 * @Route("/ajax/lookup-ip/{ip}/", name="lookupIp")

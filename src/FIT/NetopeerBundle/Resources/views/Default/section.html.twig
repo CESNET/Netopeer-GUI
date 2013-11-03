@@ -67,6 +67,14 @@ if advised of the possibility of such damage.
 						$(formConfig).find('input[type=submit]').hide();
 					</script>
 				</form>
+				<div id="block--sourceValidation">
+				{% block sourceValidation %}
+					<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink" data-disable-history="true">validate</a>
+					{% if isSourceValid is defined %}
+						<span class="source-validation bubble {{ (isSourceValid) ? 'green' : 'red' }}">{{ (isSourceValid) ? 'valid' : 'invalid' }}</span>
+					{% endif %}
+				{% endblock %}
+				</div>
 			{% endif %}
 			{% if formCopyConfig is defined %}
 			<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">

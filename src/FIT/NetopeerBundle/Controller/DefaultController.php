@@ -694,11 +694,12 @@ class DefaultController extends BaseController
 				'data' => 'formCopyConfig',
 			))
 			->add('target', 'choice', array(
+				'label' => "copy to:",
 				'choices' => $targets,
 			))
 			->getForm();
 
-
+		$this->assign("dataStore", $this->getCurrentDatastoreForKey($key));
 		$this->assign('formState', $this->filterForms['state']->createView());
 		$this->assign('formConfig', $this->filterForms['config']->createView());
 		$this->assign('formCopyConfig', $this->filterForms['copyConfig']->createView());

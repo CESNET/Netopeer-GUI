@@ -76,6 +76,7 @@ class Data {
 	const MSG_GETSCHEMA			= 16;
 	const MSG_RELOADHELLO			= 17;
 	const MSG_NTF_GETHISTORY		= 18;
+	const MSG_VALIDATE			= 19;
 
 	/* subscription of notifications */
 	const CPBLT_NOTIFICATIONS		= "urn:ietf:params:netconf:capability:notification:1.0";
@@ -954,6 +955,29 @@ class Data {
 		}
 	}
 
+	public function handle_validate(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+
+		$sessionKey = $this->getHashFromKey($params['key']);
+
+		$get_params = array(
+			"type" 		=> self::MSG_VALIDATE,
+			"session" 	=> $sessionKey,
+			"target" 	=> $params['target'],
+		);
+		if (isset($params['url']) && ($params['url'] != NULL) && ($params['target'] == 'url')) {
+			$get_params["url"] = $params['url'];
+		}
+		if ($params['filter'] !== "") {
+			$get_params["filter"] = $params['filter'];
+		}
+
+		$decoded = $this->execute_operation($sock, $get_params);
+		return $this->checkDecodedData($decoded);
+	}
+
 	/**
 	 * checks, if logged keys are valid
 	 *
@@ -1184,6 +1208,9 @@ class Data {
 				break;
 			case "killsession":
 				$res = $this->handle_killsession($sock, $params, $result);
+				break;
+			case "validate":
+				$res = $this->handle_validate($sock, $params, $result);
 				break;
 			default:
 				$this->container->get('request')->getSession()->getFlashBag()->add('info', printf("Command not implemented yet. (%s)", $command));
