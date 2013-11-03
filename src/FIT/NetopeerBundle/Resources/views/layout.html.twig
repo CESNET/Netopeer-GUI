@@ -119,18 +119,18 @@ if advised of the possibility of such damage.
 		{# if submenu is defined and submenu #}
 		<nav id="block--leftColumn">
 			{% block leftColumn %}
+				{% if sectionName is defined %}<h3>{{ sectionName }}</h3>{% endif %}
 				{% for subsection in submenu %}
 					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="ajaxLink {% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 				{% endfor %}
 				{% block leftColumnAdditional %}
+					{% if rpcMethods is defined and rpcMethods|length > 0 %}
+					<h4>RPC methods defined in model:</h4>
+					{% for rpc in rpcMethods %}
+						<span class="item has-bullet"><span class="bullet"></span>{{ rpc.name }}</span>
+					{% endfor %} {% endif %}
 				{% endblock leftColumnAdditional %}
 			{% endblock leftColumn %}
-			{% if rpcMethods is defined and rpcMethods|length > 0 %}
-			{# TODO improve style #}
-			<h3>RPC methods from model:</h3>
-			{% for rpc in rpcMethods %}
-				<a href="">{{ rpc.name }}</a>
-			{% endfor %} {% endif %}
 		</nav>
 		{% set addToColumnClass = ' left-nav-defined' %}
 		{# endif #}
