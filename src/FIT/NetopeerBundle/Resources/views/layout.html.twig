@@ -96,6 +96,10 @@ if advised of the possibility of such damage.
 					{% endif %}
 				{% endif %}
 
+				<div id="alerts-icon" class="static">
+					<a href="" title="Show alerts" class="static header-icon ico-alerts"><span></span><strong class="count">0</strong></a>
+				</div>
+
 				<div id="userpane" class="static">
 					Logged user: <strong>{{ app.user.username }}</strong>
 					{% if is_granted('IS_AUTHENTICATED_FULLY') %}<a href="{{ path('_logout') }}" class="log-out">Log out</a>{% endif %}
@@ -110,6 +114,7 @@ if advised of the possibility of such damage.
 			{% endblock topMenu %}
 		</nav>
 
+		<div class="cover-wo-alerts">
 		{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
 		{# if submenu is defined and submenu #}
 		<nav id="block--leftColumn">
@@ -135,18 +140,8 @@ if advised of the possibility of such damage.
 			{% endblock topPart %}
 		</div>
 
-		<div class="alert-cover" id="block--alerts">
-			{% block alerts %}
-				{% for type, flashMessages in app.session.flashbag.all() %}
-					{% for flashMessage in flashMessages %}
-						<div class="alert {{ type }}">
-							<span class="close">X</span>
-							{{ flashMessage|raw }}
-						</div>
-					{% endfor %}
-				{% endfor %}
-			{% endblock alerts %}
-		</div>
+		{#<div class="alert-cover">#}
+		{#</div>#}
 
 		{% if singleColumnLayout == false %}
 			<section id="block--state" class="column{{addToColumnClass}}">
@@ -163,6 +158,21 @@ if advised of the possibility of such damage.
 				{% endblock singleContent %}
 			</section>
 		{% endif %}
+		</div>
+
+		<section class="column-alerts" id="block--alerts">
+			{% block alerts %}
+				{% for type, flashMessages in app.session.flashbag.all() %}
+					{% for flashMessage in flashMessages %}
+						<div class="message {{ type }}">
+							<span class="circle"></span>
+							<span class="close">X</span>
+							{{ flashMessage|raw }}
+						</div>
+					{% endfor %}
+				{% endfor %}
+			{% endblock alerts %}
+		</section>
 
 	{% else %}
 		<nav id="block--topMenu">

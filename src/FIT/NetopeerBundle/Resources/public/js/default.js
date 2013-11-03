@@ -61,12 +61,51 @@ function initJS() {
 		duplicateNode($(this));
 	}).on('click', ".remove-child", function() {
 				removeNode($(this));
-			}).on('click', ".create-child", function() {
+	}).on('click', ".create-child", function() {
 //				generateNode($(this));
-				createNode($(this));
-			});
+		createNode($(this));
+	});
 
-	$(window).on('click', '.alert', function(e) {
+	// activate column with flash messages
+	$("#alerts-icon .header-icon").unbind('click').click(function(e) {
+		e.preventDefault();
+
+		var mright = "-20%";
+		var mleft = "0";
+		var notWidth = "86%";
+
+		if (!$("#block--alerts").hasClass('openAlerts')) {
+			mright = "0";
+			mleft = 0 - $("#block--alerts").outerWidth();
+			notWidth = "100%";
+			$("#block--alerts").addClass('openAlerts');
+		} else {
+			$("#block--alerts").removeClass('openAlerts');
+		}
+
+		$("#block--alerts").stop(true,true).animate({
+			"margin-right": mright
+		}, 500, "linear");
+
+		$(".cover-wo-alerts").stop(true,true).animate({
+			"margin-left": mleft
+		}, 500, "linear");
+
+		$("#block--notifications").stop(true,true).animate({
+			width: notWidth
+		}, 500, "linear");
+
+		return false;
+	});
+
+	// refresh number of flash messages
+	setInterval(function() {
+		var previousCnt = parseInt($("#alerts-icon .count").text(), 10);
+		$("#alerts-icon .count").text($("#block--alerts").children().length);
+	}, 1000);
+
+	// handle click on alert or flash message (closes)
+	$(window).on('click', '.alert .error, .alert .success, .message', function(e) {
 		e.preventDefault();
 		$(this).stop(true,true).fadeOut('fast', function() {
 			$(this).remove();
@@ -78,7 +117,6 @@ function initJS() {
 		$(this).toggleClass("hover");
 	});
 
-	prepareAlertsActions();
 	prepareTooltipActions();
 
 	/* when range input type, add number of current value before input */
@@ -107,39 +145,6 @@ function initJS() {
 	});
 }
 
-/**
- * set animation for alerts in .alert-cover
- */
-(function( $ ) {
-	$.fn.animateAlert = function() {
-		if (!$(this).is(":hidden")) {
-			$(this).hide();
-		}
-		var topOffset = $(this).position().top;
-		var $alert = $(this);
-
-		$(this).css('top', 0 - $(this).outerHeight() - parseInt($(".alert-cover").css('top'), 10)).show().animate({
-			top: topOffset
-		}, 1000, 'easeOutBack');
-
-		/* hide alerts after some time - only successfull */
-		if ($(this).hasClass('success')) {
-			var $flash = $(this);
-			setTimeout(function() {
-				$flash.fadeOut(function() {
-					$flash.remove();
-				});
-			}, 5000); /* 3s animation + 4s visible */
-		}
-	};
-})( jQuery );
-
-function prepareAlertsActions() {
-	$(".alert-cover .alert").hide().delay(500).each(function() {
-		$(this).animateAlert();
-	});
-}
-
 function prepareTooltipActions() {
 	// tooltip
 	$('.tooltip .icon-help').each(function() {
@@ -163,7 +168,7 @@ function collapseTopNav() {
 	if ( $nav.length ) {
 		var $othersCover = $nav.find('.others-cover');
 		var $others = $othersCover.find(".others");
-        var availableSpace = $nav.outerWidth();
+    var availableSpace = $nav.outerWidth();
 
 		// we will count available space for sections hrefs
 		$nav.find('.static').each(function() {
@@ -219,7 +224,7 @@ function changeSectionHeight() {
 		h -= $(notifOutput).outerHeight();
 	}
 
-	$("body > section, body > section#content").css('min-height', '0%').height(h);
+	$("body section, body section#content").css('min-height', '0%').height(h);
 	$(notifOutput).css('top', h);
 }
 

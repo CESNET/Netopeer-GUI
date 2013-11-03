@@ -56,8 +56,7 @@ if advised of the possibility of such damage.
 					targetConfigure.find("> a").show();
 					if (dataArr['message']) {
 						var flash = prepareFlashMessage(dataArr['status'], dataArr['message']);
-						$(".alert-cover").append($(flash).hide());
-						$(flash).animateAlert();
+						$("#block--alerts").append($(flash));
 					}
 					reloadHistoryOfConnectedDevices();
 					if (dataArr['status'] == "success") {
@@ -84,13 +83,11 @@ if advised of the possibility of such damage.
 
 		function prepareFlashMessage(status, message) {
 			var flashMessage = $("<div/>", {
-				"class": "alert " + status
+				"class": "message " + status
 			});
 			flashMessage.text(message);
+			flashMessage.prepend($("<span/>").addClass('circle'));
 			flashMessage.prepend($("<span/>").addClass('close').text('X'));
-//			setTimeout(function() {
-//				flashMessage.fadeOut().remove();
-//			}, 3000);
 			return flashMessage;
 		}
 
@@ -116,8 +113,7 @@ if advised of the possibility of such damage.
 					}
 					if (jsonArr['message']) {
 						var flash = prepareFlashMessage(jsonArr['status'], jsonArr['message']);
-						$(".alert-cover").append($(flash).hide());
-						$(flash).animateAlert();
+						$("#block--alerts").append($(flash));
 					}
 				});
 			}).delegate("a.device-item", 'click', function($e) {

@@ -79,6 +79,8 @@ hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: tra
 .red { color: $cAlert; }
 .green { color: $cGreen; }
 
+.cover-wo-alerts { position: relative; height: 100%; min-height: 100%; width: 100%; }
+
 .button { @include background( linear-gradient(lighten($cBase, 10%), darken($cBase, 4%)) ); @include border-radius(5px); padding: 8px 20px; color: #fff; @include text-shadow(1px, 1px, 2px, #333); font-size: 1em; font-weight: normal; border: 1px solid darken($cBase, 4%); cursor: pointer; @include single-box-shadow(#aaa, 0px, 0px, 8px); margin: 15px 0px; position: relative; z-index: 1; text-decoration: none;
 	&:before { position: absolute; z-index: -1; content: ""; top: 1px; left: 0px; right: 0px; bottom: 0px; border-top: 1px solid rgba(255,255,255,0.2); }
 	&:active { @include single-box-shadow(rgba(255,255,255,0.25), 0px, 2px, 5px, false, true);  }
@@ -134,6 +136,11 @@ nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(da
 		span { background: url($img + 'ico/16_refresh.png') center center no-repeat; }
 	}
 
+	.ico-alerts { width: 63px; height: 39px; display: block; padding: 0px; background: #000; border-left: 0px none;
+		span { background: url($img + 'ico/16_alerts.png') center center no-repeat; }
+		.count { @include border-radius(50%); background: #444; color: #fff; text-align: center; width: 22px; height: 22px; display: block; float: right; margin-top: 9px; line-height: 22px; margin-right: 5px; margin-left: -8px; }
+	}
+
 	.others-cover { float:right; position:relative;
 		.show-link, .others { display:none; }
 		.show-link { background: $cComp1Dark; border-left: 1px solid lighten($cComp1Dark, 10%); width: 30px; height: $hNavTop; border-right: 1px solid desaturate($cComp1Light, 50%);
@@ -156,6 +163,8 @@ nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(da
 			&:hover { text-decoration: none; }
 		}
 	}
+
+	#alerts-icon { background: #000; float: right; color: #fff; height: 39px; border-left: 1px solid #777; }
 }
 
 nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop 0px 0px 0px; font-size: 1.3em; position: relative; //overflow-y: scroll;
@@ -183,12 +192,34 @@ nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa
 	}
 }
 
-body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPadding; font-size: 1.4em; overflow-y: scroll; background: #f5f5f5; @include box-sizing(border-box); border-top: $hNavTop solid transparent; 
+body section { float: left; width: 50%; min-height: 100%; padding: $sContentPadding; font-size: 1.4em; overflow-y: scroll; background: #f5f5f5; @include box-sizing(border-box); border-top: $hNavTop solid transparent;
 	&.left-nav-defined { width: 45%; }
 
 
 	&#block--state { border-right: 1px solid #bababa; @include single-box-shadow(darken(#f5f5f5, 5%), -5px, 0px, 5px, false, true); padding-right: 2 * $sContentPadding; }
 	&#block--config { padding-left: 2 * $sContentPadding; }
+	&#block--alerts { width: 20%; position: absolute; top: 0px; right: 0px; background: #333; border-left: 1px solid #000; @include box-shadow( 0px -7px 7px rgba(0,0,0,0.9)); padding-left: 0px; padding-right: 0px; margin-right: -20%;
+		.message { border-bottom: 1px solid #000; padding: 10px 5%; color: #aaa; font-size: 0.9em; border-top: 1px solid #666; line-height: 1.4em;
+			&:first-child { border-top: 0px none; }
+			&:last-child { border-bottom: 0px none; }
+
+			&.error {
+				.circle { background: #b90505; }
+			}
+			&.success {
+				.circle { background: $cGreen; }
+			}
+			&:hover { color: #fff;
+				.close { display: block; }
+				.circle { display: none; }
+			}
+
+			span { float: right; margin-left: 5px; }
+			.close { display: none; cursor: pointer; }
+			.circle { @include border-radius(50%); width: 10px; height: 10px; display: block; @include box-shadow(rgba(0,0,0,0.2) 0px 2px 4px); margin-bottom: 5px; }
+		}
+	}
+
 
 	*[class*='level'] { position: relative; float: left; width: 100%;
 		.dots { background: url($img + 'dot.png') left top repeat transparent; @include inline-block; position: absolute; left: 0px; top: 0px; min-height: 28px; height: 100%; }
@@ -283,7 +314,7 @@ body > section { float: left; width: 50%; min-height: 100%; padding: $sContentPa
 }
 .configure .loading { background: url($img + "loading-bar.gif") repeat-x; display:block; height: 20px; line-height: 20px; color: #fff; padding: 0px 3%; width: 94%; border: 1px solid darken($cBase, 10%); @include border-radius(5px); }
 
-body > section, #block--singleContent { position: relative; @include box-sizing(border-box);
+body section, #block--singleContent { position: relative; @include box-sizing(border-box);
 	h1, h2, h3, h4, legend { font-family: $fHeadings; color: $cBase; }
 	h1 { font-size: 1.9em; margin: 20px 0px 15px 0px; }
 	h2 { font-size: 1.7em; margin: 15px 0px 10px 0px; }
@@ -417,7 +448,7 @@ table { width: 100%; margin: 15px 0px;
 /* media queries */
 @media screen and (max-width: 1280px) {
 	nav#block--leftColumn { width: 14%; }
-	body > section { 
+	body section {
 		&.left-nav-defined { width: (100% - 14%)/2; }
 		&#block--singleContent { 
 			&.left-nav-defined { width: 86%; }
@@ -427,7 +458,7 @@ table { width: 100%; margin: 15px 0px;
 }
 
 @media screen and (max-width: 1550px) {
-	body > section {
+	body section {
 		&.column {
 			.leaf-line { 
 				//.edit-bar { width: 16%; display: none; position: absolute; }

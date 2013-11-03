@@ -947,7 +947,7 @@ class Data {
 
 		if ($decoded["type"] === self::REPLY_OK) {
 			$session->getFlashBag()->add('success', "Session successfully killed.");
-			$this->updateConnLock($params['key']);
+			$this->updateConnLock($params['key'], $params['target']);
 		} else {
 			$this->logger->addError("Could not kill session.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not kill session.");
