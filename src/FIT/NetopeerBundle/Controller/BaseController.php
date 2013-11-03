@@ -141,6 +141,13 @@ class BaseController extends Controller
 		$this->assign("topmenu", array());
 		$this->assign("submenu", array());
 
+		// process flash messages
+		$messages = $this->getRequest()->getSession()->getFlashBag()->all();
+		foreach ($messages as $key => $message) {
+			$messages[$key] = array_unique($message);
+		}
+		$this->assign('allFlashMessages', $messages);
+
 		/**
 		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
 		 */

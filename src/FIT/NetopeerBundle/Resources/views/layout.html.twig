@@ -162,7 +162,7 @@ if advised of the possibility of such damage.
 
 		<section class="column-alerts" id="block--alerts">
 			{% block alerts %}
-				{% for type, flashMessages in app.session.flashbag.all() %}
+				{% for type, flashMessages in allFlashMessages %}
 					{% for flashMessage in flashMessages %}
 						<div class="message {{ type }}">
 							<span class="circle"></span>
