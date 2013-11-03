@@ -158,7 +158,8 @@ if advised of the possibility of such damage.
 		{% endif %}
 		<div class="notif-cover">
 			<div class="notif-history-cover"></div>
-			<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>
+			{#<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>#}
+			{# TODO: show, when notifications history wont cause deadlock #}
 		</div>
 		<div id="ipModalCover" class="modal hide fade" tabindex="-1" role="dialog"></div>
 	{% endif %}
