@@ -168,7 +168,7 @@ nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(da
 	#alerts-icon { background: #000; float: right; color: #fff; height: 39px; border-left: 1px solid #777; }
 }
 
-nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop 0px 0px 0px; font-size: 1.3em; position: relative; //overflow-y: scroll;
+nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(darken(#dadada, 10%), 0px, 0px, 10px, false, true); min-height: 100%; padding: $hNavTop 0px 0px 0px; font-size: 1.3em; position: relative; margin-left: -1px; //overflow-y: scroll;
 	> *:first-child { margin-top: $sContentPadding; }
 	h3 { padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1.1em; border-bottom: 1px solid #888; margin-bottom: 5px; }
 	h4 { margin-top: 25px; padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1em; border-bottom: 1px solid #bbb; margin-bottom: 5px; }
