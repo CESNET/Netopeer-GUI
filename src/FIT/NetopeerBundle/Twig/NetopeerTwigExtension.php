@@ -62,7 +62,8 @@ class NetopeerTwigExtension extends Twig_Extension
         return array(
             'isNumberType' => new Twig_Function_Method($this, 'isNumberType'),
             'isUrlType' => new Twig_Function_Method($this, 'isUrlType'),
-            'explode' => new Twig_Function_Method($this, 'explodeString')
+            'explode' => new Twig_Function_Method($this, 'explodeString'),
+	          'array_unique' => new Twig_Function_Method($this, 'arrayUnique')
         );
     }
 
@@ -103,6 +104,16 @@ class NetopeerTwigExtension extends Twig_Extension
 	public function explodeString($delimiter, $string) {
         return explode($delimiter, $string);
     }
+
+	/**
+	 * Array unique function
+	 *
+	 * @param array $array
+	 * @return array
+	 */
+	public function arrayUnique($array) {
+		return array_unique($array);
+	}
 
 	/**
 	 * Get name of this extension
