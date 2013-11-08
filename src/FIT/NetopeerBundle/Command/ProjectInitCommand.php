@@ -85,6 +85,7 @@ class ProjectInitCommand extends ContainerAwareCommand
 		$process->run();
 
 		while ($process->isRunning()) {
+			$process->getIncrementalOutput();
 			$process->getIncrementalErrorOutput();
 		}
 
@@ -98,5 +99,7 @@ class ProjectInitCommand extends ContainerAwareCommand
 		$output->writeln("========================");
 		$output->writeln("End of post ". $command ." script");
 		$output->writeln("========================");
+
+		return 1;
 	}
 }

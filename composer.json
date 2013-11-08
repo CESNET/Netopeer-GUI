@@ -24,7 +24,7 @@
     },
     "scripts": {
         "pre-status-cmd": [
-            "php app/console app:install --post=update"
+            "php app/console app:install --post=status"
         ],
         "post-install-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
@@ -33,10 +33,11 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
             "php app/console doctrine:database:create",
-            "php app/console doctrine:generate:entities FIT/NetopeerBundle/Entity/",
-            "php app/console doctrine:schema:update --force",
             "php app/console app:install --post=install",
-            "php app/console app:user --action=add --user=admin --pass=pass"
+            "php app/console doctrine:generate:entities FIT",
+            "php app/console doctrine:schema:update --force",
+            "php app/console app:user --action=add --user=admin --pass=pass",
+            "php app/console assetic:dump --env=prod --no-debug"
         ],
         "post-update-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
@@ -44,9 +45,10 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
-            "php app/console doctrine:generate:entities FIT/NetopeerBundle/Entity/",
+            "php app/console doctrine:generate:entities FIT",
             "php app/console doctrine:schema:update --force",
-            "php app/console app:install --post=update"
+            "php app/console app:install --post=update",
+            "php app/console assetic:dump --env=prod --no-debug"
         ]
     },
     "config": {
@@ -61,6 +63,7 @@
         },
         "branch-alias": {
             "dev-master": "2.3-dev"
-        }
+        },
+        "symfony-assets-install": "symlink"
     }
 }
