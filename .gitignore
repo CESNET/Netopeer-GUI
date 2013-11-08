@@ -1,8 +1,8 @@
-/src/Acme/*
 /app/logs/*
 /app/logs/dev.log
 /app/*.db
 /src/FIT/NetopeerBundle/Resources/public/.sass-cache/
+/src/winzou
 /web/phpinfo.php
 /web/adminer.php
 /web/css

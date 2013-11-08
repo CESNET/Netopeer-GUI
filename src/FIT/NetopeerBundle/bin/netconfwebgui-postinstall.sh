@@ -32,44 +32,11 @@
 # if advised of the possibility of such damage.
 #
 
-
-read -p "Enter path to netconfwebgui app directory [/var/www/netconfwebgui/app/]: " NWGPATH
-if [ -z "$NWGPATH" ]; then
-	NWGPATH=/var/www/netconfwebgui/app/
-fi
-if [ ! -e "$NWGPATH" ]; then
-	echo "Directory $NWGPATH does not exist." > /dev/stderr
-	exit 1
-fi
-cd "$NWGPATH" || exit 2
-echo -e "Please update DB connection settings...\nSelect editor to open The configuration file."
-if [ -z "$EDITOR" ]; then
-	select EDITOR in vi vim nano joe gedit; do
-		if [ -n "$EDITOR" ]; then export EDITOR; break; fi
-	done
-fi
-
-${EDITOR} config/parameters.ini
-
-ANS="";
-while [ -z "$ANS" ]; do
-	read -n1 -p "Drop previous DB from configuration? [YyNn]: " ANS
-done
-if [ "$ANS" = "y" -o "$ANS" = "Y" ]; then
-	php console doctrine:database:drop --force
-else echo "Skipping"; fi
-ANS="";
-while [ -z "$ANS" ]; do
-	read -n1 -p "Create new DB? [YyNn]: " ANS
-done
-if [ "$ANS" = "y" -o "$ANS" = "Y" ]; then
-	php console doctrine:database:create
-else echo "Skipping"; fi
-ANS="";
-while [ -z "$ANS" ]; do
-	read -n1 -p "Update schema? [YyNn]: " ANS
-done
-if [ "$ANS" = "y" -o "$ANS" = "Y" ]; then
-	php console doctrine:schema:update --force
-else echo "Skipping"; fi
-
+service httpd restart
+chown -R apache:apache ./*
+chmod 700 -R app/{cache,logs}
+chown -R apache:apache app/{cache,logs}
+chmod 700 src/FIT/NetopeerBundle/Data/models{,/tmp}
+chown -R apache:apache src/FIT/NetopeerBundle/Data/models{,/tmp}
+chown apache:apache app/netopeerWebGui.db
+chmod 600 app/netopeerWebGui.db

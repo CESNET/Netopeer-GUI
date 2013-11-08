@@ -19,22 +19,34 @@
         "sensio/distribution-bundle": "2.3.*",
         "sensio/framework-extra-bundle": "2.3.*",
         "sensio/generator-bundle": "2.3.*",
-        "incenteev/composer-parameter-handler": "~2.0"
+        "incenteev/composer-parameter-handler": "~2.0",
+        "winzou/cache-bundle": "dev-master"
     },
     "scripts": {
+        "pre-status-cmd": [
+            "php app/console app:install --post=update"
+        ],
         "post-install-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile"
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+            "php app/console doctrine:database:create",
+            "php app/console doctrine:generate:entities FIT/NetopeerBundle/Entity/",
+            "php app/console doctrine:schema:update --force",
+            "php app/console app:install --post=install",
+            "php app/console app:user --action=add --user=admin --pass=pass"
         ],
         "post-update-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile"
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+            "php app/console doctrine:generate:entities FIT/NetopeerBundle/Entity/",
+            "php app/console doctrine:schema:update --force",
+            "php app/console app:install --post=update"
         ]
     },
     "config": {
