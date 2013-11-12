@@ -99,7 +99,5 @@ class ProjectInitCommand extends ContainerAwareCommand
 		$output->writeln("========================");
 		$output->writeln("End of post ". $command ." script");
 		$output->writeln("========================");
-
-		return 1;
 	}
 }

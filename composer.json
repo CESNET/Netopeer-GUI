@@ -23,9 +23,6 @@
         "winzou/cache-bundle": "dev-master"
     },
     "scripts": {
-        "pre-status-cmd": [
-            "php app/console app:install --post=status"
-        ],
         "post-install-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
@@ -33,11 +30,11 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
             "php app/console doctrine:database:create",
-            "php app/console app:install --post=install",
             "php app/console doctrine:generate:entities FIT",
             "php app/console doctrine:schema:update --force",
             "php app/console app:user --action=add --user=admin --pass=pass",
-            "php app/console assetic:dump --env=prod --no-debug"
+            "php app/console assetic:dump --env=prod --no-debug",
+            "php app/console app:install --post=install"
         ],
         "post-update-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
@@ -46,7 +43,6 @@
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
             "php app/console doctrine:generate:entities FIT",
-            "php app/console doctrine:schema:update --force",
             "php app/console app:install --post=update",
             "php app/console assetic:dump --env=prod --no-debug"
         ]
