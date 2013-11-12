@@ -23,9 +23,6 @@
         "winzou/cache-bundle": "dev-master"
     },
     "scripts": {
-				"pre-install-cmd": [
-						"php app/check.php"
-				],
         "post-install-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
