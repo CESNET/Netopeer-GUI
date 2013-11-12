@@ -19,22 +19,35 @@
         "sensio/distribution-bundle": "2.3.*",
         "sensio/framework-extra-bundle": "2.3.*",
         "sensio/generator-bundle": "2.3.*",
-        "incenteev/composer-parameter-handler": "~2.0"
+        "incenteev/composer-parameter-handler": "~2.0",
+        "winzou/cache-bundle": "dev-master"
     },
     "scripts": {
+				"pre-install-cmd": [
+						"php app/check.php"
+				],
         "post-install-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile"
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+            "php app/console doctrine:database:create",
+            "php app/console doctrine:generate:entities FIT",
+            "php app/console doctrine:schema:update --force",
+            "php app/console app:user --action=add --user=admin --pass=pass",
+            "php app/console assetic:dump --env=prod --no-debug",
+            "php app/console app:install --post=install"
         ],
         "post-update-cmd": [
             "Incenteev\\ParameterHandler\\ScriptHandler::buildParameters",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::buildBootstrap",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::clearCache",
             "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installAssets",
-            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile"
+            "Sensio\\Bundle\\DistributionBundle\\Composer\\ScriptHandler::installRequirementsFile",
+            "php app/console doctrine:generate:entities FIT",
+            "php app/console app:install --post=update",
+            "php app/console assetic:dump --env=prod --no-debug"
         ]
     },
     "config": {
@@ -49,6 +62,7 @@
         },
         "branch-alias": {
             "dev-master": "2.3-dev"
-        }
+        },
+        "symfony-assets-install": "symlink"
     }
 }

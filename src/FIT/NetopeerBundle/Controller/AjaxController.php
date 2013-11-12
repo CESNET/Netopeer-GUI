@@ -324,7 +324,7 @@ class AjaxController extends BaseController
 	 */
 	public function getNotificationsHistoryAction($connectedDeviceId, $from = null, $to = 0, $max = 50)
 	{
-		return $this->getTwigArr(); // TODO: remove, when will be working fine
+		//return $this->getTwigArr(); // TODO: remove, when will be working fine
 		
 		/**
 		 * @var \FIT\NetopeerBundle\Models\Data $dataClass

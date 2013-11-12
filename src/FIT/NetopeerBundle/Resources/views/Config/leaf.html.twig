@@ -71,7 +71,10 @@ if advised of the possibility of such damage.
 		</span>
 	</span>
 
-	{% if element.attributes.eltype is defined and element.attributes.eltype in ["list", "leaf-list"] and ((hideEditBar is defined and hideEditBar != true) or hideEditBar is not defined) %}
+	{% if element.attributes.eltype is defined
+		and (element.attributes.eltype == "list" or element.attributes.eltype == "leaf-list")
+		and ((hideEditBar is defined and hideEditBar != true) or hideEditBar is not defined)
+	%}
 		<span class="edit-bar">
 			<img src="{{ asset('bundles/fitnetopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="create-child" rel="{{ xpath|replace({'/': '--', '[': '?', ']': '!'}) }}{#_{{ path("generateFromModel", {"level": level, "xPath": xpath|replace({'/': '-', '[': '?', ']': '!'})|url_encode, "key": routeParams.key, "module": routeParams.module, "subsection": routeParams.subsection} ) }}#}" data-typeahead-path="{{ valuesTypeaheadPath }}"/>
 			<img src="{{ asset('bundles/fitnetopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" rel="{{ xpath|replace({'/': '--', '[': '?', ']': '!'}) }}" class="sibling" />
