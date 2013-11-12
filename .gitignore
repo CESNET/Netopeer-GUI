@@ -13,3 +13,4 @@
 /web/bundles/*
 .idea
 /src/FIT/NetopeerBundle/Entity/*~
+composer.lock
