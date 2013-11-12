@@ -81,7 +81,7 @@ class ProjectInitCommand extends ContainerAwareCommand
 		$output->writeln('Executing post '. $command. ' script.');
 		$output->writeln("========================");
 
-		$process = new Process("./src/FIT/NetopeerBundle/bin/netconfwebgui-postinstall.sh");
+		$process = new Process("/bin/bash ./src/FIT/NetopeerBundle/bin/netconfwebgui-postinstall.sh");
 		$process->run();
 
 		while ($process->isRunning()) {
