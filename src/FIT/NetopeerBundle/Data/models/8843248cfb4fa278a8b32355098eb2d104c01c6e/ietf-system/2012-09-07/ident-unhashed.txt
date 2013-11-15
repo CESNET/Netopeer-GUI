@@ -1,1 +1,0 @@
-urn:ietf:params:xml:ns:yang:ietf-system

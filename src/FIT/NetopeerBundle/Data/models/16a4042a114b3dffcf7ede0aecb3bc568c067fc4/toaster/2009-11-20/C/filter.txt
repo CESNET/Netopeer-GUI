@@ -1,1 +1,0 @@
-<toaster xmlns="http://netconfcentral.org/ns/toaster"><test><C/></test></toaster>
