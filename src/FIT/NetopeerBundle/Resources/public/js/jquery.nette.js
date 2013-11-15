@@ -165,7 +165,7 @@ function successAjaxFunction(data, textStatus, jqXHR, href, $elem) {
 //	l($elem);
 
 	$.nette.success(data);
-	if ($('a[href="'+ href +'"]').length) {
+	if ($('a[href="'+ href +'"]').length && $elem.data().disableActiveLink !== true) {
 		$.nette.setActiveLink($('a[href="'+ href +'"]'));
 	}
 

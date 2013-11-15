@@ -461,8 +461,10 @@ table { width: 100%; margin: 15px 0px;
 	nav#block--leftColumn { width: 14%; }
 	body section {
 		&.left-nav-defined { width: (100% - 14%)/2; }
+		form[name=formCopyConfig] { margin-top: 0px; margin-bottom: 0px; }
 		&#block--singleContent { 
 			&.left-nav-defined { width: 86%; }
+			form[name=formCopyConfig] { margin-top: 20px; }
 		}
 	}
 	#block--notifications { width: 86%; }

@@ -136,11 +136,9 @@ function initJS() {
 	showIconsOnLeafLine();
 	changeSectionHeight();
 
-	$("form").on("change", "input, select", function(event){
+	$("form[name=formConfigData]").on("change", "input, select", function(event){
 		formInputChanged = true;
-	});
-
-	$("form").on("submit", function(event){
+	}).on("submit", function(event){
 		formInputChanged = false;
 	});
 }

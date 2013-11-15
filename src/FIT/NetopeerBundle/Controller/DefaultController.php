@@ -801,7 +801,6 @@ class DefaultController extends BaseController
 	 * @return int 1 on error, 0 on success
 	 */
 	private function handleFilterConfig(&$key) {
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
 
 		$this->filterForms['config']->bind($this->getRequest());
 
@@ -866,6 +865,7 @@ class DefaultController extends BaseController
 		$this->assign('singleColumnLayout', false);
 		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
 		$this->assign('hideColumnControl', true);
+		$this->assign('showConfigFilter', true);
 
 		$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:section.html.twig');
 		$html = $template->renderBlock('config', $this->getAssignedVariablesArr());
