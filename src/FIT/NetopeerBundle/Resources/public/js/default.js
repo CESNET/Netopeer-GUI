@@ -35,6 +35,7 @@
 // if advised of the possibility of such damage.
 
 var formChangeAlert = 'Some of form values has been changed. Do you want discard and go to another page?';
+var gmright, gmleft, gnotWidth;
 
  $(document).ready(function() {
 	initJS();
@@ -44,6 +45,7 @@ $(window).resize(function() {
 	changeSectionHeight();
 	showIconsOnLeafLine();
 	collapseTopNav();
+	prepareAlertsVariables();
 }).bind('beforeunload', function() {
 	var shouldLoadingContinue = formInputChangeConfirm(false);
 	if (!shouldLoadingContinue) {
@@ -51,8 +53,15 @@ $(window).resize(function() {
 	}
 });
 
+function prepareAlertsVariables() {
+	gmright = $("#block--alerts").css('margin-right');
+	gmleft = "0";
+	gnotWidth = $("#block--notifications").css('width');
+}
+
 function initJS() {
 	collapseTopNav();
+	prepareAlertsVariables();
 
 	// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
 	$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
@@ -70,17 +79,26 @@ function initJS() {
 	$("#alerts-icon .header-icon").unbind('click').click(function(e) {
 		e.preventDefault();
 
-		var mright = "-20%";
-		var mleft = "0";
-		var notWidth = "86%";
+		mright = gmright;
+		mleft = gmleft;
+		notWidth = gnotWidth;
 
 		if (!$("#block--alerts").hasClass('openAlerts')) {
 			mright = "0";
 			mleft = 0 - $("#block--alerts").outerWidth();
 			notWidth = "100%";
 			$("#block--alerts").addClass('openAlerts');
+
+			// handle click outside of alerts
+			$("body").bind("click", function(elem) {
+				if (!$(elem.target).closest("#block--alerts").length) {
+					$("#alerts-icon .header-icon").click();
+					elem.preventDefault();
+				}
+			});
 		} else {
 			$("#block--alerts").removeClass('openAlerts');
+			$("body").unbind('click');
 		}
 
 		$("#block--alerts").stop(true,true).animate({
@@ -93,7 +111,7 @@ function initJS() {
 
 		$("#block--notifications").stop(true,true).animate({
 			width: notWidth
-		}, 500, "linear");
+		}, 300, "linear");
 
 		return false;
 	});
@@ -136,11 +154,9 @@ function initJS() {
 	showIconsOnLeafLine();
 	changeSectionHeight();
 
-	$("form").on("change", "input, select", function(event){
+	$("form[name=formConfigData]").on("change", "input, select", function(event){
 		formInputChanged = true;
-	});
-
-	$("form").on("submit", function(event){
+	}).on("submit", function(event){
 		formInputChanged = false;
 	});
 }

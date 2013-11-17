@@ -141,6 +141,14 @@ class BaseController extends Controller
 		$this->assign("topmenu", array());
 		$this->assign("submenu", array());
 
+		// we have to assign global variables, which are known in Twig, because they are missing now...
+		$app = array(
+			'user' => $this->get('security.context')->getToken()->getUser(),
+			'request' => $this->getRequest(),
+			'session' => $this->getRequest()->getSession(),
+		);
+		$this->assign('app', $app);
+
 		/**
 		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
 		 */
@@ -239,15 +247,6 @@ class BaseController extends Controller
 		$retArr = array();
 
 		$this->prepareGlobalTwigVariables();
-
-		// we have to assign global variables, which are known in Twig, because they are missing now...
-		$app = array(
-			'user' => $this->get('security.context')->getToken()->getUser(),
-			'request' => $this->getRequest(),
-			'session' => $this->getRequest()->getSession(),
-		);
-		$this->assign('app', $app);
-
 
 		foreach ($this->getAjaxBlocks() as $blockId => $arr) {
 			$template = $this->get('twig')->loadTemplate($arr['template']);

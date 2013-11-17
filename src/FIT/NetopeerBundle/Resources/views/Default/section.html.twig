@@ -49,26 +49,33 @@ if advised of the possibility of such damage.
 	{% endif %}
 {% endblock topPart %}
 
+{% set stateDefined = 'false' %}
+
 {% block state %}
 {% block singleContent %}
+	{% set stateDefined = 'true' %}
 	{% if configSingleContent is defined %}
 		{{ configSingleContent|raw }}
 	{% else %}
 		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
 		{% if stateArr is defined and not(stateArr is empty) %}
-			{% if configArr is not defined and formConfig is defined %}
-				<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
-					{{ form_widget(formConfig) }}
-			    <input type="submit" value="Change" class="button small grey left" />
-					<script type="text/javascript">
-						$('#form_source').change(function () {
-							$(this).closest('form').submit();
-						});
-						$(formConfig).find('input[type=submit]').hide();
-					</script>
-				</form>
+			{% if formConfig is defined %}
+				{% block filterConfig %}
+					<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig" data-disable-active-link="true">
+						{{ form_widget(formConfig) }}
+				    <input type="submit" value="Change" class="button small grey left" />
+						<script type="text/javascript">
+							$('#form_source').change(function () {
+								$(this).closest('form').submit();
+							});
+							$(formConfig).find('input[type=submit]').hide();
+						</script>
+					</form>
+				{% endblock filterConfig %}
+
 				<div id="block--sourceValidation">
 				{% block sourceValidation %}
+					{# duplicated in config form filter !#}
 					<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink" data-disable-history="true">validate</a>
 					{% if isSourceValid is defined %}
 						<span class="source-validation bubble {{ (isSourceValid) ? 'green' : 'red' }}">{{ (isSourceValid) ? 'valid' : 'invalid' }}</span>
@@ -84,10 +91,6 @@ if advised of the possibility of such damage.
 			{% endif %}
 
 			<hr class="cleaner" />
-			{# <form action="" method="post" {{ form_enctype(formState) }} class="filter" name="formState">
-				{{ form_widget(formState) }}
-			    <input type="submit" value="Get" />
-			</form> #}
 			<form action="" method="post" name="formConfigData" data-disable-history="true">
 				<div class="root">
 					{% set iterator = 1 %}
@@ -114,21 +117,20 @@ if advised of the possibility of such damage.
 
 {% block config %}
 	<h1 class="left">{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
-	<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig">
-		{{ form_widget(formConfig) }}
-		<input type="submit" value="Change" class="button small grey left" />
-		{# <span class="note left">(State informations are not available in this datastore)</span> #}
-		<script type="text/javascript">
-			$('#form_source').change(function () {
-				$(this).closest('form').submit();
-			});
-			$(formConfig).find('input[type=submit]').hide();
-		</script>
-	</form>
-	<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
-		{{ form_widget(formCopyConfig) }}
-		<input type="submit" value="Copy" class="button small grey left" />
-	</form>
+
+	{% if showConfigFilter is defined and showConfigFilter == true %}
+		{{ block('filterConfig') }}
+
+		<div id="block--sourceValidation">
+			{{ block('sourceValidation') }}
+		</div>
+
+		<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
+			{{ form_widget(formCopyConfig) }}
+			<input type="submit" value="Copy" class="button small grey left" />
+		</form>
+	{% endif %}
+
 	<hr class="cleaner" />
 	{% if configArr is defined and not(configArr is empty) %}
 		<form action="" method="post" name="formConfigData" data-disable-history="true">
