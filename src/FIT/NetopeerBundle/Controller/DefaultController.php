@@ -51,6 +51,7 @@ use FIT\NetopeerBundle\Entity\BaseConnection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Default controller for all pages directly visible from
@@ -288,6 +289,18 @@ class DefaultController extends BaseController
 		}
 
 		$res = $dataClass->handle($command, $params, false);
+		if ($command === "backup") {
+			$resp = new Response();
+			$resp->setStatusCode(200);
+			$resp->headers->set('Cache-Control', 'private');
+			$resp->headers->set('Content-Length', strlen($res));
+			$resp->headers->set('Content-Type', 'application/force-download');
+			$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.xml"', date("Y-m-d"), $dataClass->getHostFromKey($key)));
+			$resp->sendHeaders();
+			$resp->setContent($res);
+			$resp->sendContent();
+			die();
+		}
 
 		if ( $res != 1 ) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));

@@ -1212,6 +1212,15 @@ class Data {
 			case "validate":
 				$res = $this->handle_validate($sock, $params, $result);
 				break;
+			case "backup":
+				$params["source"] = "startup";
+				$res_startup = "<startup>".$this->handle_getconfig($sock, $params)."</startup>";
+				$params["source"] = "running";
+				$res_running = "<running>".$this->handle_getconfig($sock, $params)."</running>";
+				$params["source"] = "candidate";
+				$res_candidate = "<candidate>".$this->handle_getconfig($sock, $params)."</candidate>";
+				$res = "<webgui-backup>".$res_startup.$res_running.$res_candidate."</webgui-backup>";
+				return $res;
 			default:
 				$this->container->get('request')->getSession()->getFlashBag()->add('info', printf("Command not implemented yet. (%s)", $command));
 				return 1;
