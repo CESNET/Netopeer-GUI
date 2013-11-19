@@ -32,11 +32,7 @@
 # if advised of the possibility of such damage.
 #
 
-service httpd restart
 chown -R apache:apache ./*
 chmod 700 -R app/{cache,logs}
-chown -R apache:apache app/{cache,logs}
 chmod 700 src/FIT/NetopeerBundle/Data/models{,/tmp}
-chown -R apache:apache src/FIT/NetopeerBundle/Data/models{,/tmp}
-chown apache:apache app/netopeerWebGui.db
 chmod 600 app/netopeerWebGui.db
