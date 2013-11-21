@@ -659,13 +659,16 @@ class Data {
 		$params['config'] = str_replace($replaceWhatArr, $replaceWithArr, $params['config']);
 
 		/* edit-config to store new values */
-		$params = array(
+		$editparams = array(
 			"type" => self::MSG_EDITCONFIG,
 			"session" => $sessionKey,
 			"target" => $params['target'],
 			"config" => $params['config']
 		);
-		$decoded = $this->execute_operation($sock, $params);
+		if (isset($params['default-operation']) && ($params['default-operation'] !== "")) {
+			$editparams['default-operation'] = $params['defopt'];
+		}
+		$decoded = $this->execute_operation($sock, $editparams);
 		return $this->checkDecodedData($decoded);
 	}
 
