@@ -116,10 +116,24 @@ function initJS() {
 		return false;
 	});
 
-	// refresh number of flash messages
+	// refresh number of flash messages, change background color according to last flash state
 	setInterval(function() {
+		var $icon = $("#alerts-icon .ico-alerts");
+		var $alerts = $("#block--alerts").children();
 		var previousCnt = parseInt($("#alerts-icon .count").text(), 10);
-		$("#alerts-icon .count").text($("#block--alerts").children().length);
+		var cnt = $alerts.length;
+		$icon.find('.count').text(cnt);
+		if (cnt) {
+			var $lastCh = $alerts.last();
+			if ($lastCh.hasClass('success')) {
+				$icon.addClass('green').removeClass('red');
+			} else if ($lastCh.hasClass('error')) {
+				$icon.addClass('red').removeClass('green');
+			}
+		} else {
+			$icon.removeClass('red').removeClass('green');
+		}
+
 	}, 1000);
 
 	// handle click on alert or flash message (closes)

@@ -138,6 +138,12 @@ nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(da
 	}
 
 	.ico-alerts { width: 63px; height: 39px; display: block; padding: 0px; background: #000; border-left: 0px none;
+		&.red { background: $cAlert;
+			.count { background: darken($cAlert, 10%); }
+		}
+		&.green { background: $cGreen;
+			.count { background: darken($cGreen, 10%); }
+		}
 		span { background: url($img + 'ico/16_alerts.png') center center no-repeat; }
 		.count { @include border-radius(50%); background: #444; color: #fff; text-align: center; width: 22px; height: 22px; display: block; float: right; margin-top: 9px; line-height: 22px; margin-right: 5px; margin-left: -8px; }
 	}

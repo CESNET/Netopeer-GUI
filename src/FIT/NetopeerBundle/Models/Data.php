@@ -571,10 +571,12 @@ class Data {
 			return 0;
 		} else {
 			$this->logger->addError("Could not connect.", array("error" => (isset($decoded["errors"])?" Error: ".var_export($decoded["errors"], true) : var_export($this->getJsonError(), true))));
-			if (sizeof($decoded['errors'])) {
+			if (isset($decoded['errors'])) {
 				foreach ($decoded['errors'] as $error) {
 					$session->getFlashBag()->add('error', $error);
 				}
+			} else {
+				$session->getFlashBag()->add('error', "Could not connect. Unknown error.");
 			}
 			return 1;
 		}

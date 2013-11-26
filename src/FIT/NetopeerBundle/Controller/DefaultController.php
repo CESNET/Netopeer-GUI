@@ -139,7 +139,7 @@ class DefaultController extends BaseController
 		}
 		// process form for connection to the server
 		if ($this->getRequest()->getMethod() == 'POST') {
-			$form->bind($this->getRequest());
+			$form->handleRequest($this->getRequest());
 
 			if ($form->isValid()) {
 				$post_vals = $this->getRequest()->get("form");
