@@ -1608,13 +1608,13 @@ XML;
 	 * Get one model and process it.
 	 *
 	 * @param array &$schparams  key, identifier, version, format for get-schema
-	 * @param string $identifier identifier of folder in /tmp/symfony directory
+	 * @param string $identifier identifier of folder in modelsDir directory
 	 * @return int               0 on success, 1 on error
 	 */
 	private function getschema(&$schparams, $identifier)
 	{
 		$data = "";
-		$path = "/tmp/symfony/";
+		$path = $this->getModelsDir()."/tmp/";
 		@mkdir($path, 0700, true);
 		$path .= "/$identifier";
 
