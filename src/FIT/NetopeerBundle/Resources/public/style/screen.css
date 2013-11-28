@@ -756,6 +756,13 @@ body section .level-0:not(.container):not(.list):nth-child(odd) > .leaf-line:fir
   border-top: 1px solid #aaa; }
 body section .level-0 > .leaf-line > .label > .label-cover > span.dash {
   display: none; }
+body section .sortable-placeholder {
+  height: 40px;
+  width: 100%;
+  display: block;
+  min-height: 40px;
+  float: left;
+  clear: left; }
 body section .leaf-line {
   padding: 7px 1.5% 7px 0px;
   border-top: 1px solid #ddd;

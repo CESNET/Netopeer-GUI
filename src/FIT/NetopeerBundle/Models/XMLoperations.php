@@ -167,9 +167,11 @@ class XMLoperations {
 	 * @param  string $xpath       XPath to the element
 	 * @param  string $val         new value
 	 * @param  string $xPathPrefix
+	 * @param  int    $newIndex    new index of elem in parent cover (selectable plugin)
+	 *
 	 * @return \SimpleXMLElement   modified node
 	 */
-	public function elementValReplace(&$configXml, $elementName, $xpath, $val, $xPathPrefix = "xmlns:")
+	public function elementValReplace(&$configXml, $elementName, $xpath, $val, $xPathPrefix = "xmlns:", $newIndex = -1)
 	{
 		$isAttribute = false;
 
@@ -200,9 +202,15 @@ class XMLoperations {
 			if (isset($elem->$elementName) && (sizeof($elem->$elementName) > 0)) {
 				$e = $elem->$elementName;
 				$e[0] = str_replace("\r", '', $val); // removes \r from value
+				if ($newIndex !== -1) {
+					$elem->addAttribute($xPathPrefix."index", $newIndex);
+				}
 			} else {
 				if ( !is_array($elem) ) {
 					$elem[0] = str_replace("\r", '', $val);
+					if ($newIndex !== -1) {
+						$elem[0]->addAttribute($xPathPrefix."index", $newIndex);
+					}
 				}
 			}
 		}
@@ -246,13 +254,38 @@ class XMLoperations {
 				}
 
 				// foreach over all post values
+				$parentNodesForSorting = array();
 				foreach ( $post_vals as $postKey => $val ) {
+					$index = -1;
+
+					// divide string, if index is set
+					if (strpos($postKey, "|") !== false) {
+						$arr = explode("|", $postKey);
+
+						if (sizeof($arr) == 2 && strpos($postKey, "index") !== false) {
+							$postKey = $arr[1];
+							$index = str_replace("index", "", $arr[0]);
+
+							$processSorting = true;
+						}
+					}
 					$values = $this->divideInputName($postKey);
 					$elementName = $values[0];
 					$xpath = $this->decodeXPath($values[1]);
 					$xpath = substr($xpath, 1); // removes slash at the begining
 
-					$this->elementValReplace($configXml, $elementName, $xpath, $val, $xPathPrefix);
+					$modifiedElem = $this->elementValReplace($configXml, $elementName, $xpath, $val, $xPathPrefix, $index);
+					if ($index != -1) {
+						$parent = $modifiedElem->xpath("parent::*");
+						array_push($parentNodesForSorting, $parent);
+						// TODO: insert only unique nodes
+					}
+				}
+
+				if (sizeof($parentNodesForSorting)) {
+					foreach ($parentNodesForSorting as $parent) {
+						// TODO: sort children according to index attribute
+					}
 				}
 
 				// for debugging, edited configXml will be saved into temp file

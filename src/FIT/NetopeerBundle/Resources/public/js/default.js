@@ -76,6 +76,28 @@ function initJS() {
 		createNode($(this));
 	});
 
+	$(".sortable-node").sortable({
+		placeholder: "sortable-placeholder ui-state-highlight",
+		axis: "y",
+		items: "> div",
+		handle: ".sort-item",
+		deactivate: function(e, ui) {
+			var $leafs = $(this).children(".leaf-line");
+			$leafs.each(function(i, elem) {
+				$(elem).find('input, select').each(function(j, e) {
+					var s = $(e).attr('name');
+					var delimIndex = s.lastIndexOf('|');
+					if (delimIndex == -1) {
+						delimIndex = s.lastIndexOf('[');
+					}
+					var newXpath = s.substring(0, s.lastIndexOf('[')) + "[index" + i + "|" + s.substring(delimIndex + 1);
+					$(e).attr('name', newXpath);
+					l(newXpath);
+				});
+			})
+		}
+	}).disableSelection();
+
 	// activate column with flash messages
 	$("#alerts-icon .header-icon").unbind('click').click(function(e) {
 		e.preventDefault();

@@ -104,6 +104,9 @@ and (element.attributes.eltype == "leaf-list" or element.attributes.eltype == "l
 	or editBarShouldBeVisible
 	%}
 		<span class="edit-bar">
+			{% if isSortable %}
+			<img src="{{ asset('bundles/fitnetopeer/images/ico/sort_item.png')}}" alt="Sort" title="Sort" class="sort-item" />
+			{% endif %}
 			{% if editBarShouldBeVisible %}
 				<img src="{{ asset('bundles/fitnetopeer/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="create-child" rel="{{ xpath|replace({'/': '--', '[': '?', ']': '!'}) }}{#_{{ path("generateFromModel", {"level": level, "xPath": xpath|replace({'/': '-', '[': '?', ']': '!'})|url_encode, "key": routeParams.key, "module": routeParams.module, "subsection": routeParams.subsection} ) }}#}" data-typeahead-path="{{ valuesTypeaheadPath }}"/>
 				<img src="{{ asset('bundles/fitnetopeer/images/ico/add_sibling.png')}}" alt="Add sibling" title="Add sibling" rel="{{ xpath|replace({'/': '--', '[': '?', ']': '!'}) }}" class="sibling" />
