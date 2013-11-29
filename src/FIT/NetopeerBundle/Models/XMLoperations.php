@@ -255,6 +255,7 @@ class XMLoperations {
 
 				// foreach over all post values
 				$parentNodesForSorting = array();
+				$processSorting = false;
 				foreach ( $post_vals as $postKey => $val ) {
 					$index = -1;
 
@@ -284,7 +285,45 @@ class XMLoperations {
 
 				if (sizeof($parentNodesForSorting)) {
 					foreach ($parentNodesForSorting as $parent) {
-						// TODO: sort children according to index attribute
+						$items = array();
+						$parentDOM = dom_import_simplexml($parent[0]);
+						foreach ($parentDOM->childNodes as $child) {
+							if ($child instanceof \DOMElement) {
+								$items[] = $child;
+							}
+						}
+
+						// deleting must be separated
+						foreach ($parentDOM->childNodes as $child) {
+							$parentDOM->removeChild($child);
+						}
+
+						usort($items, function($a, $b) {
+							$indA = 0;
+							$indB = 0;
+
+							foreach($a->attributes as $name => $node) {
+								if ($name == "index") {
+									$indA = $node->nodeValue;
+									break;
+								}
+							}
+
+							foreach($b->attributes as $name => $node) {
+								if ($name == "index") {
+									$indB = $node->nodeValue;
+									break;
+								}
+							}
+
+
+							return $indA - $indB;
+						});
+
+						foreach ($items as $child) {
+							$child->removeAttribute('index');
+							$parentDOM->appendChild($child);
+						}
 					}
 				}
 
@@ -293,7 +332,7 @@ class XMLoperations {
 					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/edited.yin', $configXml->asXml());
 				}
 
-				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source']);
+				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source'], $processSorting);
 				if ($res !== 1) {
 					$this->container->get('session')->getFlashBag()->add('success', "Config has been edited successfully.");
 				}
@@ -690,18 +729,24 @@ class XMLoperations {
 	/**
 	 * sends modified XML to server
 	 *
-	 * @param  int    $key    	session key of current connection
-	 * @param  string $config 	XML document which will be send
+	 * @param  int    $key    session key of current connection
+	 * @param  string $config XML document which will be send
 	 * @param  string $target = "running" target source
-	 * @return int						  return 0 on success, 1 on error
+	 * @param bool    $isDefaultOperation if true, default-operation param will be added into config params
+	 *
+	 * @return int              return 0 on success, 1 on error
 	 */
-	private function executeEditConfig($key, $config, $target = "running") {
+	private function executeEditConfig($key, $config, $target = "running", $isDefaultOperation = false) {
 		$res = 0;
 		$editConfigParams = array(
 			'key' 	 => $key,
 			'target' => $target,
 			'config' => str_replace('<?xml version="1.0"?'.'>', '', $config)
 		);
+
+		if ($isDefaultOperation) {
+			$editConfigParams['default-operation'] = true;
+		}
 
 		// edit-cofig
 		if ( ($merged = $this->dataModel->handle('editconfig', $editConfigParams)) != 1 ) {

@@ -682,7 +682,7 @@ class Data {
 			$editparams['config'] = $params['config'];
 		}
 		if (isset($params['default-operation']) && ($params['default-operation'] !== "")) {
-			$editparams['default-operation'] = $params['defopt'];
+			$editparams['default-operation'] = $params['default-operation'];
 		}
 		if (isset($params['test-option']) && ($params['test-option'] !== "")) {
 			$editparams['test-option'] = $params['test-option'];
