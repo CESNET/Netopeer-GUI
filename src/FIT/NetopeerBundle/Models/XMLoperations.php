@@ -201,13 +201,17 @@ class XMLoperations {
 
 			if (isset($elem->$elementName) && (sizeof($elem->$elementName) > 0)) {
 				$e = $elem->$elementName;
-				$e[0] = str_replace("\r", '', $val); // removes \r from value
+				if ($val != "") {
+					$e[0] = str_replace("\r", '', $val); // removes \r from value
+				}
 				if ($newIndex !== -1) {
 					$elem->addAttribute($xPathPrefix."index", $newIndex);
 				}
 			} else {
 				if ( !is_array($elem) ) {
-					$elem[0] = str_replace("\r", '', $val);
+					if ($val != "") {
+						$elem[0] = str_replace("\r", '', $val);
+					}
 					if ($newIndex !== -1) {
 						$elem[0]->addAttribute($xPathPrefix."index", $newIndex);
 					}
@@ -270,60 +274,63 @@ class XMLoperations {
 							$processSorting = true;
 						}
 					}
+
 					$values = $this->divideInputName($postKey);
 					$elementName = $values[0];
 					$xpath = $this->decodeXPath($values[1]);
 					$xpath = substr($xpath, 1); // removes slash at the begining
 
 					$modifiedElem = $this->elementValReplace($configXml, $elementName, $xpath, $val, $xPathPrefix, $index);
-					if ($index != -1) {
-						$parent = $modifiedElem->xpath("parent::*");
-						array_push($parentNodesForSorting, $parent);
-						// TODO: insert only unique nodes
+					if ($index != -1 && $modifiedElem instanceof \SimpleXMLIterator) {
+						array_push($parentNodesForSorting, $modifiedElem);
 					}
 				}
 
 				if (sizeof($parentNodesForSorting)) {
-					foreach ($parentNodesForSorting as $parent) {
-						$items = array();
-						$parentDOM = dom_import_simplexml($parent[0]);
-						foreach ($parentDOM->childNodes as $child) {
-							if ($child instanceof \DOMElement) {
-								$items[] = $child;
+					$items = array();
+					$parent = false;
+					foreach ($parentNodesForSorting as $child) {
+						$childDOM = dom_import_simplexml($child[0]);
+						$items[] = $childDOM;
+						$par = $child->xpath("parent::*");
+						$parent = dom_import_simplexml($par[0]);
+					}
+
+					// deleting must be separated
+					foreach ($items as $child) {
+						if ($parent) $parent->removeChild($child);
+					}
+
+					usort($items, function($a, $b) {
+						$indA = 0;
+						$indB = 0;
+
+						foreach($a->attributes as $name => $node) {
+							if ($name == "index") {
+								$indA = $node->nodeValue;
+								break;
 							}
 						}
 
-						// deleting must be separated
-						foreach ($parentDOM->childNodes as $child) {
-							$parentDOM->removeChild($child);
+						foreach($b->attributes as $name => $node) {
+							if ($name == "index") {
+								$indB = $node->nodeValue;
+								break;
+							}
 						}
 
-						usort($items, function($a, $b) {
-							$indA = 0;
-							$indB = 0;
 
-							foreach($a->attributes as $name => $node) {
-								if ($name == "index") {
-									$indA = $node->nodeValue;
-									break;
-								}
-							}
+						return $indA - $indB;
+					});
 
-							foreach($b->attributes as $name => $node) {
-								if ($name == "index") {
-									$indB = $node->nodeValue;
-									break;
-								}
-							}
+					foreach ($items as $child) {
+						$child->removeAttribute('index');
+						if ($parent) $parent->appendChild($child);
+					}
 
-
-							return $indA - $indB;
-						});
-
-						foreach ($items as $child) {
-							$child->removeAttribute('index');
-							$parentDOM->appendChild($child);
-						}
+					if ($parent) {
+						$parentSimple = simplexml_import_dom($parent);
+						$parentSimple->addAttribute("xc:operation", "replace", "urn:ietf:params:xml:ns:netconf:base:1.0");
 					}
 				}
 
@@ -332,7 +339,7 @@ class XMLoperations {
 					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/edited.yin', $configXml->asXml());
 				}
 
-				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source'], $processSorting);
+				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source']);
 				if ($res !== 1) {
 					$this->container->get('session')->getFlashBag()->add('success', "Config has been edited successfully.");
 				}
@@ -344,6 +351,7 @@ class XMLoperations {
 			$this->logger->warn('Could not save config correctly.', array('error' => $e->getMessage()));
 			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not save config correctly. Error: ".$e->getMessage());
 		}
+
 
 		return $res;
 	}
@@ -732,21 +740,16 @@ class XMLoperations {
 	 * @param  int    $key    session key of current connection
 	 * @param  string $config XML document which will be send
 	 * @param  string $target = "running" target source
-	 * @param bool    $isDefaultOperation if true, default-operation param will be added into config params
 	 *
 	 * @return int              return 0 on success, 1 on error
 	 */
-	private function executeEditConfig($key, $config, $target = "running", $isDefaultOperation = false) {
+	private function executeEditConfig($key, $config, $target = "running") {
 		$res = 0;
 		$editConfigParams = array(
 			'key' 	 => $key,
 			'target' => $target,
 			'config' => str_replace('<?xml version="1.0"?'.'>', '', $config)
 		);
-
-		if ($isDefaultOperation) {
-			$editConfigParams['default-operation'] = true;
-		}
 
 		// edit-cofig
 		if ( ($merged = $this->dataModel->handle('editconfig', $editConfigParams)) != 1 ) {

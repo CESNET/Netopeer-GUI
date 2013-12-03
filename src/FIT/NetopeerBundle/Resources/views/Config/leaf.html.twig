@@ -38,8 +38,8 @@ if advised of the possibility of such damage.
 
 {% set isSortable = false %}
 {% if element.attributes.orderedBy is defined
-and element.attributes.orderedBy == "user"
-and (element.attributes.eltype == "leaf-list" or element.attributes.eltype == "list") %}
+	and element.attributes.orderedBy == "user"
+	and (element.attributes.eltype == "leaf-list" or element.attributes.eltype == "list") %}
 	{% set isSortable = true %}
 {% endif %}
 
@@ -194,6 +194,10 @@ and (element.attributes.eltype == "leaf-list" or element.attributes.eltype == "l
 			{% endif %}
 		{% endblock configInputElem %}
 	{% else %}
+		{% if element.attributes.eltype is defined and
+			(element.attributes.eltype == "leaf-list" or element.attributes.eltype == "list") %}
+			<input type="hidden" value="" name="{{ currentInputName }}">
+		{% endif %}
 		<span class="value"></span>
 	{% endif %}
 

@@ -60,6 +60,10 @@ function prepareAlertsVariables() {
 	gnotWidth = $("#block--notifications").css('width');
 }
 
+jQuery.fn.reverse = function() {
+	return this.pushStack(this.get().reverse(), arguments);
+};
+
 function initJS() {
 	collapseTopNav();
 	prepareAlertsVariables();
@@ -76,13 +80,16 @@ function initJS() {
 		createNode($(this));
 	});
 
-	$(".sortable-node").sortable({
+	var sortableChildren;
+	$(".sortable-node").parent().parent().sortable({
 		placeholder: "sortable-placeholder ui-state-highlight",
 		axis: "y",
-		items: "> div",
+		items: ".sortable-node",
 		handle: ".sort-item",
 		deactivate: function(e, ui) {
-			var $leafs = $(this).children(".leaf-line");
+			var $leafs = $(ui.item).parent().parent().children().children(".sortable-node");
+
+			// set new index order
 			$leafs.each(function(i, elem) {
 				$(elem).find('input, select').each(function(j, e) {
 					var s = $(e).attr('name');
@@ -92,9 +99,25 @@ function initJS() {
 					}
 					var newXpath = s.substring(0, s.lastIndexOf('[')) + "[index" + i + "|" + s.substring(delimIndex + 1);
 					$(e).attr('name', newXpath);
-					l(newXpath);
 				});
-			})
+			});
+
+			// move all children of prev sortable node
+			$(ui.item).nextUntil('.sortable-node').each(function(i, e) {
+				$(e).insertBefore($(ui.item));
+			});
+
+			// move all children of current sortable node
+			if (sortableChildren.length) {
+				sortableChildren.reverse().each(function(i, elem) {
+					$(elem).insertAfter($(ui.item));
+				});
+			}
+
+			$(".sortable-placeholder").remove();
+		},
+		activate: function(e, ui) {
+			sortableChildren = $(ui.item).nextUntil('.sortable-node');
 		}
 	}).disableSelection();
 
