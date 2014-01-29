@@ -110,6 +110,8 @@ and (element.attributes.eltype == "leaf-list" or element.attributes.eltype == "l
 	{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '--', '[': '?', ']': '!'}) ~ "]" %}
 	{% if element.0 is defined and element.0|length == 0 %}
 		{% block configInputElem %}
+			{# we must set this variable again, because we render only block configInputElem #}
+			{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '--', '[': '?', ']': '!'}) ~ "]" %}
 			{% if element.attributes.type is defined and element.attributes.type == 'boolean' %}
 				<span class="config-value-cover">
 					<label>

@@ -290,7 +290,6 @@ class AjaxController extends BaseController
 						$twigArr['xpath'] = "";
 						$twigArr['element'] = $res['elems'][$_GET['label']];
 
-
 						$html = $template->renderBlock('configInputElem', $twigArr);
 						$retArr['valueElem'] = $html;
 					}

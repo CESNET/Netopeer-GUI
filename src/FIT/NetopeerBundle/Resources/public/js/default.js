@@ -638,6 +638,10 @@ function createNode($elem) {
 	var $form = generateFormObject('newNodeForm');
 
 	var uniqueId = generateUniqueId();
+	var urlTemplate = $elem.data().typeaheadPath;
+	var sourceUrl = urlTemplate
+		.replace("FORMID", $form.find('input[name=formId]').val())
+		.replace("XPATH", encodeURIComponent(parentXPath));
 
 	// input for label name
 	var $elementName = $("<input>")
@@ -652,9 +656,6 @@ function createNode($elem) {
 			minLength: 0,
 			items: 15,
 			source: function(query, process) {
-				var urlTemplate = $elem.data().typeaheadPath;
-				var sourceUrl = urlTemplate.replace("FORMID", $form.find("input[name=formId]"));
-				sourceUrl = urlTemplate.replace("XPATH", encodeURIComponent(parentXPath));
 				$.ajax({
 					url: sourceUrl,
 					data: {
@@ -668,10 +669,6 @@ function createNode($elem) {
 				})
 			}
 	}).change(function() {
-		var urlTemplate = $elem.data().typeaheadPath;
-		var sourceUrl = urlTemplate.replace("FORMID", $form.find("input[name=formId]"));
-		sourceUrl = urlTemplate.replace("XPATH", encodeURIComponent(parentXPath));
-
 		var $currentInput = $(this);
 		$.ajax({
 			url: sourceUrl,
