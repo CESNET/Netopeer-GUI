@@ -221,7 +221,7 @@ class Data {
 	 * @param  int $key session key
 	 * @return array  return array of identifiers on success, false on error
 	 */
-	private function getModuleIdentifiersForCurrentDevice($key) {
+	public function getModuleIdentifiersForCurrentDevice($key) {
 		$conn = $this->getConnFromKey($key);
 		if (!$conn) {
 			return false;

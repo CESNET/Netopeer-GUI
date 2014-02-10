@@ -67,12 +67,11 @@ if advised of the possibility of such damage.
 	%}
 	<script src="{{ asset_url }}"></script>
 	{% endjavascripts %}
-	{% block javascripts %}{% endblock javascripts %}
 
 	<title id="block--title">{% block title %}{% endblock title %} {% block additionalTitle %}| NetopeerWebGUI{% endblock additionalTitle %}</title>
 </head>
 <body>
-	<div id="block--javascripts"></div>
+	<div id="block--javascripts">{% block javascripts %}{% endblock javascripts %}</div>
 
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="block--topMenu">
@@ -93,6 +92,7 @@ if advised of the possibility of such damage.
 							{% set i = i + 1 %}
 						{% endfor %}
 						<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "all" %}active{% endif %}" title="GET all information">All<span class="arrow"></span></a>
+						<a href="{{ path("createEmptyModule", {"key":app.request.get('key')}) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "empty datastore" %}active{% endif %}" title="Insert into empty datastore">+<span class="arrow"></span></a>
 					{% endif %}
 				{% endif %}
 

@@ -272,6 +272,35 @@ class XMLoperations {
 		return $res;
 	}
 
+	public function handleCreateEmptyModuleForm($key, $configParams, $postVals) {
+		$name = $postVals['name'];
+		$namespace = $postVals['namespace'];
+		$res = 0;
+
+		$xmlTree = new \SimpleXMLElement('<'.$name.'></'.$name.'>');
+		$xmlTree->addAttribute('xmlns', $namespace);
+		$xmlTree->registerXPathNamespace('xc', 'urn:ietf:params:xml:ns:netconf:base:1.0');
+
+		$xmlTree->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
+
+		$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $xmlTree->asXML());
+
+		try {
+			$res = $this->executeEditConfig($key, $createString, $configParams['source']);
+
+			if ($res == 0) {
+				$this->container->get('request')->getSession()->getFlashBag()->add('success', "New module was created.");
+			} else {
+				$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not create empty module.");
+			}
+		} catch (\ErrorException $e) {
+			$this->logger->warn('Could not create empty module.', array('error' => $e->getMessage(), 'xml' => $createString));
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not create empty module. Error: ".$e->getMessage());
+		}
+
+		return $res;
+	}
+
 	/**
 	 * duplicates node in config - values of duplicated nodes (elements)
 	 *

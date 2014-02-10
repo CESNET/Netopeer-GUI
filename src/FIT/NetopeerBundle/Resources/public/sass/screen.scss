@@ -398,6 +398,9 @@ form { margin: 15px 0px;
 			&[type="submit"] { margin-left: 25%; }
 		}		
 	}
+	&.create-empty-module { width: 70%;
+		label { width: 130px; }
+	}
 
 	label { @include inline-block; width: 90px; height: $hInput; line-height: $hInput; margin-top: 10px;
 		&.required {

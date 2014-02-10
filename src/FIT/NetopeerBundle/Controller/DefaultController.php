@@ -50,6 +50,8 @@ use FIT\NetopeerBundle\Entity\BaseConnection;
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\DependencyInjection\SimpleXMLElement;
+use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -436,7 +438,7 @@ class DefaultController extends BaseController
 	 * Prepares section, module or subsection action data
 	 *
 	 * @Route("/sections/{key}/", name="section")
-	 * @Route("/sections/{key}/{module}/", name="module")
+	 * @Route("/sections/{key}/{module}/", name="module", requirements={"key" = "\d+"})
 	 * @Route("/sections/{key}/{module}/{subsection}/", name="subsection")
 	 * @Template("FITNetopeerBundle:Default:section.html.twig")
 	 *
@@ -595,6 +597,54 @@ class DefaultController extends BaseController
 		return $this->getTwigArr();
 	}
 
+
+	/**
+	 * @Route("/sections/create-empty-module/{key}/", name="createEmptyModule")
+	 * @Template("FITNetopeerBundle:Default:createEmptyModule.html.twig")
+	 *
+	 * @param $key
+	 *
+	 * @return array|Response
+	 */
+	public function createEmptyModuleAction($key) {
+		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'title');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'state');
+		$this->assign('historyHref', $this->getRequest()->getRequestUri());
+
+		if ($this->getRequest()->getMethod() == 'POST') {
+			$xmlOperations = $this->get("XMLoperations");
+			$postVals = $this->getRequest()->get("form");
+			$this->setSectionFormsParams($key);
+
+			$res = $xmlOperations->handleCreateEmptyModuleForm($key, $this->getConfigParams(), $postVals);
+			if ($res == 0) {
+				return $this->forward('reloadDeviceAction', array('key' => $key));
+			}
+		}
+
+		$dataClass = $this->get("DataModel");
+		$arr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
+
+		$form = $this->createFormBuilder()
+				->add('name', 'text', array(
+								'label' => "Module name"
+						))
+				->add('namespace', 'text', array(
+								'label' => "Namespace",
+				        'attr' => array(
+						        'class' => 'typeaheadNS',
+				            'data-provide' => 'typeahead',
+				            'data-source' => json_encode(array_keys($arr))
+				        )
+						))
+				->getForm();
+
+		$this->assign('form', $form->createView());
+		$this->assign('sectionName', 'Empty datastore');
+
+		return $this->getTwigArr();
+	}
+
 	/**
 	 * Set values of state array
 	 *
@@ -638,15 +688,17 @@ class DefaultController extends BaseController
 		$dataClass = $this->get('DataModel');
 		$conn = $dataClass->getConnFromKey($key);
 
-		if ($sourceConfig !== "") {
-			$conn->setCurrentDatastore($sourceConfig);
+		if ($conn) {
+			if ($sourceConfig !== "") {
+				$conn->setCurrentDatastore($sourceConfig);
+			}
+			$this->setConfigParams('source', $conn->getCurrentDatastore());
 		}
 
 		$this->setStateParams('key', $key);
 		$this->setStateParams('filter', $filterState);
 
 		$this->setConfigParams('key', $key);
-		$this->setConfigParams('source', $conn->getCurrentDatastore());
 		$this->setConfigParams('filter', $filterConfig);
 	}
 
@@ -915,7 +967,13 @@ class DefaultController extends BaseController
 		 */
 		$dataClass = $this->get('DataModel');
 		$conn = $dataClass->getConnFromKey($key);
-		return $conn->getCurrentDatastore();
+
+		if ($conn) {
+			return $conn->getCurrentDatastore();
+		} else {
+			return false;
+		}
+
 	}
 }
 
