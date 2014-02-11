@@ -572,6 +572,12 @@ class DefaultController extends BaseController
 
 			if ( ($xml = $dataClass->handle('get', $this->getStateParams(), $merge)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+
+				// we have only root module
+				if ($xml->count() == 0) {
+					$this->showEmptyModule($key, $module, $xml);
+				}
+
 				$this->assign("stateArr", $xml);
 			}
 		} catch (\ErrorException $e) {
@@ -595,6 +601,20 @@ class DefaultController extends BaseController
 		}
 
 		return $this->getTwigArr();
+	}
+
+	/**
+	 *
+	 */
+	public function showEmptyModule($key, $name, &$xml) {
+		// TODO: remove after succesfull merge with model, won't be necessary
+		$xml->addAttribute('config', 'true');
+		$xml->addAttribute('iskey', 'true');
+		$xml->addAttribute('eltype', 'container');
+
+		$this->assign('isEmptyModule', true);
+		$this->assign('stateArr', $xml);
+		$this->assign('sectionName', $name);
 	}
 
 

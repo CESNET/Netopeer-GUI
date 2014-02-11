@@ -290,8 +290,6 @@ class XMLoperations {
 
 			if ($res == 0) {
 				$this->container->get('request')->getSession()->getFlashBag()->add('success', "New module was created.");
-			} else {
-				$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not create empty module.");
 			}
 		} catch (\ErrorException $e) {
 			$this->logger->warn('Could not create empty module.', array('error' => $e->getMessage(), 'xml' => $createString));
@@ -839,14 +837,20 @@ class XMLoperations {
 			}
 		}
 	}
+}
 
-	/**
-	 * Go through $root_el tree that represents the response from Netconf server.
-	 *
-	 * @param  \SimpleXMLElement &$model  with data model
-	 * @param  \SimpleXMLElement $root_el with element of response
-	 */
-	public function mergeRecursive(&$model, $root_el) {
+/**
+ * Go through $root_el tree that represents the response from Netconf server.
+ *
+ * @param  \SimpleXMLElement &$model  with data model
+ * @param  \SimpleXMLElement $root_el with element of response
+ */
+public function mergeRecursive(&$model, $root_el) {
+		if ($root_el->count() == 0) {
+//			$this->findAndComplete($model, $root_el);
+			// TODO: repair merge with root element (no parents)
+		}
+
 		foreach ($root_el as $ch) {
 			$this->findAndComplete($model, $ch);
 			$this->mergeRecursive($model, $ch);

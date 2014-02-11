@@ -58,7 +58,7 @@ if advised of the possibility of such damage.
 		{{ configSingleContent|raw }}
 	{% else %}
 		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
-		{% if stateArr is defined and not(stateArr is empty) %}
+		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
 			{% if formConfig is defined %}
 				{% block filterConfig %}
 					<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig" data-disable-active-link="true">
@@ -93,6 +93,13 @@ if advised of the possibility of such damage.
 			<hr class="cleaner" />
 			<form action="" method="post" name="formConfigData" data-disable-history="true">
 				<div class="root">
+					{# new item insertion#}
+
+					{% if isEmptyModule is defined and isEmptyModule == true %}
+						{{ dump(stateArr) }}
+						{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 0, 'hasChildren': false} %}
+					{% endif %}
+
 					{% set iterator = 1 %}
 					{% for key, element in stateArr %}
 						{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}

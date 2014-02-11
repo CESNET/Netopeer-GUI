@@ -253,11 +253,13 @@ class Data {
 	/**
 	 * get path for module name, includes identifier
 	 *
-	 * @param  int $key      session key
+	 * @param  int    $key        session key
 	 * @param  string $moduleName name of element
+	 * @param  string  $ns        namespace of module will be used instead of module name
+	 *
 	 * @return string           relative path on success, false on error
 	 */
-	private function getModulePathByRootModuleName($key, $moduleName) {
+	private function getModulePathByRootModuleName($key, $moduleName, $ns = '') {
 		if (!is_array($this->moduleIdentifiers) || !count($this->moduleIdentifiers)) {
 			$this->getModuleIdentifiersForCurrentDevice($key);
 		}
@@ -273,6 +275,10 @@ class Data {
 							"/" . $this->moduleIdentifiers[$namespace]['revision'];
 				}
 			}
+		} elseif (isset($this->moduleIdentifiers[$ns])) {
+			return $this->moduleIdentifiers[$ns]['hash'] .
+			"/" . $this->moduleIdentifiers[$ns]['moduleName'] .
+			"/" . $this->moduleIdentifiers[$ns]['revision'];
 		}
 		return false;
 	}
