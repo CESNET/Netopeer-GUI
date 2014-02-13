@@ -575,7 +575,7 @@ class DefaultController extends BaseController
 
 				// we have only root module
 				if ($xml->count() == 0) {
-					$this->showEmptyModule($key, $module, $xml);
+					$this->assign('isEmptyModule', true);
 				}
 
 				$this->assign("stateArr", $xml);
@@ -602,21 +602,6 @@ class DefaultController extends BaseController
 
 		return $this->getTwigArr();
 	}
-
-	/**
-	 *
-	 */
-	public function showEmptyModule($key, $name, &$xml) {
-		// TODO: remove after succesfull merge with model, won't be necessary
-		$xml->addAttribute('config', 'true');
-		$xml->addAttribute('iskey', 'true');
-		$xml->addAttribute('eltype', 'container');
-
-		$this->assign('isEmptyModule', true);
-		$this->assign('stateArr', $xml);
-		$this->assign('sectionName', $name);
-	}
-
 
 	/**
 	 * @Route("/sections/create-empty-module/{key}/", name="createEmptyModule")

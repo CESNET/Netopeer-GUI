@@ -694,6 +694,29 @@ class XMLoperations {
 		return preg_replace("/<\?xml .*\?".">/i", "n", $text);
 	}
 
+	public function loadModel() {
+		$notEditedPath = $this->dataModel->getModelsDir();
+		$path = $this->dataModel->getPathToModels();
+		$modelFile = $path . 'wrapped.wyin';
+		$res = 1;
+
+		$this->logger->info("Trying to find model in ", array('pathToFile' => $modelFile));
+		if ( file_exists($modelFile) ) {
+			$this->logger->info("Model found in ", array('pathToFile' => $modelFile));
+			if ( $path != $notEditedPath ) {
+				try {
+					$res = simplexml_load_file($modelFile);
+				} catch (\ErrorException $e) {
+					$this->logger->err("Could not load model");
+				}
+			}
+		} else {
+			// TODO: if is not set module direcotory, we have to set model to merge with
+			// problem: we have to load all models (for example combo, comet-tester...)
+			$this->logger->warn("Could not find model in ", array('pathToFile' => $modelFile));
+		}
+		return $res;
+	}
 
 	/**
 	 * Merge given XML with data model
@@ -703,137 +726,126 @@ class XMLoperations {
 	 */
 	public function mergeXMLWithModel(&$xml) {
 		// load model
-		$notEditedPath = $this->dataModel->getModelsDir();
-		$path = $this->dataModel->getPathToModels();
-		$modelFile = $path . 'wrapped.wyin';
+		$model = $this->loadModel();
+		$res = 1;
 
-		$this->logger->info("Trying to find model in ", array('pathToFile' => $modelFile));
-
-		if ( file_exists($modelFile) ) {
-			$this->logger->info("Model found in ", array('pathToFile' => $modelFile));
-			if ( $path != $notEditedPath ) {
-				$model = simplexml_load_file($modelFile);
-				try {
-					$res = $this->mergeWithModel($model, $xml);
-				} catch (\ErrorException $e) {
-					// TODO
-					$this->logger->err("Could not merge with model");
-					$res = 1;
-				}
-			} else {
-				// TODO: if is not set module direcotory, we have to set model to merge with
-				// problem: we have to load all models (for example combo, comet-tester...)
-				$this->logger->warn("Could not find model in ", array('pathToFile' => $modelFile));
-				$res = 1;
+		if ($model != 1) {
+			try {
+				$res = $this->mergeWithModel($model, $xml);
+			} catch (\ErrorException $e) {
+				// TODO
+				$this->logger->err("Could not merge with model:", array('error' => $e->getMessage()));
 			}
-		} else {
-			$this->logger->warn("Could not find model in ", array('pathToFile' => $modelFile));
-			$res = 1;
 		}
 		return $res;
 	}
 
-	/**
-	 * Check, if XML response is valid.
-	 *
-	 * @param string            &$xmlString       xml response
-	 * @return int  1 on success, 0 on error
-	 */
-	public function isResponseValidXML(&$xmlString) {
-		$e = false;
+
+/**
+ * Check, if XML response is valid.
+ *
+ * @param string            &$xmlString       xml response
+ * @return int  1 on success, 0 on error
+ */
+public function isResponseValidXML(&$xmlString) {
+	$e = false;
+	try {
+		$simpleXMLRes = simplexml_load_string($xmlString);
+	} catch (\ErrorException $e) {
+		// Exception will be handled bellow
+	}
+	if ( (isset($simpleXMLRes) && $simpleXMLRes === false) || $e !== false) {
+		// sometimes is exactly one root node missing
+		// we will check, if is not XML valid with root node
+		$xmlString = "<root>".$xmlString."</root>";
 		try {
 			$simpleXMLRes = simplexml_load_string($xmlString);
 		} catch (\ErrorException $e) {
-			// Exception will be handled bellow
+			return 0;
 		}
-		if ( (isset($simpleXMLRes) && $simpleXMLRes === false) || $e !== false) {
-			// sometimes is exactly one root node missing
-			// we will check, if is not XML valid with root node
-			$xmlString = "<root>".$xmlString."</root>";
-			try {
-				$simpleXMLRes = simplexml_load_string($xmlString);
-			} catch (\ErrorException $e) {
-				return 0;
-			}
-		}
-		return 1;
 	}
+	return 1;
+}
 
-	/**
-	 * Get parent for element.
-	 *
-	 * @param $element
-	 * @return bool|\SimpleXMLElement
-	 */
-	public function getElementParent($element) {
-		$parents = $element->xpath("parent::*");
-		if ($parents) {
-			return $parents[0];
+/**
+ * Get parent for element.
+ *
+ * @param $element
+ * @return bool|\SimpleXMLElement
+ */
+public function getElementParent($element) {
+	$parents = $element->xpath("parent::*");
+	if ($parents) {
+		return $parents[0];
+	}
+	return false;
+}
+
+/**
+ * Check if two elements match.
+ *
+ * @param $model_el
+ * @param $possible_el
+ * @return bool
+ */
+public function checkElemMatch($model_el, $possible_el) {
+	$mel = $this->getElementParent($model_el);
+	$pel = $this->getElementParent($possible_el);
+
+	if ($mel instanceof \SimpleXMLElement && $pel instanceof \SimpleXMLElement) {
+		while ($pel && $mel) {
+			if ($pel->getName() !== $mel->getName()) {
+				return false;
+			}
+			$pel = $this->getElementParent($pel);
+			$mel = $this->getElementParent($mel);
 		}
+		return true;
+	} else {
 		return false;
 	}
+}
 
-	/**
-	 * Check if two elements match.
-	 *
-	 * @param $model_el
-	 * @param $possible_el
-	 * @return bool
-	 */
-	public function checkElemMatch($model_el, $possible_el) {
-		$mel = $this->getElementParent($model_el);
-		$pel = $this->getElementParent($possible_el);
-
-		if ($mel instanceof \SimpleXMLElement && $pel instanceof \SimpleXMLElement) {
-			while ($pel && $mel) {
-				if ($pel->getName() !== $mel->getName()) {
-					return false;
-				}
-				$pel = $this->getElementParent($pel);
-				$mel = $this->getElementParent($mel);
-			}
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	/**
-	 * Completes tree structure for target element.
-	 *
-	 * @param \SimpleXMLElement $source
-	 * @param \SimpleXMLElement $target
-	 */
-	public function completeAttributes(&$source, &$target) {
-		if ($source->attributes()) {
-			$attrs = $source->attributes();
-			if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
-				foreach ($source->attributes() as $key => $val) {
+/**
+ * Completes tree structure for target element.
+ *
+ * @param \SimpleXMLElement $source
+ * @param \SimpleXMLElement $target
+ */
+public function completeAttributes(&$source, &$target) {
+	if ($source->attributes()) {
+		$attrs = $source->attributes();
+		if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
+			foreach ($source->attributes() as $key => $val) {
+				try {
 					$target->addAttribute($key, $val);
+				} catch (\ErrorException $e) {
+//					$this->logger->addWarning('Error in adding attributes: ', array('error' => $e->getMessage()));
 				}
+
 			}
 		}
 	}
+}
 
-	/**
-	 * Find corresponding $el in configuration model $model and complete attributes from $model.
-	 *
-	 * @param  \SimpleXMLElement &$model with data model
-	 * @param  \SimpleXMLElement $el     with element of response
-	 */
-	public function findAndComplete(&$model, $el) {
-		$modelns = $model->getNamespaces();
-		$model->registerXPathNamespace("c", $modelns[""]);
-		$found = $model->xpath("//c:". $el->getName());
-		if (sizeof($found) == 1) {
-			$this->completeAttributes($found[0], $el);
-		} else {
-			//echo "Not found unique<br>";
-			foreach ($found as $found_el) {
-				if ($this->checkElemMatch($el, $found_el)) {
-					$this->completeAttributes($found_el, $el);
-					break;
-				}
+/**
+ * Find corresponding $el in configuration model $model and complete attributes from $model.
+ *
+ * @param  \SimpleXMLElement &$model with data model
+ * @param  \SimpleXMLElement $el     with element of response
+ */
+public function findAndComplete(&$model, $el) {
+	$modelns = $model->getNamespaces();
+	$model->registerXPathNamespace("c", $modelns[""]);
+	$found = $model->xpath("//c:". $el->getName());
+	if (sizeof($found) == 1) {
+		$this->completeAttributes($found[0], $el);
+	} else {
+		//echo "Not found unique<br>";
+		foreach ($found as $found_el) {
+			if ($this->checkElemMatch($el, $found_el)) {
+				$this->completeAttributes($found_el, $el);
+				break;
 			}
 		}
 	}
@@ -847,7 +859,7 @@ class XMLoperations {
  */
 public function mergeRecursive(&$model, $root_el) {
 		if ($root_el->count() == 0) {
-//			$this->findAndComplete($model, $root_el);
+			$this->findAndComplete($model, $root_el);
 			// TODO: repair merge with root element (no parents)
 		}
 
@@ -928,6 +940,8 @@ public function mergeRecursive(&$model, $root_el) {
 			$xml = $cache->fetch('getResponseForFormId_'.$formId);
 		} else {
 			$xml = $this->dataModel->handle('getconfig', $configParams);
+//			$xml = $this->loadModel()->asXML();
+			// TODO: complete loading af all subtrees of element instead of loading getconfig (which is not complete, for example for empty datastore element)
 			$cache->save('getResponseForFormId_'.$formId, $xml, 1000);
 		}
 
