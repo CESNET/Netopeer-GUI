@@ -665,8 +665,16 @@ class Data {
 			"type" => self::MSG_EDITCONFIG,
 			"session" => $sessionKey,
 			"target" => $params['target'],
-			"config" => $params['config']
 		);
+		if (isset($params['source']) && ($params['source'] === "url")) {
+			/* required 'uri-source' when 'source' is 'url' */
+			$editparams['source'] = 'url';
+			$editparams['uri-source'] = $params['uri-source'];
+		} else {
+			/* source can be set to "config" or "url" */
+			$editparams['source'] = 'config';
+			$editparams['config'] = $params['config']
+		}
 		if (isset($params['default-operation']) && ($params['default-operation'] !== "")) {
 			$editparams['default-operation'] = $params['defopt'];
 		}
@@ -686,14 +694,20 @@ class Data {
 			return 1;
 		}
 		$sessionKey = $this->getHashFromKey($params['key']);
-		/* edit-config to store new values */
-		$params = array(
+		/* copy-config parameters */
+		$newparams = array(
 			"type" => self::MSG_COPYCONFIG,
 			"session" => $sessionKey,
 			"source" => $params['source'],
 			"target" => $params['target'],
 		);
-		$decoded = $this->execute_operation($sock, $params);
+		if ($params['source'] === "url") {
+			$newparams['uri-source'] = $params['uri-source'];
+		}
+		if ($params['target'] === "url") {
+			$newparams['uri-target'] = $params['uri-target'];
+		}
+		$decoded = $this->execute_operation($sock, $newparams);
 		return $this->checkDecodedData($decoded);
 	}
 
