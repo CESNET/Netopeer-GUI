@@ -678,6 +678,9 @@ class Data {
 		if (isset($params['default-operation']) && ($params['default-operation'] !== "")) {
 			$editparams['default-operation'] = $params['defopt'];
 		}
+		if (isset($params['test-option']) && ($params['test-option'] !== "")) {
+			$editparams['test-option'] = $params['test-option'];
+		}
 		$decoded = $this->execute_operation($sock, $editparams);
 		return $this->checkDecodedData($decoded);
 	}
