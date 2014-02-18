@@ -135,18 +135,21 @@ class XMLoperations {
 			$parent = $parent[0]->xpath("parent::*");
 		}
 		$config = $config_string;
-		for ($i = 0; $i < sizeof($pos_subroot); $i++) {
-			$tmp = $pos_subroot[$i]->getName();
-			$config .= "</".$pos_subroot[$i]->getName().">\n";
 
-			if ($i == sizeof($pos_subroot) - 1) {
-				$config = "<".$pos_subroot[$i]->getName().
-						($namespace!==""?" xmlns=\"$namespace\"":"").
-						" xmlns:xc=\"urn:ietf:params:xml:ns:netconf:base:1.0\"".
-						">\n".$config;
-			} else {
-				$config = "<".$pos_subroot[$i]->getName().
-						">\n".$config;
+		if (isset($pos_subroot)) {
+			for ($i = 0; $i < sizeof($pos_subroot); $i++) {
+				$tmp = $pos_subroot[$i]->getName();
+				$config .= "</".$pos_subroot[$i]->getName().">\n";
+
+				if ($i == sizeof($pos_subroot) - 1) {
+					$config = "<".$pos_subroot[$i]->getName().
+							($namespace!==""?" xmlns=\"$namespace\"":"").
+							" xmlns:xc=\"urn:ietf:params:xml:ns:netconf:base:1.0\"".
+							">\n".$config;
+				} else {
+					$config = "<".$pos_subroot[$i]->getName().
+							">\n".$config;
+				}
 			}
 		}
 		$result = simplexml_load_string($config);
@@ -939,9 +942,7 @@ public function mergeRecursive(&$model, $root_el) {
 		if ($cache->contains('getResponseForFormId_'.$formId)) {
 			$xml = $cache->fetch('getResponseForFormId_'.$formId);
 		} else {
-			$xml = $this->dataModel->handle('getconfig', $configParams);
-//			$xml = $this->loadModel()->asXML();
-			// TODO: complete loading af all subtrees of element instead of loading getconfig (which is not complete, for example for empty datastore element)
+			$xml = $this->loadModel()->asXML();
 			$cache->save('getResponseForFormId_'.$formId, $xml, 1000);
 		}
 
@@ -953,6 +954,15 @@ public function mergeRecursive(&$model, $root_el) {
 			$dom->loadXML($xml);
 
 			$decodedXPath = str_replace("/", "/xmlns:", $this->decodeXPath($xPath))."/*";
+			if (strpos($xPath, '----') !== false) {
+				// we have to correct xpath selector if xpath start with '//'
+				$decodedXPath = str_replace('xmlns:/', '/', $decodedXPath);
+			} else {
+				// we have to add one level for "module" (root) element, which in model in addition to getconfig response
+				$decodedXPath = '/xmlns:*'.$decodedXPath;
+				// we have to remove all array selectors [D]
+				$decodedXPath = preg_replace('/\[.+\]/', '', $decodedXPath);
+			}
 			$domXpath = new \DOMXPath($dom);
 
 			$context = $dom->documentElement;

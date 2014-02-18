@@ -569,13 +569,15 @@ class DefaultController extends BaseController
 			} else {
 				$merge = true;
 			}
+			$isEmptyModule = false;
 
 			if ( ($xml = $dataClass->handle('get', $this->getStateParams(), $merge)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 
 				// we have only root module
 				if ($xml->count() == 0) {
-					$this->assign('isEmptyModule', true);
+					$isEmptyModule = true;
+					$this->assign('isEmptyModule', $isEmptyModule);
 				}
 
 				$this->assign("stateArr", $xml);
@@ -587,7 +589,7 @@ class DefaultController extends BaseController
 
 		// we will load config part only if two column layout is enabled or we are on section (which has two column always)
 		$tmp = $this->getConfigParams();
-		if ($module == null || ($module != null && $tmp['source'] !== "running")) {
+		if ($module == null || ($module != null && $tmp['source'] !== "running" && !$isEmptyModule)) {
 			$this->loadConfigArr(false, $merge);
 			$this->setOnlyConfigSection();
 		} else if ( $module == null || $module == 'all' || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
@@ -622,8 +624,8 @@ class DefaultController extends BaseController
 			$this->setSectionFormsParams($key);
 
 			$res = $xmlOperations->handleCreateEmptyModuleForm($key, $this->getConfigParams(), $postVals);
-			if ($res == 0) {
-				return $this->forward('reloadDeviceAction', array('key' => $key));
+			if ($res != 0) {
+				$this->forward('reloadDeviceAction', array('key' => $key));
 			}
 		}
 

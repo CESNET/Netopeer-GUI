@@ -632,7 +632,11 @@ function createNode($elem) {
 	} else {
 		parentName = $currentParent.find('input.label').val();
 	}
-	var parentXPath = xPath.substring(0, xPath.lastIndexOf("*?")) + parentName;
+	var lastIndex = xPath.lastIndexOf("*?");
+	if (lastIndex == -1) {
+		lastIndex = xPath.length;
+	}
+	var parentXPath = xPath.substring(0, lastIndex) + parentName;
 
 	// generate new form
 	var $form = generateFormObject('newNodeForm');

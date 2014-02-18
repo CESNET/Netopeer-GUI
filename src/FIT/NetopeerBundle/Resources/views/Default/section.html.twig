@@ -96,8 +96,8 @@ if advised of the possibility of such damage.
 					{# new item insertion#}
 
 					{% if isEmptyModule is defined and isEmptyModule == true %}
-						{{ dump(stateArr) }}
-						{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 0, 'hasChildren': false} %}
+
+						{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
 					{% endif %}
 
 					{% set iterator = 1 %}
