@@ -186,10 +186,6 @@ and (element.attributes.eltype == "leaf-list" or element.attributes.eltype == "l
 			{% endif %}
 		{% endblock configInputElem %}
 	{% else %}
-		{% if element.attributes.eltype is defined and
-		(element.attributes.eltype == "leaf-list" or element.attributes.eltype == "list") %}
-			<input type="hidden" value="" name="{{ currentInputName }}">
-		{% endif %}
 		<span class="value"></span>
 	{% endif %}
 
