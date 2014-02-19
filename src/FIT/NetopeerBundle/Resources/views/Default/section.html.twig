@@ -53,6 +53,11 @@ if advised of the possibility of such damage.
 
 {% block state %}
 {% block singleContent %}
+	{#<div class="edit-bar">#}
+		{#<span class="create-child"#}
+		{#rel="--*" data-typeahead-path="/symfony/app_dev.php/ajax/get-values-for-label/FORMID/0/nacm/XPATH/">new node</span>#}
+	{#</div>#}
+
 	{% set stateDefined = 'true' %}
 	{% if configSingleContent is defined %}
 		{{ configSingleContent|raw }}
@@ -94,7 +99,6 @@ if advised of the possibility of such damage.
 			<form action="" method="post" name="formConfigData" data-disable-history="true">
 				<div class="root">
 					{# new item insertion#}
-
 					{% if isEmptyModule is defined and isEmptyModule == true %}
 
 						{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
@@ -154,10 +158,15 @@ if advised of the possibility of such damage.
 				{% endif %}
 			</div>
 		</form>
+	{% elseif isEmptyModule is defined and isEmptyModule == true %}
+		{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
 	{% else %}
 		<div class="alert info">
 			No results found.
 		</div>
+		{% if additionalForm is defined %}
+			{{ additionalForm|raw }}
+		{% endif %}
 	{% endif %}
 {% endblock config %}
 

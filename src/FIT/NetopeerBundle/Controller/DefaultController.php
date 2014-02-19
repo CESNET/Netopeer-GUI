@@ -617,6 +617,7 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'title');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'state');
 		$this->assign('historyHref', $this->getRequest()->getRequestUri());
+		$this->assign('key', $key);
 
 		if ($this->getRequest()->getMethod() == 'POST') {
 			$xmlOperations = $this->get("XMLoperations");
@@ -627,8 +628,24 @@ class DefaultController extends BaseController
 			if ($res != 0) {
 				$this->forward('reloadDeviceAction', array('key' => $key));
 			}
+
+			if (isset($postVals['redirectUrl'])) {
+				return $this->redirect($postVals['redirectUrl']);
+			}
 		}
 
+		$this->setEmptyModuleForm($key);
+		$this->assign('sectionName', 'Empty datastore');
+
+		return $this->getTwigArr();
+	}
+
+	/**
+	 * prepares form for empty module (root element) insertion
+	 *
+	 * @param $key
+	 */
+	private function setEmptyModuleForm($key) {
 		$dataClass = $this->get("DataModel");
 		$arr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
 
@@ -638,18 +655,15 @@ class DefaultController extends BaseController
 						))
 				->add('namespace', 'text', array(
 								'label' => "Namespace",
-				        'attr' => array(
-						        'class' => 'typeaheadNS',
-				            'data-provide' => 'typeahead',
-				            'data-source' => json_encode(array_keys($arr))
-				        )
+								'attr' => array(
+										'class' => 'typeaheadNS',
+										'data-provide' => 'typeahead',
+										'data-source' => json_encode(array_keys($arr))
+								)
 						))
 				->getForm();
 
-		$this->assign('form', $form->createView());
-		$this->assign('sectionName', 'Empty datastore');
-
-		return $this->getTwigArr();
+		$this->assign('emptyModuleForm', $form->createView());
 	}
 
 	/**
@@ -960,6 +974,22 @@ class DefaultController extends BaseController
 			// getcofig part
 			if ( ($xml = $dataClass->handle('getconfig', $this->getConfigParams(), $merge)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+
+				// we have only root module
+				if ($xml->count() == 0 && $xml->getName() == 'root') {
+					$this->setEmptyModuleForm($this->getRequest()->get('key'));
+					$this->assign('key', $this->getRequest()->get('key'));
+					$this->assign('additionalTitle', 'Create empty root element');
+					$this->assign('redirectUrl', $this->getRequest()->getRequestUri());
+
+					$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:createEmptyModule.html.twig');
+					$html = $template->renderBlock('singleContent', $this->getAssignedVariablesArr());
+
+					$this->assign('additionalForm', $html);
+				} elseif ($xml->count() == 0) {
+					$this->assign('isEmptyModule', true);
+				}
+
 				$this->assign("configArr", $xml);
 			}
 		} catch (\ErrorException $e) {
