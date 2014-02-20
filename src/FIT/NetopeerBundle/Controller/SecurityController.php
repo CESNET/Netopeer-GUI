@@ -38,7 +38,11 @@
  * otherwise) arising in any way out of the use of this software, even
  * if advised of the possibility of such damage.
  */
+
+
 namespace FIT\NetopeerBundle\Controller;
+
+require_once('/usr/share/simplesamlphp/lib/_autoload.php');
 
 use FIT\NetopeerBundle\Controller\BaseController;
 use Symfony\Component\Security\Core\SecurityContext;
@@ -88,6 +92,51 @@ class SecurityController extends BaseController
      */
     public function logoutAction()
     {
-        // The security layer will intercept this request
+      // The security layer will intercept this request
     }
+
+    /**
+     * Logout page action.
+     *
+     * @Route("/samllogin2", name="_samllogin2")
+     * @Template()
+     */
+     public function samlloginAction()
+     {
+         $request = $this->getRequest();
+         $session = $request->getSession();
+         $as = new \SimpleSAML_Auth_Simple('netconfwebgui2');
+         if (!$session->get('samlauth')) {
+             $session->set('samlauth', 'yes');
+             $as->requireAuth();
+         }
+         $isAuth = $as->isAuthenticated();
+         $attributes = $as->getAttributes();
+         if ($isAuth) {
+             $this->assign('isauthenticated', 'Huray');
+         } else {
+             $this->assign('isauthenticated', 'Not authenticated');
+         }
+
+         return $this->getTwigArr($this);
+     }
+
+    /**
+     * Logout page action.
+     *
+     * @Route("/samllogout2", name="_samllogout2")
+     * @Template()
+			 */
+     public function samllogoutAction()
+     {
+         $as = new \SimpleSAML_Auth_Simple('netconfwebgui2');
+         $isAuth = $as->isAuthenticated();
+         if ($isAuth) {
+             $as->logout(\SimpleSAML_Utilities::selfURLNoQuery());
+         }
+         die();
+
+         return $this->getTwigArr($this);
+     }
+
 }
