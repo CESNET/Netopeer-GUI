@@ -20,7 +20,9 @@
         "sensio/framework-extra-bundle": "2.3.*",
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
-        "winzou/cache-bundle": "dev-master"
+        "winzou/cache-bundle": "dev-master",
+	"aerialship/lightsaml": "dev-master",
+	"aerialship/saml-sp-bundle": "dev-master"
     },
     "scripts": {
         "post-install-cmd": [

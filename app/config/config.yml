@@ -58,6 +58,11 @@ doctrine:
         auto_generate_proxy_classes: %kernel.debug%
         auto_mapping: true
 
+# Saml Bundle
+aerial_ship_saml_sp:
+    driver: orm
+    sso_state_entity_class: FIT\NetopeerBundle\Entity\SamlUser
+
 # Swiftmailer Configuration
 swiftmailer:
     transport: %mailer_transport%

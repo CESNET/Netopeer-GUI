@@ -18,6 +18,7 @@ class AppKernel extends Kernel
 			new Sensio\Bundle\FrameworkExtraBundle\SensioFrameworkExtraBundle(),
 			new FIT\NetopeerBundle\FITNetopeerBundle(),
 			new winzou\CacheBundle\winzouCacheBundle(),
+	        new AerialShip\SamlSPBundle\AerialShipSamlSPBundle(),
 		);
 
 		if (in_array($this->getEnvironment(), array('dev', 'test'))) {
