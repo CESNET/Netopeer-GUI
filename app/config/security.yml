@@ -10,9 +10,11 @@ security:
     providers:
         chain_provider:
             chain:
-                providers:          [user_db, in_memory]
+                providers:          [user_db, in_memory, saml_user_db, saml_user_provider]
         user_db:
             entity: { class: FITNetopeerBundle:User, property: username }
+        saml_user_db:
+                    entity: { class: FITNetopeerBundle:SamlUser, property: SamlUser }
         saml_user_provider:
             id: SamlToState
         in_memory:
@@ -38,6 +40,7 @@ security:
                 discovery_path: /saml/sp/discovery
                 local_logout_path: /logout
                 provider: saml_user_provider
+                create_user_if_not_exists: true
                 services:
                     openidp:
                         idp:

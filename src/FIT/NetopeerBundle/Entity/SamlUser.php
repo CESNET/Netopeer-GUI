@@ -32,7 +32,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	protected $id;
 
 	/**
-	 * @var string unique username
+	 * @var string username
 	 *
 	 * @ORM\Column(type="string", length=64, nullable=true)
 	 * @ORM\JoinColumn(onDelete="cascade")
@@ -40,38 +40,46 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	protected $username;
 
 	/**
+	 * @var string targetedId
+	 *
+	 * @ORM\Column(type="string", length=64, nullable=true, name="targeted_id")
+	 * @ORM\JoinColumn(onDelete="cascade")
+	 */
+	protected $targetedID;
+
+	/**
 	 * @var string
-	 * @ORM\Column(type="string", length=64)
+	 * @ORM\Column(type="string", length=32, name="provider_id", nullable=true)
 	 */
 	protected $providerID;
 
 	/**
 	 * @var string
-	 * @ORM\Column(type="string", length=64)
+	 * @ORM\Column(type="string", length=32, name="auth_svc_name")
 	 */
 	protected $authenticationServiceName;
 
 	/**
 	 * @var string
-	 * @ORM\Column(type="string", length=64)
+	 * @ORM\Column(type="string", length=64, name="session_index", nullable=true)
 	 */
 	protected $sessionIndex;
 
 	/**
 	 * @var string
-	 * @ORM\Column(type="string", length=64)
+	 * @ORM\Column(type="string", length=64, name="name_id")
 	 */
 	protected $nameID;
 
 	/**
 	 * @var string
-	 * @ORM\Column(type="string", length=64)
+	 * @ORM\Column(type="string", length=64, name="name_id_format")
 	 */
 	protected $nameIDFormat;
 
 	/**
 	 * @var \DateTime
-	 * @ORM\Column(type="datetime")
+	 * @ORM\Column(type="datetime", name="created_on")
 	 */
 	protected $createdOn;
 
@@ -489,4 +497,27 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	{
 		return $this->username;
 	}
+
+    /**
+     * Set targetedID
+     *
+     * @param string $targetedID
+     * @return SamlUser
+     */
+    public function setTargetedID($targetedID)
+    {
+        $this->targetedID = $targetedID;
+    
+        return $this;
+    }
+
+    /**
+     * Get targetedID
+     *
+     * @return string 
+     */
+    public function getTargetedID()
+    {
+        return $this->targetedID;
+    }
 }

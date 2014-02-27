@@ -1202,6 +1202,16 @@ form#login-form input[type="text"], form#login-form textarea, form#login-form in
   float: left; }
 form#login-form input[type="submit"] {
   margin-left: 25%; }
+form#login-form .login-alternative {
+  border-left: 1px solid #666;
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  zoom: 1;
+  *display: inline;
+  margin-left: 8px;
+  padding-left: 8px; }
 form.create-empty-module {
   width: 70%; }
 form.create-empty-module label {

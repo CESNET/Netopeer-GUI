@@ -36,27 +36,16 @@ class SamlToState implements UserManagerInterface
 	 */
 	public function loadUserBySamlInfo(SamlSpInfo $samlInfo)
 	{
-		$nameID = $samlInfo->getNameID()->getValue();
-
-		$user = $this->loadUserByNameId($nameID);
-		$attr = $samlInfo->getAttributes();
-		$username = $attr['uid'];
-		$username = $username->getValues();
-		$user->setUsername($username[0]);
-
-		$em = $this->container->get('doctrine')->getManager();
-		$repository = $em->getRepository('FITNetopeerBundle:SamlUser');
-		$em->persist($user);
-		$em->flush();
+		$user = $this->loadUserByTargetedID($samlInfo->getAttributes()['eduPersonTargetedID']->getFirstValue());
 
 		return $user;
 	}
 
-	private function loadUserByNameId($nameId) {
+	private function loadUserByTargetedID($targetedID) {
 		$repository = $this->container->get('doctrine')->getManager()->getRepository('FITNetopeerBundle:SamlUser');
 
 		$user = $repository->findOneBy(
-				array('nameID' => $nameId)
+				array('targetedID' => $targetedID)
 		);
 
 		if ($user) {
@@ -71,13 +60,33 @@ class SamlToState implements UserManagerInterface
 	 */
 	public function createUserFromSamlInfo(SamlSpInfo $samlInfo)
 	{
-		$user = new SamlUser();
-		$user->setUsername($samlInfo->getAttributes('username'));
-		$user->setNameID($samlInfo->getNameID()->getValue());
-
 		$repository = $this->container->get('doctrine')->getManager()->getRepository('FITNetopeerBundle:SamlUser');
-		$repository->persist($user);
-		$repository->flush();
+
+		$user = $repository->findOneBy(
+				array('nameID' => $samlInfo->getNameID()->getValue())
+		);
+
+		if ($user) {
+			$user->setUsername($samlInfo->getAttributes()['eduPersonPrincipalName']->getFirstValue());
+			$user->setTargetedID($samlInfo->getAttributes()['eduPersonTargetedID']->getFirstValue());
+		} else {
+			$user = new SamlUser();
+			$user->setUsername($samlInfo->getAttributes()['eduPersonPrincipalName']->getFirstValue());
+			$user->setTargetedID($samlInfo->getAttributes()['eduPersonTargetedID']->getFirstValue());
+
+			$user->setSessionIndex($samlInfo->getAuthnStatement()->getSessionIndex());
+
+			$user->setProviderID($samlInfo->getNameID()->getSPProvidedID());
+			$user->setAuthenticationServiceName($samlInfo->getAuthenticationServiceID());
+			$user->setNameID($samlInfo->getNameID()->getValue());
+			$user->setNameIDFormat($samlInfo->getNameID()->getFormat());
+		}
+
+		$em = $this->container->get('doctrine')->getManager();
+		$em->persist($user);
+		$em->flush();
+
+		return $user;
 	}
 
 	public function loadUserByUsername($username)
@@ -101,7 +110,18 @@ class SamlToState implements UserManagerInterface
 	 */
 	public function refreshUser(UserInterface $user)
 	{
-		return $this->loadUserByNameId($user->getNameID());
+		$repository = $this->container->get('doctrine')->getManager()->getRepository('FITNetopeerBundle:SamlUser');
+
+		$newUser = $repository->findOneBy(
+				array('sessionIndex' => $user->getSessionIndex(),
+				      'nameID' => $user->getNameID())
+		);
+
+		if (!$newUser) {
+			throw new \Symfony\Component\Security\Core\Exception\UsernameNotFoundException();
+		}
+
+		return $newUser;
 	}
 
 	/**
@@ -109,6 +129,7 @@ class SamlToState implements UserManagerInterface
 	 */
 	public function supportsClass($class)
 	{
+		$tmp = $class;
 		return true;
 	}
 
