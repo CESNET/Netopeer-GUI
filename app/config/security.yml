@@ -10,11 +10,9 @@ security:
     providers:
         chain_provider:
             chain:
-                providers:          [user_db, in_memory, saml_user_db, saml_user_provider]
+                providers:          [user_db, in_memory]
         user_db:
             entity: { class: FITNetopeerBundle:User, property: username }
-        saml_user_db:
-                    entity: { class: FITNetopeerBundle:SamlUser, property: SamlUser }
         saml_user_provider:
             id: SamlToState
         in_memory:
@@ -29,8 +27,8 @@ security:
             security: false
 
         saml:
-            pattern: ^/saml/
-            anonymous: true
+            pattern: ^/
+            anonymous: false
             aerial_ship_saml_sp:
                 login_path: /saml/sp/login
                 check_path: /saml/sp/acs
@@ -38,7 +36,7 @@ security:
                 failure_path: /saml/sp/failure
                 metadata_path: /saml/sp/FederationMetadata.xml
                 discovery_path: /saml/sp/discovery
-                local_logout_path: /logout
+                local_logout_path: /logout/
                 provider: saml_user_provider
                 create_user_if_not_exists: true
                 services:
@@ -48,10 +46,10 @@ security:
                         sp:
                             config:
                                 # required
-                                entity_id: netconfwebgui3
+                                entity_id: netconfwebgui4
                                 # if different then url being used in request
                                 # used for construction of assertion consumer and logout urls in SP entity descriptor
-                                base_url: https://garnacha.liberouter.org/netconfwebgui/
+                                base_url: https://garnacha.liberouter.org/netconfwebgui/app_dev.php
                             signing:
                                 # must implement SPSigningProviderInterface
                                 # id: my.signing.provider.service.id
@@ -66,7 +64,7 @@ security:
 
                                 # or use builtin SpMetaConfigProvider
                                 # any valid saml name id format or shortcuts: persistent or transient
-                                name_id_format: persistent
+                                name_id_format: transient
                                 binding:
                                     # any saml binding or shortcuts: post or redirect
                                     authn_request: post

@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="saml_sso_state")
+ * @ORM\Table(name="samlUser")
  */
 class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements UserInterface
 {
@@ -451,7 +451,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function getRoles()
 	{
-		return array($this->roles);
+		return explode(",", $this->roles);
 	}
 
 	/**

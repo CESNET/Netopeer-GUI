@@ -101,7 +101,7 @@ class SamlToState implements UserManagerInterface
 			return $user;
 		}
 
-		throwException(\Symfony\Component\Security\Core\Exception\UsernameNotFoundException);
+		throw new \Symfony\Component\Security\Core\Exception\UsernameNotFoundException();
 		return false;
 	}
 
@@ -113,8 +113,7 @@ class SamlToState implements UserManagerInterface
 		$repository = $this->container->get('doctrine')->getManager()->getRepository('FITNetopeerBundle:SamlUser');
 
 		$newUser = $repository->findOneBy(
-				array('sessionIndex' => $user->getSessionIndex(),
-				      'nameID' => $user->getNameID())
+				array('nameID' => $user->getNameID())
 		);
 
 		if (!$newUser) {
@@ -129,7 +128,6 @@ class SamlToState implements UserManagerInterface
 	 */
 	public function supportsClass($class)
 	{
-		$tmp = $class;
 		return true;
 	}
 
