@@ -97,14 +97,14 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 
 	/**
 	 * @var array   array of connected devices (from history)
-	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
+	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="samlUserId")
 	 * @ORM\OrderBy({"accessTime" = "DESC"})
 	 */
 	protected $connectedDevicesInHistory;
 
 	/**
 	 * @var array   array of connected devices (from profiles)
-	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
+	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="samlUserId")
 	 * @ORM\OrderBy({"host" = "ASC"})
 	 */
 	protected $connectedDevicesInProfiles;

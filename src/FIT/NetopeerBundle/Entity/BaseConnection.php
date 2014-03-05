@@ -108,6 +108,14 @@ class BaseConnection {
 	protected $userId;
 
 	/**
+	 * @var int   user id
+	 *
+	 * @ORM\ManyToOne(targetEntity="SamlUser")
+	 * @ORM\JoinColumn(name="samlUserId", referencedColumnName="id", onDelete="cascade")
+	 */
+	protected $samlUserId;
+
+	/**
 	 * @var \DateTime  creation time
 	 *
 	 * @ORM\Column(type="datetime")
@@ -324,11 +332,15 @@ class BaseConnection {
   /**
    * Set userId
    *
-   * @param \FIT\NetopeerBundle\Entity\User $userId
+   * @param \FIT\NetopeerBundle\Entity\User|\FIT\NetopeerBundle\Entity\SamlUser $user
    */
-  public function setUserId(\FIT\NetopeerBundle\Entity\User $userId)
+  public function setUserId($user)
   {
-      $this->userId = $userId;
+	  if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
+		  $this->userId = $user;
+	  } else if ($user instanceof \FIT\NetopeerBundle\Entity\SamlUser) {
+		  $this->samlUserId = $user;
+	  }
   }
 
   /**
@@ -338,7 +350,10 @@ class BaseConnection {
    */
   public function getUserId()
   {
-      return $this->userId;
+	  if ($this->samlUserId !== null) {
+		  return $this->samlUserId;
+	  }
+	  return $this->userId;
   }
 
 
@@ -358,7 +373,7 @@ class BaseConnection {
 		$repository = $this->em->getRepository('FITNetopeerBundle:BaseConnection');
 		$user = $this->securityContext->getToken()->getUser();
 
-		if (!$user instanceof \FIT\NetopeerBundle\Entity\User) {
+		if (!$user instanceof \FIT\NetopeerBundle\Entity\User and !$user instanceof \FIT\NetopeerBundle\Entity\SamlUser) {
 			return 1;
 		}
 
@@ -431,17 +446,27 @@ class BaseConnection {
 		$user = $this->securityContext->getToken()->getUser();
 		$em = $this->em;
 
-		if (!$user instanceof \FIT\NetopeerBundle\Entity\User) {
+		if (!$user instanceof \FIT\NetopeerBundle\Entity\User and !$user instanceof \FIT\NetopeerBundle\Entity\SamlUser) {
 			return false;
 		}
+
+		if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
+			$findArr = array(
+					"id" => $connectedDeviceId,
+					"userId" => $user->getId(),
+			);
+		} else {
+			$findArr = array(
+					"id" => $connectedDeviceId,
+					"samlUserId" => $user->getId(),
+			);
+		}
+
 		try {
 			/**
 			 * @var BaseConnection $device
 			 */
-			$device = $em->getRepository('FITNetopeerBundle:BaseConnection')->findOneBy(array(
-			"id" => $connectedDeviceId,
-			"userId" => $user->getId(),
-			));
+			$device = $em->getRepository('FITNetopeerBundle:BaseConnection')->findOneBy($findArr);
 		} catch (\ErrorException $e) {
 			// we don't care
 		}
@@ -461,7 +486,7 @@ class BaseConnection {
 		$user = $this->securityContext->getToken()->getUser();
 		$em = $this->em;
 
-		if (!$user instanceof \FIT\NetopeerBundle\Entity\User) {
+		if (!$user instanceof \FIT\NetopeerBundle\Entity\User and !$user instanceof \FIT\NetopeerBundle\Entity\SamlUser) {
 			return 1;
 		}
 		try {
@@ -481,4 +506,27 @@ class BaseConnection {
 		}
 		return 1;
 	}
+
+    /**
+     * Set samlUserId
+     *
+     * @param \FIT\NetopeerBundle\Entity\SamlUser $samlUserId
+     * @return BaseConnection
+     */
+    public function setSamlUserId(\FIT\NetopeerBundle\Entity\SamlUser $samlUserId = null)
+    {
+        $this->samlUserId = $samlUserId;
+    
+        return $this;
+    }
+
+    /**
+     * Get samlUserId
+     *
+     * @return \FIT\NetopeerBundle\Entity\SamlUser 
+     */
+    public function getSamlUserId()
+    {
+        return $this->samlUserId;
+    }
 }

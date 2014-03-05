@@ -126,9 +126,7 @@ class AjaxController extends BaseController
 		 */
 			$user = $this->get('security.context')->getToken()->getUser();
 			$this->assign('isProfile', false);
-			if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
-				$this->assign('connectedDevices', $user->getConnectedDevicesInHistory());
-			}
+			$this->assign('connectedDevices', $user->getConnectedDevicesInHistory());
 		} catch (\ErrorException $e) {
 			// we don't care
 		}
@@ -205,9 +203,7 @@ class AjaxController extends BaseController
 		 */
 			$user = $this->get('security.context')->getToken()->getUser();
 			$this->assign('isProfile', true);
-			if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
-				$this->assign('connectedDevices', $user->getConnectedDevicesInProfiles());
-			}
+			$this->assign('connectedDevices', $user->getConnectedDevicesInProfiles());
 		} catch (\ErrorException $e) {
 			// we don't care
 		}
