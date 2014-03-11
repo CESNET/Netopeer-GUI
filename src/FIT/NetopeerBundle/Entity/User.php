@@ -88,7 +88,7 @@ class User implements UserInterface, EquatableInterface {
 
 	/**
 	 * @var UserCustomData
-	 * @ORM\OneToOne(targetEntity="UserCustomData")
+	 * @ORM\OneToOne(targetEntity="UserCustomData", cascade={"all"}, fetch="EAGER")
 	 * @ORM\JoinColumn(name="user_data", referencedColumnName="id")
 	 */
 	protected $customData;
@@ -103,7 +103,6 @@ class User implements UserInterface, EquatableInterface {
 		if (!$this->customData instanceof UserCustomData) {
 			$this->customData  = new UserCustomData();
 		}
-		$this->customData  = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	/**

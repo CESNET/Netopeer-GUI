@@ -27,7 +27,7 @@ security:
             security: false
 
         saml:
-            pattern: ^/
+            pattern: ^/(?!login_check)
             anonymous: true
             aerial_ship_saml_sp:
                 login_path: /saml/sp/login
@@ -86,5 +86,5 @@ security:
         - { path: ^/login/$, roles: IS_AUTHENTICATED_ANONYMOUSLY}
         - { path: ^/saml/sp/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/saml/sp/acs$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/(connections|section|ajax), roles: ROLE_USER}
+        - { path: ^/(login_check|connections|section|ajax), roles: ROLE_USER}
         #- { path: ^/_internal/secure, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
