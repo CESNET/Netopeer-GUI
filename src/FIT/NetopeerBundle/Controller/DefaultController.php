@@ -74,16 +74,30 @@ class DefaultController extends BaseController
 	private $filterForms;
 
 	/**
+	 * @Route("/", name="_home")
+	 *
+	 * @return RedirectResponse
+	 */
+	public function indexAction() {
+		$securityContext = $this->get('security.context');
+		if( $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ){
+			// authenticated REMEMBERED, FULLY will imply REMEMBERED (NON anonymous)
+			return $this->redirect($this->generateUrl('connections'));
+		}
+		return $this->redirect($this->generateUrl('_login'));
+	}
+
+	/**
 	 * Prepares form for connection to the server and table with active connection list
 	 *
-	 * @Route("/", name="_home")
-	 * @Route("/device-{connectedDeviceId}/", name="homeFromHistory")
+	 * @Route("/connections/", name="connections")
+	 * @Route("/connections/device-{connectedDeviceId}/", name="homeFromHistory")
 	 * @Template()
 	 *
 	 * @param int $connectedDeviceId    id of connected device from history
 	 * @return array
 	 */
-	public function indexAction($connectedDeviceId = NULL)
+	public function connectionsAction($connectedDeviceId = NULL)
 	{
 		// DependencyInjection (DI) - defined in Resources/config/services.yml
 		/**
@@ -91,16 +105,16 @@ class DefaultController extends BaseController
 		 */
 		$dataClass = $this->get('DataModel');
 
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'title');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'additionalTitle');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'alerts');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'state');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'config');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'notifications');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'javascripts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'title');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'additionalTitle');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'alerts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'state');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'config');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'leftColumn');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'notifications');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topPart');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'javascripts');
 
 		//TODO: delete only session from refferer
 		$this->getRequest()->getSession()->set('activeNotifications', array());
@@ -324,7 +338,7 @@ class DefaultController extends BaseController
 
 		// if something goes wrong, we will redirect to connections page
 		if ( in_array($command, array("connect", "disconnect", "getschema")) ) {
-			return $this->redirect($this->generateUrl('_home'));
+			return $this->redirect($this->generateUrl('connections'));
 		} else {
 			$url = $this->get('request')->headers->get('referer');
 			return $this->redirect($url);
@@ -485,7 +499,7 @@ class DefaultController extends BaseController
 		if ($dataClass->checkLoggedKeys() === 1) {
 			$url = $this->get('request')->headers->get('referer');
 			if (!strlen($url)) {
-				$url = $this->generateUrl('_home');
+				$url = $this->generateUrl('connections');
 			}
 			return $this->redirect($url);
 		}
@@ -559,7 +573,7 @@ class DefaultController extends BaseController
 				$this->assign('sectionName', $host->host);
 			} else {
 				$this->getRequest()->getSession()->getFlashBag()->add('state error', "You try to load device you are not connected to.");
-				return $this->redirect($this->generateUrl("_home", array()));
+				return $this->redirect($this->generateUrl("connections", array()));
 			}
 
 			// because we do not allow changing layout in section, controls will be hidden

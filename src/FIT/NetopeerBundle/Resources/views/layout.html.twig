@@ -76,7 +76,7 @@ if advised of the possibility of such damage.
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="block--topMenu">
 			{% block topMenu %}
-				<a href="{{ path('_home') }}" title="Home" class="static ico-home header-icon ajaxLink {% if activeAction is defined and activeAction == "home" %}active{% endif %}" data-callback="setIndexActions()"><span></span>Connections</a>
+				<a href="{{ path('connections') }}" title="Home" class="static ico-home header-icon ajaxLink {% if activeAction is defined and activeAction == "home" %}active{% endif %}" data-callback="setIndexActions()"><span></span>Connections</a>
 				{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
 					{% if lockedConn == false %}
 						<a href="{{ path("handleConnection", {"command": "lock", "key": app.request.get('key')} ) }}" title="Lock" class="static ico-unlock header-icon ajaxLink" data-disable-history="true" data-do-not-activate="true"><span></span></a>
@@ -102,7 +102,7 @@ if advised of the possibility of such damage.
 
 				<div id="userpane" class="static">
 					Logged user: <strong>{{ app.user.username }}</strong>
-					{% if is_granted('IS_AUTHENTICATED_FULLY') %}<a href="{{ path('_logout') }}" class="log-out">Log out</a>{% endif %}
+					{% if is_granted('IS_AUTHENTICATED_FULLY') %}<a href="{% if app.user.getTargetedID is defined %}{{ path('aerial_ship_saml_sp.security.logout') }}{% else %}{{ path('_logout') }}{% endif %}" class="log-out">Log out</a>{% endif %}
 				</div>
 
 				<div class="others-cover">
@@ -177,7 +177,7 @@ if advised of the possibility of such damage.
 
 	{% else %}
 		<nav id="block--topMenu">
-				<a href="{{ path('_home') }}" title="Home" id="ico-home"></a>
+				<a href="{{ path('connections') }}" title="Home" id="ico-home"></a>
 		</nav>
 
 		<article id="block--singleContent">

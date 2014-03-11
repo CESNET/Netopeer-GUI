@@ -199,7 +199,7 @@ if advised of the possibility of such damage.
 {% endblock leftColumnAdditional %}
 
 {% block state %}
-	<form action="{{ path('_home') }}" method="post" {{ form_enctype(form) }} class="login">
+	<form action="{{ path('connections') }}" method="post" {{ form_enctype(form) }} class="login">
 		<legend>Connect to server</legend>
 	    {{ form_widget(form) }}
 	    <input type="submit" value="Connect" />

@@ -8,6 +8,9 @@ DirectoryIndex app.php
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    RewriteRule /netconfwebgui/ %{ENV:BASE}/netconfwebgui/login/  [R=301,L]
+    RewriteRule /netconfwebgui/app_dev\.php/ %{ENV:BASE}/netconfwebgui/app_dev.php/login/  [R=301,L]
+
     # Determine the RewriteBase automatically and set it as environment variable.
     # If you are using Apache aliases to do mass virtual hosting or installed the
     # project in a subdirectory, the base path will be prepended to allow proper

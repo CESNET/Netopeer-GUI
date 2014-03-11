@@ -28,7 +28,7 @@ security:
 
         saml:
             pattern: ^/
-            anonymous: false
+            anonymous: true
             aerial_ship_saml_sp:
                 login_path: /saml/sp/login
                 check_path: /saml/sp/acs
@@ -64,13 +64,13 @@ security:
 
                                 # or use builtin SpMetaConfigProvider
                                 # any valid saml name id format or shortcuts: persistent or transient
-                                name_id_format: transient
+                                name_id_format: persistent
                                 binding:
                                     # any saml binding or shortcuts: post or redirect
                                     authn_request: post
                                     logout_request: post
             logout:
-                path: /logout
+                path: /logout/
 
         secured_area:
             pattern:    ^
@@ -83,8 +83,8 @@ security:
                 target: /
 
     access_control:
-        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY}
-        - { path: ^/saml/sp/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/saml/sp/acs, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/, roles: ROLE_USER}
+        - { path: ^/login/$, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+        - { path: ^/saml/sp/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/saml/sp/acs$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/(connections|section|ajax), roles: ROLE_USER}
         #- { path: ^/_internal/secure, roles: IS_AUTHENTICATED_ANONYMOUSLY, ip: 127.0.0.1 }
