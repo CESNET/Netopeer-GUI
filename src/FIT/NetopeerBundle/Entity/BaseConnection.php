@@ -79,6 +79,14 @@ class BaseConnection {
 	protected $id;
 
 	/**
+	* @var UserCustomData
+	*
+	* @ORM\ManyToOne(targetEntity="UserCustomData")
+	* @ORM\JoinColumn(name="customUserData", referencedColumnName="id", onDelete="cascade")
+	*/
+	protected $customUserData;
+
+	/**
 	 * @var string target hostname
 	 *
 	 * @ORM\Column(type="string", length=255)
@@ -98,22 +106,6 @@ class BaseConnection {
 	 * @ORM\Column(type="string", length=100)
 	 */
 	protected $username;
-
-	/**
-	 * @var int   user id
-	 *
-	 * @ORM\ManyToOne(targetEntity="User")
-	 * @ORM\JoinColumn(name="userId", referencedColumnName="id", onDelete="cascade")
-	 */
-	protected $userId;
-
-	/**
-	 * @var int   user id
-	 *
-	 * @ORM\ManyToOne(targetEntity="SamlUser")
-	 * @ORM\JoinColumn(name="samlUserId", referencedColumnName="id", onDelete="cascade")
-	 */
-	protected $samlUserId;
 
 	/**
 	 * @var \DateTime  creation time
@@ -329,35 +321,6 @@ class BaseConnection {
       return $this->enabled;
   }
 
-  /**
-   * Set userId
-   *
-   * @param \FIT\NetopeerBundle\Entity\User|\FIT\NetopeerBundle\Entity\SamlUser $user
-   */
-  public function setUserId($user)
-  {
-	  if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
-		  $this->userId = $user;
-	  } else if ($user instanceof \FIT\NetopeerBundle\Entity\SamlUser) {
-		  $this->samlUserId = $user;
-	  }
-  }
-
-  /**
-   * Get userId
-   *
-   * @return \FIT\NetopeerBundle\Entity\User
-   */
-  public function getUserId()
-  {
-	  if ($this->samlUserId !== null) {
-		  return $this->samlUserId;
-	  }
-	  return $this->userId;
-  }
-
-
-
 
 	/**
 	 * Saves  connection info into DB - for history
@@ -378,7 +341,7 @@ class BaseConnection {
 		}
 
 		$connection = $repository->findOneBy(
-			array('host' => $host, 'port' => $port, 'username' => $username, 'userId' => $user->getId(), 'kind' => $kind)
+			array('host' => $host, 'port' => $port, 'username' => $username, 'customUserData' => $user->getCustomData()->getId(), 'kind' => $kind)
 		);
 
 		try {
@@ -391,7 +354,7 @@ class BaseConnection {
 				$this->setUsername($username);
 
 				$user->addConnection($this, $kind);
-				$this->setUserId($user);
+				$this->setCustomUserData($user->getCustomData());
 
 				$em->persist($this);
 				$em->persist($user);
@@ -450,17 +413,10 @@ class BaseConnection {
 			return false;
 		}
 
-		if ($user instanceof \FIT\NetopeerBundle\Entity\User) {
-			$findArr = array(
-					"id" => $connectedDeviceId,
-					"userId" => $user->getId(),
-			);
-		} else {
-			$findArr = array(
-					"id" => $connectedDeviceId,
-					"samlUserId" => $user->getId(),
-			);
-		}
+		$findArr = array(
+				"id" => $connectedDeviceId,
+				"customUserData" => $user->getCustomData(),
+		);
 
 		try {
 			/**
@@ -507,26 +463,26 @@ class BaseConnection {
 		return 1;
 	}
 
-    /**
-     * Set samlUserId
-     *
-     * @param \FIT\NetopeerBundle\Entity\SamlUser $samlUserId
-     * @return BaseConnection
-     */
-    public function setSamlUserId(\FIT\NetopeerBundle\Entity\SamlUser $samlUserId = null)
-    {
-        $this->samlUserId = $samlUserId;
-    
-        return $this;
-    }
+  /**
+   * Set customUserData
+   *
+   * @param \FIT\NetopeerBundle\Entity\UserCustomData $customUserData
+   * @return BaseConnection
+   */
+  public function setCustomUserData(\FIT\NetopeerBundle\Entity\UserCustomData $customUserData = null)
+  {
+      $this->customUserData = $customUserData;
 
-    /**
-     * Get samlUserId
-     *
-     * @return \FIT\NetopeerBundle\Entity\SamlUser 
-     */
-    public function getSamlUserId()
-    {
-        return $this->samlUserId;
-    }
+      return $this;
+  }
+
+  /**
+   * Get customUserData
+   *
+   * @return \FIT\NetopeerBundle\Entity\UserCustomData
+   */
+  public function getCustomUserData()
+  {
+      return $this->customUserData;
+  }
 }

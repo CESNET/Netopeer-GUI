@@ -81,52 +81,29 @@ class User implements UserInterface, EquatableInterface {
 	protected $password;
 
 	/**
-	 * @var string  string of user roles
-	 * @ORM\Column(type="string", nullable=true)
-	 */
-	protected $roles;
-
-	/**
 	 * @var string  salt for salting password
 	 * @ORM\Column(type="string", length=32)
 	 */
 	protected $salt;
 
 	/**
-	 * @var string  serialized array of UserSettings class
-	 * @ORM\Column(type="array")
+	 * @var UserCustomData
+	 * @ORM\OneToOne(targetEntity="UserCustomData")
+	 * @ORM\JoinColumn(name="user_data", referencedColumnName="id")
 	 */
-	protected $settings;
+	protected $customData;
 
-	/**
-	 * @var array   array of connected devices (from history)
-	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
-	 * @ORM\OrderBy({"accessTime" = "DESC"})
-	 */
-	protected $connectedDevicesInHistory;
 
-	/**
-	 * @var array   array of connected devices (from profiles)
-	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="userId")
-	 * @ORM\OrderBy({"host" = "ASC"})
-	 */
-	protected $connectedDevicesInProfiles;
 
 	/**
 	 * initialize User object and generates salt for password
 	 */
 	public function __construct() {
 		$this->salt = md5(uniqid(null, true));
-		$this->connectedDevicesInHistory = new \Doctrine\Common\Collections\ArrayCollection();
-		$this->connectedDevicesInProfiles = new \Doctrine\Common\Collections\ArrayCollection();
-		$this->settings = new UserSettings();
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getRoles() {
-		return explode(",", $this->roles);
+		if (!$this->customData instanceof UserCustomData) {
+			$this->customData  = new UserCustomData();
+		}
+		$this->customData  = new \Doctrine\Common\Collections\ArrayCollection();
 	}
 
 	/**
@@ -221,16 +198,6 @@ class User implements UserInterface, EquatableInterface {
   }
 
   /**
-   * Set roles
-   *
-   * @param string $roles
-   */
-  public function setRoles($roles)
-  {
-      $this->roles = $roles;
-  }
-
-  /**
    * Set salt
    *
    * @param string $salt
@@ -239,27 +206,6 @@ class User implements UserInterface, EquatableInterface {
   {
       $this->salt = $salt;
   }
-
-	/**
-	 * Set user settings
-	 *
-	 * @param UserSettings $settings
-	 */
-	public function setSettings(UserSettings $settings)
-	{
-		$this->settings = $settings;
-	}
-
-	/**
-	 * Get user settings
-	 *
-	 * @return UserSettings
-	 */
-	public function getSettings()
-	{
-		return $this->settings;
-	}
-
 
 	/**
 	 * don't know, why this method must exist, but some
@@ -273,64 +219,45 @@ class User implements UserInterface, EquatableInterface {
 	}
 
 	/**
+	 * Set user settings
+	 *
+	 * @param UserSettings $settings
+	 */
+	public function setSettings(UserSettings $settings)
+	{
+		$this->customData->setSettings($settings);
+	}
+
+	/**
+	 * Get user settings
+	 *
+	 * @return UserSettings
+	 */
+	public function getSettings()
+	{
+		return $this->customData->getSettings();
+	}
+
+	/**
 	 * Add connection either to history or profile
 	 *
 	 * @param BaseConnection $conn
-	 * @param int $kind   kind of connection
+	 * @param int            $kind kind of connection
 	 */
 	public function addConnection(BaseConnection $conn, $kind)
 	{
-		if ($kind == BaseConnection::$kindProfile) {
-			$this->addConnectionToProfiles($conn);
-		} else if ($kind == BaseConnection::$kindHistory) {
-			$this->addBaseConnection($conn);
-		}
+		$this->customData->addConnection($conn, $kind);
 	}
 
-  /**
-   * Add connectedDevicesInHistory
-   *
-   * @param BaseConnection $connectedDevicesInHistory
-   */
-  public function addBaseConnection(BaseConnection $connectedDevicesInHistory)
-  {
-		$connectedDevicesInHistory->setKind(BaseConnection::$kindHistory);
-    $this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
-  }
-
 	/**
-   * Add connectedDevicesInProfile
-   *
-   * @param BaseConnection $connectedDevicesInProfile
-   */
-  public function addConnectionToProfiles(BaseConnection $connectedDevicesInProfile)
-  {
-	  $connectedDevicesInProfile->setKind(BaseConnection::$kindProfile);
-    $this->connectedDevicesInProfiles[] = $connectedDevicesInProfile;
-  }
-
-	/**
-   * Get connectedDevicesInHistory
-   *
-   * @return \Doctrine\Common\Collections\Collection
-   */
-  public function getConnectedDevicesInHistory()
-  {
-	  $tmpArr = $this->connectedDevicesInHistory;
-	  $arr = array();
-
-	  $max = $this->getSettings()->getHistoryDuration();
-	  $limit = new \DateTime();
-	  $limit->modify('- '.$max.' day');
-	  foreach ($tmpArr as $key => $conn) {
-		  if ($conn->getKind() != BaseConnection::$kindHistory) {
-			  continue;
-		  }
-		  if ($conn->getAccessTime() < $limit) break;
-		  $arr[] = $conn;
-	  }
-    return $arr;
-  }
+	 * Get connectedDevicesInHistory
+	 *
+	 * @return \Doctrine\Common\Collections\Collection
+	 */
+	public function getConnectedDevicesInHistory()
+	{
+		return $this->customData->getConnectedDevicesInHistory();
+	}
 
 	/**
 	 * Get connectedDevicesInProfiles
@@ -339,58 +266,101 @@ class User implements UserInterface, EquatableInterface {
 	 */
 	public function getConnectedDevicesInProfiles()
 	{
-		$arr = $this->connectedDevicesInProfiles;
-		foreach ($arr as $key => $conn) {
-			if ($conn->getKind() != BaseConnection::$kindProfile) {
-				unset($arr[$key]);
-			}
-		}
-		return $arr;
+		return $this->customData->getConnectedDevicesInProfiles();
+	}
+
+	/**
+	 * Add connectedDevicesInHistory
+	 *
+	 * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory
+	 *
+	 * @return User
+	 */
+	public function addConnectedDevicesInHistory(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
+	{
+		$this->customData->addConnectedDevicesInHistory($connectedDevicesInHistory);
+
+		return $this;
+	}
+
+	/**
+	 * Remove connectedDevicesInHistory
+	 *
+	 * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory
+	 */
+	public function removeConnectedDevicesInHistory(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
+	{
+		$this->customData->removeConnectedDevicesInHistory($connectedDevicesInHistory);
+	}
+
+	/**
+	 * Add connectedDevicesInProfiles
+	 *
+	 * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles
+	 *
+	 * @return User
+	 */
+	public function addConnectedDevicesInProfile(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles)
+	{
+		$this->addConnectedDevicesInProfile($connectedDevicesInProfiles);
+
+		return $this;
+	}
+
+	/**
+	 * Remove connectedDevicesInProfiles
+	 *
+	 * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles
+	 */
+	public function removeConnectedDevicesInProfile(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles)
+	{
+		$this->customData->removeConnectedDevicesInProfile($connectedDevicesInProfiles);
+	}
+
+	/**
+	 * Set roles
+	 *
+	 * @param string $roles
+	 *
+	 * @return SamlUser
+	 */
+	public function setRoles($roles)
+	{
+		$this->customData->setRoles($roles);
+
+		return $this;
+	}
+
+	/**
+	 * Get roles
+	 *
+	 * @return string
+	 */
+	public function getRoles()
+	{
+		return $this->customData->getRoles();
 	}
 
     /**
-     * Add connectedDevicesInHistory
+     * Set customData
      *
-     * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory
+     * @param \FIT\NetopeerBundle\Entity\UserCustomData $customData
      * @return User
      */
-    public function addConnectedDevicesInHistory(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
+    public function setCustomData(\FIT\NetopeerBundle\Entity\UserCustomData $customData = null)
     {
-        $this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
+        $this->customData = $customData;
     
         return $this;
     }
 
     /**
-     * Remove connectedDevicesInHistory
+     * Get customData
      *
-     * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory
+     * @return \FIT\NetopeerBundle\Entity\UserCustomData 
      */
-    public function removeConnectedDevicesInHistory(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
+    public function getCustomData()
     {
-        $this->connectedDevicesInHistory->removeElement($connectedDevicesInHistory);
-    }
-
-    /**
-     * Add connectedDevicesInProfiles
-     *
-     * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles
-     * @return User
-     */
-    public function addConnectedDevicesInProfile(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles)
-    {
-        $this->connectedDevicesInProfiles[] = $connectedDevicesInProfiles;
-    
-        return $this;
-    }
-
-    /**
-     * Remove connectedDevicesInProfiles
-     *
-     * @param \FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles
-     */
-    public function removeConnectedDevicesInProfile(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles)
-    {
-        $this->connectedDevicesInProfiles->removeElement($connectedDevicesInProfiles);
+        return $this->customData;
     }
 }

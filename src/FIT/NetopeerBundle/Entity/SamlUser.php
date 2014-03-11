@@ -17,9 +17,9 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function __construct()
 	{
-		$this->connectedDevicesInHistory  = new \Doctrine\Common\Collections\ArrayCollection();
-		$this->connectedDevicesInProfiles = new \Doctrine\Common\Collections\ArrayCollection();
-		$this->settings                   = new UserSettings();
+		if (!$this->customData instanceof UserCustomData) {
+			$this->customData  = new UserCustomData();
+		}
 		$this->setRoles('ROLE_ADMIN');
 	}
 
@@ -84,30 +84,11 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	protected $createdOn;
 
 	/**
-	 * @var string  string of user roles
-	 * @ORM\Column(type="string", nullable=true)
+	 * @var UserCustomData
+	 * @ORM\OneToOne(targetEntity="UserCustomData", cascade={"all"}, fetch="EAGER")
+	 * @ORM\JoinColumn(name="user_data", referencedColumnName="id")
 	 */
-	protected $roles;
-
-	/**
-	 * @var string  serialized array of UserSettings class
-	 * @ORM\Column(type="array")
-	 */
-	protected $settings;
-
-	/**
-	 * @var array   array of connected devices (from history)
-	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="samlUserId")
-	 * @ORM\OrderBy({"accessTime" = "DESC"})
-	 */
-	protected $connectedDevicesInHistory;
-
-	/**
-	 * @var array   array of connected devices (from profiles)
-	 * @ORM\OneToMany(targetEntity="BaseConnection", mappedBy="samlUserId")
-	 * @ORM\OrderBy({"host" = "ASC"})
-	 */
-	protected $connectedDevicesInProfiles;
+	protected $customData;
 
 	/**
 	 * @param int $id
@@ -271,27 +252,6 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	}
 
 	/**
-	 * Set user settings
-	 *
-	 * @param UserSettings $settings
-	 */
-	public function setSettings(UserSettings $settings)
-	{
-		$this->settings = $settings;
-	}
-
-	/**
-	 * Get user settings
-	 *
-	 * @return UserSettings
-	 */
-	public function getSettings()
-	{
-		return $this->settings;
-	}
-
-
-	/**
 	 * don't know, why this method must exist, but some
 	 * error occurred without
 	 *
@@ -303,6 +263,26 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	}
 
 	/**
+	 * Set user settings
+	 *
+	 * @param UserSettings $settings
+	 */
+	public function setSettings(UserSettings $settings)
+	{
+		$this->customData->setSettings($settings);
+	}
+
+	/**
+	 * Get user settings
+	 *
+	 * @return UserSettings
+	 */
+	public function getSettings()
+	{
+		return $this->customData->getSettings();
+	}
+
+	/**
 	 * Add connection either to history or profile
 	 *
 	 * @param BaseConnection $conn
@@ -310,35 +290,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function addConnection(BaseConnection $conn, $kind)
 	{
-		if ($kind == BaseConnection::$kindProfile) {
-			$this->addConnectionToProfiles($conn);
-		} else {
-			if ($kind == BaseConnection::$kindHistory) {
-				$this->addBaseConnection($conn);
-			}
-		}
-	}
-
-	/**
-	 * Add connectedDevicesInHistory
-	 *
-	 * @param BaseConnection $connectedDevicesInHistory
-	 */
-	public function addBaseConnection(BaseConnection $connectedDevicesInHistory)
-	{
-		$connectedDevicesInHistory->setKind(BaseConnection::$kindHistory);
-		$this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
-	}
-
-	/**
-	 * Add connectedDevicesInProfile
-	 *
-	 * @param BaseConnection $connectedDevicesInProfile
-	 */
-	public function addConnectionToProfiles(BaseConnection $connectedDevicesInProfile)
-	{
-		$connectedDevicesInProfile->setKind(BaseConnection::$kindProfile);
-		$this->connectedDevicesInProfiles[] = $connectedDevicesInProfile;
+		$this->customData->addConnection($conn, $kind);
 	}
 
 	/**
@@ -348,21 +300,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function getConnectedDevicesInHistory()
 	{
-		$tmpArr = $this->connectedDevicesInHistory;
-		$arr    = array();
-
-		$max   = $this->getSettings()->getHistoryDuration();
-		$limit = new \DateTime();
-		$limit->modify('- ' . $max . ' day');
-		foreach ($tmpArr as $key => $conn) {
-			if ($conn->getKind() != BaseConnection::$kindHistory) {
-				continue;
-			}
-			if ($conn->getAccessTime() < $limit) break;
-			$arr[] = $conn;
-		}
-
-		return $arr;
+		return $this->customData->getConnectedDevicesInHistory();
 	}
 
 	/**
@@ -372,14 +310,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function getConnectedDevicesInProfiles()
 	{
-		$arr = $this->connectedDevicesInProfiles;
-		foreach ($arr as $key => $conn) {
-			if ($conn->getKind() != BaseConnection::$kindProfile) {
-				unset($arr[$key]);
-			}
-		}
-
-		return $arr;
+		return $this->customData->getConnectedDevicesInProfiles();
 	}
 
 	/**
@@ -391,7 +322,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function addConnectedDevicesInHistory(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
 	{
-		$this->connectedDevicesInHistory[] = $connectedDevicesInHistory;
+		$this->customData->addConnectedDevicesInHistory($connectedDevicesInHistory);
 
 		return $this;
 	}
@@ -403,7 +334,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function removeConnectedDevicesInHistory(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInHistory)
 	{
-		$this->connectedDevicesInHistory->removeElement($connectedDevicesInHistory);
+		$this->customData->removeConnectedDevicesInHistory($connectedDevicesInHistory);
 	}
 
 	/**
@@ -415,7 +346,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function addConnectedDevicesInProfile(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles)
 	{
-		$this->connectedDevicesInProfiles[] = $connectedDevicesInProfiles;
+		$this->addConnectedDevicesInProfile($connectedDevicesInProfiles);
 
 		return $this;
 	}
@@ -427,7 +358,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function removeConnectedDevicesInProfile(\FIT\NetopeerBundle\Entity\BaseConnection $connectedDevicesInProfiles)
 	{
-		$this->connectedDevicesInProfiles->removeElement($connectedDevicesInProfiles);
+		$this->customData->removeConnectedDevicesInProfile($connectedDevicesInProfiles);
 	}
 
 	/**
@@ -439,7 +370,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function setRoles($roles)
 	{
-		$this->roles = $roles;
+		$this->customData->setRoles($roles);
 
 		return $this;
 	}
@@ -451,7 +382,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 */
 	public function getRoles()
 	{
-		return explode(",", $this->roles);
+		return $this->customData->getRoles();
 	}
 
 	/**
@@ -519,5 +450,28 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
     public function getTargetedID()
     {
         return $this->targetedID;
+    }
+
+    /**
+     * Set customData
+     *
+     * @param \FIT\NetopeerBundle\Entity\UserCustomData $customData
+     * @return SamlUser
+     */
+    public function setCustomData(\FIT\NetopeerBundle\Entity\UserCustomData $customData = null)
+    {
+        $this->customData = $customData;
+    
+        return $this;
+    }
+
+    /**
+     * Get customData
+     *
+     * @return \FIT\NetopeerBundle\Entity\UserCustomData 
+     */
+    public function getCustomData()
+    {
+        return $this->customData;
     }
 }
