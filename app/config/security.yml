@@ -72,6 +72,8 @@ security:
             logout:
                 path: /logout/
 
+            context: commont_context
+
         secured_area:
             pattern:    ^
             anonymous:  ~
@@ -81,6 +83,7 @@ security:
             logout:
                 path:   /logout/
                 target: /
+            context: commont_context
 
     access_control:
         - { path: ^/login/$, roles: IS_AUTHENTICATED_ANONYMOUSLY}
