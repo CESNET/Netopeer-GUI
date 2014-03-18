@@ -1,12 +1,15 @@
+/web/bundles/
+/app/bootstrap*
+/app/cache/*
 /app/logs/*
-/app/logs/dev.log
+/vendor/
+/app/config/parameters.yml
 /app/*.db
 /bin/doctrine
 /bin/doctrine.php
 /src/FIT/NetopeerBundle/Resources/public/.sass-cache/
 /src/FIT/NetopeerBundle/Data/models/*
 /src/winzou/*
-/vendor/*
 /web/phpinfo.php
 /web/adminer.php
 /web/css/*
