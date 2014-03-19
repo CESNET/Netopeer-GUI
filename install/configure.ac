@@ -13,6 +13,18 @@ AC_SUBST(USERMAIL)
 RELEASE=1
 AC_SUBST(RELEASE)
 
+if test "x$webguidir" == x; then
+	webguidir=$(cd ..; dirname $PWD)
+fi
+AC_ARG_VAR(webguidir, [Installation directory for webgui [/var/www]])
+AC_SUBST(webguidir)
+
+if test "x$webguiname" == x; then
+	webguiname=$(cd ..; basename $PWD)
+fi
+AC_ARG_VAR(webguiname, [Installation directory name for webgui [netconfwebgui]])
+AC_SUBST(webguiname)
+
 AC_ARG_VAR(httpdmoduledir, [Installation directory for Apache module, leave unset to use Apache default.])
 AC_SUBST(httpdmoduledir)
 
@@ -72,6 +84,7 @@ AM_CONDITIONAL(MAKE_RPMS, test x$RPMBUILD != x)
 
 AC_CONFIG_SUBDIRS(mod_netconf)
 AC_CONFIG_FILES([Makefile
+		netopeergui.conf
 		pyang/Makefile])
 AC_OUTPUT
 
@@ -102,6 +115,5 @@ echo "  webgui dir...........: $webguidir"
 echo "  webgui name..........: $webguiname"
 echo "  httpdmoduledir.......: $(test -z "$httpdmoduledir" && echo "Apache default path" || echo "$httpdmoduledir")"
 echo "  httpdconfddir........: $(test -z "$httpdconfddir" && echo "Apache default path" || echo "$httpdconfddir")"
-echo "  run composer install.: $composerinstall"
 echo
 

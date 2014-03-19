@@ -16,6 +16,11 @@ RPMDIR = RPMBUILD
 dist-hook:
 	find "$(distdir)" -name .gitignore -exec rm {} \;
 
+install-data-hook:
+	[ -e "$(httpdconfddir)" ] || mkdir -p "$(httpdconfddir)"; \
+	[ -e "$(httpdconfddir)/$(webguiname).conf" ] && mv "$(httpdconfddir)/$(webguiname).conf" "$(httpdconfddir)/$(webguiname).conf.back"; \
+	cp netopeergui.conf $(httpdconfddir)/$(webguiname).conf;
+
 if MAKE_RPMS
 
 RPMFILENAME=$(PACKAGE_NAME)-$(VERSION)
