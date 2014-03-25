@@ -1,7 +1,5 @@
-ACLOCAL_AMFLAGS = -I m4
-
 if MODNETCONF_OPT
-  MODNETCONF_OPT=apache/src
+  MODNETCONF_OPT=mod_netconf
 else
   MODNETCONF_OPT=
 endif
@@ -10,18 +8,18 @@ if PYANG_OPT
 else
   PYANG_OPT=
 endif
-if WEBGUI_OPT
-  WEBGUI_OPT=symfony_gui
-else
-  WEBGUI_OPT=
-endif
 
-SUBDIRS=$(WEBGUI_OPT) $(MODNETCONF_OPT) $(PYANG_OPT)
+SUBDIRS=$(MODNETCONF_OPT) $(PYANG_OPT)
 
 RPMDIR = RPMBUILD
 
 dist-hook:
 	find "$(distdir)" -name .gitignore -exec rm {} \;
+
+install-data-hook:
+	[ -e "$(httpdconfddir)" ] || mkdir -p "$(httpdconfddir)"; \
+	[ -e "$(httpdconfddir)/$(webguiname).conf" ] && mv "$(httpdconfddir)/$(webguiname).conf" "$(httpdconfddir)/$(webguiname).conf.back"; \
+	cp netopeergui.conf $(httpdconfddir)/$(webguiname).conf;
 
 if MAKE_RPMS
 
