@@ -43,6 +43,7 @@
  */
 namespace FIT\NetopeerBundle\Models;
 
+use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use FIT\NetopeerBundle\Models\Data as Data;
 use Symfony\Component\Finder\Finder;
@@ -717,6 +718,7 @@ class XMLoperations {
 		try {
 			$simpleXMLRes = simplexml_load_string($xmlString);
 		} catch (\ErrorException $e) {
+			$e = null;
 			// Exception will be handled bellow
 		}
 		if ( (isset($simpleXMLRes) && $simpleXMLRes === false) || $e !== false) {
