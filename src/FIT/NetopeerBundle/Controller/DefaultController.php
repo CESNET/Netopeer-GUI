@@ -252,7 +252,11 @@ class DefaultController extends BaseController
 
 		//reconstructs a routing path and gets a routing array called $route_params
 		if ($this->getRequest()->isXmlHttpRequest()) {
-			$this->getRequest()->getSession()->set('isAjax', true);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'alerts');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
+			return $this->getTwigArr();
 		}
 
 		$url = $this->getRequest()->headers->get('referer');

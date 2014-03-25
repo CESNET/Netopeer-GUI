@@ -837,7 +837,7 @@ class Data {
 			return 1;
 		}
 
-		return $this->checkDecodedData($decoded);
+		return $decoded;
 	}
 
 	/**
@@ -1665,7 +1665,7 @@ XML;
 		$path = $schparams["path"];
 
 		$res = @system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$this->getModelsDir()."\"");
-		$this->logger->addInfo("Process schema result (Pyang console): ", array('res' => var_export($res, true)));
+//		$this->logger->addInfo("Process schema result (Pyang console): ", array('res' => $res));
 		return 1;
 	}
 
