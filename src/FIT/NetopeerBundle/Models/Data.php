@@ -834,9 +834,10 @@ class Data {
 			/* error occurred, unexpected response */
 			$this->logger->addError("Could get reload hello.", array("error" => var_export($decoded, true)));
 			$session->getFlashBag()->add('error', "Could not reload device informations.");
+			return 1;
 		}
 
-		return $decoded;
+		return $this->checkDecodedData($decoded);
 	}
 
 	/**
@@ -1637,7 +1638,8 @@ XML;
 
 		if (file_exists($path)) {
 			/* already exists */
-			return 1;
+			$schparams["path"] = $path;
+			return -1;
 		}
 
 		if ($this->handle("getschema", $schparams, false, $data) == 0) {
@@ -1646,7 +1648,7 @@ XML;
 			$schparams["path"] = $path;
 			return 0;
 		} else {
-			$this->container->get('request')->getSession()->getFlashBag()->add('error', 'Getting model failed.');
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', 'Getting models failed.');
 			return 1;
 		}
 		return 0;
@@ -1662,7 +1664,8 @@ XML;
 	{
 		$path = $schparams["path"];
 
-		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$this->getModelsDir()."\"");
+		$res = @system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$this->getModelsDir()."\"");
+		$this->logger->addInfo("Process schema result (Pyang console): ", array('res' => var_export($res, true)));
 		return 1;
 	}
 
@@ -1675,9 +1678,6 @@ XML;
 	 */
 	public function updateLocalModels($key)
 	{
-		$schemaData = AjaxSharedData::getInstance();
-		$schemaData->setDataForKey($key, 'isInProgress', true);
-
 		$ns = "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
 		$params = array(
 			'key' => $key,
@@ -1689,15 +1689,13 @@ XML;
 			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 			if ($xml === false) {
 				/* invalid message received */
-				$schemaData->setDataForKey($key, 'isInProgress', false);
-				$schemaData->setDataForKey($key, 'status', "error");
-				$schemaData->setDataForKey($key, 'message', "Getting the list of schemas failed.");
+				$this->container->get('request')->getSession()->getFlashBag()->add('error', 'Getting the list of schemas failed.');
 				return;
 			}
 			$xml->registerXPathNamespace("xmlns", $ns);
 			$schemas = $xml->xpath("//xmlns:schema");
 
-			$this->addLog("Trying to find models for namespaces: ", array('namespaces', var_export($schemas)));
+			$this->logger->addInfo("Trying to find models for namespaces: ", array('namespaces' => var_export($schemas, true)));
 
 			$list = array();
 			$lock = sem_get(12345678, 1, 0666, 1);
@@ -1711,27 +1709,26 @@ XML;
 				if (file_exists($this->getModelsDir()."/$ident")) {
 					$this->addLog("Model found, skipping: ", array('ident', $ident));
 					continue;
+				} else if ($this->getschema($schparams, $ident) == -1) {
+					$this->logger->addInfo("Get schema file found, but no models.", array("ident" => $ident));
+					$list[] = $schparams;
 				} else if ($this->getschema($schparams, $ident) == 1) {
-					//break; /* not get the rest on error */
+					continue; // get schema failed, skipping
 				} else {
 					$list[] = $schparams;
 				}
 			}
 			sem_release($lock);
 
-			$this->addLog("Not found models for namespaces: ", array('namespaces', var_export($list)));
 
 			/* non-critical - only models, that I downloaded will be processed, others already exist */
 			foreach ($list as $schema) {
 				$this->processSchema($schema);
 			}
-			$schemaData->setDataForKey($key, 'status', "success");
-			$schemaData->setDataForKey($key, 'message', "Configuration data models were updated.");
+			$this->container->get('request')->getSession()->getFlashBag()->add('success', 'Configuration data models were updated.');
 		} else {
-			$schemaData->setDataForKey($key, 'status', "error");
-			$schemaData->setDataForKey($key, 'message', "Getting the list of schemas failed.");
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', 'Getting the list of schemas failed.');
 		}
-		$schemaData->setDataForKey($key, 'isInProgress', false);
 	}
 
 	/**
