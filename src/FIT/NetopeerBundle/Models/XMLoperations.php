@@ -716,7 +716,7 @@ class XMLoperations {
 	public function isResponseValidXML(&$xmlString) {
 		$e = false;
 		try {
-			$simpleXMLRes = simplexml_load_string($xmlString);
+			@$simpleXMLRes = simplexml_load_string($xmlString);
 		} catch (\ErrorException $e) {
 			$e = null;
 			// Exception will be handled bellow
