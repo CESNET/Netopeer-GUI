@@ -43,6 +43,7 @@
  */
 namespace FIT\NetopeerBundle\Models;
 
+use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use FIT\NetopeerBundle\Models\Data as Data;
 use Symfony\Component\Finder\Finder;
@@ -753,7 +754,7 @@ class XMLoperations {
 public function isResponseValidXML(&$xmlString) {
 	$e = false;
 	try {
-		$simpleXMLRes = simplexml_load_string($xmlString);
+		@$simpleXMLRes = simplexml_load_string($xmlString);
 	} catch (\ErrorException $e) {
 		// Exception will be handled bellow
 	}
@@ -762,7 +763,7 @@ public function isResponseValidXML(&$xmlString) {
 		// we will check, if is not XML valid with root node
 		$xmlString = "<root>".$xmlString."</root>";
 		try {
-			$simpleXMLRes = simplexml_load_string($xmlString);
+			@$simpleXMLRes = simplexml_load_string($xmlString);
 		} catch (\ErrorException $e) {
 			return 0;
 		}

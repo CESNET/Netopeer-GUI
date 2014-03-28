@@ -1,0 +1,3 @@
+[submodule "install/mod_netconf"]
+	path = install/mod_netconf
+	url = https://github.com/CESNET/mod_netconf.git

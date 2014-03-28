@@ -238,22 +238,35 @@ class DefaultController extends BaseController
 	 */
 	public function reloadDeviceAction($key)
 	{
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
 		$dataClass = $this->get('DataModel');
 
 		/* reload hello message */
 		$params = array('key' => $key);
-		$dataClass->handle("reloadhello", $params);
+		if (($res = $dataClass->handle("reloadhello", $params) == 0)) {
+
+		}
 
 		$dataClass->updateLocalModels($key);
 		$dataClass->invalidateMenuStructureForKey($key);
 
 		//reconstructs a routing path and gets a routing array called $route_params
-		$url = $this->get('request')->headers->get('referer');
 		if ($this->getRequest()->isXmlHttpRequest()) {
-			$this->getRequest()->getSession()->set('isAjax', true);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'alerts');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
+			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
+			return $this->getTwigArr();
 		}
 
-		return new RedirectResponse($url);
+		$url = $this->getRequest()->headers->get('referer');
+		if ($url) {
+			return new RedirectResponse($url);
+		} else {
+			return new RedirectResponse($this->generateUrl('section', array('key' => $key)));
+		}
 	}
 
 	/**
@@ -372,10 +385,8 @@ class DefaultController extends BaseController
 			$this->assign("stateArr", $xml);
 			$this->assign('hideStateSubmitButton', true);
 		} else if ($action == "reload") {
-			echo "Reload info page";
 			$params = array('key' => $key);
-			var_dump($dataClass->handle("reloadhello", $params));
-			die();
+			$dataClass->handle("reloadhello", $params);
 		}
 
 		$this->assign('singleColumnLayout', true);
