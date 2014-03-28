@@ -822,7 +822,7 @@ public function completeAttributes(&$source, &$target) {
 		if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
 			foreach ($source->attributes() as $key => $val) {
 				try {
-					$target->addAttribute($key, $val);
+					@$target->addAttribute($key, $val);
 				} catch (\ErrorException $e) {
 //					$this->logger->addWarning('Error in adding attributes: ', array('error' => $e->getMessage()));
 				}
