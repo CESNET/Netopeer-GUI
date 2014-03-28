@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 # nmp.sh : create process YIN/YANG data model for Netopeer GUI
-# Copyright (C) 2012
-# Author(s): Tomas Cejka  <cejkato2@fit.cvut.cz>
+# Copyright (C) 2012,2013,2014
+# Author(s): Tomas Cejka  <cejkato2@fit.cvut.cz>, <cejkat@cesnet.cz>
 #
 # LICENSE TERMS
 #
@@ -125,6 +125,9 @@ else
 	mkdir -p "$MODELDIR"
 	pyang -f nmp --nmp-genrpc  --nmp-outputdir "$MODELDIR" "$INPUTFILE" > /dev/null&
 	#pyang -f nmp --nmp-genrpc  --nmp-outputdir "$MODELDIR" --nmp-hostname "$HOST" --nmp-username "$USERNAME" --nmp-port "$PORT" "$INPUTFILE" > /dev/null
+
+        # generate element tree from model
+        pyang -f tree -o "$MODELDIR/tree.txt" "$INPUTFILE" > /dev/null&
 
 	# generate wrapped form
 	pyang -f wyin -o "$MODELDIR/wrapped.wyin" "$INPUTFILE" > /dev/null&
