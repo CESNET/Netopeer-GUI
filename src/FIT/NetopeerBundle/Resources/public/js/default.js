@@ -36,6 +36,7 @@
 
 var formChangeAlert = 'Some of form values has been changed. Do you want discard and go to another page?';
 var gmright, gmleft, gnotWidth;
+var typeaheadALLconst = '__ALL__';
 
  $(document).ready(function() {
 	initJS();
@@ -658,7 +659,7 @@ function createNode($elem) {
 			'data-parrent-xPath': encodeURIComponent(parentXPath)
 		}).typeahead({
 			minLength: 0,
-			items: 15,
+			items: 9999,
 			source: function(query, process) {
 				$.ajax({
 					url: sourceUrl,
@@ -668,9 +669,17 @@ function createNode($elem) {
 					type: "GET",
 					dataType: "json",
 					success: function(data){
-						return process(data);
+						process(data);
 					}
 				})
+			},
+			matcher: function(item) {
+				if (this.query == typeaheadALLconst) {
+					return true;
+				} else if (item.toLowerCase().indexOf(this.query.trim().toLowerCase()) != -1) {
+					return true;
+				}
+				return false;
 			}
 	}).change(function() {
 		var $currentInput = $(this);
@@ -723,6 +732,10 @@ function createNode($elem) {
 				}
 			}
 		});
+	}).on('focus', function() {
+		$(this).val(typeaheadALLconst);
+		$(this).typeahead('lookup');
+		$(this).val('');
 	});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 
@@ -824,6 +837,9 @@ function createNode($elem) {
 	if (!disableScrolling) {
 		scrollToGeneratedForm($elem, $form);
 	}
+
+	// finally focus on new created elem
+	$coverDiv.find('input.label').focus();
 }
 
 function formInputChangeConfirm(showDialog) {
