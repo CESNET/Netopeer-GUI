@@ -256,7 +256,8 @@ class DefaultController extends BaseController
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
-			return $this->getTwigArr();
+			ob_clean();
+			$this->getRequest()->getSession()->set('isAjax', true);
 		}
 
 		$url = $this->getRequest()->headers->get('referer');

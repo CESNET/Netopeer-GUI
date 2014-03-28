@@ -784,7 +784,7 @@ class XMLoperations {
 			$attrs = $source->attributes();
 			if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
 				foreach ($source->attributes() as $key => $val) {
-					$target->addAttribute($key, $val);
+					@$target->addAttribute($key, $val);
 				}
 			}
 		}

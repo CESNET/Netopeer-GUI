@@ -146,9 +146,13 @@ function loadAjaxLink(e, $THIS, href, type, data) {
 		data: data,
 		type: type,
 		success: function(data, textStatus, jqXHR) {
+//			l('succ');
 			successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
 		},
-		error: function() {
+		error: function(qXHR, textStatus, errorThrown) {
+//			l(qXHR);
+//			l(textStatus);
+//			l(errorThrown);
 			window.location.href = href;
 		}
 	});
