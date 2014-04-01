@@ -230,7 +230,7 @@ class XMLoperations {
 
 				// save to temp file - for debugging
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $configXml->asXml());
+					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $configXml->asXml());
 				}
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
@@ -257,7 +257,7 @@ class XMLoperations {
 
 				// for debugging, edited configXml will be saved into temp file
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/edited.yin', $configXml->asXml());
+					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/edited.yin', $configXml->asXml());
 				}
 
 				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source']);
@@ -324,7 +324,7 @@ class XMLoperations {
 
 				// save to temp file - for debugging
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
+					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
 				}
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
@@ -378,7 +378,7 @@ class XMLoperations {
 
 				// for debugging, edited configXml will be saved into temp file
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/newElem.yin', $createTree->asXml());
+					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/newElem.yin', $createTree->asXml());
 				}
 				$res = $this->executeEditConfig($key, $createTree->asXml(), $configParams['source']);
 
