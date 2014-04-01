@@ -613,7 +613,7 @@ class XMLoperations {
 
 				// save to temp file - for debugging
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
+					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/original.yin', $tmpConfigXml->asXml());
 				}
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
@@ -636,7 +636,7 @@ class XMLoperations {
 
 				// for debugging, edited configXml will be saved into temp file
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
-					file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/removeNode.yin', $tmpConfigXml->asXml());
+					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/removeNode.yin', $tmpConfigXml->asXml());
 				}
 				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml(), $configParams['source']);
 				if ($res == 0) {
@@ -674,7 +674,7 @@ class XMLoperations {
 		if ( ($merged = $this->dataModel->handle('editconfig', $editConfigParams)) != 1 ) {
 			// for debugging purposes, we will save result into the temp file
 			if ($this->container->getParameter('kernel.environment') == 'dev') {
-				file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/merged.yin', $merged);
+				@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/merged.yin', $merged);
 			}
 		} else {
 			$this->logger->err('Edit-config failed.', array('params', $editConfigParams));

@@ -102,6 +102,8 @@ if advised of the possibility of such damage.
 					{% if isEmptyModule is defined and isEmptyModule == true %}
 
 						{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
+					{% elseif showRootElem is defined and showRootElem == true %}
+						{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
 					{% endif %}
 
 					{% set iterator = 1 %}

@@ -590,6 +590,8 @@ class DefaultController extends BaseController
 				if ($xml->count() == 0) {
 					$isEmptyModule = true;
 					$this->assign('isEmptyModule', $isEmptyModule);
+				} else {
+					$this->assign('showRootElem', true);
 				}
 
 				$this->assign("stateArr", $xml);
@@ -628,6 +630,7 @@ class DefaultController extends BaseController
 	public function createEmptyModuleAction($key) {
 		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'title');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'state');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'alerts');
 		$this->assign('historyHref', $this->getRequest()->getRequestUri());
 		$this->assign('key', $key);
 
@@ -659,7 +662,14 @@ class DefaultController extends BaseController
 	 */
 	private function setEmptyModuleForm($key) {
 		$dataClass = $this->get("DataModel");
-		$arr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
+		$tmpArr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
+
+		// use small hack when appending space at the end of key, which will fire all options in typeahead
+		if (!empty($tmpArr)) {
+			foreach ($tmpArr as $key => $item) {
+				$tmpArr[$key . " "] = $item;
+			}
+		}
 
 		$form = $this->createFormBuilder()
 				->add('name', 'text', array(
@@ -670,7 +680,8 @@ class DefaultController extends BaseController
 								'attr' => array(
 										'class' => 'typeaheadNS',
 										'data-provide' => 'typeahead',
-										'data-source' => json_encode(array_keys($arr))
+										'data-source' => !empty($tmpArr) ? json_encode(array_keys($tmpArr)) : '',
+								    'data-min-length' => 0
 								)
 						))
 				->getForm();
@@ -1000,6 +1011,8 @@ class DefaultController extends BaseController
 					$this->assign('additionalForm', $html);
 				} elseif ($xml->count() == 0) {
 					$this->assign('isEmptyModule', true);
+				} else {
+					$this->assign('showRootElem', true);
 				}
 
 				$this->assign("configArr", $xml);

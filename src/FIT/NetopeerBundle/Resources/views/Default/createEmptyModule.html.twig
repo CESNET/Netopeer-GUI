@@ -53,5 +53,17 @@ if advised of the possibility of such damage.
 		<input type="submit" value="Create" class="button left" />
 	</form>
 
+	<script type="text/javascript">
+		$(document).ready(function() {
+			$(".typeaheadNS").on('focus', function() {
+				$(this).val(' ');
+				$(this).typeahead('lookup');
+				$(this).val('');
+			}).on('change', function() {
+				$(this).val($.trim($(this).val()));
+			});
+		});
+	</script>
+
 {% endblock singleContent %}
 {% endblock state %}
