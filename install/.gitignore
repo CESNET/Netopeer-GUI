@@ -1,0 +1,15 @@
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache/
+config.guess
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+missing
+netopeergui.conf
+pyang/Makefile
+pyang/Makefile.in
