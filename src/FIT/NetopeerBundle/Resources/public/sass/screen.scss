@@ -51,7 +51,6 @@ $cComp2Light: 			#804B00;
 $cComp2Dark: 			#341E00;
 $cAlert:				#820101;
 $cGreen:				#007711;
-
 $cFont: 				#333;
 
 // basic sizes
@@ -259,6 +258,7 @@ body section { float: left; width: 50%; min-height: 100%; padding: $sContentPadd
 		&.hover { background-color: #dadada; border-color: #aaa; }
 		&.is-root-elem { border-left: 0px none !important; border-right: 0px none !important;  margin-bottom: 15px !important;
 			.dots, .dash { display: none; }
+			.edit-bar .sibling { display: none; }
 		}
 		.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
 		.value { width: 59%; float: left; color: #000; margin-left: 2%; }
