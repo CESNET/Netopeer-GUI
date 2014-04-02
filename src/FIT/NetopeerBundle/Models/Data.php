@@ -1670,9 +1670,9 @@ XML;
 	{
 		$path = $schparams["path"];
 
-		@system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$this->getModelsDir()."\"");
+		$res = @system(__DIR__."/../bin/nmp.sh -i \"$path\" -o \"".$this->getModelsDir()."\"");
 		ob_clean();
-//		$this->logger->addInfo("Process schema result (Pyang console): ", array('res' => $res));
+		$this->logger->addInfo("Process schema result (Pyang console): ", array('path' => $path, 'modelDir' => $this->getModelsDir(), 'res' => $res));
 		return 1;
 	}
 
