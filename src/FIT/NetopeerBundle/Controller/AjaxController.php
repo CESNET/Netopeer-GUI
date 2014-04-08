@@ -102,8 +102,8 @@ class AjaxController extends BaseController
 		}
 
 		$data = $schemaData->getDataForKey($key);
-		$result['status'] = $data['status'];
-		$result['message'] = $data['message'];
+		$flashes = $this->getRequest()->getSession()->getFlashBag()->all();
+		$result['message'] = $flashes;
 		$result['key'] = $key;
 
 		return new Response(json_encode($result));
@@ -154,11 +154,9 @@ class AjaxController extends BaseController
 		$result = array();
 		$result['result'] = $baseConn->removeDeviceWithId($connectionId);
 		if ($result['result'] == 0) {
-			$result['status'] = "success";
-			$result['message'] = "Device has been removed.";
+			$result['message'] = array('success' => array("Device has been removed."));
 		} else {
-			$result['status'] = "error";
-			$result['message'] = "Could not remove device from the list.";
+			$result['message'] = array('error' => array("Could not remove device from the list."));
 		}
 		return new Response(json_encode($result));
 	}
@@ -181,11 +179,9 @@ class AjaxController extends BaseController
 		$result = array();
 		$result['result'] = $baseConn->saveConnectionIntoDB($conn->getHost(), $conn->getPort(), $conn->getUsername(), $baseConn::$kindProfile);
 		if ($result['result'] === 0) {
-			$result['status'] = "success";
-			$result['message'] = "Device has been added into profiles.";
+			$result['message'] = array('success' => array("Device has been added into profiles."));
 		} else {
-			$result['status'] = "error";
-			$result['message'] = "Could not add device into profiles.";
+			$result['message'] = array('error' => array("Could not add device into profiles."));
 		}
 
 		return new Response(json_encode($result));

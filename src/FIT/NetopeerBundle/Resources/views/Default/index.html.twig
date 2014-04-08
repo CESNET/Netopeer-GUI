@@ -55,7 +55,7 @@ if advised of the possibility of such damage.
 					targetConfigure.find(".loading").remove();
 					targetConfigure.find("> a").show();
 					if (dataArr['message']) {
-						var flash = prepareFlashMessage(dataArr['status'], dataArr['message']);
+						var flash = prepareFlashMessage(dataArr['message']);
 						$("#block--alerts").append($(flash));
 					}
 					reloadHistoryOfConnectedDevices();
@@ -81,14 +81,22 @@ if advised of the possibility of such damage.
 			setLeftPaneHeight();
 		});
 
-		function prepareFlashMessage(status, message) {
-			var flashMessage = $("<div/>", {
-				"class": "message " + status
+		function prepareFlashMessage(message) {
+			var flashMessages = $("<div/>");
+			$.each(message, function(status, messArr) {
+				$.each(messArr, function(key, mess) {
+					var flashMessage = $("<div/>", {
+						"class": "message " + status
+					});
+					flashMessage.text(mess);
+					flashMessage.prepend($("<span/>").addClass('circle'));
+					flashMessage.prepend($("<span/>").addClass('close').text('X'));
+
+					flashMessage.appendTo($(flashMessages));
+				});
 			});
-			flashMessage.text(message);
-			flashMessage.prepend($("<span/>").addClass('circle'));
-			flashMessage.prepend($("<span/>").addClass('close').text('X'));
-			return flashMessage;
+
+			return flashMessages.html();
 		}
 
 		function setLeftPaneHeight() {
@@ -112,7 +120,7 @@ if advised of the possibility of such damage.
 						}
 					}
 					if (jsonArr['message']) {
-						var flash = prepareFlashMessage(jsonArr['status'], jsonArr['message']);
+						var flash = prepareFlashMessage(jsonArr['message']);
 						$("#block--alerts").append($(flash));
 					}
 				});
