@@ -119,6 +119,13 @@ if advised of the possibility of such damage.
 					{% endif %}
 				</div>
 			</form>
+			{% if modelTreeDump is defined %}
+			<div id="hiddenModelTreeDump">
+<pre>
+{{ modelTreeDump|raw }}
+</pre>
+			</div>
+			{% endif %}
 		{% else %}
 			<div class="alert info">
 				No results found.

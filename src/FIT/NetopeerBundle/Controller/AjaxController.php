@@ -347,6 +347,7 @@ class AjaxController extends BaseController
 	 * @param $key
 	 * @param $target
 	 * @param $module
+	 * @return array
 	 */
 	public function validateSource($key, $target, $module)
 	{

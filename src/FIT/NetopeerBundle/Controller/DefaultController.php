@@ -601,6 +601,12 @@ class DefaultController extends BaseController
 			$this->getRequest()->getSession()->getFlashBag()->add('state error', "Could not parse filter correctly. ");
 		}
 
+		// load model tree dump
+		$modelTree = $dataClass->getModelTreeDump($module);
+		if ($modelTree) {
+			$this->assign('modelTreeDump', $modelTree);
+		}
+
 		// we will load config part only if two column layout is enabled or we are on section (which has two column always)
 		$tmp = $this->getConfigParams();
 		if ($module == null || ($module != null && $tmp['source'] !== "running" && !$isEmptyModule)) {

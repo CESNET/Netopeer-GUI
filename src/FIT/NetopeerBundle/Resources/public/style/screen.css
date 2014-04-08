@@ -995,6 +995,13 @@ body section #block--sourceValidation .source-validation {
   -o-border-radius: 5px;
   border-radius: 5px; }
 
+#hiddenModelTreeDump {
+  display: none; }
+
+pre {
+  font-family: "Courier New", Courier, monospace;
+  line-height: 1.4em; }
+
 body section, #block--singleContent {
   position: relative;
   -webkit-box-sizing: border-box;
@@ -1298,6 +1305,18 @@ form.generatedForm input[type="submit"] {
 form.generatedForm .close {
   float: left;
   margin-left: 15px; }
+form.generatedForm #modelTreeDump {
+  display: none;
+  width: 94%;
+  overflow: hidden;
+  clear: both;
+  padding: 15px 3%;
+  background: #f0f0f0;
+  border-top: 1px solid #ccc; }
+form.generatedForm .model-tree-opener {
+  float: right;
+  margin: 25px 25px 0px 0px;
+  cursor: pointer; }
 
 article#block--singleContent #login-hp {
   padding: 100px 0px 0px 0px; }

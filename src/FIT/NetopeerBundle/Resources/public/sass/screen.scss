@@ -335,6 +335,10 @@ body section { float: left; width: 50%; min-height: 100%; padding: $sContentPadd
 }
 .configure .loading { background: url($img + "loading-bar.gif") repeat-x; display:block; height: 20px; line-height: 20px; color: #fff; padding: 0px 3%; width: 94%; border: 1px solid darken($cBase, 10%); @include border-radius(5px); }
 
+// model tree dump
+#hiddenModelTreeDump { display: none; }
+pre { font-family: "Courier New", Courier, monospace; line-height: 1.4em; }
+
 body section, #block--singleContent { position: relative; @include box-sizing(border-box);
 	h1, h2, h3, h4, legend { font-family: $fHeadings; color: $cBase; }
 	h1 { font-size: 1.9em; margin: 20px 0px 15px 0px; }
@@ -433,13 +437,16 @@ form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 
 	}	
 	input[type="submit"] { float: right; margin-right: 15px; }
 	.close { float: left; margin-left: 15px; }
+
+	#modelTreeDump { display: none; width: 94%; overflow: hidden; clear: both; padding: 15px 3%; background: #f0f0f0; border-top: 1px solid #ccc; }
+	.model-tree-opener { float: right; margin: 25px 25px 0px 0px; cursor: pointer; }
 }
 
 article#block--singleContent #login-hp { padding: 100px 0px 0px 0px;
 	.alert { margin-bottom: 0px; }
 }
 
-table { width: 100%; margin: 15px 0px; 
+table { width: 100%; margin: 15px 0px;
 	th, td { border: 1px solid #ccc; padding: 8px 15px; }
 	tr:nth-child(even) {
 		th, td { background: #eaeaea; }

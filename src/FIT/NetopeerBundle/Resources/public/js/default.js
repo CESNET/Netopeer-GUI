@@ -456,15 +456,7 @@ function generateNode($elem) {
 }
 
 function createFormUnderlay($elem) {
-	var $cover;
-	// find cover - if we are on state, it would be state column, or we could be on config
-	if ($elem.parents('section').length) {
-		$cover = $elem.parents('section');
-
-	// or we have single column layout
-	} else {
-		$cover = $("#content");
-	}
+	var $cover = findFormUnderlayCover($elem);
 
 	// if form-underlay already exists, will be removed
 	if ( $cover.find(".form-underlay").length === 0 ) {
@@ -473,16 +465,7 @@ function createFormUnderlay($elem) {
 		$cover.append($("<div>").addClass('form-underlay'));
 		$cover.append($("<div>").addClass('form-cover'));
 
-		// we have to count new dimensions for new form-underlay
-		// and fill it over whole cover part
-		var nWidth = $cover.outerWidth(),
-			nHeight = $cover[0].scrollHeight + $elem.parent().parent().parent().outerHeight() + 150; // 150 px for buttons
-
-		// we have to set form to fill cover (from top)
-		$cover.find(".form-underlay").width(nWidth).height(nHeight).css({
-			'margin-top': 0,
-			'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
-		});
+		recountFormUnderlayDimensions($cover);
 
 		$cover.find(".form-underlay").click(function() {
 
@@ -490,6 +473,33 @@ function createFormUnderlay($elem) {
 	}
 
 	return $cover;
+}
+
+function findFormUnderlayCover($elem) {
+	// find cover - if we are on state, it would be state column, or we could be on config
+	if ($elem.parents('section').length) {
+		return $elem.parents('section');
+
+		// or we have single column layout
+	} else {
+		return $("#content");
+	}
+}
+
+function recountFormUnderlayDimensions($cover, minusHeight) {
+	if (minusHeight == undefined) {
+		minusHeight = 0;
+	}
+	// we have to count new dimensions for new form-underlay
+	// and fill it over whole cover part
+	var nWidth = $cover.outerWidth(),
+		nHeight = $cover[0].scrollHeight - minusHeight;
+
+	// we have to set form to fill cover (from top)
+	$cover.find(".form-underlay").width(nWidth).height(nHeight).css({
+		'margin-top': 0,
+		'margin-left': 0 - parseInt($cover.css('padding-left'), 10)
+	});
 }
 
 function findLevelValue($elem) {
@@ -535,6 +545,9 @@ function generateFormObject(formName) {
 			type: 'hidden',
 			name: 'formId',
 			value: new Date().getTime()
+		}));
+		$form.append($("<div/>", {
+			'id': 'modelTreeDump'
 		}));
 	}
 
@@ -651,6 +664,8 @@ function unwrapCoverForm($currentParentLevel, $cover) {
 	$oldForm.html('');
 	$cover.prepend($oldForm);
 	$currentParentLevel.parents('form').children('.root').unwrap();
+
+	recountFormUnderlayDimensions($cover);
 }
 
 function l (str) {
@@ -877,6 +892,29 @@ function createNode($elem) {
 	// create submit and close button
 	createSubmitButton($form, "Create new node");
 	createCloseButton($cover, $form);
+
+	// reload content of model dump tree
+	if ($("#hiddenModelTreeDump").length) {
+		if (!$(".model-tree-opener").length) {
+			var $modelOpener = $("<a/>", {
+				'class': 'model-tree-opener',
+				html: '<span class="toToggle">Show</span><span class="toToggle" style="display:none;">Hide</span> model tree'
+			}).insertBefore($form.find('.close'));
+			$modelOpener.click(function() {
+				$("#modelTreeDump").toggle(50, function() {
+					var minusHeight;
+					if ($(this).is(":visible")) {
+						minusHeight = 0;
+					} else {
+						minusHeight = $("#modelTreeDump").outerHeight();
+					}
+					recountFormUnderlayDimensions($cover, minusHeight);
+				});
+				$(".model-tree-opener .toToggle").toggle();
+			});
+		}
+		$form.find("#modelTreeDump").html($("#hiddenModelTreeDump").html()).appendTo($form);
+	}
 
 	unwrapCoverForm($currentParent, $cover);
 	if (!disableScrolling) {

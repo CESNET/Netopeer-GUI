@@ -1629,6 +1629,22 @@ XML;
 	}
 
 	/**
+	 * Get model tree file from models dir.
+	 *
+	 * @return string|int
+	 */
+	public function getModelTreeDump($moduleName = '')
+	{
+		$path = $this->getPathToModels($moduleName).'tree.txt';
+
+		if (file_exists($path)) {
+			return file_get_contents($path);
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Get one model and process it.
 	 *
 	 * @param array &$schparams  key, identifier, version, format for get-schema
