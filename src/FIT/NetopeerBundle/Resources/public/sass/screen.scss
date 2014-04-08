@@ -241,7 +241,7 @@ body section { float: left; width: 50%; min-height: 100%; padding: $sContentPadd
 	  	input.label { margin-left: 6px + (8px * $i); padding-left: 0px; }
 	  }
 	}
-	.level-0:not(.container):not(.list) { margin: 0px; border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f4f4f4;
+	.level-0:not(.container):not(.list) { margin: 0px; border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f4f4f4; @include box-sizing(border-box); width: 100%;
 		&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
 			//.even { background: #f8f8f8; }
 			> .leaf-line:first-child { border-top: 1px solid #666; }
@@ -265,10 +265,10 @@ body section { float: left; width: 50%; min-height: 100%; padding: $sContentPadd
 		.value { width: 59%; float: left; color: #000; margin-left: 2%; }
 		.range { width: 42%; float: left; }
 		.range-cover-number { width: 6%; float: left; margin-right: 1.8%; text-align: right; padding: 3px 5px; margin-top: -2px; margin-bottom: -2px; @include box-sizing(border-box); border: 1px solid #ccc; @include background( linear-gradient(#fff, #f4f4f4) ); @include inline-block; @include border-radius(3px); }
-		.config-value-cover, .value-cover { width: 50%; float: left; margin-top: -3px; margin-left: 2%;
+		.config-value-cover, .value-cover { width: 45%; float: left; margin-top: -3px; margin-left: 2%;
 			label { margin: 0px; padding: 0px; width: auto; padding-right: 10px; line-height: 18px; height: 18px; }
 		}
-		input.value.text { width: 50%; margin: -4px 0px; border: 1px solid #ccc; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
+		input.value.text { width: 45%; margin: -4px 0px; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
 		textarea.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
 
 		&.generated {
@@ -276,7 +276,7 @@ body section { float: left; width: 50%; min-height: 100%; padding: $sContentPadd
 			.tooltip { margin-top: 3px; }
 		}
 
-		.edit-bar { width: 80px; min-height: 22px; margin: -3px 0px -5px 2%; float: right; text-align: right;
+		.edit-bar { min-height: 22px; margin: -3px 0px -5px 2%; float: right; text-align: right;
 			.child { display: none; }
 			img { @include opacity(0.4); cursor: pointer;
 				&:hover { @include opacity(1); }
@@ -412,7 +412,9 @@ form { margin: 15px 0px;
 		}
 	}
 	input { @include box-sizing(border-box);
-		&[type="text"], &[type="password"], &.text { width: 200px; height: $hInput; line-height: $hInput; padding: 0px 5px; border: 1px solid #ccc; @include background( linear-gradient(#fff, #f4f4f4) ); margin-top: 10px; @include inline-block; @include border-radius(3px); font-size: 1em; }
+		&[type="text"], &[type="password"], &.text { width: 200px; height: $hInput; line-height: $hInput; padding: 0px 5px; border: 1px solid #aaa; @include background( linear-gradient(#fff, #fafafa) ); margin-top: 10px; @include inline-block; @include border-radius(3px); font-size: 1em;
+			&[disabled="true"] { border-color: #ccc; }
+		}
 		&[type="submit"] { @extend .button; }
 	} 
 	textarea { @include box-sizing(border-box); @extend input[type="text"]; @include background( linear-gradient(#fff, #fafafa) ); height: 80px; line-height: 1.2em; }

@@ -745,7 +745,11 @@ body section .level-0:not(.container):not(.list) {
   margin: 0px;
   border-left: 2px solid #aaa;
   border-right: 2px solid #aaa;
-  background: #f4f4f4; }
+  background: #f4f4f4;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  width: 100%; }
 body section .level-0:not(.container):not(.list):nth-child(even) {
   background: #fff;
   border-left: 2px solid #333;
@@ -829,7 +833,7 @@ body section .leaf-line .range-cover-number {
   -o-border-radius: 3px;
   border-radius: 3px; }
 body section .leaf-line .config-value-cover, body section .leaf-line .value-cover {
-  width: 50%;
+  width: 45%;
   float: left;
   margin-top: -3px;
   margin-left: 2%; }
@@ -841,9 +845,8 @@ body section .leaf-line .config-value-cover label, body section .leaf-line .valu
   line-height: 18px;
   height: 18px; }
 body section .leaf-line input.value.text {
-  width: 50%;
+  width: 45%;
   margin: -4px 0px;
-  border: 1px solid #ccc;
   height: 22px;
   line-height: 22px;
   padding: 0px 3px;
@@ -862,7 +865,6 @@ body section .leaf-line.generated input.value.text, body section .leaf-line.gene
 body section .leaf-line.generated .tooltip {
   margin-top: 3px; }
 body section .leaf-line .edit-bar {
-  width: 80px;
   min-height: 22px;
   margin: -3px 0px -5px 2%;
   float: right;
@@ -1219,12 +1221,12 @@ form input[type="text"], form textarea, form input[type="password"], form input.
   height: 30px;
   line-height: 30px;
   padding: 0px 5px;
-  border: 1px solid #ccc;
-  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #f4f4f4));
-  background: -webkit-linear-gradient(#ffffff, #f4f4f4);
-  background: -moz-linear-gradient(#ffffff, #f4f4f4);
-  background: -o-linear-gradient(#ffffff, #f4f4f4);
-  background: linear-gradient(#ffffff, #f4f4f4);
+  border: 1px solid #aaa;
+  background: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ffffff), color-stop(100%, #fafafa));
+  background: -webkit-linear-gradient(#ffffff, #fafafa);
+  background: -moz-linear-gradient(#ffffff, #fafafa);
+  background: -o-linear-gradient(#ffffff, #fafafa);
+  background: linear-gradient(#ffffff, #fafafa);
   margin-top: 10px;
   display: -moz-inline-stack;
   display: inline-block;
@@ -1238,6 +1240,8 @@ form input[type="text"], form textarea, form input[type="password"], form input.
   -o-border-radius: 3px;
   border-radius: 3px;
   font-size: 1em; }
+form input[type="text"][disabled="true"], form textarea[disabled="true"], form input[type="password"][disabled="true"], form input.text[disabled="true"] {
+  border-color: #ccc; }
 form textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
