@@ -55,8 +55,8 @@ For a more detailed explanation of symfony2 installation, see the [Installation 
 
 ### Setting custom user
 For setting new user or edit current, use command line script. This script will create or update user in DB. There is no "GUI" for user settings.
-#### Create user
 
+#### Create user
 	su
 	php app/console app:user [--action=add] --user=username --pass=password
 
@@ -67,3 +67,60 @@ For setting new user or edit current, use command line script. This script will 
 #### Change password
 	su
 	php app/console app:user --action=edit --user=username --pass=newpass [--new-username=newusername]
+	
+#### Using SAML
+NetopeerGUI has implemented login using SAML and [SamlSPBundle](https://github.com/aerialship/SamlSPBundle/). For configuration, you must edit `/app/config/security.yml` file. Find section 
+
+	saml:
+            pattern: ^/(?!login_check)
+            anonymous: true
+            aerial_ship_saml_sp:
+                login_path: /saml/sp/login
+                check_path: /saml/sp/acs
+                logout_path: /saml/sp/logout
+                failure_path: /saml/sp/failure
+                metadata_path: /saml/sp/FederationMetadata.xml
+                discovery_path: /saml/sp/discovery
+                local_logout_path: /logout/
+                provider: saml_user_provider
+                create_user_if_not_exists: true
+                services:
+                    openidp:
+                    idp:
+                            file: "@FITNetopeerBundle/Resources/saml/openidp.metadata.xml"
+                        sp:
+                            config:
+                                # required
+                                entity_id: netopeergui_sauvignon
+                                # if different then url being used in request
+                                # used for construction of assertion consumer and logout urls in SP entity descriptor
+                                base_url: https://sauvignon.liberouter.org/netopeergui
+                            signing:
+                                # must implement SPSigningProviderInterface
+                                # id: my.signing.provider.service.id
+
+                                # or use built in SPSigningProviderFile with specific certificate and key files
+                                cert_file: "@FITNetopeerBundle/Resources/saml/server.pem"
+                                key_file: "@FITNetopeerBundle/Resources/saml/server.key"
+                                key_pass: ""
+                            meta:
+                                # must implement SpMetaProviderInterface
+                                # id: my.sp.provider.service.id
+
+                                # or use builtin SpMetaConfigProvider
+                                # any valid saml name id format or shortcuts: persistent or transient
+                                name_id_format: persistent
+                                binding:
+                                    # any saml binding or shortcuts: post or redirect
+                                    authn_request: redirect
+                                    logout_request: post
+                                    
+and edit following lines:
+
+	file: "@FITNetopeerBundle/Resources/saml/openidp.metadata.xml"
+	entity_id: netopeergui_sauvignon
+	base_url: https://sauvignon.liberouter.org/netopeergui
+	
+Configuration notes are described in [SamlSPBundle configuration](https://github.com/aerialship/SamlSPBundle/blob/master/src/AerialShip/SamlSPBundle/Resources/doc/configuration.md) doc.
+
+This example service uses [https://openidp.feide.no](https://openidp.feide.no) user provider. For register this your netopeerGUI, generate FederationMetadata.xml file (located in /saml/sp/FederationMetadata.xml) and upload it into OpenIDP.

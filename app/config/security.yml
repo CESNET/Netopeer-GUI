@@ -46,10 +46,10 @@ security:
                         sp:
                             config:
                                 # required
-                                entity_id: netconfwebgui4
+                                entity_id: netopeergui_sauvignon
                                 # if different then url being used in request
                                 # used for construction of assertion consumer and logout urls in SP entity descriptor
-                                base_url: https://garnacha.liberouter.org/netconfwebgui/app_dev.php
+                                base_url: https://sauvignon.liberouter.org/netopeergui
                             signing:
                                 # must implement SPSigningProviderInterface
                                 # id: my.signing.provider.service.id
@@ -67,7 +67,7 @@ security:
                                 name_id_format: persistent
                                 binding:
                                     # any saml binding or shortcuts: post or redirect
-                                    authn_request: post
+                                    authn_request: redirect
                                     logout_request: post
             logout:
                 path: /logout/

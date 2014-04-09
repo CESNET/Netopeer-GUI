@@ -7,6 +7,7 @@
 /app/*.db
 /bin/doctrine
 /bin/doctrine.php
+/bin/lightsaml
 /src/FIT/NetopeerBundle/Resources/public/.sass-cache/
 /src/FIT/NetopeerBundle/Data/models/*
 /src/winzou/*
