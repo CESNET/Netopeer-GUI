@@ -1040,10 +1040,10 @@ public function mergeRecursive(&$model, $root_el) {
 				// we have to correct xpath selector if xpath start with '//'
 				$decodedXPath = str_replace('xmlns:/', '/', $decodedXPath);
 			} else {
+				// we have to remove all array selectors [D]
+				$decodedXPath = preg_replace('/\[[0-9]+\]/', '', $decodedXPath);
 				// we have to add one level for "module" (root) element, which in model in addition to getconfig response
 				$decodedXPath = '/xmlns:*'.$decodedXPath;
-				// we have to remove all array selectors [D]
-				$decodedXPath = preg_replace('/\[.+\]/', '', $decodedXPath);
 			}
 			$domXpath = new \DOMXPath($dom);
 
