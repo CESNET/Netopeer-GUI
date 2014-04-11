@@ -793,9 +793,13 @@ function createNode($elem) {
 			}
 		});
 	}).on('focus', function() {
-		$(this).val(typeaheadALLconst);
-		$(this).typeahead('lookup');
-		$(this).val('');
+		if ($(this).val() == "") {
+			$(this).val(typeaheadALLconst);
+			$(this).typeahead('lookup');
+			$(this).val('');
+		} else {
+			$(this).typeahead('lookup');
+		}
 	});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 
