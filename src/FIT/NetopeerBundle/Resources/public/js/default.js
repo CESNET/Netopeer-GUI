@@ -916,6 +916,8 @@ function createNode($elem) {
 				});
 				$(".model-tree-opener .toToggle").toggle();
 			});
+		} else {
+			$(".model-tree-opener").insertBefore($form.find('.close'));
 		}
 		$form.find("#modelTreeDump").html($("#hiddenModelTreeDump").html()).appendTo($form);
 	}
