@@ -152,9 +152,16 @@ if advised of the possibility of such damage.
 	{% endif %}
 
 	<hr class="cleaner" />
-	{% if configArr is defined and not(configArr is empty) %}
+	{% if (configArr is defined and not(configArr is empty)) or (isEmptyModule is defined and isEmptyModule == true) %}
 		<form action="" method="post" name="formConfigData" data-disable-history="true">
 			<div class="root">
+				{% if isEmptyModule is defined and isEmptyModule == true %}
+					{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
+
+				{% elseif showRootElem is defined and showRootElem == true %}
+					{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
+				{% endif %}
+
 				{% set iterator = 1 %}
 				{% for key, element in configArr %}
 					{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
@@ -167,8 +174,6 @@ if advised of the possibility of such damage.
 				{% endif %}
 			</div>
 		</form>
-	{% elseif isEmptyModule is defined and isEmptyModule == true %}
-		{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
 	{% else %}
 		<div class="alert info">
 			No results found.
@@ -176,6 +181,14 @@ if advised of the possibility of such damage.
 		{% if additionalForm is defined %}
 			{{ additionalForm|raw }}
 		{% endif %}
+	{% endif %}
+
+	{% if modelTreeDump is defined %}
+		<div id="hiddenModelTreeDump">
+<pre>
+{{ modelTreeDump|raw }}
+</pre>
+		</div>
 	{% endif %}
 {% endblock config %}
 
