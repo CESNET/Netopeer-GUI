@@ -99,9 +99,12 @@ if advised of the possibility of such damage.
 	)
 	%}
 
+	{% set forceHideEditBar = forceShowEditBar is defined and forceShowEditBar == false %}
+
 	{% if
-	element.attributes.mandatory is not defined
-	or editBarShouldBeVisible
+	(element.attributes.mandatory is not defined
+		or editBarShouldBeVisible
+	) and forceHideEditBar != true
 	%}
 		<span class="edit-bar">
 			{% if isSortable %}

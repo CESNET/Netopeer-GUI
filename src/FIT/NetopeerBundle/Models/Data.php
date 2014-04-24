@@ -1510,17 +1510,11 @@ XML;
 	 * @param  string $subsection subsection name
 	 * @return array              array with config and state filter
 	 */
-	public function loadRPCsModel(&$module, &$subsection) {
-		// if file filter.txt exists in models, we will use it
-		$filterState = $filterConfig = "";
-
+	public function loadRPCsModel($module, $subsection) {
 		$path = $this->getPathToModels($module);
-
-
 		$file = $path.'rpc.yin';
 
 		$rpcs_model = "";
-		// if file with filter does not exist, only empty filter will be returned
 		if ( file_exists($file) ) {
 			$rpcs_model = file_get_contents($file);
 		}

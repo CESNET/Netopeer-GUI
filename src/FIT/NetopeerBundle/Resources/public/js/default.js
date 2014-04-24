@@ -468,11 +468,26 @@ function createFormUnderlay($elem) {
 		recountFormUnderlayDimensions($cover);
 
 		$cover.find(".form-underlay").click(function() {
-
+			hideAndEmptyModalWindow();
 		});
 	}
 
 	return $cover;
+}
+
+function hideAndEmptyModalWindow() {
+	var modalBlock = $("#block--modalWindow");
+	if (modalBlock.length) {
+		modalBlock.modal('hide');
+		modalBlock.html('').hide();
+		$('.form-underlay').remove();
+	}
+}
+
+function bindModalWindowActions() {
+	$("#block--modalWindow").on('click', '.close', function() {
+		hideAndEmptyModalWindow();
+	})
 }
 
 function findFormUnderlayCover($elem) {
@@ -482,7 +497,7 @@ function findFormUnderlayCover($elem) {
 
 		// or we have single column layout
 	} else {
-		return $("#content");
+		return $("body");
 	}
 }
 

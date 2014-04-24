@@ -33,6 +33,12 @@ jQuery.extend({
 				$("#" + id).html(html);
 			}
 
+			if (id === "block--modalWindow") {
+				$("#block--modalWindow").show();
+				createFormUnderlay($("#block--modalWindow"));
+				bindModalWindowActions();
+			}
+
 		},
 
 		success: function (payload) {
