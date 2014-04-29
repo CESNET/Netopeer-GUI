@@ -632,7 +632,16 @@ class DefaultController extends BaseController
 			if ($module == 'all') {
 				$this->assign('hideColumnControl', true);
 			}
+		} else if ($this->get('session')->get('singleColumnLayout') != "true") {
+			$this->loadConfigArr(false, $merge);
+			$this->assign('singleColumnLayout', true);
+			$this->setOnlyConfigSection();
 		} else {
+			$conn = $dataClass->getConnFromKey($key);
+			if ($conn->getCurrentDatastore() !== "running") {
+				$this->loadConfigArr(false, $merge);
+				$this->setOnlyConfigSection();
+			}
 			$this->assign('singleColumnLayout', true);
 		}
 
@@ -1025,13 +1034,17 @@ class DefaultController extends BaseController
 					$this->assign('additionalTitle', 'Create empty root element');
 					$this->assign('redirectUrl', $this->getRequest()->getRequestUri());
 
+					$this->assign('isEmptyModule', false);
+					$this->assign('showRootElem', false);
 					$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:createEmptyModule.html.twig');
 					$html = $template->renderBlock('singleContent', $this->getAssignedVariablesArr());
 
 					$this->assign('additionalForm', $html);
 				} elseif ($xml->count() == 0) {
 					$this->assign('isEmptyModule', true);
+					$this->assign('showRootElem', false);
 				} else {
+					$this->assign('isEmptyModule', false);
 					$this->assign('showRootElem', true);
 				}
 
