@@ -392,7 +392,11 @@ def emit_nmp(modules, fd, ctx):
                 if ctx.opts.nmp_genrpc:
                     # print RPC operations into special file
                     yin = YINPlugin()
+                    import pyang.translators.yin
+                    back_yin_namespace = pyang.translators.yin.yin_namespace
+                    pyang.translators.yin.yin_namespace = namespace
                     yin.emit(ctx,[section], rpcfile)
+                    pyang.translators.yin.yin_namespace = back_yin_namespace
             else:
                 #print section.arg, section.keyword
                 pass
