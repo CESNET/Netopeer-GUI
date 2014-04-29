@@ -506,6 +506,9 @@ class DefaultController extends BaseController
 				$xmlEl = new SimpleXMLElement("<".$name."></".$name.">");
 				$xmlEl->addAttribute('description', $rpc->description->text);
 
+				$ns = $rpc->getNamespaces();
+				$xmlEl->addAttribute('namespace', !empty($ns) ? array_pop($ns) : 'false');
+
 				if ($rpc->input) {
 					foreach ($rpc->input->children() as $leafs) {
 						$this->getRPCinputAttributesAndChildren($leafs, $xmlEl);
@@ -732,18 +735,13 @@ class DefaultController extends BaseController
 		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
 
 		if ($this->getRequest()->getMethod() == 'POST') {
-//			$xmlOperations = $this->get("XMLoperations");
-//			$postVals = $this->getRequest()->get("form");
-//			$this->setSectionFormsParams($key);
-//
-//			$res = $xmlOperations->handleCreateEmptyModuleForm($key, $this->getConfigParams(), $postVals);
-//			if ($res != 0) {
-//				$this->forward('reloadDeviceAction', array('key' => $key));
-//			}
-//
-//			if (isset($postVals['redirectUrl'])) {
-//				return $this->redirect($postVals['redirectUrl']);
-//			}
+			$xmlOperations = $this->get("XMLoperations");
+			$postVals = $this->getRequest()->get("configDataForm");
+			$this->setSectionFormsParams($key);
+
+			$res = $xmlOperations->handleRPCMethodForm($key, $this->getConfigParams(), $postVals);
+			$url = $this->get('request')->headers->get('referer');
+			return new RedirectResponse($url);
 		}
 
 		$this->assign('rpcArr', $this->getRPCXmlForMethod($rpcName, $module));

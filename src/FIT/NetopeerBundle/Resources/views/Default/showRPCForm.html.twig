@@ -45,6 +45,8 @@ if advised of the possibility of such damage.
 		</div>
 		<div class="modal-body">
 			{% set iterator = 1 %}
+			<input type="hidden" name="configDataForm[rootElemName]" value="{{ rpcArr.getName }}" />
+			<input type="hidden" name="configDataForm[rootElemNamespace]" value="{{ rpcArr.attributes.namespace }}" />
 			{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': rpcArr, 'xpath': '/*[1]', 'key': rpcArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': false, 'isRootElem': true} %}
 			{% for key, element in rpcArr %}
 				{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': '/*[1]', 'key': element.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': false, 'isRootElem': true} %}
