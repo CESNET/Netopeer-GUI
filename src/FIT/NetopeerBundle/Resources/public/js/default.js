@@ -47,6 +47,7 @@ $(window).resize(function() {
 	showIconsOnLeafLine();
 	collapseTopNav();
 	prepareAlertsVariables();
+	hideAlertsPanel();
 }).bind('beforeunload', function() {
 	var shouldLoadingContinue = formInputChangeConfirm(false);
 	if (!shouldLoadingContinue) {
@@ -66,7 +67,6 @@ jQuery.fn.reverse = function() {
 
 function initJS() {
 	collapseTopNav();
-	prepareAlertsVariables();
 
 	// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
 	$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
@@ -80,115 +80,8 @@ function initJS() {
 		createNode($(this));
 	});
 
-	var sortableChildren;
-	$(".sortable-node").parent().parent().sortable({
-		placeholder: "sortable-placeholder ui-state-highlight",
-		axis: "y",
-		items: ".sortable-node",
-		handle: ".sort-item",
-		deactivate: function(e, ui) {
-			var $leafs = $(ui.item).parent().parent().children().children(".sortable-node");
-
-			// set new index order
-			$leafs.each(function(i, elem) {
-				$(elem).find('input, select').each(function(j, e) {
-					var s = $(e).attr('name');
-					var delimIndex = s.lastIndexOf('|');
-					if (delimIndex == -1) {
-						delimIndex = s.lastIndexOf('[');
-					}
-					var newXpath = s.substring(0, s.lastIndexOf('[')) + "[index" + i + "|" + s.substring(delimIndex + 1);
-					$(e).attr('name', newXpath);
-				});
-			});
-
-			// move all children of prev sortable node
-			$(ui.item).nextUntil('.sortable-node').each(function(i, e) {
-				$(e).insertBefore($(ui.item));
-			});
-
-			// move all children of current sortable node
-			if (sortableChildren.length) {
-				sortableChildren.reverse().each(function(i, elem) {
-					$(elem).insertAfter($(ui.item));
-				});
-			}
-
-			$(".sortable-placeholder").remove();
-		},
-		activate: function(e, ui) {
-			sortableChildren = $(ui.item).nextUntil('.sortable-node');
-		}
-	}).disableSelection();
-
-	// activate column with flash messages
-	$("#alerts-icon .header-icon").unbind('click').click(function(e) {
-		e.preventDefault();
-
-		mright = gmright;
-		mleft = gmleft;
-		notWidth = gnotWidth;
-
-		if (!$("#block--alerts").hasClass('openAlerts')) {
-			mright = "0";
-			mleft = 0 - $("#block--alerts").outerWidth();
-			notWidth = "100%";
-			$("#block--alerts").addClass('openAlerts');
-
-			// handle click outside of alerts
-			$("body").bind("click", function(elem) {
-				if (!$(elem.target).closest("#block--alerts").length) {
-					$("#alerts-icon .header-icon").click();
-					elem.preventDefault();
-				}
-			});
-		} else {
-			$("#block--alerts").removeClass('openAlerts');
-			$("body").unbind('click');
-		}
-
-		$("#block--alerts").stop(true,true).animate({
-			"margin-right": mright
-		}, 500, "linear");
-
-		$(".cover-wo-alerts").stop(true,true).animate({
-			"margin-left": mleft
-		}, 500, "linear");
-
-		$("#block--notifications").stop(true,true).animate({
-			width: notWidth
-		}, 300, "linear");
-
-		return false;
-	});
-
-	// refresh number of flash messages, change background color according to last flash state
-	setInterval(function() {
-		var $icon = $("#alerts-icon .ico-alerts");
-		var $alerts = $("#block--alerts").children();
-		var previousCnt = parseInt($("#alerts-icon .count").text(), 10);
-		var cnt = $alerts.length;
-		$icon.find('.count').text(cnt);
-		if (cnt) {
-			var $lastCh = $alerts.last();
-			if ($lastCh.hasClass('success')) {
-				$icon.addClass('green').removeClass('red');
-			} else if ($lastCh.hasClass('error')) {
-				$icon.addClass('red').removeClass('green');
-			}
-		} else {
-			$icon.removeClass('red').removeClass('green');
-		}
-
-	}, 1000);
-
-	// handle click on alert or flash message (closes)
-	$(window).on('click', '.alert .error, .alert .success, .message', function(e) {
-		e.preventDefault();
-		$(this).stop(true,true).fadeOut('fast', function() {
-			$(this).remove();
-		});
-	});
+	prepareSortable();
+	prepareAlerts();
 
 	// line of XML output
 	$(".leaf-line").hover(function() {
@@ -344,6 +237,129 @@ function showIconsOnLeafLine() {
 
 function initDefaultTooltip($el) {
 	$el.gips({ 'theme': 'blue', placement: 'top', animationSpeed: 100, bottom: $el.parent().parent().parent().outerHeight(), text: $el.siblings('.tooltip-description').text() });
+}
+
+function prepareAlerts() {
+	prepareAlertsVariables();
+
+	// activate column with flash messages
+	$("#alerts-icon .header-icon").unbind('click').click(function(e) {
+		e.preventDefault();
+
+		mright = gmright;
+		mleft = gmleft;
+		notWidth = gnotWidth;
+
+		if (!$("#block--alerts").hasClass('openAlerts')) {
+			mright = "0";
+			mleft = 0 - $("#block--alerts").outerWidth();
+			notWidth = "100%";
+			$("#block--alerts").addClass('openAlerts');
+
+			// handle click outside of alerts
+			$("body").bind("click", function(elem) {
+				if (!$(elem.target).closest("#block--alerts").length) {
+					$("#alerts-icon .header-icon").click();
+					elem.preventDefault();
+				}
+			});
+		} else {
+			$("#block--alerts").removeClass('openAlerts');
+			$("body").unbind('click');
+		}
+
+		$("#block--alerts").stop(true,true).animate({
+			"margin-right": mright
+		}, 500, "linear");
+
+		$(".cover-wo-alerts").stop(true,true).animate({
+			"margin-left": mleft
+		}, 500, "linear");
+
+		$("#block--notifications").stop(true,true).animate({
+			width: notWidth
+		}, 300, "linear");
+
+		return false;
+	});
+
+	// refresh number of flash messages, change background color according to last flash state
+	setInterval(function() {
+		var $icon = $("#alerts-icon .ico-alerts");
+		var $alerts = $("#block--alerts").children();
+		var previousCnt = parseInt($("#alerts-icon .count").text(), 10);
+		var cnt = $alerts.length;
+		$icon.find('.count').text(cnt);
+		if (cnt) {
+			var $lastCh = $alerts.last();
+			if ($lastCh.hasClass('success')) {
+				$icon.addClass('green').removeClass('red');
+			} else if ($lastCh.hasClass('error')) {
+				$icon.addClass('red').removeClass('green');
+			}
+		} else {
+			$icon.removeClass('red').removeClass('green');
+		}
+
+	}, 1000);
+
+	// handle click on alert or flash message (closes)
+	$(window).on('click', '.alert .error, .alert .success, .message', function(e) {
+		e.preventDefault();
+		$(this).stop(true,true).fadeOut('fast', function() {
+			$(this).remove();
+		});
+	});
+}
+
+function hideAlertsPanel() {
+	$("body").unbind('click');
+	$(".cover-wo-alerts").css('margin-left', '0px');
+	$("#block--notifications").css('width', '');
+	$("#block--alerts").css('margin-right', '-20%').removeClass('openAlerts');
+}
+
+function prepareSortable() {
+	var sortableChildren;
+	$(".sortable-node").parent().parent().sortable({
+		placeholder: "sortable-placeholder ui-state-highlight",
+		axis: "y",
+		items: ".sortable-node",
+		handle: ".sort-item",
+		deactivate: function(e, ui) {
+			var $leafs = $(ui.item).parent().parent().children().children(".sortable-node");
+
+			// set new index order
+			$leafs.each(function(i, elem) {
+				$(elem).find('input, select').each(function(j, e) {
+					var s = $(e).attr('name');
+					var delimIndex = s.lastIndexOf('|');
+					if (delimIndex == -1) {
+						delimIndex = s.lastIndexOf('[');
+					}
+					var newXpath = s.substring(0, s.lastIndexOf('[')) + "[index" + i + "|" + s.substring(delimIndex + 1);
+					$(e).attr('name', newXpath);
+				});
+			});
+
+			// move all children of prev sortable node
+			$(ui.item).nextUntil('.sortable-node').each(function(i, e) {
+				$(e).insertBefore($(ui.item));
+			});
+
+			// move all children of current sortable node
+			if (sortableChildren.length) {
+				sortableChildren.reverse().each(function(i, elem) {
+					$(elem).insertAfter($(ui.item));
+				});
+			}
+
+			$(".sortable-placeholder").remove();
+		},
+		activate: function(e, ui) {
+			sortableChildren = $(ui.item).nextUntil('.sortable-node');
+		}
+	}).disableSelection();
 }
 
 function duplicateNode($elem) {
