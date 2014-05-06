@@ -485,7 +485,6 @@ nav#block--leftColumn #history-and-profiles #block--historyOfConnectedDevices, n
   width: 100%;
   min-height: 50%;
   margint-top: 0px;
-  overflow-y: scroll;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box; }
@@ -537,13 +536,15 @@ nav#block--leftColumn #history-and-profiles a:hover .icon {
   zoom: 1;
   *display: inline; }
 
+.scrollable-cover {
+  overflow-y: scroll; }
+
 body section {
   float: left;
   width: 50%;
   min-height: 100%;
   padding: 15px;
   font-size: 1.4em;
-  overflow-y: scroll;
   background: #f5f5f5;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;

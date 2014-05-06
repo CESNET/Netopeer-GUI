@@ -144,18 +144,24 @@ if advised of the possibility of such damage.
 		{#</div>#}
 
 		{% if singleColumnLayout == false %}
-			<section id="block--state" class="column{{addToColumnClass}}">
+			<section id="block--state" class="column{{addToColumnClass}} scrollable-cover">
+				<div class="scrollable">
 				{% block state %}
 				{% endblock state %}
+				</div>
 			</section>
-			<section id="block--config" class="column{{addToColumnClass}}">
+			<section id="block--config" class="column{{addToColumnClass}} scrollable-cover">
+				<div class="scrollable">
 				{% block config %}
 				{% endblock config %}
+				</div>
 			</section>
 		{% else %}
-			<section id="block--singleContent" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %}">
+			<section id="block--singleContent" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %} scrollable-cover">
+				<div class="scrollable">
 				{% block singleContent %}
 				{% endblock singleContent %}
+				</div>
 			</section>
 		{% endif %}
 		</div>

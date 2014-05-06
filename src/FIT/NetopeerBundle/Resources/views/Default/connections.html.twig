@@ -139,14 +139,30 @@ if advised of the possibility of such damage.
 				url: "{{ path("historyOfConnectedDevices") }}",
 				dataType: "json",
 				success: function(data) {
-					if (!$("#block--historyOfConnectedDevices").length || force === true) {
-						$("#block--historyOfConnectedDevices").remove();
-						$("#history-and-profiles").prepend($("<div></div>").attr('id', 'block--historyOfConnectedDevices'));
-						$.nette.success(data);
-						delegateAnchorActions($("#block--historyOfConnectedDevices"));
-					}
+					createHistoryOrProfileBox("block--historyOfConnectedDevices", data, true, force);
 				}
 			});
+		}
+
+		function createHistoryOrProfileBox(selector, data, prepend, force) {
+			if (!$("#"+selector).length || force === true) {
+				$("#"+selector).remove();
+
+				if (selector == "block--profilesOfConnectedDevices" && data.snippets['block--profilesOfConnectedDevices'].trim() === "") {
+					return;
+				}
+
+				var newBox = $("<div/>").attr('id', selector).addClass('scrollable-cover').attr("data-parent", "#"+selector);
+
+				if (prepend) {
+					$("#history-and-profiles").prepend(newBox);
+				} else {
+					$("#history-and-profiles").append(newBox);
+				}
+
+				$.nette.success(data);
+				delegateAnchorActions($("#"+selector));
+			}
 		}
 
 		function reloadProfilesOfConnectedDevices(force) {
@@ -154,14 +170,7 @@ if advised of the possibility of such damage.
 				url: "{{ path("profilesOfConnectedDevices") }}",
 				dataType: "json",
 				success: function(data) {
-					if (!$("#block--profilesOfConnectedDevices").length || force === true) {
-						$("#block--profilesOfConnectedDevices").remove();
-						if (data.snippets['block--profilesOfConnectedDevices'].trim() !== "") {
-							$("#history-and-profiles").append($("<div></div>").attr('id', 'block--profilesOfConnectedDevices'));
-							$.nette.success(data);
-							delegateAnchorActions($("#block--profilesOfConnectedDevices"));
-						}
-					}
+					createHistoryOrProfileBox("block--profilesOfConnectedDevices", data, false, force);
 				}
 			});
 		}
@@ -190,13 +199,13 @@ if advised of the possibility of such damage.
 	max-width-column
 {% endblock singleContentClass %}
 
-{% block leftColumnAdditional %}
+{% block leftColumn %}
 	<div id="history-and-profiles">
 		<script type="text/javascript">
 //			setIndexActions();
 		</script>
 	</div>
-{% endblock leftColumnAdditional %}
+{% endblock leftColumn %}
 
 {% block state %}
 	<form action="{{ path('connections') }}" method="post" {{ form_enctype(form) }} class="login">
