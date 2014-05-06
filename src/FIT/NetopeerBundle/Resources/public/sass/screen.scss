@@ -203,8 +203,8 @@ nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa
 }
 
 .scrollable-cover { overflow-y: scroll; }
-body section { float: left; width: 49.99%; min-height: 100%; padding: $sContentPadding; font-size: 1.4em; background: #f5f5f5; @include box-sizing(border-box); border-top: $hNavTop solid transparent;
-	&.left-nav-defined { width: 44.99%; }
+body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentPadding; font-size: 1.4em; background: #f5f5f5; @include box-sizing(border-box); border-top: $hNavTop solid transparent;
+	&.left-nav-defined { width: 44.93%; }
 
 
 	&#block--state { border-right: 1px solid #bababa; @include single-box-shadow(darken(#f5f5f5, 5%), -5px, 0px, 5px, false, true); padding-right: 2 * $sContentPadding; }
@@ -313,7 +313,7 @@ body section { float: left; width: 49.99%; min-height: 100%; padding: $sContentP
 	}
 
 	&#block--singleContent { width: 100%; min-height: 100%; font-size: 1.4em; padding: $sContentPadding 2 * $sContentPadding $sContentPadding / 2 2 * $sContentPadding;
-		&.left-nav-defined { width: 89.999%; }
+		&.left-nav-defined { width: 89.91%; }
 		&.max-width-column { max-width: 800px; width: 100%; float: none; }
 	}
 

@@ -541,7 +541,7 @@ nav#block--leftColumn #history-and-profiles a:hover .icon {
 
 body section {
   float: left;
-  width: 49.99%;
+  width: 49.93%;
   min-height: 100%;
   padding: 15px;
   font-size: 1.4em;
@@ -551,7 +551,7 @@ body section {
   box-sizing: border-box;
   border-top: 40px solid transparent; }
 body section.left-nav-defined {
-  width: 44.99%; }
+  width: 44.93%; }
 body section#block--state {
   border-right: 1px solid #bababa;
   -webkit-box-shadow: inset -5px 0px 5px #e8e8e8;
@@ -930,7 +930,7 @@ body section#block--singleContent {
   font-size: 1.4em;
   padding: 15px 30px 7.5px 30px; }
 body section#block--singleContent.left-nav-defined {
-  width: 89.999%; }
+  width: 89.91%; }
 body section#block--singleContent.max-width-column {
   max-width: 800px;
   width: 100%;
