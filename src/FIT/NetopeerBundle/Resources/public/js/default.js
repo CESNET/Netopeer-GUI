@@ -302,6 +302,26 @@ function changeSectionHeight() {
 
 	$("body section, body section#content").css('min-height', '0%').height(h);
 	$(notifOutput).css('top', h);
+
+	fixOverflowY();
+}
+
+function fixOverflowY() {
+	var wHeight = $(window).height();
+	$(".scrollable-cover").each(function() {
+		var scrollableContent = $(this).children('.scrollable');
+		var sHeight = scrollableContent.outerHeight();
+		var cHeight = wHeight;
+		if (scrollableContent.data('parent') !== undefined) {
+			cHeight = $(scrollableContent.data('parent')).outerHeight();
+		}
+
+		if (sHeight <= cHeight) {
+			$(this).css('overflow-y', 'auto');
+		} else {
+			$(this).css('overflow-y', 'scroll');
+		}
+	});
 }
 
 function showIconsOnLeafLine() {
