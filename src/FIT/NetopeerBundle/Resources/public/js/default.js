@@ -309,6 +309,9 @@ function changeSectionHeight() {
 function fixOverflowY() {
 	var wHeight = $(window).height();
 	$(".scrollable-cover").each(function() {
+		if ($(this).data('addScrollable') == true && !$(this).children(".scrollable").length) {
+			$(this).wrapInner($("<div/>").addClass('scrollable'));
+		}
 		var scrollableContent = $(this).children('.scrollable');
 		var sHeight = scrollableContent.outerHeight();
 		var cHeight = wHeight;
