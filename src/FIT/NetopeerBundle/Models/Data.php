@@ -1483,18 +1483,15 @@ XML;
 		// if file filter.txt exists in models, we will use it
 		$filterState = $filterConfig = "";
 
-		$path = $this->getPathToModels($module);
+		$namespaces = $this->getModelNamespaces($this->container->get('request')->get('key'));
+		if (isset($namespaces[$module])) { $namespace = $namespaces[$module];
+			$filter = new \SimpleXMLElement("<".$module."></".$module.">");
+			$filter->addAttribute('xmlns', $namespace);
+			if ( $subsection ) {
+				$filter->addChild($subsection);
+			}
 
-		// if subsection is defined, we will add it to path
-		if ( $subsection ) {
-			$path .= $subsection.'/';
-		}
-
-		$file = $path.'filter.txt';
-
-		// if file with filter does not exist, only empty filter will be returned
-		if ( file_exists($file) ) {
-			$filterState = $filterConfig = file_get_contents($file);
+			$filterState = $filterConfig  = str_replace('<?xml version="1.0"?'.'>', '', $filter->asXml());
 		}
 
 		return array(
