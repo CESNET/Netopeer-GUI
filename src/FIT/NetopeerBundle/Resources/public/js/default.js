@@ -246,6 +246,9 @@ function collapseTopNav() {
 		var $others = $othersCover.find(".others");
     var availableSpace = $nav.outerWidth();
 
+		// reset collapsed behaviour
+		$others.hide();
+
 		// we will count available space for sections hrefs
 		$nav.find('.static').each(function() {
 			availableSpace -= $(this).outerWidth();
