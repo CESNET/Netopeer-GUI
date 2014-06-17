@@ -421,7 +421,10 @@ class XMLoperations {
 		$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $xmlTree->asXML());
 
 		try {
-			$res = $this->executeEditConfig($key, $createString, $configParams['source']);
+			$editParams = array();
+			$editParams['type'] = Data::MSG_GENERIC;
+			
+			$res = $this->executeEditConfig($key, $createString, $configParams['source'], $editParams);
 
 			if ($res == 0) {
 				$this->container->get('request')->getSession()->getFlashBag()->add('success', "RPC method invocation was successful.");
@@ -798,13 +801,14 @@ class XMLoperations {
 	 *
 	 * @return int              return 0 on success, 1 on error
 	 */
-	private function executeEditConfig($key, $config, $target = "running") {
+	private function executeEditConfig($key, $config, $target = "running", $additionalParams = array()) {
 		$res = 0;
 		$editConfigParams = array(
 			'key' 	 => $key,
 			'target' => $target,
 			'config' => str_replace('<?xml version="1.0"?'.'>', '', $config)
 		);
+		$editConfigParams = array_merge($editConfigParams, $additionalParams);
 
 		// edit-cofig
 		if ( ($merged = $this->dataModel->handle('editconfig', $editConfigParams)) != 1 ) {

@@ -684,6 +684,9 @@ class Data {
 		if (isset($params['default-operation']) && ($params['default-operation'] !== "")) {
 			$editparams['default-operation'] = $params['default-operation'];
 		}
+		if (isset($params['type']) && ($params['type'] !== "")) {
+			$editparams['type'] = $params['type'];
+		}
 		if (isset($params['test-option']) && ($params['test-option'] !== "")) {
 			$editparams['test-option'] = $params['test-option'];
 		}
