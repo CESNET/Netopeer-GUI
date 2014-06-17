@@ -9,10 +9,10 @@ use Symfony\Component\Debug\Debug;
 
 // This check prevents access to debug front controllers that are deployed by accident to production servers.
 // Feel free to remove this, extend it, or make something more sophisticated.
-if (@$_SERVER['SERVER_ADDR'] != '147.251.21.32') {
-    header('HTTP/1.0 403 Forbidden');
-    exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
-}
+//if (@$_SERVER['SERVER_ADDR'] != '127.0.0.1') {
+//    header('HTTP/1.0 403 Forbidden');
+//    exit('You are not allowed to access this file. Check '.basename(__FILE__).' for more information.');
+//}
 
 $loader = require_once __DIR__.'/../app/bootstrap.php.cache';
 Debug::enable();
