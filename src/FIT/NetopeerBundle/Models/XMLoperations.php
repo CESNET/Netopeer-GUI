@@ -388,16 +388,12 @@ class XMLoperations {
 		$namespace = $postVals['rootElemNamespace'];
 		$res = 0;
 
-		$xmlTree = new \SimpleXMLElement('<rpc></rpc>');
+		$xmlTree = new \SimpleXMLElement('<'.$name.'></'.$name.'>');
 		$xmlTree->registerXPathNamespace('xc', 'urn:ietf:params:xml:ns:netconf:base:1.0');
-		$xmlTree->addAttribute('xmlns', 'urn:ietf:params:xml:ns:netconf:base:1.0');
-		$xmlTree->addAttribute('message-id', '101');
 
-		$rpcModule = $xmlTree->addChild($name);
 		if ($namespace !== 'false' && $namespace !== '') {
 			$xmlTree->registerXPathNamespace('rpcMod', $namespace);
-			$rpcModule->registerXPathNamespace('', $namespace);
-			$rpcModule->addAttribute('xmlns', $namespace);
+			$xmlTree->addAttribute('xmlns', $namespace);
 		}
 
 		// we will go through all post values
