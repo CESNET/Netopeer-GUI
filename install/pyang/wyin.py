@@ -343,7 +343,7 @@ def getAttrs(ctx, s):
         attrs += " mandatory=\"%s\"" % s.search_one('mandatory').arg.__str__().lower()
 
     if hasattr(s, "i_default") and s.i_default:
-        attrs += " default=\"%s\"" % s.i_default.__str__()
+        attrs += " default=\"%s\"" % s.search_one('default').arg.__str__()
     if typename == "enumeration":
         attrs += handleEnumeration(ctx, typeelem)
 

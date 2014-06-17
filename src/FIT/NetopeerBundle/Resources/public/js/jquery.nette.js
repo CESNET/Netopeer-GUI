@@ -23,8 +23,12 @@ jQuery.extend({
 					$afterEl = $("#block--singleContent");
 				}
 
-				var tmp = $('<section></section>').attr('id', 'block--config').insertAfter($afterEl);
-				tmp.addClass('left-nav-defined');
+				var tmp = $('<section></section>').insertAfter($afterEl);
+				tmp.addClass('left-nav-defined')
+					.addClass('scrollable-cover')
+					.attr('add-data-scrollable', 'true')
+					.attr('id', 'block--config')
+				;
 				$afterEl.attr('id', 'block--state').addClass('left-nav-defined');
 			}
 			if (id === "block--alerts") {

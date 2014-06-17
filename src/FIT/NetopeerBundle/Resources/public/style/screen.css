@@ -541,7 +541,7 @@ nav#block--leftColumn #history-and-profiles a:hover .icon {
 
 body section {
   float: left;
-  width: 50%;
+  width: 49.93%;
   min-height: 100%;
   padding: 15px;
   font-size: 1.4em;
@@ -551,7 +551,7 @@ body section {
   box-sizing: border-box;
   border-top: 40px solid transparent; }
 body section.left-nav-defined {
-  width: 45%; }
+  width: 44.93%; }
 body section#block--state {
   border-right: 1px solid #bababa;
   -webkit-box-shadow: inset -5px 0px 5px #e8e8e8;
@@ -992,6 +992,50 @@ body section #block--sourceValidation .source-validation {
 .tooltip {
   float: right;
   margin: 0px 0px 0px 4px; }
+body section#block--singleContent {
+  width: 100%;
+  min-height: 100%;
+  font-size: 1.4em;
+  padding: 15px 30px 7.5px 30px; }
+body section#block--singleContent.left-nav-defined {
+  width: 89.91%; }
+body section#block--singleContent.max-width-column {
+  max-width: 800px;
+  width: 100%;
+  float: none; }
+body section .filter {
+  margin-top: 20px; }
+body section .filter > div {
+  float: left;
+  margin-left: 30px; }
+body section .filter label {
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  zoom: 1;
+  *display: inline;
+  margin: 0px 10px 0px 0px;
+  width: auto;
+  height: auto;
+  line-height: 1em; }
+body section .filter label.required:after {
+  content: " "; }
+body section .filter select {
+  margin-top: 5px;
+  width: 100px; }
+body section .filter .button, body section .filter form input[type="submit"], form body section .filter input[type="submit"] {
+  margin: 1px 10px; }
+body section .filter .note {
+  font-size: 0.8em;
+  font-style: italic;
+  margin-top: 7px; }
+body section #block--sourceValidation {
+  float: left;
+  margin: 29px 0px 0px 7px;
+  font-size: 0.9em; }
+body section #block--sourceValidation .source-validation {
+  margin-top: -6px; }
 
 .top-part {
   position: absolute;

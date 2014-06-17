@@ -47,6 +47,7 @@ $(window).resize(function() {
 	showIconsOnLeafLine();
 	collapseTopNav();
 	prepareAlertsVariables();
+	hideAlertsPanel();
 }).bind('beforeunload', function() {
 	var shouldLoadingContinue = formInputChangeConfirm(false);
 	if (!shouldLoadingContinue) {
@@ -66,7 +67,6 @@ jQuery.fn.reverse = function() {
 
 function initJS() {
 	collapseTopNav();
-	prepareAlertsVariables();
 
 	// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
 	$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
@@ -80,46 +80,167 @@ function initJS() {
 		createNode($(this));
 	});
 
-	var sortableChildren;
-	$(".sortable-node").parent().parent().sortable({
-		placeholder: "sortable-placeholder ui-state-highlight",
-		axis: "y",
-		items: ".sortable-node",
-		handle: ".sort-item",
-		deactivate: function(e, ui) {
-			var $leafs = $(ui.item).parent().parent().children().children(".sortable-node");
+	prepareSortable();
+	prepareAlerts();
 
-			// set new index order
-			$leafs.each(function(i, elem) {
-				$(elem).find('input, select').each(function(j, e) {
-					var s = $(e).attr('name');
-					var delimIndex = s.lastIndexOf('|');
-					if (delimIndex == -1) {
-						delimIndex = s.lastIndexOf('[');
-					}
-					var newXpath = s.substring(0, s.lastIndexOf('[')) + "[index" + i + "|" + s.substring(delimIndex + 1);
-					$(e).attr('name', newXpath);
-				});
+	// line of XML output
+	$(".leaf-line").hover(function() {
+		$(this).toggleClass("hover");
+	});
+
+	prepareTooltipActions();
+
+	/* when range input type, add number of current value before input */
+	$("input[type='range']").each(function(i, e) {
+		var tmp = $("<input>").attr({
+			'class': 'range-cover-number',
+			type: 'number',
+			disabled: 'disabled',
+			value: e.value
+		}).text(e.value);
+		$(e).after(tmp);
+		$(e).bind('change', function() {
+			$(e).next('.range-cover-number').val(e.value);
+		});
+	});
+
+	showIconsOnLeafLine();
+	changeSectionHeight();
+
+	$("form[name=formConfigData]").on("change", "input, select", function(event){
+		formInputChanged = true;
+	}).on("submit", function(event){
+		formInputChanged = false;
+	});
+}
+
+function prepareTooltipActions() {
+	// tooltip
+	$('.tooltip .icon-help').each(function() {
+		initDefaultTooltip($(this));
+	});
+}
+
+function initPopupMenu($cover) {
+	$cover.find('.show-link').unbind('hover');
+	$cover.find('.show-link').hover(function() {
+		$cover.find(".others").stop(true).slideToggle('fast');
+	});
+}
+
+/**
+ * collapse top nav - when links for sections overflows available space, 
+ * double down arrow with popup submenu will appear
+ */
+function collapseTopNav() {
+    var $nav = $("nav#block--topMenu");
+	if ( $nav.length ) {
+		var $othersCover = $nav.find('.others-cover');
+		var $others = $othersCover.find(".others");
+    var availableSpace = $nav.outerWidth();
+
+		// reset collapsed behaviour
+		$others.hide();
+
+		// we will count available space for sections hrefs
+		$nav.find('.static').each(function() {
+			availableSpace -= $(this).outerWidth();
+		});
+		availableSpace -= $othersCover.children(".show-link").outerWidth() + 50;
+
+		// move old links back to top nav bar
+		if ($othersCover.hasClass('visible')) {
+			$others.children('a').each(function() {
+				$("#userpane").before($(this).clone());
+				$(this).remove();
 			});
-
-			// move all children of prev sortable node
-			$(ui.item).nextUntil('.sortable-node').each(function(i, e) {
-				$(e).insertBefore($(ui.item));
-			});
-
-			// move all children of current sortable node
-			if (sortableChildren.length) {
-				sortableChildren.reverse().each(function(i, elem) {
-					$(elem).insertAfter($(ui.item));
-				});
-			}
-
-			$(".sortable-placeholder").remove();
-		},
-		activate: function(e, ui) {
-			sortableChildren = $(ui.item).nextUntil('.sortable-node');
+			$othersCover.removeClass('visible');
 		}
-	}).disableSelection();
+
+		// check, if dynamic href should be visible or hidden under popup menu
+		if ( $nav.find(".dynamic").length ) {
+			var firstOffset;
+			var maxOffset = $nav.find("#userpane").offset().left;
+			var isLastItemVisible = true;
+			var i = 0;
+			$nav.find('.dynamic').each(function() {
+				if (i++ === 0) {
+					firstOffset = $(this).offset().left;
+				}
+				if ( ($(this).offset().left - firstOffset + $(this).outerWidth()) >= availableSpace ||
+						($(this).offset().left + $(this).outerWidth()) >= maxOffset ||
+						isLastItemVisible === false
+					) {
+					if (isLastItemVisible === true) {
+						$othersCover.addClass('visible');
+						initPopupMenu($othersCover);
+						isLastItemVisible = false;
+					}
+					$others.append($(this).clone());
+					$(this).remove();
+				}
+			});
+		}
+	}
+}
+
+function changeSectionHeight() {
+	if (!notifOutput) {
+		notifInit();
+	}
+
+	notifResizable();
+
+	var h = $(window).height();
+	if (!$(notifOutput).hasClass('hidden')) {
+		h -= $(notifOutput).outerHeight();
+	}
+
+	$("body section, body section#content").css('min-height', '0%').height(h);
+	$(notifOutput).css('top', h);
+
+	fixOverflowY();
+}
+
+function fixOverflowY() {
+	var wHeight = $(window).height();
+	$(".scrollable-cover").each(function() {
+		if ($(this).data('addScrollable') == true && !$(this).children(".scrollable").length) {
+			$(this).wrapInner($("<div/>").addClass('scrollable'));
+		}
+		var scrollableContent = $(this).children('.scrollable');
+		var sHeight = scrollableContent.outerHeight();
+		var cHeight = wHeight;
+		if (scrollableContent.data('parent') !== undefined) {
+			cHeight = $(scrollableContent.data('parent')).outerHeight();
+		}
+
+		if (sHeight <= cHeight) {
+			$(this).css('overflow-y', 'auto');
+		} else {
+			$(this).css('overflow-y', 'scroll');
+		}
+	});
+}
+
+function showIconsOnLeafLine() {
+	/*
+	if ($(window).width() < 1550) {
+		$('.root').delegate(".leaf-line", 'hover', function() {
+			$(this).find('.icon-bar').fadeToggle();
+		});
+	} else {
+		$('.root').undelegate('.leaf-line', hover);
+	}
+	*/
+}
+
+function initDefaultTooltip($el) {
+	$el.gips({ 'theme': 'blue', placement: 'top', animationSpeed: 100, bottom: $el.parent().parent().parent().outerHeight(), text: $el.siblings('.tooltip-description').text() });
+}
+
+function prepareAlerts() {
+	prepareAlertsVariables();
 
 	// activate column with flash messages
 	$("#alerts-icon .header-icon").unbind('click').click(function(e) {
@@ -189,155 +310,56 @@ function initJS() {
 			$(this).remove();
 		});
 	});
-
-	// line of XML output
-	$(".leaf-line").hover(function() {
-		$(this).toggleClass("hover");
-	});
-
-	prepareTooltipActions();
-
-	/* when range input type, add number of current value before input */
-	$("input[type='range']").each(function(i, e) {
-		var tmp = $("<input>").attr({
-			'class': 'range-cover-number',
-			type: 'number',
-			disabled: 'disabled',
-			value: e.value
-		}).text(e.value);
-		$(e).after(tmp);
-		$(e).bind('change', function() {
-			$(e).next('.range-cover-number').val(e.value);
-		});
-	});
-
-	showIconsOnLeafLine();
-	changeSectionHeight();
-
-	$("form[name=formConfigData]").on("change", "input, select", function(event){
-		formInputChanged = true;
-	}).on("submit", function(event){
-		formInputChanged = false;
-	});
 }
 
-function prepareTooltipActions() {
-	// tooltip
-	$('.tooltip .icon-help').each(function() {
-		initDefaultTooltip($(this));
-	});
+function hideAlertsPanel() {
+	$("body").unbind('click');
+	$(".cover-wo-alerts").css('margin-left', '0px');
+	$("#block--notifications").css('width', '');
+	$("#block--alerts").css('margin-right', '-20%').removeClass('openAlerts');
 }
 
-function initPopupMenu($cover) {
-	$cover.find('.show-link').unbind('hover');
-	$cover.find('.show-link').hover(function() {
-		$cover.find(".others").stop(true).slideToggle('fast');
-	});
-}
+function prepareSortable() {
+	var sortableChildren;
+	$(".sortable-node").parent().parent().sortable({
+		placeholder: "sortable-placeholder ui-state-highlight",
+		axis: "y",
+		items: ".sortable-node",
+		handle: ".sort-item",
+		deactivate: function(e, ui) {
+			var $leafs = $(ui.item).parent().parent().children().children(".sortable-node");
 
-/**
- * collapse top nav - when links for sections overflows available space, 
- * double down arrow with popup submenu will appear
- */
-function collapseTopNav() {
-    var $nav = $("nav#block--topMenu");
-	if ( $nav.length ) {
-		var $othersCover = $nav.find('.others-cover');
-		var $others = $othersCover.find(".others");
-    var availableSpace = $nav.outerWidth();
-
-		// we will count available space for sections hrefs
-		$nav.find('.static').each(function() {
-			availableSpace -= $(this).outerWidth();
-		});
-		availableSpace -= $othersCover.children(".show-link").outerWidth() + 50;
-
-		// move old links back to top nav bar
-		if ($othersCover.hasClass('visible')) {
-			$others.children('a').each(function() {
-				$("#userpane").before($(this).clone());
-				$(this).remove();
-			});
-			$othersCover.removeClass('visible');
-		}
-
-		// check, if dynamic href should be visible or hidden under popup menu
-		if ( $nav.find(".dynamic").length ) {
-			var firstOffset;
-			var maxOffset = $nav.find("#userpane").offset().left;
-			var isLastItemVisible = true;
-			var i = 0;
-			$nav.find('.dynamic').each(function() {
-				if (i++ === 0) {
-					firstOffset = $(this).offset().left;
-				}
-				if ( ($(this).offset().left - firstOffset + $(this).outerWidth()) >= availableSpace ||
-						($(this).offset().left + $(this).outerWidth()) >= maxOffset ||
-						isLastItemVisible === false
-					) {
-					if (isLastItemVisible === true) {
-						$othersCover.addClass('visible');
-						initPopupMenu($othersCover);
-						isLastItemVisible = false;
+			// set new index order
+			$leafs.each(function(i, elem) {
+				$(elem).find('input, select').each(function(j, e) {
+					var s = $(e).attr('name');
+					var delimIndex = s.lastIndexOf('|');
+					if (delimIndex == -1) {
+						delimIndex = s.lastIndexOf('[');
 					}
-					$others.append($(this).clone());
-					$(this).remove();
-				}
+					var newXpath = s.substring(0, s.lastIndexOf('[')) + "[index" + i + "|" + s.substring(delimIndex + 1);
+					$(e).attr('name', newXpath);
+				});
 			});
+
+			// move all children of prev sortable node
+			$(ui.item).nextUntil('.sortable-node').each(function(i, e) {
+				$(e).insertBefore($(ui.item));
+			});
+
+			// move all children of current sortable node
+			if (sortableChildren.length) {
+				sortableChildren.reverse().each(function(i, elem) {
+					$(elem).insertAfter($(ui.item));
+				});
+			}
+
+			$(".sortable-placeholder").remove();
+		},
+		activate: function(e, ui) {
+			sortableChildren = $(ui.item).nextUntil('.sortable-node');
 		}
-	}
-}
-
-function changeSectionHeight() {
-	if (!notifOutput) {
-		notifInit();
-	}
-
-	notifResizable();
-
-	var h = $(window).height();
-	if (!$(notifOutput).hasClass('hidden')) {
-		h -= $(notifOutput).outerHeight();
-	}
-
-	$("body section, body section#content").css('min-height', '0%').height(h);
-	$(notifOutput).css('top', h);
-
-	fixOverflowY();
-}
-
-function fixOverflowY() {
-	var wHeight = $(window).height();
-	$(".scrollable-cover").each(function() {
-		var scrollableContent = $(this).children('.scrollable');
-		var sHeight = scrollableContent.outerHeight();
-		var cHeight = wHeight;
-		if (scrollableContent.data('parent') !== undefined) {
-			cHeight = $(scrollableContent.data('parent')).outerHeight();
-		}
-
-		if (sHeight <= cHeight) {
-			$(this).css('overflow-y', 'auto');
-		} else {
-			$(this).css('overflow-y', 'scroll');
-		}
-	});
-}
-
-function showIconsOnLeafLine() {
-	/*
-	if ($(window).width() < 1550) {
-		$('.root').delegate(".leaf-line", 'hover', function() {
-			$(this).find('.icon-bar').fadeToggle();
-		});
-	} else {
-		$('.root').undelegate('.leaf-line', hover);
-	}
-	*/
-}
-
-function initDefaultTooltip($el) {
-	$el.gips({ 'theme': 'blue', placement: 'top', animationSpeed: 100, bottom: $el.parent().parent().parent().outerHeight(), text: $el.siblings('.tooltip-description').text() });
+	}).disableSelection();
 }
 
 function duplicateNode($elem) {

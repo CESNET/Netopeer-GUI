@@ -13,10 +13,10 @@ After tha, **run** the following commands:
 	# go to apache web directory
 	cd /var/www
 	
-    git clone --recursive https://github.com/cesnet/netopeergui.git
+    git clone --recursive https://github.com/cesnet/netopeer-gui.git
     # OR for already cloned repos or older GIT versions use
     #
-    # git clone https://github.com/cesnet/netopeergui.git
+    # git clone https://github.com/cesnet/netopeer-gui.git
     # cd netopeergui
     # git submodule update --init --recursive 
     
