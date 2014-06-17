@@ -102,6 +102,9 @@ model=${file%.*}
 
 mkdir -p $OUTPUTDIR
 
+cd "$(dirname "$INPUTFILE")"
+INPUTFILE="$(basename "$INPUTFILE")"
+
 # generate RPC and model tree
 echo "`date` "'pyang -f nmp --nmp-genidentifier --nmp-hostname "'$HOST'" --nmp-username "'$USERNAME'" --nmp-port "'$PORT'" --nmp-outputdir "'$OUTPUTDIR'" "'$INPUTFILE'"' >> "$NMPLOGFILE"
 
