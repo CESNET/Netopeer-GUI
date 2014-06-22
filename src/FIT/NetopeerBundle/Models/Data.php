@@ -815,6 +815,40 @@ class Data {
 	}
 
 	/**
+	 * handle User RPC method
+	 *
+	 * @param  resource &$sock    socket descriptor
+	 * @param  array    &$params   must contain "identifier" of schema, can contain "version" and "format" of schema
+	 * @param  mixed    &$result  decoded data from response
+	 * @return int             		0 on success, 1 on error
+	 */
+	private function handle_userrpc(&$sock, &$params, &$result) {
+
+		if ($this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+		$session = $this->container->get('request')->getSession();
+		$sessionKey = $this->getHashFromKey($params['key']);
+
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_GENERIC,
+			"content"	=> $params['content'],
+			"session" 	=> $sessionKey
+		));
+
+		if ($decoded["type"] === self::REPLY_OK) {
+			$session->getFlashBag()->add('success', "Successful call of method.");
+		} else if ($decoded["type"] === self::REPLY_DATA) {
+			$result = $decoded["data"];
+			return 0;
+                } else {
+			$this->logger->addError("User RPC call.", array("error" => var_export($decoded, true)));
+			$session->getFlashBag()->add('error', "RPC error: ".
+				((isset($decoded["errors"]) && sizeof($decoded['errors'])) ? $decoded["errors"][0] : ""));
+                        return 1;
+		}
+	}
+	/**
 	 * handle reload info action
 	 *
 	 * Result is the same as from handle_info()
@@ -1244,6 +1278,9 @@ class Data {
 			case "validate":
 				$res = $this->handle_validate($sock, $params, $result);
 				break;
+			case "userrpc":
+				$res = $this->handle_userrpc($sock, $params, $result);
+				break;
 			case "backup":
 				$params["source"] = "startup";
 				$res_startup = "<startup>".$this->handle_getconfig($sock, $params)."</startup>";
@@ -1512,7 +1549,7 @@ XML;
 	 */
 	public function loadRPCsModel($module, $subsection) {
 		$path = $this->getPathToModels($module);
-		$file = $path.'rpc.yin';
+		$file = $path.'rpc.wyin';
 
 		$rpcs_model = "";
 		if ( file_exists($file) ) {

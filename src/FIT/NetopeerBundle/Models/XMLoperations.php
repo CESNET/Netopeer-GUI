@@ -421,10 +421,11 @@ class XMLoperations {
 		$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $xmlTree->asXML());
 
 		try {
-			$editParams = array();
-			$editParams['type'] = Data::MSG_GENERIC;
-			
-			$res = $this->executeEditConfig($key, $createString, $configParams['source'], $editParams);
+			$res = $this->dataModel->handle("userrpc", array(
+					'key' => $key,
+					'content' => $createString,
+				), false, $result);
+			/* RPC can return output data in $result */
 
 			if ($res == 0) {
 				$this->container->get('request')->getSession()->getFlashBag()->add('success', "RPC method invocation was successful.");

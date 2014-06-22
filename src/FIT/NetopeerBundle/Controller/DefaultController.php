@@ -425,59 +425,12 @@ class DefaultController extends BaseController
 	  Create array (with subarrays) of input elements of RPC method
 	*/
 	private function getRPCinputAttributesAndChildren(\SimpleXMLElement $root_elem, \SimpleXMLElement &$xmlEl) {
-		switch ($root_elem->getName()) {
-		case "leaf":
-		case "leaf-list":
-			$inputName = (string) $root_elem->attributes()->name;
-			$child = $xmlEl->addChild($inputName);
-			$child->addAttribute('eltype', $root_elem->getName());
-
-			foreach ($root_elem->children() as $rootChild) {
-				/**
-				 * @var SimpleXMLElement $rootChild
-				 */
-				switch ($rootChild->getName()) {
-					case "type":
-						$elType = (string) $rootChild->attributes()->name;
-						$child->addAttribute('type', $elType);
-
-						if ($elType == 'enumeration') {
-							$arr = array();
-							foreach ($rootChild->children() as $enum) {
-								array_push($arr, $enum->attributes()->name);
-							}
-							$child->addAttribute('enumval', implode("|", $arr));
-						} elseif (in_array($elType, array('uint32', 'uint64'))) {
-		          $child->addAttribute('range', $rootChild->range->attributes()->value);
-	          }
-						break;
-
-					case "default":
-						$child->addAttribute('default', $rootChild->attributes()->value);
-						break;
-
-					case "description":
-						$child->addAttribute('description', $rootChild->text);
-						break;
-
-					case "mandatory":
-						$child->addAttribute('mandatory', $rootChild->attributes()->value);
-						break;
-				}
-			}
-			break;
-
-		case "container":
-		case "list":
-			// TODO
-//			foreach ($root_elem->children() as $ch) {
-//				$ch_elems[] = $this->createInputs($ch);
-//			}
-//			return array('children' => $ch_elems);
-			break;
-		default:
-			break;
-		}
+                $attr = $root_elem->attributes();
+                $inputName = (string) $root_elem->getName();
+                $child = $xmlEl->addChild($inputName);
+                foreach ($attr as $n => $a) {
+                        $child->addAttribute($n, $a);
+                }
 	}
 
 	/**
@@ -739,6 +692,7 @@ class DefaultController extends BaseController
 			$postVals = $this->getRequest()->get("configDataForm");
 			$this->setSectionFormsParams($key);
 
+			$result = "";
 			$res = $xmlOperations->handleRPCMethodForm($key, $this->getConfigParams(), $postVals);
 			$url = $this->get('request')->headers->get('referer');
 			return new RedirectResponse($url);
