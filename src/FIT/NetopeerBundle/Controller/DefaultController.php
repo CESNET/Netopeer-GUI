@@ -125,7 +125,7 @@ class DefaultController extends BaseController
 		$this->getRequest()->getSession()->set('activeNotifications', array());
 
 		$host = "";
-		$port = "22";
+		$port = "830";
 		$userName = "";
 		if ($connectedDeviceId !== NULL) {
 			/**
