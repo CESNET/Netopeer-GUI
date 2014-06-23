@@ -74,6 +74,11 @@ class DefaultController extends BaseController
 	private $filterForms;
 
 	/**
+	 * @var array $rpcs         holds XML for rpc methods
+	 */
+	private static $rpcs;
+
+	/**
 	 * @Route("/", name="_home")
 	 *
 	 * @return RedirectResponse
@@ -436,45 +441,59 @@ class DefaultController extends BaseController
 	/**
 	  Create array (with subarrays) of input elements of RPC method
 	*/
-	private function createRPCInputs($root_elem) {
-		switch ($root_elem->getName()) {
-		case "leaf":
-		case "leaf-list":
-			$input_name = (string) $root_elem->attributes()->name; /* toasterDoneness */
-			$input_type = (string) $root_elem->type->attributes()->name; /* uint32 */
-			return array('name' => $input_name, 'type' => $input_type);
-		case "container":
-		case "list":
-			$ch_elems = array();
-			foreach ($root_elem->children() as $ch) {
-
-				$ch_elems[] = $this->createInputs($ch);
-			}
-			return array('children' => $ch_elems);
-		default:
-			echo "unsupported type ".$root_elem->getName();
-		}
+	private function getRPCinputAttributesAndChildren(\SimpleXMLElement $root_elem, \SimpleXMLElement &$xmlEl) {
+                $attr = $root_elem->attributes();
+                $inputName = (string) $root_elem->getName();
+                $child = $xmlEl->addChild($inputName);
+                foreach ($attr as $n => $a) {
+                        $child->addAttribute($n, $a);
+                }
 	}
 
-	public function createRPCListFromModel($dataClass, $module, $subsection)
+	/**
+	 * @param $module
+	 * @param $subsection
+	 *
+	 * @return array
+	 */
+	private function createRPCListFromModel($module, $subsection = "")
 	{
+		if (!empty($this::$rpcs)) return $this::$rpcs;
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
+		$dataClass = $this->get('DataModel');
 		$rpcs = $dataClass->loadRPCsModel($module, $subsection);
 		$rpcxml = simplexml_load_string($rpcs["rpcs"]);
 		$rpcs = array();
 		if ($rpcxml) {
 			foreach ($rpcxml as $rpc) {
 				$name = (string) $rpc->attributes()->name;
-				$inputs = array();
+				if (isset($rpcs[$name])) {
+					continue;
+				}
+
+				$xmlEl = new SimpleXMLElement("<".$name."></".$name.">");
+				$xmlEl->addAttribute('description', $rpc->description->text);
+
+				$ns = $rpc->getNamespaces();
+				$xmlEl->addAttribute('namespace', !empty($ns) ? array_pop($ns) : 'false');
+
 				if ($rpc->input) {
 					foreach ($rpc->input->children() as $leafs) {
-						$inputs[] = $this->createRPCInputs($leafs);
+						$this->getRPCinputAttributesAndChildren($leafs, $xmlEl);
 					}
 				}
-				$rpcs[] = array('name' => $name,
-					'inputs' => $inputs);
+				$rpcs[$name] = $xmlEl;
 			}
 		}
+		$this::$rpcs = $rpcs;
 		return $rpcs;
+	}
+
+	private function getRPCXmlForMethod($rpcMethod, $module, $subsection = "") {
+		$rpcs = $this->createRPCListFromModel($module, $subsection);
+		return isset($rpcs[$rpcMethod]) ? $rpcs[$rpcMethod] : false;
 	}
 
 	/**
@@ -527,7 +546,7 @@ class DefaultController extends BaseController
 		// filter will be empty
 		$filters = $dataClass->loadFilters($module, $subsection);
 
-		$this->assign('rpcMethods', $this->createRPCListFromModel($dataClass, $module, $subsection));
+		$this->assign('rpcMethods', $this->createRPCListFromModel($module, $subsection));
 
 		$this->setSectionFormsParams($key, $filters['state'], $filters['config']);
 
@@ -661,6 +680,42 @@ class DefaultController extends BaseController
 			}
 			$this->assign('singleColumnLayout', true);
 		}
+
+		return $this->getTwigArr();
+	}
+
+	/**
+	 * @Route("/sections/rpc/{key}/{module}/{rpcName}/", name="showRPCForm", requirements={"key" = "\d+"})
+	 * @Template("FITNetopeerBundle:Default:showRPCForm.html.twig")
+	 *
+	 * @param $key
+	 * @param $module
+	 * @param $rpcName
+	 *
+	 * @return array|Response
+	 */
+	public function showRPCFormAction($key, $module, $rpcName) {
+		$this->addAjaxBlock('FITNetopeerBundle:Default:showRPCForm.html.twig', 'modalWindow');
+		$this->assign('key', $key);
+		$this->assign('module', $module);
+		$this->assign('rpcName', $rpcName);
+		$this->assign('sectionName', '');
+		// path for creating node typeahead
+		$valuesTypeaheadPath = $this->generateUrl("getValuesForLabel", array('formId' => "FORMID", 'key' => $key, 'xPath' => "XPATH"));
+		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
+
+		if ($this->getRequest()->getMethod() == 'POST') {
+			$xmlOperations = $this->get("XMLoperations");
+			$postVals = $this->getRequest()->get("configDataForm");
+			$this->setSectionFormsParams($key);
+
+			$result = "";
+			$res = $xmlOperations->handleRPCMethodForm($key, $this->getConfigParams(), $postVals);
+			$url = $this->get('request')->headers->get('referer');
+			return new RedirectResponse($url);
+		}
+
+		$this->assign('rpcArr', $this->getRPCXmlForMethod($rpcName, $module));
 
 		return $this->getTwigArr();
 	}

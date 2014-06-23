@@ -50,10 +50,6 @@ class nmpPlugin(plugin.PyangPlugin):
                                  action="store_true",
                                  dest="nmp_genident",
                                  help="Generate identifier of model and exit"),
-            optparse.make_option("--nmp-genrpc",
-                                 action="store_true",
-                                 dest="nmp_genrpc",
-                                 help="Create rpc.yin output with RPC operations"),
             optparse.make_option("--nmp-minchildsec",
                                  type="int",
                                  dest="nmp_minchildsec",
@@ -368,11 +364,6 @@ def emit_nmp(modules, fd, ctx):
 	ident.write(model_identifier[1])
 	ident.close()
 
-        # global filter.txt for one model
-        if ctx.opts.nmp_genrpc:
-            rpcfilepath = curpathname + "/rpc.yin"
-            rpcfile = open(rpcfilepath, "w")
-
         # iterate over module
         for section in module.i_children:
             if section.keyword == "container":
@@ -388,35 +379,8 @@ def emit_nmp(modules, fd, ctx):
                         dive_into_section(section, fd, ctx, curpathname, ctx.opts.nmp_maxdepth, STATE_STR, namespace)
                 else:
                     save_model_part(ctx, section, curpathname, "rest")
-            elif section.keyword == "rpc":
-                if ctx.opts.nmp_genrpc:
-                    # print RPC operations into special file
-                    yin = YINPlugin()
-                    import pyang.translators.yin
-                    back_yin_namespace = pyang.translators.yin.yin_namespace
-                    pyang.translators.yin.yin_namespace = namespace
-                    yin.emit(ctx,[section], rpcfile)
-                    pyang.translators.yin.yin_namespace = back_yin_namespace
             else:
                 #print section.arg, section.keyword
                 pass
-        if ctx.opts.nmp_genrpc:
-            rpcfile.close()
-            postprocess_rpcfile(rpcfilepath)
     return
-
-def postprocess_rpcfile(filepath):
-        # Read content of generated rpc.yin to remove xmldoc type
-        rpcfile = open(filepath, "r")
-        text = rpcfile.readlines()
-        rpcfile.close()
-        if text:
-            rpcfile = open(filepath, "w")
-            rpcfile.write(text[0])
-            # wrap RPC operations into root element
-            rpcfile.write("<rpc-operations>\n")
-            for line in text[1:]:
-                rpcfile.write(line.replace('<?xml version="1.0" encoding="UTF-8"?>\n', ''))
-            rpcfile.write("</rpc-operations>\n")
-            rpcfile.close()
 

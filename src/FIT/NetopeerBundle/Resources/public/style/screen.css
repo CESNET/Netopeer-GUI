@@ -615,11 +615,56 @@ body section#block--alerts .message .circle {
   -moz-box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px;
   margin: 2px 0px 5px 0px; }
-body section *[class*='level'] {
+body section#block--singleContent {
+  width: 100%;
+  min-height: 100%;
+  font-size: 1.4em;
+  padding: 15px 30px 7.5px 30px; }
+body section#block--singleContent.left-nav-defined {
+  width: 90%; }
+body section#block--singleContent.max-width-column {
+  max-width: 800px;
+  width: 100%;
+  float: none; }
+body section .filter {
+  margin-top: 20px; }
+body section .filter > div {
+  float: left;
+  margin-left: 30px; }
+body section .filter label {
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  zoom: 1;
+  *display: inline;
+  margin: 0px 10px 0px 0px;
+  width: auto;
+  height: auto;
+  line-height: 1em; }
+body section .filter label.required:after {
+  content: " "; }
+body section .filter select {
+  margin-top: 5px;
+  width: 100px; }
+body section .filter .button, body section .filter form input[type="submit"], form body section .filter input[type="submit"] {
+  margin: 1px 10px; }
+body section .filter .note {
+  font-size: 0.8em;
+  font-style: italic;
+  margin-top: 7px; }
+body section #block--sourceValidation {
+  float: left;
+  margin: 29px 0px 0px 7px;
+  font-size: 0.9em; }
+body section #block--sourceValidation .source-validation {
+  margin-top: -6px; }
+
+*[class*='level'] {
   position: relative;
   float: left;
   width: 100%; }
-body section *[class*='level'] .dots {
+*[class*='level'] .dots {
   background: url("../images/dot.png") left top repeat transparent;
   display: -moz-inline-stack;
   display: inline-block;
@@ -632,119 +677,136 @@ body section *[class*='level'] .dots {
   top: 0px;
   min-height: 28px;
   height: 100%; }
-body section .level-0 .dots {
+
+.level-0 .dots {
   width: 0px; }
-body section .level-0 .label {
+.level-0 .label {
   padding-left: 6px; }
-body section .level-0 input.label {
+.level-0 input.label {
   margin-left: 6px;
   padding-left: 0px; }
-body section .level-1 .dots {
+
+.level-1 .dots {
   width: 8px; }
-body section .level-1 .label {
+.level-1 .label {
   padding-left: 14px; }
-body section .level-1 input.label {
+.level-1 input.label {
   margin-left: 14px;
   padding-left: 0px; }
-body section .level-2 .dots {
+
+.level-2 .dots {
   width: 16px; }
-body section .level-2 .label {
+.level-2 .label {
   padding-left: 22px; }
-body section .level-2 input.label {
+.level-2 input.label {
   margin-left: 22px;
   padding-left: 0px; }
-body section .level-3 .dots {
+
+.level-3 .dots {
   width: 24px; }
-body section .level-3 .label {
+.level-3 .label {
   padding-left: 30px; }
-body section .level-3 input.label {
+.level-3 input.label {
   margin-left: 30px;
   padding-left: 0px; }
-body section .level-4 .dots {
+
+.level-4 .dots {
   width: 32px; }
-body section .level-4 .label {
+.level-4 .label {
   padding-left: 38px; }
-body section .level-4 input.label {
+.level-4 input.label {
   margin-left: 38px;
   padding-left: 0px; }
-body section .level-5 .dots {
+
+.level-5 .dots {
   width: 40px; }
-body section .level-5 .label {
+.level-5 .label {
   padding-left: 46px; }
-body section .level-5 input.label {
+.level-5 input.label {
   margin-left: 46px;
   padding-left: 0px; }
-body section .level-6 .dots {
+
+.level-6 .dots {
   width: 48px; }
-body section .level-6 .label {
+.level-6 .label {
   padding-left: 54px; }
-body section .level-6 input.label {
+.level-6 input.label {
   margin-left: 54px;
   padding-left: 0px; }
-body section .level-7 .dots {
+
+.level-7 .dots {
   width: 56px; }
-body section .level-7 .label {
+.level-7 .label {
   padding-left: 62px; }
-body section .level-7 input.label {
+.level-7 input.label {
   margin-left: 62px;
   padding-left: 0px; }
-body section .level-8 .dots {
+
+.level-8 .dots {
   width: 64px; }
-body section .level-8 .label {
+.level-8 .label {
   padding-left: 70px; }
-body section .level-8 input.label {
+.level-8 input.label {
   margin-left: 70px;
   padding-left: 0px; }
-body section .level-9 .dots {
+
+.level-9 .dots {
   width: 72px; }
-body section .level-9 .label {
+.level-9 .label {
   padding-left: 78px; }
-body section .level-9 input.label {
+.level-9 input.label {
   margin-left: 78px;
   padding-left: 0px; }
-body section .level-10 .dots {
+
+.level-10 .dots {
   width: 80px; }
-body section .level-10 .label {
+.level-10 .label {
   padding-left: 86px; }
-body section .level-10 input.label {
+.level-10 input.label {
   margin-left: 86px;
   padding-left: 0px; }
-body section .level-11 .dots {
+
+.level-11 .dots {
   width: 88px; }
-body section .level-11 .label {
+.level-11 .label {
   padding-left: 94px; }
-body section .level-11 input.label {
+.level-11 input.label {
   margin-left: 94px;
   padding-left: 0px; }
-body section .level-12 .dots {
+
+.level-12 .dots {
   width: 96px; }
-body section .level-12 .label {
+.level-12 .label {
   padding-left: 102px; }
-body section .level-12 input.label {
+.level-12 input.label {
   margin-left: 102px;
   padding-left: 0px; }
-body section .level-13 .dots {
+
+.level-13 .dots {
   width: 104px; }
-body section .level-13 .label {
+.level-13 .label {
   padding-left: 110px; }
-body section .level-13 input.label {
+.level-13 input.label {
   margin-left: 110px;
   padding-left: 0px; }
-body section .level-14 .dots {
+
+.level-14 .dots {
   width: 112px; }
-body section .level-14 .label {
+.level-14 .label {
   padding-left: 118px; }
-body section .level-14 input.label {
+.level-14 input.label {
   margin-left: 118px;
   padding-left: 0px; }
-body section .level-15 .dots {
+
+.level-15 .dots {
   width: 120px; }
-body section .level-15 .label {
+.level-15 .label {
   padding-left: 126px; }
-body section .level-15 input.label {
+.level-15 input.label {
   margin-left: 126px;
   padding-left: 0px; }
-body section .level-0:not(.container):not(.list) {
+
+.level-0:not(.container):not(.list) {
   margin: 0px;
   border-left: 2px solid #aaa;
   border-right: 2px solid #aaa;
@@ -753,24 +815,27 @@ body section .level-0:not(.container):not(.list) {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   width: 100%; }
-body section .level-0:not(.container):not(.list):nth-child(even) {
+.level-0:not(.container):not(.list):nth-child(even) {
   background: #fff;
   border-left: 2px solid #333;
   border-right: 2px solid #333; }
-body section .level-0:not(.container):not(.list):nth-child(even) > .leaf-line:first-child {
+.level-0:not(.container):not(.list):nth-child(even) > .leaf-line:first-child {
   border-top: 1px solid #666; }
-body section .level-0:not(.container):not(.list):nth-child(odd) > .leaf-line:first-child {
+.level-0:not(.container):not(.list):nth-child(odd) > .leaf-line:first-child {
   border-top: 1px solid #aaa; }
-body section .level-0 > .leaf-line > .label > .label-cover > span.dash {
+
+.level-0 > .leaf-line > .label > .label-cover > span.dash {
   display: none; }
-body section .sortable-placeholder {
+
+.sortable-placeholder {
   height: 40px;
   width: 100%;
   display: block;
   min-height: 40px;
   float: left;
   clear: left; }
-body section .leaf-line {
+
+.leaf-line {
   padding: 7px 1.5% 7px 0px;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
@@ -781,33 +846,33 @@ body section .leaf-line {
   float: left;
   width: 100%;
   position: relative; }
-body section .leaf-line.hover {
+.leaf-line.hover {
   background-color: #dadada;
   border-color: #aaa; }
-body section .leaf-line.is-root-elem {
+.leaf-line.is-root-elem {
   border-left: 0px none !important;
   border-right: 0px none !important;
   margin-bottom: 15px !important; }
-body section .leaf-line.is-root-elem .dots, body section .leaf-line.is-root-elem .dash {
+.leaf-line.is-root-elem .dots, .leaf-line.is-root-elem .dash {
   display: none; }
-body section .leaf-line.is-root-elem .edit-bar .sibling {
+.leaf-line.is-root-elem .edit-bar .sibling {
   display: none; }
-body section .leaf-line .label {
+.leaf-line .label {
   width: 35%;
   float: left;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   color: #333; }
-body section .leaf-line .value {
+.leaf-line .value {
   width: 59%;
   float: left;
   color: #000;
   margin-left: 2%; }
-body section .leaf-line .range {
+.leaf-line .range {
   width: 42%;
   float: left; }
-body section .leaf-line .range-cover-number {
+.leaf-line .range-cover-number {
   width: 6%;
   float: left;
   margin-right: 1.8%;
@@ -835,19 +900,19 @@ body section .leaf-line .range-cover-number {
   -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px; }
-body section .leaf-line .config-value-cover, body section .leaf-line .value-cover {
+.leaf-line .config-value-cover, .leaf-line .value-cover {
   width: 45%;
   float: left;
   margin-top: -3px;
   margin-left: 2%; }
-body section .leaf-line .config-value-cover label, body section .leaf-line .value-cover label {
+.leaf-line .config-value-cover label, .leaf-line .value-cover label {
   margin: 0px;
   padding: 0px;
   width: auto;
   padding-right: 10px;
   line-height: 18px;
   height: 18px; }
-body section .leaf-line input.value.text {
+.leaf-line input.value.text {
   width: 45%;
   margin: -4px 0px;
   height: 22px;
@@ -855,75 +920,78 @@ body section .leaf-line input.value.text {
   padding: 0px 3px;
   font-size: 0.9em;
   margin-left: 2%; }
-body section .leaf-line textarea.value {
+.leaf-line textarea.value {
   width: 50%;
   margin: -4px 0px;
   border: 1px solid #ccc;
   padding: 0px 3px;
   font-size: 0.9em;
   margin-left: 2%; }
-body section .leaf-line.generated input.value.text, body section .leaf-line.generated textarea.value {
+.leaf-line.generated input.value.text, .leaf-line.generated textarea.value {
   margin-top: 0px;
   margin-bottom: 0px; }
-body section .leaf-line.generated .tooltip {
+.leaf-line.generated .tooltip {
   margin-top: 3px; }
-body section .leaf-line .edit-bar {
+.leaf-line .edit-bar {
   min-height: 22px;
   margin: -3px 0px -5px 2%;
   float: right;
   text-align: right; }
-body section .leaf-line .edit-bar .child {
+.leaf-line .edit-bar .child {
   display: none; }
-body section .leaf-line .edit-bar img {
+.leaf-line .edit-bar img {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
   opacity: 0.4;
   cursor: pointer; }
-body section .leaf-line .edit-bar img:hover {
+.leaf-line .edit-bar img:hover {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1; }
-body section .leaf-line .edit-bar.generated {
+.leaf-line .edit-bar.generated {
   margin-top: 0px; }
-body section .leaf-line.state .edit-bar {
+.leaf-line.state .edit-bar {
   width: auto; }
-body section .leaf-line.active {
+.leaf-line.active {
   position: relative;
   z-index: 25;
   background: #fff; }
-body section .leaf-line.has-children span.bull {
+.leaf-line.has-children span.bull {
   width: 5px;
   height: 5px;
   position: absolute;
   left: -9px;
   top: 6px;
   background-color: #666; }
-body section .leaf-line .label-cover {
+.leaf-line .label-cover {
   position: relative; }
-body section .leaf-line .label-cover span.dash {
+.leaf-line .label-cover span.dash {
   width: 5px;
   height: 1px;
   position: absolute;
   left: -9px;
   top: 8px;
   background-color: #666; }
-body section .container, body section .list {
+
+.container, .list {
   margin: 25px 0px; }
-body section .container > *:not(.container):not(.list), body section .list > *:not(.container):not(.list) {
+.container > *:not(.container):not(.list), .list > *:not(.container):not(.list) {
   border-left: 2px solid #aaa;
   border-right: 2px solid #aaa;
   background: #f0f0f0; }
-body section .container > *:not(.container):not(.list):nth-child(even), body section .list > *:not(.container):not(.list):nth-child(even) {
+.container > *:not(.container):not(.list):nth-child(even), .list > *:not(.container):not(.list):nth-child(even) {
   background: #fff;
   border-left: 2px solid #333;
   border-right: 2px solid #333; }
-body section .container > *:not(.container):not(.list):nth-child(even) .dots, body section .list > *:not(.container):not(.list):nth-child(even) .dots {
+.container > *:not(.container):not(.list):nth-child(even) .dots, .list > *:not(.container):not(.list):nth-child(even) .dots {
   background-color: #fff; }
-body section .container .container, body section .container .list, body section .list .container, body section .list .list {
+.container .container, .container .list, .list .container, .list .list {
   border-top: 1px solid #ddd; }
-body section .container + * > .leaf-line:first-child, body section .list + * > .leaf-line:first-child {
+.container + * > .leaf-line:first-child, .list + * > .leaf-line:first-child {
   margin-top: 0px; }
-body section .mandatory {
+
+.mandatory {
   color: #888; }
-body section .tooltip {
+
+.tooltip {
   float: right;
   margin: 0px 0px 0px 4px; }
 body section#block--singleContent {
@@ -1370,6 +1438,17 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
 .modal-header .button, .modal-header form input[type="submit"], form .modal-header input[type="submit"] {
   margin-top: 0px;
   margin-bottom: 0px; }
+
+/** modal RPC methods **/
+#block--modalWindow {
+  display: none;
+  font-size: 1.3em; }
+#block--modalWindow > form {
+  margin: 0px; }
+#block--modalWindow .modal-body {
+  overflow-y: visible; }
+#block--modalWindow .modal-footer input[type="submit"] {
+  margin: 0px; }
 
 /* tooltip */
 .tooltip {

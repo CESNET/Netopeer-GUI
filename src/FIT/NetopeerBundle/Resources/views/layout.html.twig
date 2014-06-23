@@ -128,7 +128,7 @@ if advised of the possibility of such damage.
 					{% if rpcMethods is defined and rpcMethods|length > 0 %}
 					<h4>RPC methods defined in model:</h4>
 					{% for rpc in rpcMethods %}
-						<span class="item has-bullet"><span class="bullet"></span>{{ rpc.name }}</span>
+						<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc.name}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc.name }}</a>
 					{% endfor %} {% endif %}
 				{% endblock leftColumnAdditional %}
 			{% endblock leftColumn %}
@@ -202,6 +202,8 @@ if advised of the possibility of such damage.
 		{% endblock notifications %}
 		<div class="notif-cover"></div>
 	</div>
+
+	<div id="block--modalWindow" class="modal" role="dialog"></div>
 
 </body>
 </html>

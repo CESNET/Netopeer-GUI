@@ -106,7 +106,7 @@ cd "$(dirname "$INPUTFILE")"
 INPUTFILE="$(basename "$INPUTFILE")"
 
 # generate RPC and model tree
-echo "`date` "'pyang -f nmp --nmp-genidentifier --nmp-hostname "'$HOST'" --nmp-username "'$USERNAME'" --nmp-port "'$PORT'" --nmp-outputdir "'$OUTPUTDIR'" "'$INPUTFILE'"' >> "$NMPLOGFILE"
+#echo "`date` "'pyang -f nmp --nmp-genidentifier --nmp-hostname "'$HOST'" --nmp-username "'$USERNAME'" --nmp-port "'$PORT'" --nmp-outputdir "'$OUTPUTDIR'" "'$INPUTFILE'"' >> "$NMPLOGFILE"
 
 OUTPUT=$(pyang -f nmp --nmp-genidentifier --nmp-hostname "$HOST" --nmp-username "$USERNAME" --nmp-port "$PORT" --nmp-outputdir "$OUTPUTDIR" "$INPUTFILE")
 
@@ -126,20 +126,20 @@ if [ -e "$MODELDIR" ]; then
 	echo "`date` Already exists ($MODELDIR)" >> "$NMPLOGFILE"
 else
 	mkdir -p "$MODELDIR"
-	pyang -f nmp --nmp-genrpc  --nmp-outputdir "$MODELDIR" "$INPUTFILE" > /dev/null&
+	pyang -f nmp --nmp-outputdir "$MODELDIR" "$INPUTFILE" > /dev/null&
 	#pyang -f nmp --nmp-genrpc  --nmp-outputdir "$MODELDIR" --nmp-hostname "$HOST" --nmp-username "$USERNAME" --nmp-port "$PORT" "$INPUTFILE" > /dev/null
 
         # generate element tree from model
         pyang -f tree -o "$MODELDIR/tree.txt" "$INPUTFILE" > /dev/null&
 
 	# generate wrapped form
-	pyang -f wyin -o "$MODELDIR/wrapped.wyin" "$INPUTFILE" > /dev/null&
+	pyang -f wyin --wyin-outputdir "$MODELDIR" -o "$MODELDIR/wrapped.wyin" "$INPUTFILE" > /dev/null&
 
-	# generate state information tree only
-	pyang -f nmp --nmp-breaktree --nmp-genrpc --nmp-outputdir "$MODELDIR" "$INPUTFILE" > /dev/null&
+	## generate state information tree only
+	#pyang -f nmp --nmp-breaktree --nmp-genrpc --nmp-outputdir "$MODELDIR" "$INPUTFILE" > /dev/null&
 
-	# generate config information tree only
-	pyang -f nmp --nmp-breaktree --nmp-config --nmp-outputdir "$MODELDIR" "$INPUTFILE" > /dev/null&
+	## generate config information tree only
+	#pyang -f nmp --nmp-breaktree --nmp-config --nmp-outputdir "$MODELDIR" "$INPUTFILE" > /dev/null&
 	## get-config template
 	#pyang -f resptempl --resptempl-config 1 $INPUTFILE > "$OUTPUTDIR/$model/resptempl"
 

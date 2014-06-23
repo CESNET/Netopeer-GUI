@@ -40,7 +40,7 @@
 @import "compass/css3";
 @import "compass/typography/links/link-colors";
 @import "compass/typography/text/ellipsis";
-
+@import "compass/utilities/general";
 
 
 // basic colors - http://kuler.adobe.com/#themeID/233350
@@ -209,8 +209,6 @@ nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa
 .scrollable-cover { overflow-y: scroll; }
 body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentPadding; font-size: 1.4em; background: #f5f5f5; @include box-sizing(border-box); border-top: $hNavTop solid transparent;
 	&.left-nav-defined { width: 44.93%; }
-
-
 	&#block--state { border-right: 1px solid #bababa; @include single-box-shadow(darken(#f5f5f5, 5%), -5px, 0px, 5px, false, true); padding-right: 2 * $sContentPadding; }
 	&#block--config { padding-left: 2 * $sContentPadding; }
 	&#block--alerts { width: 20%; position: absolute; top: 0px; right: 0px; background: #333; border-left: 1px solid #000; @include box-shadow( 0px -7px 7px rgba(0,0,0,0.9)); padding-left: 0px; padding-right: 0px; margin-right: -20%;
@@ -235,87 +233,6 @@ body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentP
 		}
 	}
 
-
-	*[class*='level'] { position: relative; float: left; width: 100%;
-		.dots { background: url($img + 'dot.png') left top repeat transparent; @include inline-block; position: absolute; left: 0px; top: 0px; min-height: 28px; height: 100%; }
-	}
-	@for $i from 0 through 15 {
-	  .level-#{$i} { 
-	  	.dots { width: 8px * $i; }
-	  	.label { padding-left: 6px + (8px * $i); }
-	  	input.label { margin-left: 6px + (8px * $i); padding-left: 0px; }
-	  }
-	}
-	.level-0:not(.container):not(.list) { margin: 0px; border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f4f4f4; @include box-sizing(border-box); width: 100%;
-		&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
-			//.even { background: #f8f8f8; }
-			> .leaf-line:first-child { border-top: 1px solid #666; }
-		}
-		&:nth-child(odd) {
-			//.even { background: #f8f8f8; }
-			> .leaf-line:first-child { border-top: 1px solid #aaa; }
-		}
-	}
-	.level-0> .leaf-line > .label > .label-cover {
-		> span.dash { display: none; }
-	}
-	.sortable-placeholder { height: 40px; width: 100%; display: block; min-height: 40px; float: left; clear: left; }
-	.leaf-line { padding: 7px 1.5% 7px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
-		&.hover { background-color: #dadada; border-color: #aaa; }
-		&.is-root-elem { border-left: 0px none !important; border-right: 0px none !important;  margin-bottom: 15px !important;
-			.dots, .dash { display: none; }
-			.edit-bar .sibling { display: none; }
-		}
-		.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
-		.value { width: 59%; float: left; color: #000; margin-left: 2%; }
-		.range { width: 42%; float: left; }
-		.range-cover-number { width: 6%; float: left; margin-right: 1.8%; text-align: right; padding: 3px 5px; margin-top: -2px; margin-bottom: -2px; @include box-sizing(border-box); border: 1px solid #ccc; @include background( linear-gradient(#fff, #f4f4f4) ); @include inline-block; @include border-radius(3px); }
-		.config-value-cover, .value-cover { width: 45%; float: left; margin-top: -3px; margin-left: 2%;
-			label { margin: 0px; padding: 0px; width: auto; padding-right: 10px; line-height: 18px; height: 18px; }
-		}
-		input.value.text { width: 45%; margin: -4px 0px; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
-		textarea.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
-
-		&.generated {
-			input.value.text, textarea.value { margin-top: 0px; margin-bottom: 0px; }
-			.tooltip { margin-top: 3px; }
-		}
-
-		.edit-bar { min-height: 22px; margin: -3px 0px -5px 2%; float: right; text-align: right;
-			.child { display: none; }
-			img { @include opacity(0.4); cursor: pointer;
-				&:hover { @include opacity(1); }
-			}
-			&.generated { margin-top: 0px; }
-		}
-		+ .leaf { }
-		&.state .edit-bar {	width: auto; }
-
-		&.active { position: relative; z-index: 25; background: #fff; }
-		&.has-children {
-			span.bull { width: 5px; height: 5px; position: absolute; left: -9px; top: 6px; background-color: #666; }
-		}
-		.label-cover { position: relative;
-			span.dash { width: 5px; height: 1px; position: absolute; left: -9px; top: 8px; background-color: #666; }
-		}
-//		&.config { background: #ccc; }
-	}	
-	.container, .list { margin: 25px 0px; 
-		> *:not(.container):not(.list) { border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f0f0f0;
-			&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
-				.dots { background-color: #fff; }
-			}
-		}
-		.container, .list { border-top: 1px solid #ddd; }
-
-		+ * > .leaf-line:first-child { margin-top: 0px; }
-	}
-	.mandatory { color: #888; }
-	.tooltip { float: right; margin: 0px 0px 0px 4px; }
-	.label-cover {
-		&.has-tooltip {  }
-	}
-
 	&#block--singleContent { width: 100%; min-height: 100%; font-size: 1.4em; padding: $sContentPadding 2 * $sContentPadding $sContentPadding / 2 2 * $sContentPadding;
 		&.left-nav-defined { width: 89.91%; }
 		&.max-width-column { max-width: 800px; width: 100%; float: none; }
@@ -335,6 +252,86 @@ body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentP
 		.source-validation { margin-top: -6px; }
 	}
 }
+*[class*='level'] { position: relative; float: left; width: 100%;
+	.dots { background: url($img + 'dot.png') left top repeat transparent; @include inline-block; position: absolute; left: 0px; top: 0px; min-height: 28px; height: 100%; }
+}
+@for $i from 0 through 15 {
+	.level-#{$i} {
+		.dots { width: 8px * $i; }
+		.label { padding-left: 6px + (8px * $i); }
+		input.label { margin-left: 6px + (8px * $i); padding-left: 0px; }
+	}
+}
+.level-0:not(.container):not(.list) { margin: 0px; border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f4f4f4; @include box-sizing(border-box); width: 100%;
+	&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
+		//.even { background: #f8f8f8; }
+		> .leaf-line:first-child { border-top: 1px solid #666; }
+	}
+	&:nth-child(odd) {
+		//.even { background: #f8f8f8; }
+		> .leaf-line:first-child { border-top: 1px solid #aaa; }
+	}
+}
+.level-0> .leaf-line > .label > .label-cover {
+	> span.dash { display: none; }
+}
+.sortable-placeholder { height: 40px; width: 100%; display: block; min-height: 40px; float: left; clear: left; }
+.leaf-line { padding: 7px 1.5% 7px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
+	&.hover { background-color: #dadada; border-color: #aaa; }
+	&.is-root-elem { border-left: 0px none !important; border-right: 0px none !important;  margin-bottom: 15px !important;
+		.dots, .dash { display: none; }
+		.edit-bar .sibling { display: none; }
+	}
+	.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
+	.value { width: 59%; float: left; color: #000; margin-left: 2%; }
+	.range { width: 42%; float: left; }
+	.range-cover-number { width: 6%; float: left; margin-right: 1.8%; text-align: right; padding: 3px 5px; margin-top: -2px; margin-bottom: -2px; @include box-sizing(border-box); border: 1px solid #ccc; @include background( linear-gradient(#fff, #f4f4f4) ); @include inline-block; @include border-radius(3px); }
+	.config-value-cover, .value-cover { width: 45%; float: left; margin-top: -3px; margin-left: 2%;
+		label { margin: 0px; padding: 0px; width: auto; padding-right: 10px; line-height: 18px; height: 18px; }
+	}
+	input.value.text { width: 45%; margin: -4px 0px; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
+	textarea.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
+
+	&.generated {
+		input.value.text, textarea.value { margin-top: 0px; margin-bottom: 0px; }
+		.tooltip { margin-top: 3px; }
+	}
+
+	.edit-bar { min-height: 22px; margin: -3px 0px -5px 2%; float: right; text-align: right;
+		.child { display: none; }
+		img { @include opacity(0.4); cursor: pointer;
+			&:hover { @include opacity(1); }
+		}
+		&.generated { margin-top: 0px; }
+	}
+	+ .leaf { }
+	&.state .edit-bar {	width: auto; }
+
+	&.active { position: relative; z-index: 25; background: #fff; }
+	&.has-children {
+		span.bull { width: 5px; height: 5px; position: absolute; left: -9px; top: 6px; background-color: #666; }
+	}
+	.label-cover { position: relative;
+		span.dash { width: 5px; height: 1px; position: absolute; left: -9px; top: 8px; background-color: #666; }
+	}
+	//		&.config { background: #ccc; }
+}
+.container, .list { margin: 25px 0px;
+	> *:not(.container):not(.list) { border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f0f0f0;
+		&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
+			.dots { background-color: #fff; }
+		}
+	}
+	.container, .list { border-top: 1px solid #ddd; }
+
+	+ * > .leaf-line:first-child { margin-top: 0px; }
+}
+.mandatory { color: #888; }
+.tooltip { float: right; margin: 0px 0px 0px 4px; }
+.label-cover {
+	&.has-tooltip {  }
+}
+
 .top-part { position: absolute; right: 2 * $sContentPadding; top: $hNavTop + $sContentPadding; font-size: 1.2em; @include opacity(0.7); z-index: 10;
 	&:hover { @include opacity(1); }
 }
@@ -469,6 +466,15 @@ table { width: 100%; margin: 15px 0px;
 .modal-header { overflow: hidden;
 	h3 { margin: 0px; padding: 0px; font-family: $fHeadings; color: $cBase; font-size: 1.5em; }
 	.button { margin-top: 0px; margin-bottom: 0px; }
+}
+
+/** modal RPC methods **/
+#block--modalWindow { display: none; font-size: 1.3em;
+	> form { margin: 0px; }
+	.modal-body { overflow-y: visible; }
+	.modal-footer {
+		input[type="submit"] { margin: 0px; }
+	}
 }
 
 /* tooltip */

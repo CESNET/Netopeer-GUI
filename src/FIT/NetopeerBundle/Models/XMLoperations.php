@@ -383,6 +383,61 @@ class XMLoperations {
 		return $res;
 	}
 
+	public function handleRPCMethodForm($key, $configParams, $postVals) {
+		$name = $postVals['rootElemName'];
+		$namespace = $postVals['rootElemNamespace'];
+		$res = 0;
+
+		$xmlTree = new \SimpleXMLElement('<'.$name.'></'.$name.'>');
+		$xmlTree->registerXPathNamespace('xc', 'urn:ietf:params:xml:ns:netconf:base:1.0');
+
+		if ($namespace !== 'false' && $namespace !== '') {
+			$xmlTree->registerXPathNamespace('rpcMod', $namespace);
+			$xmlTree->addAttribute('xmlns', $namespace);
+		}
+
+		// we will go through all post values
+		$skipArray = array('rootElemName', 'rootElemNamespace');
+		foreach ( $postVals as $labelKey => $labelVal ) {
+			if (in_array($labelKey, $skipArray)) continue;
+			$label = $this->divideInputName($labelKey);
+			// values[0] - label
+			// values[1] - encoded xPath
+
+			if ( count($label) != 2 ) {
+				$this->logger->err('RPCMethodForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $label, 'postKey' => $labelKey));
+				throw new \ErrorException("Could not proccess all form fields.");
+
+			} else {
+				$xpath = $this->decodeXPath($label[1]);
+				$xpath = substr($xpath, 1);
+
+				$node = $this->insertNewElemIntoXMLTree($xmlTree, $xpath, $label[0], $labelVal, '', $addCreateNS = false);
+
+				array_push($skipArray, $labelKey);
+			}
+		}
+
+		$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $xmlTree->asXML());
+
+		try {
+			$res = $this->dataModel->handle("userrpc", array(
+					'key' => $key,
+					'content' => $createString,
+				), false, $result);
+			/* RPC can return output data in $result */
+
+			if ($res == 0) {
+				$this->container->get('request')->getSession()->getFlashBag()->add('success', "RPC method invocation was successful.");
+			}
+		} catch (\ErrorException $e) {
+			$this->logger->warn('Could not invocate RPC method.', array('error' => $e->getMessage(), 'xml' => $createString));
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not invocate RPC method. Error: ".$e->getMessage());
+		}
+
+		return $res;
+	}
+
 	/**
 	 * duplicates node in config - values of duplicated nodes (elements)
 	 *
@@ -650,15 +705,16 @@ class XMLoperations {
 	/**
 	 * inserts new element into given XML tree
 	 *
-	 * @param  \SimpleXMLElement $configXml   xml file
-	 * @param  string $xpath       XPath to the element
-	 * @param  string $label       label value
-	 * @param  string $value       new value
-	 * @param  string $xPathPrefix
+	 * @param  \SimpleXMLElement $configXml xml file
+	 * @param  string            $xpath     XPath to the element
+	 * @param  string            $label     label value
+	 * @param  string            $value     new value
+	 * @param  string            $xPathPrefix
+	 * @param bool               $addCreateNS
 	 *
 	 * @return \SimpleXMLElement   modified node
 	 */
-	public function insertNewElemIntoXMLTree(&$configXml, $xpath, $label, $value, $xPathPrefix = "xmlns:")
+	public function insertNewElemIntoXMLTree(&$configXml, $xpath, $label, $value, $xPathPrefix = "xmlns:", $addCreateNS = true)
 	{
 		/**
 		 * get node according to xPath query
@@ -670,7 +726,10 @@ class XMLoperations {
 		} else {
 			$elem = $node[0]->addChild($label, $value);
 		}
-		$elem->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
+
+		if ($addCreateNS) {
+			$elem->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
+		}
 
 		return $elem;
 	}
@@ -743,13 +802,14 @@ class XMLoperations {
 	 *
 	 * @return int              return 0 on success, 1 on error
 	 */
-	private function executeEditConfig($key, $config, $target = "running") {
+	private function executeEditConfig($key, $config, $target = "running", $additionalParams = array()) {
 		$res = 0;
 		$editConfigParams = array(
 			'key' 	 => $key,
 			'target' => $target,
 			'config' => str_replace('<?xml version="1.0"?'.'>', '', $config)
 		);
+		$editConfigParams = array_merge($editConfigParams, $additionalParams);
 
 		// edit-cofig
 		if ( ($merged = $this->dataModel->handle('editconfig', $editConfigParams)) != 1 ) {

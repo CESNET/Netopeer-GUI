@@ -19,6 +19,9 @@ from pyang import statements
 yin_namespace = "urn:ietf:params:xml:ns:yang:yin:1"
 
 identityrefs = {}
+wyin_namespace = ""
+wyin_prefix = ""
+wyin_nsprefixes = {}
 
 def pyang_plugin_init():
     plugin.register_plugin(WYINPlugin())
@@ -39,6 +42,10 @@ class WYINPlugin(plugin.PyangPlugin):
                                  dest="enum_delim",
                                  default='|',
                                  help="Set delimiter of values for enumerate items."),
+            optparse.make_option("--wyin-outputdir",
+                                 type="string",
+                                 dest="wyin_outputdir",
+                                 help="Where to generate files?"),
             ]
         g = optparser.add_option_group("wYIN output specific options")
         g.add_options(optlist)
@@ -47,9 +54,40 @@ class WYINPlugin(plugin.PyangPlugin):
     def add_output_format(self, fmts):
         self.multiple_modules = True
         fmts['wyin'] = self
+    def postprocess_rpcfile(self, filepath):
+            # Read content of generated rpc.yin to remove xmldoc type
+            rpcfile = open(filepath, "r")
+            text = rpcfile.readlines()
+            rpcfile.close()
+            if text:
+                rpcfile = open(filepath, "w")
+                rpcfile.write(text[0])
+                # wrap RPC operations into root element
+                rpcfile.write("<rpc-operations>\n")
+                for line in text[1:]:
+                    rpcfile.write(line.replace('<?xml version="1.0" encoding="UTF-8"?>\n', ''))
+                rpcfile.write("</rpc-operations>\n")
+                rpcfile.close()
     def emit(self, ctx, modules, fd):
-        module = modules[0]
-        emit_wyin(ctx, module, fd)
+        #module = modules[0]
+        for module in modules:
+            emit_wyin(ctx, module, fd)
+
+        if not ctx.opts.wyin_outputdir:
+            print "Enter output directory for processed model by --wyin_outputdir."
+            return
+        rpcfilepath = "%s/rpc.wyin" % ctx.opts.wyin_outputdir
+        rpcfile = open(rpcfilepath, "w")
+        global yin_namespace
+        yin_namespace_backup = yin_namespace
+        yin_namespace = wyin_namespace
+        for module in modules:
+            for section in module.i_children:
+                if section.keyword == "rpc":
+                    emit_wyin(ctx, section, rpcfile)
+        yin_namespace = yin_namespace_backup
+        rpcfile.close()
+        self.postprocess_rpcfile(rpcfilepath)
 
 def escape2xml(str):
     return str.replace("&", "&amp;").\
@@ -59,17 +97,44 @@ def escape2xml(str):
          replace('"', "&quot;")
 
 def emit_wyin(ctx, module, fd):
+    global wyin_prefix, wyin_namespace, wyin_nsprefixes
     fd.write('<?xml version="1.0" encoding="UTF-8"?>\n')
-    fd.write('<%s name="%s"\n' % (module.keyword, module.arg))
-    fd.write(' ' * len(module.keyword) + '  xmlns="%s"' % yin_namespace)
+    if module.keyword and module.arg:
+        fd.write('<%s name="%s"\n' % (module.keyword, module.arg))
+        fd.write(' ' * len(module.keyword) + '  xmlns="%s"' % yin_namespace)
 
+    wyin_init_prefix(ctx, module)
+
+    print wyin_nsprefixes
+    if wyin_nsprefixes:
+        for p,ns in wyin_nsprefixes.iteritems():
+            namespace = module.search_one('namespace')
+            fd.write('\n')
+            fd.write(' ' * len(module.keyword))
+            fd.write('  xmlns:' + p + '=' +
+                     quoteattr(ns))
+
+    fd.write('>\n')
+
+    wyin_init_identityrefs(ctx, module)
+    for i in module.substmts:
+        if i not in module.i_children:
+            emit_stmt(ctx, module, i, fd, " ", " ")
+    chs = [ch for ch in module.i_children
+        if ch.keyword in statements.data_definition_keywords]
+    print_node(ctx, chs, module, fd)
+    fd.write('</%s>\n' % module.keyword)
+    #end of document
+    print identityrefs, wyin_namespace
+
+def wyin_init_prefix(ctx, module):
+    global wyin_prefix, wyin_namespace, wyin_nsprefixes
     prefix = module.search_one('prefix')
     if prefix is not None:
         namespace = module.search_one('namespace')
-        fd.write('\n')
-        fd.write(' ' * len(module.keyword))
-        fd.write('  xmlns:' + prefix.arg + '=' +
-                 quoteattr(namespace.arg))
+        wyin_prefix = prefix.arg
+        wyin_namespace = namespace.arg
+        wyin_nsprefixes[prefix.arg] = namespace.arg
     else:
         belongs_to = module.search_one('belongs-to')
         if belongs_to is not None:
@@ -83,11 +148,9 @@ def emit_wyin(ctx, module, fd):
                         pass
                     else:
                         # success - namespace found
-                        fd.write('\n')
-                        fd.write(' ' * len(module.keyword))
-                        fd.write('  xmlns:' + prefix.arg + '=' +
-                                 quoteattr(namespace.arg))
-
+                        wyin_namespace = namespace.arg
+                        wyin_nsprefixes[prefix.arg] = namespace.arg
+                wyin_prefix = prefix.arg
     for imp in module.search('import'):
         prefix = imp.search_one('prefix')
         if prefix is not None:
@@ -99,21 +162,12 @@ def emit_wyin(ctx, module, fd):
             if mod is not None:
                 ns = mod.search_one('namespace')
                 if ns is not None:
-                    fd.write('\n')
-                    fd.write(' ' * len(module.keyword))
-                    fd.write('  xmlns:' + prefix.arg + '=' +
-                             quoteattr(ns.arg))
-    fd.write('>\n')
+                    wyin_nsprefixes[prefix.arg] = ns.arg
+
+def wyin_init_identityrefs(ctx, module):
+    #pdb.set_trace()
     for ident in module.search("identity"):
         processIdentityref(ctx, ident)
-    for i in module.substmts:
-        if i not in module.i_children:
-            emit_stmt(ctx, module, i, fd, " ", " ")
-    chs = [ch for ch in module.i_children
-        if ch.keyword in statements.data_definition_keywords]
-    print_node(ctx, chs, module, fd)
-    fd.write('</%s>\n' % module.keyword)
-    #end of document
 
 # Processing method for statements
 def emit_stmt(ctx, module, stmt, fd, indent, indentstep, keys = []):
@@ -199,6 +253,20 @@ def emit_stmt(ctx, module, stmt, fd, indent, indentstep, keys = []):
                                     first_written = True
                                 fd.write(charg.arg)
                             fd.write('"')
+                        elif s.arg == "identityref":
+                            basename = get_basename(s)
+                            if identityrefs.has_key(basename):
+                                fd.write(" enumval=\"")
+                                sep = False
+                                for i in identityrefs[basename]:
+                                    if sep:
+                                        fd.write("|")
+                                    else:
+                                        sep = True
+                                    fd.write(i)
+                                fd.write("\"")
+                            else:
+                                print "no basename %s" % basename
                         else:
                             if s.substmts:
                                 #other type "attributes"
@@ -283,9 +351,22 @@ def handleEnumeration(ctx, typeelem):
         attrs += "\""
     return attrs
 
+def stripBasenamePrefix(basename):
+    global identityrefs, wyin_nsprefixes
+    parts = basename.split(":")
+    if parts:
+        expns = wyin_nsprefixes.get(parts[0])
+        if expns == wyin_namespace:
+            basename = ':'.join(parts[1:])
+    return basename
+
 def updateIdentityrefList(ctx, basename, typename = False):
     """update identityrefs dict: add derived identity name into base"""
-    global identityrefs
+    global identityrefs, wyin_nsprefixes
+
+    #remove global prefix
+    basename = stripBasenamePrefix(basename)
+
     if not identityrefs.has_key(basename):
         if typename != False:
             identityrefs[basename] = [typename]
@@ -304,6 +385,26 @@ def processIdentityref(ctx, s):
     # there is no child element <base>
     updateIdentityrefList(ctx, s.arg)
 
+def handleTypes(ctx, typename, typeelem):
+    attrs = ""
+    if typename == "identityref":
+        basename = get_basename(typeelem)
+        if identityrefs.has_key(basename):
+            attrs += " enumval=\""
+            sep = False
+            for i in identityrefs[basename]:
+                if sep:
+                    attrs += "|"
+                else:
+                    sep = True
+                attrs += i
+            attrs += "\""
+        else:
+            print "no basename %s" % basename
+    elif typename == "enumeration":
+        attrs += handleEnumeration(ctx, typeelem)
+    return attrs
+
 def getAttrs(ctx, s):
     """ ctx - to make settings accessible
         s - current element """
@@ -319,22 +420,9 @@ def getAttrs(ctx, s):
     else:
         typename = ''
     if typename:
-        if typename == "DisplayString":
-            pdb.set_trace()
         attrs += " type=\"%s\"" % typename
-        if typename == "identityref":
-            basename = get_basename(s.search_one('type'))
-            #pdb.set_trace()
-            if identityrefs.has_key(basename):
-                attrs += " enumval=\""
-                sep = False
-                for i in identityrefs[basename]:
-                    if sep:
-                        attrs += "|"
-                    else:
-                        sep = True
-                    attrs += i
-                attrs += "\""
+        attrs += handleTypes(ctx, typename, typeelem)
+
     description = get_description(s)
     if description:
         attrs += " description=\"%s\"" % get_description(s)
@@ -344,9 +432,6 @@ def getAttrs(ctx, s):
 
     if hasattr(s, "i_default") and s.i_default:
         attrs += " default=\"%s\"" % s.search_one('default').arg.__str__()
-    if typename == "enumeration":
-        attrs += handleEnumeration(ctx, typeelem)
-
     if hasattr(s, "i_range") and s.i_range:
         attrs += " range=\"%s\"" % s.i_range
 
@@ -385,9 +470,10 @@ def get_typename(s):
     return t
 
 def get_basename(s):
+    global identityrefs
     t = s.search_one('base')
     if t is not None:
-        return t.arg
+        return stripBasenamePrefix(t.arg)
     else:
         return ''
 
