@@ -84,6 +84,7 @@ if advised of the possibility of such damage.
 						<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" class="static ico-lock header-icon ajaxLink" data-disable-history="true" data-do-not-activate="true"><span></span></a>
 					{% endif %}
 					<a href="{{ path("infoPage", {"key": app.request.get('key'), "action": "session"}) }}" title="Session info" class="static ico-session header-icon ajaxLink {% if activeAction is defined and activeAction == "session" %}active{% endif %}"><span></span></a>
+					<a href="{{ path("handleBackup", {"key": app.request.get('key')}) }}" title="Backup connection" class="static ico-download header-icon"><span></span></a>
 					<a href="{{ path("reloadDevice", {"key": app.request.get('key')}) }}" title="Refresh data" class="ico-refresh header-icon ajaxLink" data-do-not-activate="true" data-disable-history="true"><span></span></a>
 					{% if topmenu is defined %}
 						{% set i = 0 %}

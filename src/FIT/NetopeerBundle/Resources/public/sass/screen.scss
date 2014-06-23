@@ -132,6 +132,10 @@ nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(da
 		span { background: url($img + 'ico/16_info.png') center center no-repeat; }
 	}
 
+	.ico-download { 
+		span { background: url($img + 'ico/16_download.png') center center no-repeat; }
+	}
+
 	.ico-refresh { border-right: 1px solid #000;
 		span { background: url($img + 'ico/16_refresh.png') center center no-repeat; }
 	}

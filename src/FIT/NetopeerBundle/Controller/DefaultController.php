@@ -319,18 +319,6 @@ class DefaultController extends BaseController
 		}
 
 		$res = $dataClass->handle($command, $params, false);
-		if ($command === "backup") {
-			$resp = new Response();
-			$resp->setStatusCode(200);
-			$resp->headers->set('Cache-Control', 'private');
-			$resp->headers->set('Content-Length', strlen($res));
-			$resp->headers->set('Content-Type', 'application/force-download');
-			$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.xml"', date("Y-m-d"), $dataClass->getHostFromKey($key)));
-			$resp->sendHeaders();
-			$resp->setContent($res);
-			$resp->sendContent();
-			die();
-		}
 
 		if ( $res != 1 ) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
@@ -343,6 +331,35 @@ class DefaultController extends BaseController
 			$url = $this->get('request')->headers->get('referer');
 			return $this->redirect($url);
 		}
+	}
+
+	/**
+	 * Handle and execute backup of connection
+	 *
+	 * @Route("/backup/{key}", name="handleBackup")
+	 *
+	 * @param int     $key          key of connected device
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	public function handleBackupAction($key)
+	{
+		$dataClass = $this->get('DataModel');
+		$params = array(
+			'key' => $key,
+			'filter' => '',
+		);
+
+		$res = $dataClass->handle('backup', $params, false);
+		$resp = new Response();
+		$resp->setStatusCode(200);
+		$resp->headers->set('Cache-Control', 'private');
+		$resp->headers->set('Content-Length', strlen($res));
+		$resp->headers->set('Content-Type', 'application/force-download');
+		$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.xml"', date("Y-m-d"), $dataClass->getHostFromKey($key)));
+		$resp->sendHeaders();
+		$resp->setContent($res);
+		$resp->sendContent();
+		die();
 	}
 
 	/**

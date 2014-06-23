@@ -307,6 +307,8 @@ nav#block--topMenu .ico-unlock span, div#block--topMenu .ico-unlock span {
   background: url("../images/ico/16_unlock.png") center center no-repeat; }
 nav#block--topMenu .ico-session span, div#block--topMenu .ico-session span {
   background: url("../images/ico/16_info.png") center center no-repeat; }
+nav#block--topMenu .ico-download span, div#block--topMenu .ico-download span {
+  background: url("../images/ico/16_download.png") center center no-repeat; }
 nav#block--topMenu .ico-refresh, div#block--topMenu .ico-refresh {
   border-right: 1px solid #000; }
 nav#block--topMenu .ico-refresh span, div#block--topMenu .ico-refresh span {
