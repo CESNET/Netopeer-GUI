@@ -130,7 +130,13 @@ jQuery(function($) {
 
 	$("section").on('submit', 'form', function(e) {
 		loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
-	})
+	});
+
+	$("body").on('submit', '.modal form', function(e) {
+		$(this).attr('data-callback', 'hideAndEmptyModalWindow()');
+		loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
+		
+	});
 });
 
 function loadAjaxLink(e, $THIS, href, type, data) {
