@@ -46,7 +46,7 @@ function getNotifWebSocket(key, hash, wsUri) {
 		socket = new $.fn.notifWebSocket(key, wsUri);
 		var sendInterval = setInterval(function() {
 			if (socket.isActive === true) {
-				socket.doSend(hash + ' -10 0');
+				socket.doSend(hash + ' -1 0');
 				clearInterval(sendInterval);
 			}
 		}, 1000);
