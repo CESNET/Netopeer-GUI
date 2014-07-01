@@ -695,6 +695,8 @@ class DefaultController extends BaseController
 	 * @return array|Response
 	 */
 	public function showRPCFormAction($key, $module, $rpcName) {
+		$this->getRequest()->getSession()->getFlashBag()->clear();
+
 		$this->addAjaxBlock('FITNetopeerBundle:Default:showRPCForm.html.twig', 'modalWindow');
 		$this->assign('key', $key);
 		$this->assign('module', $module);

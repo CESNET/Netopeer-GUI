@@ -155,7 +155,9 @@ class BaseController extends Controller
 		$dataClass = $this->get('DataModel');
 		if (!in_array($this->getRequest()->get('_route'), array('connections', '_login')) &&
 				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
-			$dataClass->buildMenuStructure($this->activeSectionKey);
+			if (!in_array($this->getRequest()->get('_route'), array('createEmptyModule'))) {
+				$dataClass->buildMenuStructure($this->activeSectionKey);
+			}
 			$this->assign('topmenu', $dataClass->getModels());
 			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
 		}
