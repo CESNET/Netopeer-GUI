@@ -935,10 +935,12 @@ class DefaultController extends BaseController
 		// processing filter on state part
 		if ( isset($post_vals['formType']) && $post_vals['formType'] == "formState") {
 			$res = $this->handleFilterState($key);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
 
 		// processing filter on config part
 		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formConfig" ) {
 			$res = $this->handleFilterConfig($key);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
 
 		// processing form on config - edit Config
 		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formCopyConfig" ) {
