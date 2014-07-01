@@ -701,7 +701,6 @@ class DefaultController extends BaseController
 		$this->assign('key', $key);
 		$this->assign('module', $module);
 		$this->assign('rpcName', $rpcName);
-		$this->assign('sectionName', '');
 		// path for creating node typeahead
 		$valuesTypeaheadPath = $this->generateUrl("getValuesForLabel", array('formId' => "FORMID", 'key' => $key, 'xPath' => "XPATH"));
 		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
