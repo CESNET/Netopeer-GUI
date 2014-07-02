@@ -129,6 +129,9 @@ jQuery(function($) {
 	});
 
 	$("section").on('submit', 'form', function(e) {
+		if ($(this).data().disableActiveLink == undefined) {
+			$(this).attr('data-disable-active-link', true);
+		}
 		loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
 	});
 

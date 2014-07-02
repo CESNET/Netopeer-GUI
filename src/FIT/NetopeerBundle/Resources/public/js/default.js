@@ -304,9 +304,9 @@ function prepareAlerts() {
 	}, 1000);
 
 	// handle click on alert or flash message (closes)
-	$(window).on('click', '.alert .error, .alert .success, .message', function(e) {
+	$(window).on('click', '.message .close', function(e) {
 		e.preventDefault();
-		$(this).stop(true,true).fadeOut('fast', function() {
+		$(this).parents('.message').stop(true,true).fadeOut('fast', function() {
 			$(this).remove();
 		});
 	});

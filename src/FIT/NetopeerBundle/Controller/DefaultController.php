@@ -695,11 +695,12 @@ class DefaultController extends BaseController
 	 * @return array|Response
 	 */
 	public function showRPCFormAction($key, $module, $rpcName) {
+		$this->getRequest()->getSession()->getFlashBag()->clear();
+
 		$this->addAjaxBlock('FITNetopeerBundle:Default:showRPCForm.html.twig', 'modalWindow');
 		$this->assign('key', $key);
 		$this->assign('module', $module);
 		$this->assign('rpcName', $rpcName);
-		$this->assign('sectionName', '');
 		// path for creating node typeahead
 		$valuesTypeaheadPath = $this->generateUrl("getValuesForLabel", array('formId' => "FORMID", 'key' => $key, 'xPath' => "XPATH"));
 		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
@@ -934,10 +935,12 @@ class DefaultController extends BaseController
 		// processing filter on state part
 		if ( isset($post_vals['formType']) && $post_vals['formType'] == "formState") {
 			$res = $this->handleFilterState($key);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
 
 		// processing filter on config part
 		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formConfig" ) {
 			$res = $this->handleFilterConfig($key);
+			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
 
 		// processing form on config - edit Config
 		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formCopyConfig" ) {

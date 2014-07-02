@@ -1060,9 +1060,17 @@ public function mergeRecursive(&$model, $root_el) {
 			foreach ($iterator as $file) {
 				$path = $file->getRealPath();
 				if (strpos($path, "rng")) {
-					$domDoc->relaxNGValidate($path);
+					try {
+						@$domDoc->relaxNGValidate($path);
+					} catch (\ContextErrorException $e) {
+						$this->logger->addWarning($e->getMessage());
+					}
 				} else if (strpos($path, "xsd")) {
-					$domDoc->schemaValidate($path);
+					try {
+						@$domDoc->schemaValidate($path);
+					} catch (\ContextErrorException $e) {
+						$this->logger->addWarning($e->getMessage());
+					}
 				}
 			}
 		} catch (\ErrorException $e) {
