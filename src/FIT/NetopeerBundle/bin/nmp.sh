@@ -151,6 +151,10 @@ else
 	# In the /usr/local/share/yang/xslt/ directory we expect *xsl files from pyang...
 	# (basename.xsl, gen-relaxng.xsl)
 	yang2dsdl  -d "$MODELDIR" "$INPUTFILE" > /dev/null&
+
+	#XSD validation schema
+	INPUTFILENAME=$(basename "$INPUTFILE")
+	pyang -f xsd "$INPUTFILE" -o "$MODELDIR/${INPUTFILENAME%%.*}.xsd"
 	wait
 	echo "`date` Generating of model finished." >> "$NMPLOGFILE"
 fi
