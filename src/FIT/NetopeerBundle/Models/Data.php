@@ -1735,7 +1735,7 @@ XML;
 		$ns = "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring";
 		$params = array(
 			'key' => $key,
-			'filter' => '<netconf-state xmlns="'.$ns.'"><schemas/></netconf-state>',
+			'filter' => '<netconf-state xmlns="'.$ns.'"><schemas><schema><identifier/><version/><format>yin</format><namespace/><location>NETCONF</location></schema></schemas></netconf-state>',
 		);
 
 		$xml = $this->handle('get', $params, false);
