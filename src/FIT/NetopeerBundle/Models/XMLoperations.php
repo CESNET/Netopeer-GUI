@@ -1082,7 +1082,7 @@ public function mergeRecursive(&$model, $root_el) {
 
 	}
 
-	public function getAvailableLabelValuesForXPath($connectedDeviceId, $formId, $xPath, $configParams) {
+	public function getAvailableLabelValuesForXPath($formId, $xPath) {
 
 		/**
 		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
@@ -1140,5 +1140,61 @@ public function mergeRecursive(&$model, $root_el) {
 		$retArr['labelsAttributes'] = $attributesArr;
 		$retArr['elems'] = $elemsArr;
 		return $retArr;
+	}
+
+	/**
+	 * @param \SimpleXMLIterator $element
+	 * @param \Twig_Template     $template
+	 *
+	 * @param string             $formId
+	 * @param string             $xPath
+	 * @param string             $requiredChildren
+	 *
+	 * @return array|bool
+	 */
+	public function getChildrenValues($element, $template, $formId, $xPath = "", $requiredChildren = "") {
+		$retArr = array();
+		$targetAttributes = array('key', 'iskey');
+
+		foreach ($element as $label => $el) {
+			$attributesArr = array_fill_keys($targetAttributes, "");
+
+			foreach ($element->attributes() as $name => $attr) {
+				if (in_array($name, $targetAttributes)) {
+					$attributesArr[$name] = (string)$attr[0];
+				}
+			}
+
+			if ( ($attributesArr['iskey'] !== "true" && $attributesArr['key'] == "")
+					||
+					($requiredChildren !== "" && $label != $requiredChildren)
+			) {
+				continue;
+			}
+
+			if ($attributesArr['key'] !== "") {
+				$requiredChildren = $attributesArr['key'];
+			} else {
+				$requiredChildren = "";
+			}
+
+			$twigArr = array();
+			$twigArr['key'] = "";
+			$twigArr['xpath'] = "";
+			$twigArr['element'] = $el;
+			$twigArr['useHiddenInput'] = true;
+
+			$xPath .= "/*";
+			$res = $this->getAvailableLabelValuesForXPath($formId, $xPath);
+
+			$retArr[$label] = array();
+			if (isset($res['labelsAttributes'][$label])) {
+				$retArr[$label]['labelAttributes'] = $res['labelsAttributes'][$label];
+			}
+			$retArr[$label]['valueElem'] = $template->renderBlock('configInputElem', $twigArr);
+			$retArr[$label]['children'] = $this->getChildrenValues($el, $template, $formId, $xPath, $requiredChildren);
+		}
+
+		return sizeof($retArr) ? $retArr : false;
 	}
 }

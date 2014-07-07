@@ -254,17 +254,13 @@ class AjaxController extends BaseController
 	 * @param string $xPath    encoded xPath selector
 	 * @return Response    $result
 	 */
-	public function getValuesForLabelAction($key, $formId, $module = null, $subsection = null, $xPath = "")
+	public function getValuesForLabelAction($key, $formId, $xPath = "", $module = null, $subsection = null)
 	{
 		$this->setActiveSectionKey($key);
 		$this->get('DataModel')->buildMenuStructure($key);
 		$formParams = $this->get('DataModel')->loadFilters($module, $subsection);
 
-		$configParams['key'] = $key;
-		$configParams['source'] = 'running';
-		$configParams['filter'] = $formParams['config'];
-
-		$res = $this->get('XMLoperations')->getAvailableLabelValuesForXPath($key, $formId, $xPath, $configParams);
+		$res = $this->get('XMLoperations')->getAvailableLabelValuesForXPath($formId, $xPath);
 
 		if (is_array($res)) {
 			if (isset($_GET['command']) && isset($_GET['label'])) {
@@ -285,6 +281,9 @@ class AjaxController extends BaseController
 
 						$html = $template->renderBlock('configInputElem', $twigArr);
 						$retArr['valueElem'] = $html;
+
+						$children = $this->get('XMLoperations')->getChildrenValues($twigArr['element'], $template, $formId, $xPath);
+						$retArr['children'] = $children;
 					}
 
 					return new Response(json_encode($retArr));
