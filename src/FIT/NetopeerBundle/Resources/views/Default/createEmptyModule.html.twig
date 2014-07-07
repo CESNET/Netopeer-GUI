@@ -56,9 +56,9 @@ if advised of the possibility of such damage.
 	<script type="text/javascript">
 		$(document).ready(function() {
 			$(".typeaheadNS").on('focus', function() {
-				$(this).val(' ');
-				$(this).typeahead('lookup');
-				$(this).val('');
+				setTimeout(function() {
+					$(".typeaheadNS").trigger({type: 'keypress', which: 40, keyCode: 40});
+				}, 1000);
 			}).on('change', function() {
 				$(this).val($.trim($(this).val()));
 			});

@@ -769,7 +769,7 @@ class DefaultController extends BaseController
 		// use small hack when appending space at the end of key, which will fire all options in typeahead
 		if (!empty($tmpArr)) {
 			foreach ($tmpArr as $key => $item) {
-				$tmpArr[$key . " "] = $item;
+				$tmpArr[$key] = $item;
 			}
 		}
 
@@ -783,7 +783,9 @@ class DefaultController extends BaseController
 										'class' => 'typeaheadNS',
 										'data-provide' => 'typeahead',
 										'data-source' => !empty($tmpArr) ? json_encode(array_keys($tmpArr)) : '',
-								    'data-min-length' => 0
+								    'data-min-length' => 0,
+								    'data-items' => 'all',
+								    'data-auto-select' => 'false'
 								)
 						))
 				->getForm();
