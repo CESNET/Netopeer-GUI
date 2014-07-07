@@ -400,6 +400,8 @@ class DefaultController extends BaseController
 			if (isset($sessionArr['session-connections'])) {
 				$connVarsArr = array();
 				foreach ($sessionArr['session-connections'] as $connKey => $conn) {
+					if ($connKey != $key) continue;
+
 					$connVarsArr['connection-'.$connKey][$connKey] = (array) unserialize($conn);
 					if ($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']) {
 						$connVarsArr['connection-'.$connKey][$connKey]['sessionStatus'] = (array) json_decode($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']);
