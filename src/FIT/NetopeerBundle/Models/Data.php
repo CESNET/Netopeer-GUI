@@ -752,7 +752,7 @@ class Data {
 		}
 
 		unset( $sessionConnections[ $requestKey] );
-		$session->set("session-connections", array_values( $sessionConnections ));
+		$session->set("session-connections", $sessionConnections);
 	}
 
 	/**

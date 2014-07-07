@@ -304,7 +304,7 @@ function prepareAlerts() {
 	}, 1000);
 
 	// handle click on alert or flash message (closes)
-	$(window).on('click', '.message .close', function(e) {
+	$("body").on('click', '.message .close', function(e) {
 		e.preventDefault();
 		$(this).parents('.message').stop(true,true).fadeOut('fast', function() {
 			$(this).remove();

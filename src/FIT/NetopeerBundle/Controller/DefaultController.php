@@ -218,8 +218,8 @@ class DefaultController extends BaseController
 		$connArray = $this->getRequest()->getSession()->get('session-connections');
 		$connections = array();
 		if (sizeof($connArray) > 0) {
-			foreach ($connArray as $c) {
-				$connections[] = unserialize($c);
+			foreach ($connArray as $key => $c) {
+				$connections[$key] = unserialize($c);
 			}
 		}
 		$this->assign('sessionConnections', $connections);
