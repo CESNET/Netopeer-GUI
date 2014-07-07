@@ -281,6 +281,7 @@ class AjaxController extends BaseController
 						$twigArr['key'] = "";
 						$twigArr['xpath'] = "";
 						$twigArr['element'] = $res['elems'][$_GET['label']];
+						$twigArr['useHiddenInput'] = true;
 
 						$html = $template->renderBlock('configInputElem', $twigArr);
 						$retArr['valueElem'] = $html;

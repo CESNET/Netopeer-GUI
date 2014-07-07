@@ -196,11 +196,16 @@ if advised of the possibility of such damage.
 						/>
 			{% endif %}
 	{% else %}
-		{% if element.attributes.eltype is defined and
-			(element.attributes.eltype == "leaf-list" or element.attributes.eltype == "list") %}
+		{% if
+		(useHiddenInput is defined and useHiddenInput == true) or
+		(element.attributes.eltype is defined and
+			(element.attributes.eltype == "leaf-list" or element.attributes.eltype == "list")
+		) %}
 			<input type="hidden" value="" name="{{ currentInputName }}">
 		{% endif %}
-		<span class="value"></span>
+		{% if (useHiddenInput is not defined or useHiddenInput != true) %}
+			<span class="value"></span>
+		{% endif %}
 	{% endif %}
 	{% endblock configInputElem %}
 
