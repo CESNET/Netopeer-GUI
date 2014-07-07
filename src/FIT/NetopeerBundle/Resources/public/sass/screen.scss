@@ -426,7 +426,9 @@ form { margin: 15px 0px;
 		&[type="submit"] { @extend .button; }
 	} 
 	textarea { @include box-sizing(border-box); @extend input[type="text"]; @include background( linear-gradient(#fff, #fafafa) ); height: 80px; line-height: 1.2em; }
-	select { @include box-sizing(border-box); width: 200px; height: $hInput; }
+	select { @include box-sizing(border-box); width: 200px; }
+
+	.radio-cover { margin-top: 4px; }
 		
 }
 

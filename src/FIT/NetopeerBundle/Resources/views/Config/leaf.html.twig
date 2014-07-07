@@ -124,7 +124,7 @@ if advised of the possibility of such damage.
 			{# we must set this variable again, because we render only block configInputElem #}
 			{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '--', '[': '?', ']': '!'}) ~ "]" %}
 			{% if element.attributes.type is defined and element.attributes.type == 'boolean' %}
-				<span class="config-value-cover">
+				<span class="config-value-cover radio-cover">
 					<label>
 						<input
 								type="radio"
