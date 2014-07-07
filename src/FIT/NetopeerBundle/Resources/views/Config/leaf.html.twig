@@ -118,9 +118,9 @@ if advised of the possibility of such damage.
 		</span>
 	{% endif %}
 
+	{% block configInputElem %}
 	{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '--', '[': '?', ']': '!'}) ~ "]" %}
 	{% if element.0 is defined and element.0|length == 0 %}
-		{% block configInputElem %}
 			{# we must set this variable again, because we render only block configInputElem #}
 			{% set currentInputName = "configDataForm[" ~ key ~ "_" ~ xpath|replace({'/': '--', '[': '?', ']': '!'}) ~ "]" %}
 			{% if element.attributes.type is defined and element.attributes.type == 'boolean' %}
@@ -195,7 +195,6 @@ if advised of the possibility of such damage.
 						{% if element.attributes.default is defined %}default="{{element.attributes.default}}" title="Default value: {{element.attributes.default}}"{% endif %}
 						/>
 			{% endif %}
-		{% endblock configInputElem %}
 	{% else %}
 		{% if element.attributes.eltype is defined and
 			(element.attributes.eltype == "leaf-list" or element.attributes.eltype == "list") %}
@@ -203,6 +202,7 @@ if advised of the possibility of such damage.
 		{% endif %}
 		<span class="value"></span>
 	{% endif %}
+	{% endblock configInputElem %}
 
 	{% if 0 and element.attributes.type is defined %}
 	{% endif %}

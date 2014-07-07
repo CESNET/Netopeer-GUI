@@ -800,6 +800,10 @@ function createNode($elem) {
 			}
 	}).change(function() {
 		var $currentInput = $(this);
+
+		$currentInput.blur();
+		$currentInput.siblings('.typeahead').hide();
+
 		$.ajax({
 			url: sourceUrl,
 			data: {
@@ -844,7 +848,6 @@ function createNode($elem) {
 							$currentInput.parents('.leaf-line').append($newHtml);
 							$newHtml.find('input, select').first().focus();
 						}
-						$currentInput.siblings('.typeahead').hide();
 					}
 				}
 			}
