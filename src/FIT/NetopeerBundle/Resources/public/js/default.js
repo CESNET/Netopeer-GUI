@@ -801,8 +801,8 @@ function createNode($elem) {
 	}).change(function() {
 		var $currentInput = $(this);
 
+		$currentInput.typeahead('hide');
 		$currentInput.blur();
-		$currentInput.siblings('.typeahead').hide();
 
 		$.ajax({
 			url: sourceUrl,
@@ -849,6 +849,9 @@ function createNode($elem) {
 							$newHtml.find('input, select').first().focus();
 						}
 					}
+					$currentInput.typeahead('hide');
+					$(".typeahead").hide();
+					$currentInput.blur();
 				}
 			}
 		});
