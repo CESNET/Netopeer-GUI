@@ -735,9 +735,34 @@ function createNode($elem) {
 	var $cover = createFormUnderlay($elem);
 
 	// we will create cover div
-	var level = findLevelValue($elem) + 1;
 	var $coverDiv = $("<div>").addClass('leaf-line').addClass('generated');
 
+	// generate new form
+	var $form = generateFormObject('newNodeForm');
+
+	createNodeElements($elem, $coverDiv, $form);
+
+	// create submit and close button
+	createSubmitButton($form, "Create new node");
+	createCloseButton($cover, $form);
+
+	// reload content of model dump tree
+	if ($("#hiddenModelTreeDump").length) {
+		reloadModalTreeDumpContent($cover, $form);
+	}
+
+	var $currentParent = $elem.parent().parent();
+	unwrapCoverForm($currentParent, $cover);
+	if ( !$('.generatedForm').length ) {
+		scrollToGeneratedForm($elem, $form);
+	}
+
+	// finally focus on new created elem
+	$coverDiv.find('input.label').focus();
+}
+
+function createNodeElements($elem, $coverDiv, $form, childName, childData) {
+	var level = findLevelValue($elem) + 1;
 	var xPath = $elem.attr('rel');	// parent XPath - from attribute rel
 	var $currentParent = $elem.parent().parent();
 	var $currentParentLevel = $elem.parents('.level-' + level);
@@ -756,14 +781,105 @@ function createNode($elem) {
 	}
 	var parentXPath = xPath.substring(0, lastIndex) + parentName;
 
-	// generate new form
-	var $form = generateFormObject('newNodeForm');
-
 	var uniqueId = generateUniqueId();
 	var urlTemplate = $elem.data().typeaheadPath;
 	var sourceUrl = urlTemplate
 		.replace("FORMID", $form.find('input[name=formId]').val())
 		.replace("XPATH", encodeURIComponent(parentXPath));
+
+	var labelValue = "";
+	var generatedInput = false;
+	var labelAttributes = false;
+
+	if (childData !== undefined && childName !== undefined) {
+		labelValue = childName;
+		generatedInput = childData.valueElem;
+		labelAttributes = childData.labelAttributes;
+	}
+
+	var refreshTooltipData = function($currentInput, labelAttributes) {
+		// remove old tooltip
+		$currentInput.parent().find('.tooltip').remove();
+
+		// if description is defined, show tooltip icon
+		if (labelAttributes !== undefined && labelAttributes.description !== undefined) {
+			var $tooltip = $("<span/>").addClass('tooltip').addClass('help');
+			$tooltip.append($("<span/>").addClass('icon-help').text("?"));
+			$tooltip.append($("<span/>").addClass('tooltip-description').text(labelAttributes.description));
+			$tooltip.insertBefore($currentInput);
+			initDefaultTooltip($tooltip.find(".icon-help"));
+		}
+	};
+
+	var insertValueElement = function($currentInput, valueElem) {
+		var $newHtml = $(valueElem);
+		if ($newHtml.prop('tagName') == "INPUT") {
+			$newHtml.attr('name', $currentInput.attr('name').replace('label', 'value'));
+			$newHtml.val('');
+			if ($newHtml.attr('default') != "") {
+				$newHtml.val($newHtml.attr('default'));
+			}
+			$newHtml.removeAttr('disabled');
+			$currentInput.parents('.leaf-line').append($newHtml);
+			$newHtml.focus();
+		} else {
+			$newHtml.find('input, select').attr('name', $currentInput.attr('name').replace('label', 'value')).removeAttr('disabled');
+			$currentInput.parents('.leaf-line').append($newHtml);
+			$newHtml.find('input, select').first().focus();
+		}
+	};
+
+	var createInputValue = function() {
+		// input for value
+		var $elementValue = $("<input>")
+			.attr({
+				name: 'newNodeForm[value' + uniqueId + '_' + xPath + ']',
+				type: 'text',
+				'class': 'value text'
+			});
+		$coverDiv.append($elementValue);
+	};
+
+	var appendCoverDivToParent = function() {
+		if ( $('.generatedForm').length ) {
+			if ($elem.parent().hasClass('generated')) {
+				if ( $elem.parent().parent().next('.level-'+String(level)).length ) {
+					$elem.parent().parent().next('.level-'+String(level)).append($coverDiv);
+				} else {
+					$elem.parent().parent().after($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
+				}
+			} else {
+				if ( $form.children('.level-'+String(level)).length ) {
+					$form.children('.level-'+String(level)).append($coverDiv);
+				} else {
+					$currentParent.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
+				}
+			}
+		} else {
+			// create hidden input with path to the duplicated node
+			var $elementWithParentXpath = $("<input>")
+				.attr({
+					type: 'hidden',
+					name: "newNodeForm[parent]",
+					value: xPath
+				});
+			$form.prepend($elementWithParentXpath);
+
+
+			$form.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
+
+			$elem.parents('.leaf-line').addClass('active');
+			$form.insertAfter($currentParent);
+		}
+
+		// we have to modify xpath and rel attributes for generated icons and inputs
+		var $originalInput = $coverDiv.find('input.value, input.label');
+		var newIndex = $coverDiv.index() + $currentParent.siblings(".is-key").length;
+		if (newIndex < 1) newIndex = 0;
+		newIndex++;
+
+		modifyInputXPath($originalInput, $coverDiv, newIndex);
+	};
 
 	// input for label name
 	var $elementName = $("<input>")
@@ -773,7 +889,8 @@ function createNode($elem) {
 			'class': 'label',
 			'data-unique-id': uniqueId,
 			'data-original-xPath': xPath,
-			'data-parrent-xPath': encodeURIComponent(parentXPath)
+			'data-parrent-xPath': encodeURIComponent(parentXPath),
+			value: labelValue
 		}).typeahead({
 			minLength: 0,
 			items: 9999,
@@ -798,87 +915,110 @@ function createNode($elem) {
 				}
 				return false;
 			}
-	}).change(function() {
-		var $currentInput = $(this);
+		}).change(function() {
+			var $currentInput = $(this);
 
-		$currentInput.typeahead('hide');
-		$currentInput.blur();
+			$currentInput.typeahead('hide');
+			$currentInput.blur();
 
-		$.ajax({
-			url: sourceUrl,
-			data: {
-				'label': $(this).val(),
-				'command': 'attributesAndValueElem'
-			},
-			type: "GET",
-			dataType: "json",
-			success: function(data){
-				if (data !== false) {
-					if (data.labelAttributes !== undefined) {
-						// remove old tooltip
-						$currentInput.parent().find('.tooltip').remove();
-
-						// if description is defined, show tooltip icon
-						if (data.labelAttributes.description != undefined) {
-							var $tooltip = $("<span/>").addClass('tooltip').addClass('help');
-							$tooltip.append($("<span/>").addClass('icon-help').text("?"));
-							$tooltip.append($("<span/>").addClass('tooltip-description').text(data.labelAttributes.description));
-							$tooltip.insertBefore($currentInput);
-							initDefaultTooltip($tooltip.find(".icon-help"));
+			$.ajax({
+				url: sourceUrl,
+				data: {
+					'label': $(this).val(),
+					'command': 'attributesAndValueElem'
+				},
+				type: "GET",
+				dataType: "json",
+				success: function(data){
+					if (data !== false) {
+						if (data.labelAttributes !== undefined) {
+							refreshTooltipData($currentInput, data.labelAttributes);
 						}
-					}
 
-					// replace whole value element and change his name attr
-					if (data.valueElem !== undefined) {
-						// remove current value element
-						$currentInput.parents('.leaf-line').find("input.value, .config-value-cover").remove();
-
-						var $newHtml = $(data.valueElem);
-						if ($newHtml.prop('tagName') == "INPUT") {
-							$newHtml.attr('name', $currentInput.attr('name').replace('label', 'value'));
-							$newHtml.val('');
-							if ($newHtml.attr('default') != "") {
-								$newHtml.val($newHtml.attr('default'));
-							}
-							$newHtml.removeAttr('disabled');
-							$currentInput.parents('.leaf-line').append($newHtml);
-							$newHtml.focus();
-						} else {
-							$newHtml.find('input, select').attr('name', $currentInput.attr('name').replace('label', 'value')).removeAttr('disabled');
-							$currentInput.parents('.leaf-line').append($newHtml);
-							$newHtml.find('input, select').first().focus();
+						if (data.children !== false) {
+							$.each(data.children, function(name, childElem) {
+								var $icon = $editBar.find('.create-child');
+								var $newCoverDiv = $("<div>").addClass('leaf-line').addClass('generated');
+								createNodeElements($icon, $newCoverDiv, $form, name, childElem);
+							});
 						}
+
+						// replace whole value element and change his name attr
+						if (data.valueElem !== undefined) {
+							// remove current value element
+							$currentInput.parents('.leaf-line').find("input.value, .config-value-cover").remove();
+
+							insertValueElement($currentInput, data.valueElem);
+						}
+						$currentInput.typeahead('hide');
+						$(".typeahead").hide();
+						$currentInput.blur();
 					}
-					$currentInput.typeahead('hide');
-					$(".typeahead").hide();
-					$currentInput.blur();
 				}
+			});
+		}).on('focus', function() {
+			if ($(this).val() == "") {
+				$(this).val(typeaheadALLconst);
+				$(this).typeahead('lookup');
+				$(this).val('');
+			} else {
+				$(this).typeahead('lookup');
 			}
 		});
-	}).on('focus', function() {
-		if ($(this).val() == "") {
-			$(this).val(typeaheadALLconst);
-			$(this).typeahead('lookup');
-			$(this).val('');
-		} else {
-			$(this).typeahead('lookup');
-		}
-	});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
+	if (labelAttributes !== false) refreshTooltipData($elementName, labelAttributes);
 
+	// append edit bar to cover
+	$editBar = bindEditBarModification($editBar, $form);
+	$coverDiv.append($editBar);
+
+	if (generatedInput !== false) {
+		insertValueElement($elementName, generatedInput);
+	} else {
+		createInputValue();
+	}
+	appendCoverDivToParent();
+}
+
+function reloadModalTreeDumpContent($cover, $form) {
+	if (!$(".model-tree-opener").length) {
+		var $modelOpener = $("<a/>", {
+			'class': 'model-tree-opener',
+			html: '<span class="toToggle">Show</span><span class="toToggle" style="display:none;">Hide</span> model tree'
+		}).insertBefore($form.find('.close'));
+		$modelOpener.click(function() {
+			$("#modelTreeDump").toggle(50, function() {
+				var minusHeight;
+				if ($(this).is(":visible")) {
+					minusHeight = 0;
+				} else {
+					minusHeight = $("#modelTreeDump").outerHeight();
+				}
+				recountFormUnderlayDimensions($cover, minusHeight);
+			});
+			$(".model-tree-opener .toToggle").toggle();
+		});
+	} else {
+		$(".model-tree-opener").insertBefore($form.find('.close'));
+	}
+	$form.find("#modelTreeDump").html($("#hiddenModelTreeDump").html()).appendTo($form);
+}
+
+function modifyInputXPath($inputs, $coverDiv, newIndex) {
+	$inputs.each(function(i,e) {
+		var s = $(e).attr('name');
+		var newXpath = s.substring(0, s.length - 1) + '--*?' + newIndex + '!]';
+		$(e).attr('name', newXpath);
+	});
+
+	var $newRel = $coverDiv.children('.edit-bar').children('img');
+	$newRel.attr('rel', $newRel.attr('rel') + '--*?' + newIndex + '!');
+}
+
+function bindEditBarModification($editBar, $form) {
 	// necessary edit bar modifications - bind all actions
 	$editBar.addClass('generated');
-	$editBar.children("img.sibling").remove();
-	var modifyInputXPath = function($inputs, $coverDiv, newIndex) {
-		$inputs.each(function(i,e) {
-			var s = $(e).attr('name');
-			var newXpath = s.substring(0, s.length - 1) + '--*?' + newIndex + '!]';
-			$(e).attr('name', newXpath);
-		});
-
-		var $newRel = $coverDiv.children('.edit-bar').children('img');
-		$newRel.attr('rel', $newRel.attr('rel') + '--*?' + newIndex + '!');
-	};
+	$editBar.children("img.sibling, img.sort-item").remove();
 	$editBar.children("img.remove-child").on('click', function() {
 		// remove all children and itself
 		$(this).parents(".leaf-line").next("div[class*='level-']").remove();
@@ -902,96 +1042,8 @@ function createNode($elem) {
 	$editBar.children("img.create-child").on('click', function() {
 		createNode($(this));
 	});
-	// append edit bar to cover
-	$coverDiv.append($editBar);
 
-	// input for value
-	var $elementValue = $("<input>")
-		.attr({
-			name: 'newNodeForm[value' + uniqueId + '_' + xPath + ']',
-			type: 'text',
-			'class': 'value text'
-		});
-	$coverDiv.append($elementValue);
-
-
-	var disableScrolling = false;
-	if ( $('.generatedForm').length ) {
-		disableScrolling = true;
-		if ($elem.parent().hasClass('generated')) {
-			if ( $elem.parent().parent().next('.level-'+String(level)).length ) {
-				$elem.parent().parent().next('.level-'+String(level)).append($coverDiv);
-			} else {
-				$elem.parent().parent().after($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
-			}
-		} else {
-			if ( $form.children('.level-'+String(level)).length ) {
-				$form.children('.level-'+String(level)).append($coverDiv);
-			} else {
-				$currentParent.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
-			}
-		}
-	} else {
-		// create hidden input with path to the duplicated node
-		var $elementWithParentXpath = $("<input>")
-				.attr({
-					type: 'hidden',
-					name: "newNodeForm[parent]",
-					value: xPath
-				});
-		$form.prepend($elementWithParentXpath);
-
-
-		$form.append($("<div>").addClass('level-' + String(level)).addClass('generated').append($coverDiv));
-
-		$elem.parents('.leaf-line').addClass('active');
-		$form.insertAfter($currentParent);
-	}
-
-	// we have to modify xpath and rel attributes for generated icons and inputs
-	var $originalInput = $coverDiv.find('input.value, input.label');
-	var newIndex = $coverDiv.index() + $currentParent.siblings(".is-key").length;
-	if (newIndex < 1) newIndex = 0;
-	newIndex++;
-
-	modifyInputXPath($originalInput, $coverDiv, newIndex);
-
-	// create submit and close button
-	createSubmitButton($form, "Create new node");
-	createCloseButton($cover, $form);
-
-	// reload content of model dump tree
-	if ($("#hiddenModelTreeDump").length) {
-		if (!$(".model-tree-opener").length) {
-			var $modelOpener = $("<a/>", {
-				'class': 'model-tree-opener',
-				html: '<span class="toToggle">Show</span><span class="toToggle" style="display:none;">Hide</span> model tree'
-			}).insertBefore($form.find('.close'));
-			$modelOpener.click(function() {
-				$("#modelTreeDump").toggle(50, function() {
-					var minusHeight;
-					if ($(this).is(":visible")) {
-						minusHeight = 0;
-					} else {
-						minusHeight = $("#modelTreeDump").outerHeight();
-					}
-					recountFormUnderlayDimensions($cover, minusHeight);
-				});
-				$(".model-tree-opener .toToggle").toggle();
-			});
-		} else {
-			$(".model-tree-opener").insertBefore($form.find('.close'));
-		}
-		$form.find("#modelTreeDump").html($("#hiddenModelTreeDump").html()).appendTo($form);
-	}
-
-	unwrapCoverForm($currentParent, $cover);
-	if (!disableScrolling) {
-		scrollToGeneratedForm($elem, $form);
-	}
-
-	// finally focus on new created elem
-	$coverDiv.find('input.label').focus();
+	return $editBar;
 }
 
 function formInputChangeConfirm(showDialog) {

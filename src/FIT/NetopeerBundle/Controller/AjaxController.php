@@ -279,7 +279,7 @@ class AjaxController extends BaseController
 						$twigArr['element'] = $res['elems'][$_GET['label']];
 						$twigArr['useHiddenInput'] = true;
 
-						$html = $template->renderBlock('configInputElem', $twigArr);
+						$html = $this->get('XMLoperations')->removeMultipleWhitespaces($template->renderBlock('configInputElem', $twigArr));
 						$retArr['valueElem'] = $html;
 
 						$children = $this->get('XMLoperations')->getChildrenValues($twigArr['element'], $template, $formId, $xPath);

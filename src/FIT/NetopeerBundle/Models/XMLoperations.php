@@ -1154,25 +1154,32 @@ public function mergeRecursive(&$model, $root_el) {
 	 */
 	public function getChildrenValues($element, $template, $formId, $xPath = "", $requiredChildren = "") {
 		$retArr = array();
-		$targetAttributes = array('key', 'iskey');
+		$targetAttributes = array('key', 'iskey', 'mandatory');
 
 		foreach ($element as $label => $el) {
-			$attributesArr = array_fill_keys($targetAttributes, "");
+			$attributesArr = array_fill_keys($targetAttributes, false);
 
 			foreach ($element->attributes() as $name => $attr) {
-				if (in_array($name, $targetAttributes)) {
+				if ($name == "key") {
 					$attributesArr[$name] = (string)$attr[0];
 				}
 			}
 
-			if ( ($attributesArr['iskey'] !== "true" && $attributesArr['key'] == "")
+			foreach ($el->attributes() as $name => $attr) {
+				if (in_array($name, array('iskey', 'mandatory'))) {
+					$attributesArr[$name] = (string)$attr[0];
+				}
+			}
+
+			if ( (($attributesArr['iskey'] !== "true" && $attributesArr['key'] == false)
 					||
-					($requiredChildren !== "" && $label != $requiredChildren)
+					($requiredChildren !== "" && $label != $requiredChildren))
+					&& $attributesArr['mandatory'] == false
 			) {
 				continue;
 			}
 
-			if ($attributesArr['key'] !== "") {
+			if ($attributesArr['key'] !== false) {
 				$requiredChildren = $attributesArr['key'];
 			} else {
 				$requiredChildren = "";
@@ -1184,17 +1191,21 @@ public function mergeRecursive(&$model, $root_el) {
 			$twigArr['element'] = $el;
 			$twigArr['useHiddenInput'] = true;
 
-			$xPath .= "/*";
-			$res = $this->getAvailableLabelValuesForXPath($formId, $xPath);
+			$newXPath = $xPath . "/*";
+			$res = $this->getAvailableLabelValuesForXPath($formId, $newXPath);
 
 			$retArr[$label] = array();
 			if (isset($res['labelsAttributes'][$label])) {
 				$retArr[$label]['labelAttributes'] = $res['labelsAttributes'][$label];
 			}
-			$retArr[$label]['valueElem'] = $template->renderBlock('configInputElem', $twigArr);
-			$retArr[$label]['children'] = $this->getChildrenValues($el, $template, $formId, $xPath, $requiredChildren);
+			$retArr[$label]['valueElem'] = $this->removeMultipleWhitespaces($template->renderBlock('configInputElem', $twigArr));
+			$retArr[$label]['children'] = $this->getChildrenValues($el, $template, $formId, $newXPath, $requiredChildren);
 		}
 
 		return sizeof($retArr) ? $retArr : false;
+	}
+
+	public function removeMultipleWhitespaces($str) {
+		return preg_replace( "/\s+/", " ", $str );
 	}
 }
