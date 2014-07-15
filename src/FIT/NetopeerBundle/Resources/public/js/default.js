@@ -825,7 +825,7 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 		} else {
 			$newHtml.find('input, select').attr('name', $currentInput.attr('name').replace('label', 'value')).removeAttr('disabled');
 			$currentInput.parents('.leaf-line').append($newHtml);
-			$newHtml.find('input, select').first().focus();
+			$newHtml.find('input, select').not('.label').first().focus();
 		}
 	};
 
@@ -874,9 +874,7 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 
 		// we have to modify xpath and rel attributes for generated icons and inputs
 		var $originalInput = $coverDiv.find('input.value, input.label');
-		var newIndex = $coverDiv.index() + $currentParent.siblings(".is-key").length;
-		if (newIndex < 1) newIndex = 0;
-		newIndex++;
+		var newIndex = getNewIndex($coverDiv);
 
 		modifyInputXPath($originalInput, $coverDiv, newIndex);
 	};
@@ -918,7 +916,7 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 		}).change(function() {
 			var $currentInput = $(this);
 
-			$currentInput.typeahead('hide');
+			$("ul.typeahead.dropdown-menu").hide();
 			$currentInput.blur();
 
 			$.ajax({
@@ -940,6 +938,7 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 								var $icon = $editBar.find('.create-child');
 								var $newCoverDiv = $("<div>").addClass('leaf-line').addClass('generated');
 								createNodeElements($icon, $newCoverDiv, $form, name, childElem);
+								modifyAllInputsXPath($newCoverDiv);
 							});
 						}
 
@@ -950,9 +949,9 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 
 							insertValueElement($currentInput, data.valueElem);
 						}
-						$currentInput.typeahead('hide');
-						$(".typeahead").hide();
 						$currentInput.blur();
+						$currentInput.typeahead('hide');
+						$("ul.typeahead.dropdown-menu").remove();
 					}
 				}
 			});
@@ -1024,26 +1023,39 @@ function bindEditBarModification($editBar, $form) {
 		$(this).parents(".leaf-line").next("div[class*='level-']").remove();
 		$(this).parents(".leaf-line").remove();
 
-		$form.find(".leaf-line").each(function() {
-			var $inputs = $(this).find('input.value, input.label');
-			var $labelInput = $(this).find("input.label");
-			var $valueInput = $(this).find("input.value");
-
-			var newIndex = $(this).index() + $(this).siblings(".is-key").length;
-			if (newIndex < 1) newIndex = 0;
-			newIndex++;
-
-			// recover original uniqueId and xPath and generate new input name
-			$labelInput.attr('name', 'newNodeForm[label' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
-			$valueInput.attr('name', 'newNodeForm[value' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
-			modifyInputXPath($inputs, $(this), newIndex);
-		});
+		modifyAllInputsXPath($form.find(".leaf-line"));
 	});
 	$editBar.children("img.create-child").on('click', function() {
 		createNode($(this));
 	});
 
 	return $editBar;
+}
+
+function modifyAllInputsXPath($leafLines) {
+	$leafLines.each(function() {
+		var $inputs = $(this).find('input.value, input.label, input.hidden-input-value, select, input[type="radio"]');
+		var $labelInput = $(this).find("input.label");
+		var $valueInput = $(this).find("input.value, select, input[type='radio'], input.hidden-input-value");
+
+		var newIndex = getNewIndex($(this));
+
+		// recover original uniqueId and xPath and generate new input name
+		$labelInput.attr('name', 'newNodeForm[label' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
+		$valueInput.attr('name', 'newNodeForm[value' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
+		modifyInputXPath($inputs, $(this), newIndex);
+	});
+}
+
+function getNewIndex($line) {
+	var ind = $line.index();
+	if ($line.hasClass('leaf-line')) {
+		ind -= $line.prevAll(":not('.leaf-line')").length;
+	}
+	var newIndex = ind + $line.siblings(".is-key").length;
+	if (newIndex < 1) newIndex = 0;
+	newIndex++;
+	return newIndex;
 }
 
 function formInputChangeConfirm(showDialog) {

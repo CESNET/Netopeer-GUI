@@ -500,9 +500,9 @@ class XMLoperations {
 						$node = $this->elementValReplace($tmpConfigXml, $values[0], $xpath, $val);
 						try {
 							if ( is_object($node) ) {
-								$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
+								@$node->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
 							}
-						} catch (\ErrorException $e) {
+						} catch (\ContextErrorException $e) {
 							// nothing happened - attribute is already there
 						}
 					}
