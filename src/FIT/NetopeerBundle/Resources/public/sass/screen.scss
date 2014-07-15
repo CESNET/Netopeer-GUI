@@ -277,7 +277,7 @@ body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentP
 	> span.dash { display: none; }
 }
 .sortable-placeholder { height: 40px; width: 100%; display: block; min-height: 40px; float: left; clear: left; }
-.leaf-line { padding: 7px 1.5% 7px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
+.leaf-line { padding: 6px 0.5% 5px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
 	&.hover { background-color: #dadada; border-color: #aaa; }
 	&.is-root-elem { border-left: 0px none !important; border-right: 0px none !important;  margin-bottom: 15px !important;
 		.dots, .dash { display: none; }
@@ -292,6 +292,7 @@ body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentP
 	}
 	input.value.text { width: 45%; margin: -4px 0px; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
 	textarea.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
+	select { margin-bottom: -1px; max-width: 70%; }
 
 	&.generated {
 		input.value.text, textarea.value { margin-top: 0px; margin-bottom: 0px; }
@@ -300,7 +301,7 @@ body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentP
 
 	.edit-bar { min-height: 22px; margin: -3px 0px -5px 2%; float: right; text-align: right;
 		.child { display: none; }
-		img { @include opacity(0.4); cursor: pointer;
+		img { @include opacity(0.4); cursor: pointer; margin-left: -2px;
 			&:hover { @include opacity(1); }
 		}
 		&.generated { margin-top: 0px; }
@@ -314,6 +315,7 @@ body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentP
 	}
 	.label-cover { position: relative;
 		span.dash { width: 5px; height: 1px; position: absolute; left: -9px; top: 8px; background-color: #666; }
+		strong { font-weight: 600; }
 	}
 	//		&.config { background: #ccc; }
 }
@@ -420,13 +422,14 @@ form { margin: 15px 0px;
 		}
 	}
 	input { @include box-sizing(border-box);
-		&[type="text"], &[type="password"], &.text { width: 200px; height: $hInput; line-height: $hInput; padding: 0px 5px; border: 1px solid #aaa; @include background( linear-gradient(#fff, #fafafa) ); margin-top: 10px; @include inline-block; @include border-radius(3px); font-size: 1em;
+		&[type="text"], &[type="password"], &.text { width: 200px; height: $hInput; line-height: $hInput; padding: 0px 5px; border: 1px solid #aaa; @include background( linear-gradient(#fff, #fafafa) ); margin-top: 10px; @include inline-block; @include border-radius(3px); font-size: 1em; font-size: 13px;
 			&[disabled="true"] { border-color: #ccc; }
 		}
 		&[type="submit"] { @extend .button; }
+		&[type="radio"], &[type="checkbox"] { @include inline-block; margin-top: -2px; margin-right: 4px; }
 	} 
-	textarea { @include box-sizing(border-box); @extend input[type="text"]; @include background( linear-gradient(#fff, #fafafa) ); height: 80px; line-height: 1.2em; }
-	select { @include box-sizing(border-box); width: 200px; }
+	textarea { @include box-sizing(border-box); @extend input[type="text"]; @include background( linear-gradient(#fff, #fafafa) ); height: 80px; line-height: 1.2em; font-size: 12px; }
+	select { @include box-sizing(border-box); width: 200px; font-size: 12px; }
 
 	.radio-cover { margin-top: 4px; }
 		
@@ -482,7 +485,7 @@ table { width: 100%; margin: 15px 0px;
 
 /* tooltip */
 .tooltip { cursor: help;
-	.icon-help { @include background(rgba(255,255,255,0.3)); border: 1px solid #ddd; color: #888; text-shadow: 1px 1px 2px #ccc; width: 16px; height: 16px; line-height: 16px; text-align: center; @include inline-block; @include border-radius(3px); font-size: 13px; margin: -4px 0px -2px 0px; 
+	.icon-help { @include background(rgba(255,255,255,0.3)); border: 1px solid #ddd; color: #888; text-shadow: 1px 1px 2px #ccc; width: 16px; height: 16px; line-height: 16px; text-align: center; @include inline-block; @include border-radius(3px); font-size: 13px; margin: -5px 0px -2px 0px;
 		&:hover { @include background(rgba(255,255,255,0.7)); border: 1px solid #bbb; }
 	}
 	.tooltip-description { display: none; }

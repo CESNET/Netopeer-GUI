@@ -838,7 +838,7 @@ body section #block--sourceValidation .source-validation {
   clear: left; }
 
 .leaf-line {
-  padding: 7px 1.5% 7px 0px;
+  padding: 6px 0.5% 5px 0px;
   border-top: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
   margin-top: -1px;
@@ -929,6 +929,9 @@ body section #block--sourceValidation .source-validation {
   padding: 0px 3px;
   font-size: 0.9em;
   margin-left: 2%; }
+.leaf-line select {
+  margin-bottom: -1px;
+  max-width: 70%; }
 .leaf-line.generated input.value.text, .leaf-line.generated textarea.value {
   margin-top: 0px;
   margin-bottom: 0px; }
@@ -944,7 +947,8 @@ body section #block--sourceValidation .source-validation {
 .leaf-line .edit-bar img {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
   opacity: 0.4;
-  cursor: pointer; }
+  cursor: pointer;
+  margin-left: -2px; }
 .leaf-line .edit-bar img:hover {
   filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=100);
   opacity: 1; }
@@ -972,6 +976,8 @@ body section #block--sourceValidation .source-validation {
   left: -9px;
   top: 8px;
   background-color: #666; }
+.leaf-line .label-cover strong {
+  font-weight: 600; }
 
 .container, .list {
   margin: 25px 0px; }
@@ -1285,9 +1291,19 @@ form input[type="text"], form textarea, form input[type="password"], form input.
   -ms-border-radius: 3px;
   -o-border-radius: 3px;
   border-radius: 3px;
-  font-size: 1em; }
+  font-size: 1em;
+  font-size: 13px; }
 form input[type="text"][disabled="true"], form textarea[disabled="true"], form input[type="password"][disabled="true"], form input.text[disabled="true"] {
   border-color: #ccc; }
+form input[type="radio"], form input[type="checkbox"] {
+  display: -moz-inline-stack;
+  display: inline-block;
+  vertical-align: middle;
+  *vertical-align: auto;
+  zoom: 1;
+  *display: inline;
+  margin-top: -2px;
+  margin-right: 4px; }
 form textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1298,12 +1314,14 @@ form textarea {
   background: -o-linear-gradient(#ffffff, #fafafa);
   background: linear-gradient(#ffffff, #fafafa);
   height: 80px;
-  line-height: 1.2em; }
+  line-height: 1.2em;
+  font-size: 12px; }
 form select {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
-  width: 200px; }
+  width: 200px;
+  font-size: 12px; }
 form .radio-cover {
   margin-top: 4px; }
 
@@ -1433,7 +1451,7 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   -o-border-radius: 3px;
   border-radius: 3px;
   font-size: 13px;
-  margin: -4px 0px -2px 0px; }
+  margin: -5px 0px -2px 0px; }
 .tooltip .icon-help:hover {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid #bbb; }
