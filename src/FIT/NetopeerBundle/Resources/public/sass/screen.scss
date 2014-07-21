@@ -277,6 +277,7 @@ body section { float: left; width: 49.93%; min-height: 100%; padding: $sContentP
 	> span.dash { display: none; }
 }
 .sortable-placeholder { height: 40px; width: 100%; display: block; min-height: 40px; float: left; clear: left; }
+.ui-sortable-helper { background: #fff; }
 .leaf-line { padding: 6px 0.5% 5px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
 	&.hover { background-color: #dadada; border-color: #aaa; }
 	&.is-root-elem { border-left: 0px none !important; border-right: 0px none !important;  margin-bottom: 15px !important;

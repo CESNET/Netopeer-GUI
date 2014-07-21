@@ -320,14 +320,13 @@ function hideAlertsPanel() {
 }
 
 function prepareSortable() {
-	var sortableChildren;
 	$(".sortable-node").parent().parent().sortable({
 		placeholder: "sortable-placeholder ui-state-highlight",
 		axis: "y",
-		items: ".sortable-node",
+		items: "> div:has(.sortable-node)",
 		handle: ".sort-item",
 		deactivate: function(e, ui) {
-			var $leafs = $(ui.item).parent().parent().children().children(".sortable-node");
+			var $leafs = $(ui.item).parent().find("> div:has(.sortable-node) .sortable-node");
 
 			// set new index order
 			$leafs.each(function(i, elem) {
@@ -343,21 +342,11 @@ function prepareSortable() {
 			});
 
 			// move all children of prev sortable node
-			$(ui.item).nextUntil('.sortable-node').each(function(i, e) {
+			$(ui.item).nextUntil("div:has(.sortable-node)").each(function(i, e) {
 				$(e).insertBefore($(ui.item));
 			});
 
-			// move all children of current sortable node
-			if (sortableChildren.length) {
-				sortableChildren.reverse().each(function(i, elem) {
-					$(elem).insertAfter($(ui.item));
-				});
-			}
-
 			$(".sortable-placeholder").remove();
-		},
-		activate: function(e, ui) {
-			sortableChildren = $(ui.item).nextUntil('.sortable-node');
 		}
 	}).disableSelection();
 }

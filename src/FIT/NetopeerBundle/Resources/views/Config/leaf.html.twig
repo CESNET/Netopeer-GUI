@@ -201,7 +201,7 @@ if advised of the possibility of such damage.
 		(element.attributes.eltype is defined and
 			(element.attributes.eltype == "leaf-list" or element.attributes.eltype == "list")
 		) %}
-			<input type="hidden" value="" name="{{ currentInputName }} class='hidden-input-value'">
+			<input type="hidden" value="" name="{{ currentInputName }}" class="hidden-input-value">
 		{% endif %}
 		{% if (useHiddenInput is not defined or useHiddenInput != true) %}
 			<span class="value"></span>

@@ -837,6 +837,9 @@ body section #block--sourceValidation .source-validation {
   float: left;
   clear: left; }
 
+.ui-sortable-helper {
+  background: #fff; }
+
 .leaf-line {
   padding: 6px 0.5% 5px 0px;
   border-top: 1px solid #ddd;
