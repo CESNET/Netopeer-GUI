@@ -390,21 +390,27 @@ nav#block--topMenu .others-cover .others a span.arrow, div#block--topMenu .other
 nav#block--topMenu #userpane, div#block--topMenu #userpane {
   float: right;
   height: 40px;
-  padding: 0px 15px 0px 41px;
+  padding: 0px 15px 0px 36px;
   color: #ccc;
   background: url("../images/ico/16_users-o50.png") 50% 5px no-repeat #002034;
   background: url("../images/ico/16_users-o50.png") 10px 11px no-repeat rgba(0, 32, 52, 0.8);
   border-left: 1px solid #000;
   font-size: 1.2em; }
-nav#block--topMenu #userpane .log-out, div#block--topMenu #userpane .log-out {
-  border-left: 1px solid #4d4d4d;
-  padding-left: 7px;
-  color: #cccccc;
-  margin-left: 5px; }
-nav#block--topMenu #userpane .log-out:hover, div#block--topMenu #userpane .log-out:hover {
-  color: #1486cd; }
-nav#block--topMenu #userpane .log-out:hover, div#block--topMenu #userpane .log-out:hover {
-  text-decoration: none; }
+nav#block--topMenu #userpane > a, div#block--topMenu #userpane > a {
+  color: #ccc; }
+nav#block--topMenu #userpane > a:hover, div#block--topMenu #userpane > a:hover {
+  color: #fff; }
+nav#block--topMenu .disconnect, div#block--topMenu .disconnect {
+  border-left: 1px solid #777;
+  height: 39px;
+  background: #002034;
+  float: right;
+  color: #ccc;
+  text-decoration: underline; }
+nav#block--topMenu .disconnect:hover, div#block--topMenu .disconnect:hover {
+  text-decoration: none;
+  color: #fff;
+  background: #000; }
 nav#block--topMenu #alerts-icon, div#block--topMenu #alerts-icon {
   background: #000;
   float: right;
