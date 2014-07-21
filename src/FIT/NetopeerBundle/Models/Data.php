@@ -1419,11 +1419,6 @@ XML;
 								if ( !in_array(array("name" => $subKey, 'index' => 0), $allowedSubmenu) ) {
 									$allowedSubmenu[] = array("name" => $subKey, 'index' => 0);
 								}
-								foreach ($tmp as $subSubKey => $tmp2) {
-									if ( !in_array(array("name" => $subSubKey, 'index' => 0), $allowedSubmenu) ) {
-										$allowedSubmenu[] = array("name" => $subSubKey, 'index' => 0);
-									}
-								}
 							}
 						}
 					}
