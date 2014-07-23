@@ -132,7 +132,11 @@ jQuery(function($) {
 		if ($(this).data().disableActiveLink == undefined) {
 			$(this).attr('data-disable-active-link', true);
 		}
-		loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
+		var formAction = $(this).attr('action');
+		if (formAction == "") {
+			formAction = window.location.href;
+		}
+		loadAjaxLink(e, $(this), formAction, 'POST', $(this).serialize());
 	});
 
 	$("body").on('submit', '.modal form', function(e) {

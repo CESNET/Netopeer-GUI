@@ -208,12 +208,12 @@ class DefaultController extends BaseController
 
 				}
 			} else {
-				$this->getRequest()->getSession()->getFlashBag()->add('state error', 'You have not filled up form correctly.');
+				$this->getRequest()->getSession()->getFlashBag()->add('state error', 'Connection - you have not filled up form correctly.');
 			}
 			$url = $this->get('request')->headers->get('referer');
-			if (!$this->getRequest()->isXmlHttpRequest()) {
+			//if (!$this->getRequest()->isXmlHttpRequest()) {
 				return new RedirectResponse($url);
-			}
+			//}
 		}
 		$connArray = $this->getRequest()->getSession()->get('session-connections');
 		$connections = array();
@@ -1006,7 +1006,7 @@ class DefaultController extends BaseController
 			$this->setStateParams("filter", $post_vals["filter"]);
 			return 0;
 		} else {
-			$this->getRequest()->getSession()->getFlashBag()->add('error', 'You have not filled up form correctly.');
+			$this->getRequest()->getSession()->getFlashBag()->add('error', 'State filter - you have not filled up form correctly.');
 			return 1;
 		}
 	}
@@ -1041,7 +1041,7 @@ class DefaultController extends BaseController
 			}
 			return 0;
 		} else {
-			$this->getRequest()->getSession()->getFlashBag()->add('error', 'You have not filled up form correctly.');
+			$this->getRequest()->getSession()->getFlashBag()->add('error', 'Config filter - you have not filled up form correctly.');
 			return  1;
 		}
 	}
@@ -1069,7 +1069,7 @@ class DefaultController extends BaseController
 			$dataClass->handle('copyconfig', $params, false);
 			return 0;
 		} else {
-			$this->getRequest()->getSession()->getFlashBag()->add('error', 'You have not filled up form correctly.');
+			$this->getRequest()->getSession()->getFlashBag()->add('error', 'Copy config - you have not filled up form correctly.');
 			return  1;
 		}
 	}
