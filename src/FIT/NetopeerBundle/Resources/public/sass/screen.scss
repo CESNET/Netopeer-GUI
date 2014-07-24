@@ -103,7 +103,7 @@ nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(da
 		&:hover, &.active { background: darken($cBase, 20%); }
 		&.nth-0 { border-left: 1px solid desaturate($cComp1Light, 50%); }
 		&.active {
-			span.arrow { position: absolute; bottom: -8px; left: 50%; margin-left: -4px; width: 0px; height: 0px; display: block; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid darken($cBase, 20%); }
+			span.arrow { position: absolute; bottom: -8px; left: 50%; margin-left: -8px; width: 0px; height: 0px; display: block; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid darken($cBase, 20%); }
 		}
 	}
 
@@ -425,6 +425,7 @@ form { margin: 15px 0px;
 		&.required {
 			&:after { content: " *"; }
 		}
+		&.percent-width { width: 15%; }
 	}
 	input { @include box-sizing(border-box);
 		&[type="text"], &[type="password"], &.text { width: 200px; height: $hInput; line-height: $hInput; padding: 0px 5px; border: 1px solid #aaa; @include background( linear-gradient(#fff, #fafafa) ); margin-top: 10px; @include inline-block; @include border-radius(3px); font-size: 1em; font-size: 13px;
@@ -432,6 +433,9 @@ form { margin: 15px 0px;
 		}
 		&[type="submit"] { @extend .button; }
 		&[type="radio"], &[type="checkbox"] { @include inline-block; margin-top: -2px; margin-right: 4px; }
+		&.percent-width {
+			&.w-50 { width: 50%; }
+		}
 	} 
 	textarea { @include box-sizing(border-box); @extend input[type="text"]; @include background( linear-gradient(#fff, #fafafa) ); height: 80px; line-height: 1.2em; font-size: 12px; }
 	select { @include box-sizing(border-box); width: 200px; font-size: 12px; }

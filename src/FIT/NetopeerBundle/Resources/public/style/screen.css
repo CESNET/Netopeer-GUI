@@ -267,7 +267,7 @@ nav#block--topMenu > a.active span.arrow, div#block--topMenu > a.active span.arr
   position: absolute;
   bottom: -8px;
   left: 50%;
-  margin-left: -4px;
+  margin-left: -8px;
   width: 0px;
   height: 0px;
   display: block;
@@ -1273,6 +1273,8 @@ form label {
   margin-top: 10px; }
 form label.required:after {
   content: " *"; }
+form label.percent-width {
+  width: 15%; }
 form input {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1313,6 +1315,8 @@ form input[type="radio"], form input[type="checkbox"] {
   *display: inline;
   margin-top: -2px;
   margin-right: 4px; }
+form input.percent-width.w-50 {
+  width: 50%; }
 form textarea {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;

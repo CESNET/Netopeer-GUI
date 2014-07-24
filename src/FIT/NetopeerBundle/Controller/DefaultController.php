@@ -755,6 +755,7 @@ class DefaultController extends BaseController
 
 		$this->setEmptyModuleForm($key);
 		$this->assign('sectionName', 'Empty datastore');
+		$this->assign('emptyModuleTitle', 'Create empty module');
 
 		return $this->getTwigArr();
 	}
@@ -767,31 +768,39 @@ class DefaultController extends BaseController
 	private function setEmptyModuleForm($key) {
 		$dataClass = $this->get("DataModel");
 		$tmpArr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
+		$tmpArr = $dataClass->getRootNamesForModuleIdentifiers($key, $tmpArr);
 
 		// use small hack when appending space at the end of key, which will fire all options in typeahead
+		$nsArr = array();
 		if (!empty($tmpArr)) {
 			foreach ($tmpArr as $key => $item) {
-				$tmpArr[$key] = $item;
+				if ($item['rootElem'] != "") {
+					$modulesArr[$item['rootElem']] = (array)$key;
+					$nsArr[] = $key;
+				}
 			}
 		}
 
 		$form = $this->createFormBuilder()
 				->add('name', 'text', array(
-								'label' => "Module name"
+								'label' => "Module name",
+				        'attr' => array(
+					        'class' => 'typeaheadName percent-width w-50',
+				          'autocomplete' => false
+				        )
 						))
 				->add('namespace', 'text', array(
 								'label' => "Namespace",
 								'attr' => array(
-										'class' => 'typeaheadNS',
-										'data-provide' => 'typeahead',
-										'data-source' => !empty($tmpArr) ? json_encode(array_keys($tmpArr)) : '',
-								    'data-min-length' => 0,
-								    'data-items' => 'all',
-								    'data-auto-select' => 'false'
+										'class' => 'typeaheadNS percent-width w-50',
+								    'autocomplete' => false
 								)
 						))
 				->getForm();
 
+		$this->assign('rootName2NS', json_encode($modulesArr));
+		$this->assign('rootNames', json_encode(array_keys($modulesArr)));
+		$this->assign('NS', json_encode($nsArr));
 		$this->assign('emptyModuleForm', $form->createView());
 	}
 

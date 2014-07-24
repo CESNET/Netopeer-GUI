@@ -42,6 +42,9 @@ if advised of the possibility of such damage.
 {% block state %}
 {% block singleContent %}
 
+	{% if emptyModuleTitle is defined %}
+		<h1>{{ emptyModuleTitle }}</h1>
+	{% endif %}
 	{% if additionalTitle is defined %}
 		<h2>{{ additionalTitle }}</h2>
 	{% endif %}
@@ -54,14 +57,42 @@ if advised of the possibility of such damage.
 	</form>
 
 	<script type="text/javascript">
+		var rootName2NS = {{ rootName2NS|raw }};
+		var rootNames = {{ rootNames|raw }};
+		var NS = {{ NS|raw }};
+
 		$(document).ready(function() {
-			$(".typeaheadNS").on('focus', function() {
-				setTimeout(function() {
-					$(".typeaheadNS").trigger({type: 'keypress', which: 40, keyCode: 40});
-				}, 1000);
-			}).on('change', function() {
-				$(this).val($.trim($(this).val()));
+//			$(".typeaheadNS").on('focus', function() {
+//				setTimeout(function() {
+//					$(".typeaheadNS").trigger({type: 'keypress', which: 40, keyCode: 40});
+//				}, 1000);
+//			}).on('change', function() {
+//				$(this).val($.trim($(this).val()));
+//			});
+
+			$('.typeaheadName').typeahead({
+				minLength: 0,
+				items: 'all',
+				autoSelect: false,
+				source: function(query, process) {
+					process(rootNames);
+				}
 			});
+
+			$('.typeaheadNS').typeahead({
+				minLength: 0,
+				items: 'all',
+				autoSelect: true,
+				source: function(query, process) {
+					var rootName = $('.typeaheadName').val().trim();
+					if (rootName2NS[rootName] != undefined) {
+						process(rootName2NS[rootName]);
+					} else {
+						process(NS);
+					}
+				}
+			});
+
 		});
 	</script>
 

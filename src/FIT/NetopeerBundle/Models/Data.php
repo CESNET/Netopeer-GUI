@@ -250,6 +250,29 @@ class Data {
 		return false;
 	}
 
+	public function getRootNamesForModuleIdentifiers($key, array $identifiers) {
+		$newArr = array();
+		foreach ($identifiers as $ns => $ident) {
+			$ident['rootElem'] = $this->getRootNameForNS($key, $ident['ns']);
+			$newArr[$ns] = $ident;
+		}
+
+		return $newArr;
+	}
+
+	public function getRootNameForNS($key, $ns) {
+		$path = $this->getModelsDir().$this->getModulePathByNS($key, $ns);
+		$file = $path . '/filter.txt';
+		$rootElem = "";
+		if ( file_exists($file) ) {
+			$dom = new \DomDocument;
+			$dom->load($file);
+			$rootElem = $dom->documentElement->tagName;
+		}
+
+		return $rootElem;
+	}
+
 	/**
 	 * get path for module name, includes identifier
 	 *
@@ -270,12 +293,28 @@ class Data {
 			if ($cnt == 1) {
 				$namespace = $modelNamespaces[$moduleName];
 				if (isset($this->moduleIdentifiers[$namespace])) {
-					return $this->moduleIdentifiers[$namespace]['hash'] .
-							"/" . $this->moduleIdentifiers[$namespace]['moduleName'] .
-							"/" . $this->moduleIdentifiers[$namespace]['revision'];
+					return $this->getModulePathByNS($key, $namespace);
 				}
 			}
 		} elseif (isset($this->moduleIdentifiers[$ns])) {
+			return $this->getModulePathByNS($key, $ns);
+		}
+		return false;
+	}
+
+	/**
+	 * get path for module namespace
+	 *
+	 * @param $key
+	 * @param $ns
+	 *
+	 * @return bool|string
+	 */
+	public function getModulePathByNS($key, $ns) {
+		if (!is_array($this->moduleIdentifiers) || !count($this->moduleIdentifiers)) {
+			$this->getModuleIdentifiersForCurrentDevice($key);
+		}
+		if (isset($this->moduleIdentifiers[$ns])) {
 			return $this->moduleIdentifiers[$ns]['hash'] .
 			"/" . $this->moduleIdentifiers[$ns]['moduleName'] .
 			"/" . $this->moduleIdentifiers[$ns]['revision'];
