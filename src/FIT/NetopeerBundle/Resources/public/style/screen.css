@@ -627,7 +627,7 @@ body section#block--singleContent {
   width: 100%;
   min-height: 100%;
   font-size: 1.4em;
-  padding: 15px 30px 7.5px 30px; }
+  padding: 15px 30px 15px 30px; }
 body section#block--singleContent.left-nav-defined {
   width: 89.91%; }
 body section#block--singleContent.max-width-column {
@@ -1151,7 +1151,8 @@ article#block--singleContent .alert {
   border-top: 1px solid #000;
   color: #ccc;
   font-size: 1.25em;
-  font-family: "Courier New", Courier, monospace; }
+  font-family: "Courier New", Courier, monospace;
+  z-index: 20; }
 #block--notifications .notif-cover {
   padding: 8px 15px;
   overflow-y: scroll;

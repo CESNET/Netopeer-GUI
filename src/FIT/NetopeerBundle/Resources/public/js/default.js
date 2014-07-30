@@ -196,7 +196,7 @@ function changeSectionHeight() {
 		h -= $(notifOutput).outerHeight();
 	}
 
-	$("body section, body section#content").css('min-height', '0%').height(h);
+	$("body section, body section#content").css('min-height', '0%').css('height', h + 'px');
 	$(notifOutput).css('top', h);
 
 	fixOverflowY();
