@@ -881,6 +881,7 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 		}).typeahead({
 			minLength: 0,
 			items: 9999,
+			autoSelect: false,
 			source: function(query, process) {
 				$.ajax({
 					url: sourceUrl,
@@ -949,8 +950,6 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 				$(this).val(typeaheadALLconst);
 				$(this).typeahead('lookup');
 				$(this).val('');
-			} else {
-				$(this).typeahead('lookup');
 			}
 		});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
