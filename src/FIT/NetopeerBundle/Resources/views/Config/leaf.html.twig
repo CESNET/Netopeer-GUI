@@ -62,7 +62,7 @@ if advised of the possibility of such damage.
 	<span class="label">
 		<span class="dots"></span>
 		{% if element.attributes.description is defined %}
-			<span class="tooltip help">
+			<span class="tooltip-cover help">
 				<span class="icon-help">?</span>
 				<span class="tooltip-description">{{element.attributes.description}}</span>
 			</span>
@@ -75,7 +75,7 @@ if advised of the possibility of such damage.
 			{% endif %}
 			<strong>{{key}}</strong>
 			{% if element.attributes.mandatory is defined %}
-				<span class="mandatory tooltip">
+				<span class="mandatory tooltip-cover">
 				<span class="icon-help">*</span>
 				<span class="tooltip-description">Mandatory item</span>
 				</span>

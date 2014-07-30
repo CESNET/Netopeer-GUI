@@ -944,7 +944,7 @@ body section #block--sourceValidation .source-validation {
 .leaf-line.generated input.value.text, .leaf-line.generated textarea.value {
   margin-top: 0px;
   margin-bottom: 0px; }
-.leaf-line.generated .tooltip {
+.leaf-line.generated .tooltip-cover {
   margin-top: 3px; }
 .leaf-line .edit-bar {
   min-height: 22px;
@@ -1008,7 +1008,7 @@ body section #block--sourceValidation .source-validation {
 .mandatory {
   color: #888; }
 
-.tooltip {
+.tooltip-cover {
   float: right;
   margin: 0px 0px 0px 4px; }
 
@@ -1442,9 +1442,9 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   margin: 0px; }
 
 /* tooltip */
-.tooltip {
+.tooltip-cover {
   cursor: help; }
-.tooltip .icon-help {
+.tooltip-cover .icon-help {
   background: rgba(255, 255, 255, 0.3);
   border: 1px solid #ddd;
   color: #888;
@@ -1466,10 +1466,10 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   border-radius: 3px;
   font-size: 13px;
   margin: -5px 0px -2px 0px; }
-.tooltip .icon-help:hover {
+.tooltip-cover .icon-help:hover {
   background: rgba(255, 255, 255, 0.7);
   border: 1px solid #bbb; }
-.tooltip .tooltip-description {
+.tooltip-cover .tooltip-description {
   display: none; }
 
 .gips-container {

@@ -116,7 +116,7 @@ function initJS() {
 
 function prepareTooltipActions() {
 	// tooltip
-	$('.tooltip .icon-help').each(function() {
+	$('.tooltip-cover .icon-help').each(function() {
 		initDefaultTooltip($(this));
 	});
 }
@@ -400,7 +400,7 @@ function duplicateNode($elem) {
 
 	// finally, initialization of Tooltip on cloned elements
 	// must be after showing form
-	$form.find('.tooltip .icon-help').each(function() {
+	$form.find('.tooltip-cover .icon-help').each(function() {
 		initDefaultTooltip($(this));
 	});
 
@@ -788,11 +788,11 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 
 	var refreshTooltipData = function($currentInput, labelAttributes) {
 		// remove old tooltip
-		$currentInput.parent().find('.tooltip').remove();
+		$currentInput.parent().find('.tooltip-cover').remove();
 
 		// if description is defined, show tooltip icon
 		if (labelAttributes !== undefined && labelAttributes.description !== undefined) {
-			var $tooltip = $("<span/>").addClass('tooltip').addClass('help');
+			var $tooltip = $("<span/>").addClass('tooltip-cover').addClass('help');
 			$tooltip.append($("<span/>").addClass('icon-help').text("?"));
 			$tooltip.append($("<span/>").addClass('tooltip-description').text(labelAttributes.description));
 			$tooltip.insertBefore($currentInput);
