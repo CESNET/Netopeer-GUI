@@ -193,14 +193,7 @@ class DefaultController extends BaseController
 						);
 					}
 
-					if ($this->getRequest()->isXmlHttpRequest()) {
-						foreach ($arr as $key => $value) {
-							$this->assign($key, $value);
-						}
-						$this->assign("getSchemaWithAjax", true);
-					} else {
-						$this->get('session')->set('getSchemaWithAjax', $arr);
-					}
+					$this->get('session')->set('getSchemaWithAjax', $arr);
 					$this->getRequest()->getSession()->getFlashBag()->add('state success', 'Form has been filled up correctly.');
 
 					$baseConn = $this->get('BaseConnection');
@@ -212,7 +205,7 @@ class DefaultController extends BaseController
 			}
 			$url = $this->get('request')->headers->get('referer');
 			//if (!$this->getRequest()->isXmlHttpRequest()) {
-				return new RedirectResponse($url);
+				return $this->redirect($url);
 			//}
 		}
 		$connArray = $this->getRequest()->getSession()->get('session-connections');
