@@ -1672,6 +1672,16 @@ XML;
 	}
 
 	/**
+	 * Invalidates and rebuild menu structure
+	 *
+	 * @param $key
+	 */
+	public function invalidateAndRebuildMenuStructureForKey($key) {
+		$this->invalidateMenuStructureForKey($key);
+		$this->buildMenuStructure($key);
+	}
+
+	/**
 	 * Invalidates cached files for menu structure
 	 *
 	 * @param  int    $key        session key of current connection

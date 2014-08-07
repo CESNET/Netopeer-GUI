@@ -265,11 +265,10 @@ class DefaultController extends BaseController
 		/* reload hello message */
 		$params = array('key' => $key);
 		if (($res = $dataClass->handle("reloadhello", $params) == 0)) {
-
 		}
 
 		$dataClass->updateLocalModels($key);
-		$dataClass->invalidateMenuStructureForKey($key);
+		$dataClass->invalidateAndRebuildMenuStructureForKey($key);
 
 		//reconstructs a routing path and gets a routing array called $route_params
 		if ($this->getRequest()->isXmlHttpRequest()) {
@@ -283,9 +282,9 @@ class DefaultController extends BaseController
 
 		$url = $this->getRequest()->headers->get('referer');
 		if ($url) {
-			return new RedirectResponse($url);
+			return $this->redirect($url);
 		} else {
-			return new RedirectResponse($this->generateUrl('section', array('key' => $key)));
+			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 	}
 
@@ -735,6 +734,8 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'title');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'state');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'alerts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:createEmptyModule.html.twig', 'leftColumn');
 		$this->assign('historyHref', $this->getRequest()->getRequestUri());
 		$this->assign('key', $key);
 
@@ -745,7 +746,7 @@ class DefaultController extends BaseController
 
 			$res = $xmlOperations->handleCreateEmptyModuleForm($key, $this->getConfigParams(), $postVals);
 			if ($res != 0) {
-				$this->forward('reloadDeviceAction', array('key' => $key));
+				return $this->forward('FITNetopeerBundle:Default:reloadDevice', array('key' => $key));
 			}
 
 			if (isset($postVals['redirectUrl'])) {
