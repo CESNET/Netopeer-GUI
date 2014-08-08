@@ -555,7 +555,19 @@ class DefaultController extends BaseController
 		$this->setSectionFilterForms($key);
 
 		// path for creating node typeahead
-		$valuesTypeaheadPath = $this->generateUrl("getValuesForLabel", array('formId' => "FORMID", 'key' => $key, 'xPath' => "XPATH"));
+		$typeaheadParams = array(
+				'formId' => "FORMID",
+				'key' => $key,
+				'xPath' => "XPATH"
+		);
+		if (!is_null($module)) {
+			$typeaheadParams['module'] = $module;
+		}
+		if (!is_null($subsection)) {
+			$typeaheadParams['subsection'] = $subsection;
+		}
+		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
+
 
 		/* Show the first module we have */
 		if ( $module == null ) {
@@ -593,8 +605,6 @@ class DefaultController extends BaseController
 				$this->assign('subsectionName', $dataClass->getSubsectionName($subsection));
 			}
 
-			$valuesTypeaheadPath = $this->generateUrl("getValuesForLabelWithModule", array('formId' => "FORMID", 'key' => $key, 'module' => $module, 'xPath' => "XPATH"));
-
 		// we are in section
 		} else {
 			$connArray = $this->getRequest()->getSession()->get('session-connections');
@@ -608,8 +618,6 @@ class DefaultController extends BaseController
 
 			// because we do not allow changing layout in section, controls will be hidden
 			$this->assign('hideColumnControl', true);
-
-			$valuesTypeaheadPath = $this->generateUrl("getValuesForLabelWithModule", array('formId' => "FORMID", 'key' => $key, 'module' => $module, 'subsection' => $subsection, 'xPath' => "XPATH"));
 		}
 
 		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);

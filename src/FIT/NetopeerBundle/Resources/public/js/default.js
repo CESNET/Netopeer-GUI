@@ -777,13 +777,15 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 		.replace("XPATH", encodeURIComponent(parentXPath));
 
 	var labelValue = "";
-	var generatedInput = false;
-	var labelAttributes = false;
+	var generatedInput =
+		labelAttributes =
+		editBarAttributes = false;
 
 	if (childData !== undefined && childName !== undefined) {
 		labelValue = childName;
 		generatedInput = childData.valueElem;
 		labelAttributes = childData.labelAttributes;
+		editBarAttributes = childData.editBar;
 	}
 
 	var refreshTooltipData = function($currentInput, labelAttributes) {
@@ -795,6 +797,15 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 			var $tooltip = $("<span/>").addClass('tooltip-cover').addClass('help');
 			$tooltip.append($("<span/>").addClass('icon-help').text("?"));
 			$tooltip.append($("<span/>").addClass('tooltip-description').text(labelAttributes.description));
+			$tooltip.insertBefore($currentInput);
+			initDefaultTooltip($tooltip.find(".icon-help"));
+		}
+
+		// if mandatory is defined, show tooltip icon
+		if (labelAttributes !== undefined && labelAttributes.mandatory !== undefined && labelAttributes.mandatory == "true") {
+			var $tooltip = $("<span/>").addClass('tooltip-cover').addClass('mandatory');
+			$tooltip.append($("<span/>").addClass('icon-help').text("*"));
+			$tooltip.append($("<span/>").addClass('tooltip-description').text("Mandatory item"));
 			$tooltip.insertBefore($currentInput);
 			initDefaultTooltip($tooltip.find(".icon-help"));
 		}
@@ -868,6 +879,23 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 		modifyInputXPath($originalInput, $coverDiv, newIndex);
 	};
 
+	var removeEditBarIcons = function($editBar, $newEditBar, labelAttributes) {
+		// if is editBar available, replace whole HTML
+		if ($newEditBar.length) {
+			if (!$newEditBar.find('.create-child').length) {
+				$editBar.find('.create-child').remove();
+			}
+
+			// leave only remove edit bar action
+		} else {
+			$editBar.find('img:not(.remove-child)').remove();
+		}
+
+		if (labelAttributes !== undefined && labelAttributes.mandatory !== undefined && labelAttributes.mandatory == "true") {
+			$editBar.find('.remove-child').remove();
+		}
+	};
+
 	// input for label name
 	var $elementName = $("<input>")
 		.attr({
@@ -932,6 +960,13 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 							});
 						}
 
+						// remove undefined icons in edit-bar
+						if (data.editBar !== undefined) {
+							var $newEditBar = $(data.editBar);
+
+							removeEditBarIcons($editBar, $newEditBar, data.labelAttributes);
+						}
+
 						// replace whole value element and change his name attr
 						if (data.valueElem !== undefined) {
 							// remove current value element
@@ -953,10 +988,12 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 			}
 		});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
+	if (editBarAttributes !== false) removeEditBarIcons($editBar, $(editBarAttributes), labelAttributes);
 	if (labelAttributes !== false) refreshTooltipData($elementName, labelAttributes);
 
 	// append edit bar to cover
 	$editBar = bindEditBarModification($editBar, $form);
+
 	$coverDiv.append($editBar);
 
 	if (generatedInput !== false) {

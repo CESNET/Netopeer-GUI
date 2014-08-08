@@ -262,6 +262,20 @@ class AjaxController extends BaseController
 
 		$res = $this->get('XMLoperations')->getAvailableLabelValuesForXPath($formId, $xPath);
 
+		// path for creating node typeahead
+		$typeaheadParams = array(
+				'formId' => "FORMID",
+				'key' => $key,
+				'xPath' => "XPATH"
+		);
+		if (!is_null($module)) {
+			$typeaheadParams['module'] = $module;
+		}
+		if (!is_null($subsection)) {
+			$typeaheadParams['subsection'] = $subsection;
+		}
+		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
+
 		if (is_array($res)) {
 			if (isset($_GET['command']) && isset($_GET['label'])) {
 				if ($_GET['command'] == 'attributesAndValueElem') {
@@ -276,11 +290,15 @@ class AjaxController extends BaseController
 
 						$twigArr['key'] = "";
 						$twigArr['xpath'] = "";
+						$twigArr['valuesTypeaheadPath'] = $valuesTypeaheadPath;
 						$twigArr['element'] = $res['elems'][$_GET['label']];
 						$twigArr['useHiddenInput'] = true;
 
 						$html = $this->get('XMLoperations')->removeMultipleWhitespaces($template->renderBlock('configInputElem', $twigArr));
 						$retArr['valueElem'] = $html;
+
+						$html = $this->get('XMLoperations')->removeMultipleWhitespaces($template->renderBlock('editBar', $twigArr));
+						$retArr['editBar'] = $html;
 
 						$children = $this->get('XMLoperations')->getChildrenValues($twigArr['element'], $template, $formId, $xPath);
 						$retArr['children'] = $children;
