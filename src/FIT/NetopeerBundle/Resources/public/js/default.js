@@ -1035,8 +1035,22 @@ function modifyInputXPath($inputs, $coverDiv, newIndex) {
 		$(e).attr('name', newXpath);
 	});
 
-	var $newRel = $coverDiv.children('.edit-bar').children('img');
-	$newRel.attr('rel', $newRel.attr('rel') + '--*?' + newIndex + '!');
+	var $labelInput = $coverDiv.find('input.label');
+	var $editBarImg = $coverDiv.find('.edit-bar img');
+	var newRel = $editBarImg.attr('rel');
+	if ($labelInput.length) {
+		newRel = $labelInput.data('originalXpath');
+	}
+
+	$editBarImg.attr('rel', newRel + '--*?' + newIndex + '!');
+}
+
+function rewriteOriginalXPath($inputs, newXpath, newIndex) {
+	$inputs.each(function(i,e) {
+		var modifiedXPath = newXpath + '--*?' + newIndex + "!";
+		$(e).data('originalXpath', modifiedXPath);
+		$(e).attr('data-original-xpath', modifiedXPath);
+	});
 }
 
 function bindEditBarModification($editBar, $form) {
@@ -1048,7 +1062,7 @@ function bindEditBarModification($editBar, $form) {
 		$(this).parents(".leaf-line").next("div[class*='level-']").remove();
 		$(this).parents(".leaf-line").remove();
 
-		modifyAllInputsXPath($form.find(".leaf-line"));
+		modifyAllInputsXPath($form.find('.leaf-line'), true);
 	});
 	$editBar.children("img.create-child").on('click', function() {
 		createNode($(this));
@@ -1057,7 +1071,7 @@ function bindEditBarModification($editBar, $form) {
 	return $editBar;
 }
 
-function modifyAllInputsXPath($leafLines) {
+function modifyAllInputsXPath($leafLines, forceRewriteOriginalXpath) {
 	$leafLines.each(function() {
 		var $inputs = $(this).find('input.value, input.label, input.hidden-input-value, select, input[type="radio"]');
 		var $labelInput = $(this).find("input.label");
@@ -1065,9 +1079,16 @@ function modifyAllInputsXPath($leafLines) {
 
 		var newIndex = getNewIndex($(this));
 
+		if (forceRewriteOriginalXpath != undefined && forceRewriteOriginalXpath == true) {
+			var $childrenLeafs = $(this).next("div[class*='level-']").children('.leaf-line');
+			rewriteOriginalXPath($childrenLeafs.find('input.label'), $labelInput.data('originalXpath'), newIndex);
+			modifyAllInputsXPath($childrenLeafs);
+		}
+		var newXpath = $labelInput.data('uniqueId') + '_' + $labelInput.data('originalXpath');
+
 		// recover original uniqueId and xPath and generate new input name
-		$labelInput.attr('name', 'newNodeForm[label' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
-		$valueInput.attr('name', 'newNodeForm[value' + $labelInput.data().uniqueId + '_' + $labelInput.data().originalXpath + ']');
+		$labelInput.attr('name', 'newNodeForm[label' + newXpath + ']');
+		$valueInput.attr('name', 'newNodeForm[value' + newXpath + ']');
 		modifyInputXPath($inputs, $(this), newIndex);
 	});
 }
