@@ -565,23 +565,25 @@ class XMLoperations {
 	public function handleNewNodeForm(&$key, $configParams)	{
 		$post_vals = $this->container->get('request')->get('newNodeForm');
 		$res = 0;
+		$keyElemsCnt = 0;
+		$dom = new \DOMDocument();
 
 		try {
 			// load original (not modified) getconfig
 			if ( ($originalXml = $this->dataModel->handle('getconfig', $configParams, true)) != 1 ) {
-				/** @var \SimpleXMLElement $tmpConfigXml */
-				$tmpConfigXml = simplexml_load_string($originalXml);
+				/** @var \SimpleXMLElement $configXml */
+				$configXml = simplexml_load_string($originalXml);
 
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
-				$xmlNameSpaces = $tmpConfigXml->getNamespaces();
+				$xmlNameSpaces = $configXml->getNamespaces();
 				if ( isset($xmlNameSpaces[""]) ) {
-					$tmpConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+					$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 				}
 			}
 
 			// if we have XML configuration
 			$skipArray = array();
-			if (isset($tmpConfigXml)) {
+			if (isset($configXml)) {
 
 				// load parent value
 				if (array_key_exists('parent', $post_vals)) {
@@ -589,14 +591,14 @@ class XMLoperations {
 
 					$xpath = $this->decodeXPath($parentPath);
 					// get node according to xPath query
-					/** @var \SimpleXMLElement $parentNode */
-					$parentNode = $tmpConfigXml->xpath($xpath);
+					/** @var \SimpleXMLElement $tmpParentNode */
+					$parentNode = $configXml->xpath($xpath);
 
 					array_push($skipArray, 'parent');
 
 					// we have to delete all children from parent node (because of xpath selector for new nodes), except from key nodes
 					$domNode = dom_import_simplexml($parentNode[0]);
-					$this->removeChildrenExceptKey($domNode, $domNode->childNodes);
+					$keyElemsCnt = $this->removeChildren($domNode, $domNode->childNodes);
 
 				} else {
 					throw new \ErrorException("Could not set parent node for new elements.");
@@ -626,9 +628,14 @@ class XMLoperations {
 						$xpath = $this->decodeXPath($label[1]);
 						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
 
-						$node = $this->insertNewElemIntoXMLTree($tmpConfigXml, $xpath, $labelVal, $value);
+						$node = $this->insertNewElemIntoXMLTree($configXml, $xpath, $labelVal, $value);
 
 					}
+				}
+
+				if ($keyElemsCnt > 0 && isset($domNode)) {
+					$dom->importNode($domNode, true);
+					$this->moveCustomKeyAttributesIntoElements($dom, $domNode, $keyElemsCnt);
 				}
 
 				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
@@ -652,38 +659,93 @@ class XMLoperations {
 	}
 
 	/**
-	 * @param $domNode
-	 * @param $domNodeChildren
+	 * @param \DOMDocument $dom
+	 * @param \DOMElement  $domNode
+	 * @param              $keyElementsCnt
+	 *
+	 * @return int         number of moved items
 	 */
-	public function removeChildrenExceptKey($domNode, $domNodeChildren)
-	{
-		$keyElems = 0;
-		while ($domNodeChildren->length > $keyElems) {
-			if (count($domNodeChildren->item($keyElems)->childNodes)) {
-				// $this->removeChildrenExceptKey($domNode, $domNodeChildren->item($keyElems)->childNodes); // TODO: make it recursive
+	public function moveCustomKeyAttributesIntoElements($dom, $domNode, $keyElementsCnt) {
+		$attributesArr = array();
+		$totalMoved = 0;
+
+		if ($domNode->hasAttributes()) {
+			foreach ($domNode->attributes as $attr) {
+				if (strpos($attr->nodeName, "GUIcustom:") === 0) {
+					$elemName = str_replace("GUIcustom:", "", $attr->nodeName);
+					$elemValue = $attr->nodeValue;
+
+					if (0 && $domNode->hasChildNodes()) {
+						// TODO: append new child as first child
+						$dom->insertBefore(new \DOMElement($elemName, $elemValue), $domNode->childNodes->item(0));
+					} else {
+						$domNode->appendChild(new \DOMElement($elemName, $elemValue));
+					}
+
+					$attributesArr[] = $attr->nodeName;
+					$totalMoved++;
+				}
 			}
+			// remove must be in new foreach, previous deletes only first one
+			foreach ($attributesArr as $attrName) {
+				$domNode->removeAttribute($attrName);
+			}
+		}
+
+		if ($totalMoved < $keyElementsCnt && $domNode->hasChildNodes()) {
+			foreach($domNode->childNodes as $child) {
+				$totalMoved += $this->moveCustomKeyAttributesIntoElements($dom, $child, $keyElementsCnt);
+			}
+		}
+
+		return $totalMoved;
+	}
+
+	/**
+	 * @param      \DOMElement $domNode
+	 * @param      \DOMNodeList $domNodeChildren
+	 * @param bool $leaveKey
+	 *
+	 * @return int  number of key elements
+	 */
+	public function removeChildren($domNode, $domNodeChildren, $leaveKey = false)
+	{
+		$keyElemIndex = $keyElemsCnt = 0;
+		while ($domNodeChildren->length > $keyElemIndex) {
 			$isKey = false;
-			if ($domNodeChildren->item($keyElems)->hasAttributes()) {
-				foreach ($domNodeChildren->item($keyElems)->attributes as $attr) {
+			$child = $domNodeChildren->item($keyElemIndex);
+			if ($child->hasAttributes()) {
+				foreach ($child->attributes as $attr) {
 					if ($attr->nodeName == "iskey" && $attr->nodeValue == "true") {
-						if ($domNodeChildren->item($keyElems)->hasAttributes()) {
-							foreach ($domNodeChildren->item($keyElems)->attributes as $attr) {
+						if ($child->hasAttributes()) {
+							foreach ($child->attributes as $attr) {
 								$attributesArr[] = $attr->nodeName;
 							}
 							// remove must be in new foreach, previous deletes only first one
 							foreach ($attributesArr as $attrName) {
-								$domNodeChildren->item($keyElems)->removeAttribute($attrName);
+								$child->removeAttribute($attrName);
 							}
 						}
-						$keyElems++;
-						$isKey = true;
+						if ($leaveKey == true) {
+							$keyElemIndex++;
+							$isKey = true;
+						} else if (isset($child)) {
+							$nodeName = $child->nodeName;
+							$nodeValue = $child->nodeValue;
+							$domNode->setAttribute("GUIcustom:".$nodeName, $nodeValue);
+						}
+						$keyElemsCnt++;
 						break;
 					}
 				}
 			}
-			if (!$isKey) {
+			if (!$isKey || $leaveKey == false) {
 				try {
-					$domNode->removeChild($domNodeChildren->item($keyElems));
+//			if (count($domNodeChildren->item($keyElemIndex)->childNodes)) {
+//				 $this->removeChildren($domNodeChildren->item($keyElemIndex), $domNodeChildren->item($keyElemIndex)->childNodes, $leaveKey);
+//			}
+					// TODO: make somehow recursive
+					$domNode->removeChild($child);
 				} catch (\DOMException $e) {
 
 				}
@@ -692,14 +754,16 @@ class XMLoperations {
 
 		if ($domNode->hasAttributes()) {
 			foreach ($domNode->attributes as $attr) {
-				$attributesArr[] = $attr->nodeName;
+				if (strpos($attr->nodeName, "GUIcustom:") !== 0) {
+					$attributesArr[] = $attr->nodeName;
+				}
 			}
 			// remove must be in new foreach, previous deletes only first one
 			foreach ($attributesArr as $attrName) {
 				$domNode->removeAttribute($attrName);
 			}
 		}
-		return;
+		return $keyElemsCnt;
 	}
 
 	/**
