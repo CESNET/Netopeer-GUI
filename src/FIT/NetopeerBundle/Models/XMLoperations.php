@@ -675,9 +675,8 @@ class XMLoperations {
 					$elemName = str_replace("GUIcustom:", "", $attr->nodeName);
 					$elemValue = $attr->nodeValue;
 
-					if (0 && $domNode->hasChildNodes()) {
-						// TODO: append new child as first child
-						$dom->insertBefore(new \DOMElement($elemName, $elemValue), $domNode->childNodes->item(0));
+					if ($domNode->hasChildNodes()) {
+						$domNode->insertBefore(new \DOMElement($elemName, $elemValue), $domNode->childNodes->item(0));
 					} else {
 						$domNode->appendChild(new \DOMElement($elemName, $elemValue));
 					}
