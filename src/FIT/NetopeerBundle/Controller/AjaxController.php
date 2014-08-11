@@ -268,13 +268,15 @@ class AjaxController extends BaseController
 				'key' => $key,
 				'xPath' => "XPATH"
 		);
+		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabel', $typeaheadParams);
 		if (!is_null($module)) {
 			$typeaheadParams['module'] = $module;
+			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
 		}
 		if (!is_null($subsection)) {
 			$typeaheadParams['subsection'] = $subsection;
+			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithSubsection', $typeaheadParams);
 		}
-		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
 
 		if (is_array($res)) {
 			if (isset($_GET['command']) && isset($_GET['label'])) {
