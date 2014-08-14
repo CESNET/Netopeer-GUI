@@ -63,7 +63,12 @@ if advised of the possibility of such damage.
 		{{ configSingleContent|raw }}
 	{% else %}
 		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
-		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
+		{% if stateArr is defined
+		and (
+			not(stateArr is empty)
+			or (isEmptyModule is defined and isEmptyModule == true)
+			or (forceShowFormConfig is defined and forceShowFormConfig == true)
+		) %}
 			{% if formConfig is defined %}
 				{% block filterConfig %}
 					<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig" data-disable-active-link="true">
@@ -94,7 +99,8 @@ if advised of the possibility of such damage.
 			    <input type="submit" value="Copy" class="button small grey left" />
 			</form>
 			{% endif %}
-
+		{% endif %}
+		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
 			<hr class="cleaner" />
 			<form action="" method="post" name="formConfigData" data-disable-history="true">
 				<div class="root">
@@ -130,6 +136,9 @@ if advised of the possibility of such damage.
 			<div class="alert info">
 				No results found.
 			</div>
+			{% if additionalForm is defined %}
+				{{ additionalForm|raw }}
+			{% endif %}
 		{% endif %}
 	{% endif %}
 {% endblock singleContent %}

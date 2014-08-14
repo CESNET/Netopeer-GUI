@@ -643,7 +643,20 @@ class DefaultController extends BaseController
 				// we have only root module
 				if ($xml->count() == 0) {
 					$isEmptyModule = true;
+					if ($xml->getName() == 'root') {
+						$this->setEmptyModuleForm($this->getRequest()->get('key'));
+						$isEmptyModule = false;
+						$this->assign('forceShowFormConfig', true);
+					}
 					$this->assign('isEmptyModule', $isEmptyModule);
+					$this->assign('key', $this->getRequest()->get('key'));
+					$this->assign('additionalTitle', 'Create empty root element');
+					$this->assign('redirectUrl', $this->getRequest()->getRequestUri());
+					$this->setEmptyModuleForm($key);
+					$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:createEmptyModule.html.twig');
+					$html = $template->renderBlock('singleContent', $this->getAssignedVariablesArr());
+
+					$this->assign('additionalForm', $html);
 				} else {
 					$this->assign('showRootElem', true);
 				}
