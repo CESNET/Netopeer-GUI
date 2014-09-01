@@ -13,3 +13,4 @@ parameters:
     mailer_password:    ~
     locale:             en
     secret:             fjdpaiouczvjyqperncvmz0900rfq
+    netopeer_single_instance:    false

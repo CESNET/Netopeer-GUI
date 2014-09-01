@@ -45,8 +45,17 @@ if advised of the possibility of such damage.
 	<div id="login-hp">
 
 		{# data odesíláme na login_check #}
-		<form action="{{ path('login_check') }}" method="post" id="login-form">
-			<legend>Log in is required for this site!</legend>
+		<form action="{% if isSingleInstance %}{{ path('single_instance_login') }}{% else %}{{ path('login_check') }}{% endif %}" method="post" id="login-form">
+			<legend>
+				{% if isSingleInstance %}
+					Connect to the local device!
+					<input type="hidden" name="form[host]" value="sauvignon.liberouter.org" />
+					<input type="hidden" name="form[port]" value="830" />
+					<input type="hidden" name="isSingleInstance" value="true" />
+				{% else %}
+					Log in is required for this site!
+				{% endif %}
+			</legend>
 
 			{% block flashes %}
 				{% for type, flashMessages in app.session.flashbag.all() %}
@@ -64,12 +73,12 @@ if advised of the possibility of such damage.
 
 		    <label for="username">Username:</label>
 		    {# pro správnou funkci se musí parametry poslané na login_check jmenovat _username a _password #}
-		    <input type="text" id="username" name="_username" value="{{ last_username }}" /><br/>
+		    <input type="text" id="username" name="{% if isSingleInstance %}form[user]{% else %}_username{% endif %}" value="{{ last_username }}" /><br/>
 		 
 		    <label for="password">Password:</label>
-		    <input type="password" id="password" name="_password" /><br/>
+		    <input type="password" id="password" name="{% if isSingleInstance %}form[password]{% else %}_password{% endif %}" /><br/>
 		 
-		    <input type="submit" name="login" value="Log in" /> <span class="login-alternative">or <a href="{{ app.request.basePath }}/saml/sp/login">login using eduID</a></span>
+		    <input type="submit" name="login" value="Log in" />{% if not isSingleInstance %}<span class="login-alternative">or <a href="{{ app.request.basePath }}/saml/sp/login">login using eduID</a>{% endif %}</span>
 		</form>
 
 	</div>

@@ -4,6 +4,7 @@ security:
         FIT\NetopeerBundle\Entity\User: sha512
 
     role_hierarchy:
+        ROLE_LOCALHOST:   ROLE_USER
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: [ROLE_USER, ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
 
@@ -19,6 +20,7 @@ security:
             memory:
                 users:
                     user:           { password: pass,    roles: [ 'ROLE_USER' ] }
+                    localhostUser:      { password: iannYw90,    roles: [ 'ROLE_LOCALHOST' ] }
                     adminNoDb:      { password: pass,    roles: [ 'ROLE_ADMIN' ] }
 
     firewalls:
@@ -86,7 +88,7 @@ security:
             context: commont_context
 
     access_control:
-        - { path: ^/login/$, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+        - { path: ^/login/, roles: IS_AUTHENTICATED_ANONYMOUSLY}
         - { path: ^/saml/sp/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/saml/sp/acs$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(login_check|connections|section|ajax), roles: ROLE_USER}

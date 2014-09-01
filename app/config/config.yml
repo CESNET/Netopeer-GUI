@@ -22,6 +22,10 @@ framework:
     fragments:       ~
     http_method_override: true
 
+# netopeerGUI configuration
+parameters:
+    fit_netopeer.single_instance: %netopeer_single_instance%
+
 # Twig Configuration
 twig:
     debug:            %kernel.debug%

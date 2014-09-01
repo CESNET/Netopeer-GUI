@@ -104,6 +104,7 @@ class DefaultController extends BaseController
 	 */
 	public function connectionsAction($connectedDeviceId = NULL)
 	{
+		$singleInstance = $this->container->getParameter('fit_netopeer.single_instance');
 		// DependencyInjection (DI) - defined in Resources/config/services.yml
 		/**
 		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
@@ -141,7 +142,7 @@ class DefaultController extends BaseController
 		}
 
 		// build form for connection to the server
-		$form = $this->createFormBuilder()
+		$form = $this->createFormBuilder(null, array('csrf_protection' => false))
 			->add('host', 'text', array('attr' => array('value' => $host)))
 			->add('port', 'number', array('attr' => array('value' => $port)))
 			->add('user', 'text', array('attr' => array('value' => $userName)))
@@ -196,12 +197,22 @@ class DefaultController extends BaseController
 					$this->get('session')->set('getSchemaWithAjax', $arr);
 					$this->getRequest()->getSession()->getFlashBag()->add('state success', 'Form has been filled up correctly.');
 
-					$baseConn = $this->get('BaseConnection');
-					$baseConn->saveConnectionIntoDB($post_vals['host'], $post_vals['port'], $post_vals['user']);
-
+					if (!$singleInstance) {
+						$baseConn = $this->get('BaseConnection');
+						$baseConn->saveConnectionIntoDB($post_vals['host'], $post_vals['port'], $post_vals['user']);
+					} else {
+						// update models
+						$dataClass->updateLocalModels($result);
+						return $this->redirect($this->generateUrl('handleConnection', array('command' => 'get', 'key' => $result)));
+					}
+				} elseif ($singleInstance) {
+					return $this->redirect($this->generateUrl('_logout'));
 				}
 			} else {
 				$this->getRequest()->getSession()->getFlashBag()->add('state error', 'Connection - you have not filled up form correctly.');
+				if ($singleInstance) {
+					return $this->redirect($this->generateUrl('_logout'));
+				}
 			}
 			$url = $this->get('request')->headers->get('referer');
 			//if (!$this->getRequest()->isXmlHttpRequest()) {

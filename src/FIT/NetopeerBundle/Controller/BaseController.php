@@ -141,6 +141,8 @@ class BaseController extends Controller
 		$this->assign("topmenu", array());
 		$this->assign("submenu", array());
 
+		$this->assign("isSingleInstance", $this->container->getParameter('fit_netopeer.single_instance') === true);
+
 		// we have to assign global variables, which are known in Twig, because they are missing now...
 		$app = array(
 			'user' => $this->get('security.context')->getToken()->getUser(),
