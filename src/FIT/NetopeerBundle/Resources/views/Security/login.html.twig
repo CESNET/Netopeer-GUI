@@ -49,8 +49,8 @@ if advised of the possibility of such damage.
 			<legend>
 				{% if isSingleInstance %}
 					Connect to the local device!
-					<input type="hidden" name="form[host]" value="sauvignon.liberouter.org" />
-					<input type="hidden" name="form[port]" value="830" />
+					<input type="hidden" name="form[host]" value="{{ singleInstanceHost|default('localhost')}}" />
+					<input type="hidden" name="form[port]" value="{{ singleInstancePort|default('830') }}" />
 					<input type="hidden" name="isSingleInstance" value="true" />
 				{% else %}
 					Log in is required for this site!

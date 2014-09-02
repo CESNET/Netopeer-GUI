@@ -203,14 +203,17 @@ class DefaultController extends BaseController
 					} else {
 						// update models
 						$dataClass->updateLocalModels($result);
+						setcookie("singleInstanceLoginFailed", false);
 						return $this->redirect($this->generateUrl('handleConnection', array('command' => 'get', 'key' => $result)));
 					}
 				} elseif ($singleInstance) {
+					setcookie("singleInstanceLoginFailed", true, time() + 60);
 					return $this->redirect($this->generateUrl('_logout'));
 				}
 			} else {
 				$this->getRequest()->getSession()->getFlashBag()->add('state error', 'Connection - you have not filled up form correctly.');
 				if ($singleInstance) {
+					setcookie("singleInstanceLoginFailed", true, time() + 60);
 					return $this->redirect($this->generateUrl('_logout'));
 				}
 			}

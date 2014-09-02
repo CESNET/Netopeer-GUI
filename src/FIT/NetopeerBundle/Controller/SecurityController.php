@@ -98,6 +98,22 @@ class SecurityController extends BaseController
 		$this->assign('last_username', $session->get(SecurityContext::LAST_USERNAME));
 		$this->assign('error', $error);
 
+		if ($this->container->getParameter('fit_netopeer.single_instance') === true) {
+			if ($this->container->hasParameter('fit_netopeer.single_instance.host')) {
+				$this->assign('singleInstanceHost', $this->container->getParameter('fit_netopeer.single_instance.host'));
+			}
+			if ($this->container->hasParameter('fit_netopeer.single_instance.port')) {
+				$this->assign('singleInstancePort', $this->container->getParameter('fit_netopeer.single_instance.port'));
+			}
+
+
+			if (isset($_COOKIE['singleInstanceLoginFailed']) && $_COOKIE['singleInstanceLoginFailed'] == true) {
+				$this->getRequest()->getSession()->getFlashBag()->add('error', 'Could not connect to local device.<br/>Probably wrong username/password.');
+			}
+
+			setcookie("singleInstanceLoginFailed", false);
+		}
+
 		return $this->getTwigArr($this);
 	}
 

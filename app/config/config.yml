@@ -25,6 +25,8 @@ framework:
 # netopeerGUI configuration
 parameters:
     fit_netopeer.single_instance: %netopeer_single_instance%
+    #fit_netopeer.single_instance.host: 'localhost'
+    #fit_netopeer.single_instance.port: '830'
 
 # Twig Configuration
 twig:
