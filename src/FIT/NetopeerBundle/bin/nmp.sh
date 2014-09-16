@@ -133,7 +133,7 @@ else
         pyang -f tree -o "$MODELDIR/tree.txt" "$INPUTFILE" > /dev/null&
 
 	# generate wrapped form
-	pyang -f wyin --wyin-outputdir "$MODELDIR" -o "$MODELDIR/wrapped.wyin" "$INPUTFILE" > /dev/null&
+	pyang -f wyin -o "$MODELDIR/wrapped.wyin" "$INPUTFILE" > /dev/null&
 
 	## generate state information tree only
 	#pyang -f nmp --nmp-breaktree --nmp-genrpc --nmp-outputdir "$MODELDIR" "$INPUTFILE" > /dev/null&
