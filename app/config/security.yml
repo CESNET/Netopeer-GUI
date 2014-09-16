@@ -48,10 +48,10 @@ security:
                         sp:
                             config:
                                 # required
-                                entity_id: netopeergui_sauvignon
+                                entity_id: %saml_entity_id%
                                 # if different then url being used in request
                                 # used for construction of assertion consumer and logout urls in SP entity descriptor
-                                base_url: https://sauvignon.liberouter.org/netopeergui
+                                base_url: %saml_base_url%
                             signing:
                                 # must implement SPSigningProviderInterface
                                 # id: my.signing.provider.service.id
