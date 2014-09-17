@@ -1256,7 +1256,7 @@ class Data {
 //		}
 
 		try {
-			$sock = fsockopen('unix:///tmp/mod_netconf.sock', NULL, $errno, $errstr);
+			$sock = fsockopen('unix:///var/run/mod_netconf.sock', NULL, $errno, $errstr);
 		} catch (\ErrorException $e) {
 			$this->logger->addError('Could not connect to socket.', array($errstr));
 			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not connect to socket. Error: $errstr");
