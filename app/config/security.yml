@@ -73,6 +73,9 @@ security:
                                     logout_request: post
             logout:
                 path: /logout/
+                success_handler: authentication_handler
+                invalidate_session: false
+
 
             context: commont_context
 

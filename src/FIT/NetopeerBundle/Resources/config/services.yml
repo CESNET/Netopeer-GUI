@@ -49,6 +49,10 @@ services:
         class: Monolog\Handler\StreamHandler       
         arguments: [%kernel.logs_dir%/%kernel.environment%.data.log]
 
+    authentication_handler:
+        class: FIT\NetopeerBundle\Handler\AuthenticationHandler
+        arguments: [@service_container, @data_logger, @DataModel]
+
     DataModel:
         class: %netopeer.data.class%
         arguments: [@service_container, @data_logger]
@@ -80,5 +84,10 @@ services:
 
     ajaxController:
         class: FIT\NetopeerBundle\Controller\AjaxController
+        arguments:
+            container: "@service_container"
+
+    securityController:
+        class: FIT\NetopeerBundle\Controller\SecurityController
         arguments:
             container: "@service_container"

@@ -1783,6 +1783,7 @@ XML;
 		);
 
 		$xml = $this->handle('get', $params, false);
+		// TODO: try/catch na simplexml_load_string
 		if (($xml !== 1) && ($xml !== "")) {
 			$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 			if ($xml === false) {

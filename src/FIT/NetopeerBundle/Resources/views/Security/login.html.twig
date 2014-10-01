@@ -60,9 +60,12 @@ if advised of the possibility of such damage.
 			{% block flashes %}
 				{% for type, flashMessages in app.session.flashbag.all() %}
 					{% for flashMessage in flashMessages %}
+						{% if flashMessage not in usedFlashes %}
 						<div class="alert {{ type }}">
 							{{ flashMessage|raw }}
 						</div>
+						{% set usedFlashes = usedFlashes|merge([flashMessage]) %}
+						{% endif %}
 					{% endfor %}
 				{% endfor %}
 			{% endblock flashes %}
