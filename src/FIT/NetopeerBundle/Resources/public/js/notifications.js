@@ -93,11 +93,10 @@ function openipdialog() {
 	$.ajax({
 		url: $(this).attr('href'),
 		success: function(data, textStatus, jqXHR) {
-			$('#ipModalCover').html(data)
-												.modal({show:true})
+			$('#block--modalWindow').html(data)
 												.on('hidden.bs.modal', function () {
-				$("#ipModalCover").html('');
-			})
+				$("#block--modalWindow").html('');
+			}).modal('show');
 		}
 	});
 	return false;

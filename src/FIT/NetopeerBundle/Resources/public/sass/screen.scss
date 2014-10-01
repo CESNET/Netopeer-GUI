@@ -472,12 +472,14 @@ table { width: 100%; margin: 15px 0px;
 }
 
 /** ip lookup **/
-#ip-info-cover { width: 100%;
+#ip-info-cover { width: 100%; @include clearfix; padding-bottom: 20px;
 	> div { width: 47%; }
 	#map-canvas { height: 250px; }
 	p { padding: 5px 0px; }
 }
+.modal { overflow: scroll; font-size: 1.3em; }
 .modal-body { font-family: $fBody; color: #333; }
+.modal-content { @include clearfix; }
 .modal-header { overflow: hidden;
 	h3 { margin: 0px; padding: 0px; font-family: $fHeadings; color: $cBase; font-size: 1.5em; }
 	.button { margin-top: 0px; margin-bottom: 0px; }
@@ -486,7 +488,7 @@ table { width: 100%; margin: 15px 0px;
 
 
 /** modal RPC methods **/
-#block--modalWindow { display: none; font-size: 1.3em; overflow: scroll;
+#block--modalWindow { display: none;
 	> form { margin: 0px; }
 	.modal-body { overflow-y: visible; }
 	.modal-footer {

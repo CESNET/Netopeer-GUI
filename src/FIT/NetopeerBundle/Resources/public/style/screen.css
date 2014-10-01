@@ -1374,7 +1374,10 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
 
 /** ip lookup **/
 #ip-info-cover {
-  width: 100%; }
+  width: 100%;
+  overflow: hidden;
+  *zoom: 1;
+  padding-bottom: 20px; }
 #ip-info-cover > div {
   width: 47%; }
 #ip-info-cover #map-canvas {
@@ -1382,9 +1385,16 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
 #ip-info-cover p {
   padding: 5px 0px; }
 
+.modal {
+  overflow: scroll; }
+
 .modal-body {
   font-family: Arial, Trebuchet, Verdana, sans-serif;
   color: #333; }
+
+.modal-content {
+  overflow: hidden;
+  *zoom: 1; }
 
 .modal-header {
   overflow: hidden; }
@@ -1406,8 +1416,7 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
 /** modal RPC methods **/
 #block--modalWindow {
   display: none;
-  font-size: 1.3em;
-  overflow: scroll; }
+  font-size: 1.3em; }
 #block--modalWindow > form {
   margin: 0px; }
 #block--modalWindow .modal-body {
