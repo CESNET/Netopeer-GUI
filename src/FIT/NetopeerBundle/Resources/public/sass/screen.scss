@@ -482,9 +482,11 @@ table { width: 100%; margin: 15px 0px;
 	h3 { margin: 0px; padding: 0px; font-family: $fHeadings; color: $cBase; font-size: 1.5em; }
 	.button { margin-top: 0px; margin-bottom: 0px; }
 }
+.modal-dialog { max-width: 70%; width: auto; margin: 5% auto; }
+
 
 /** modal RPC methods **/
-#block--modalWindow { display: none; font-size: 1.3em;
+#block--modalWindow { display: none; font-size: 1.3em; overflow: scroll;
 	> form { margin: 0px; }
 	.modal-body { overflow-y: visible; }
 	.modal-footer {
