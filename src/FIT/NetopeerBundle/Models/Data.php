@@ -1255,8 +1255,25 @@ class Data {
 //			}
 //		}
 
+                $socket_path = '/var/run/mod_netconf.sock';
+                if (!file_exists($socket_path)) {
+			$this->logger->addError('Backend is not running or socket file does not exist.', array($socket_path));
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Backend is not running or socket file does not exist: ".$socket_path);
+                        return 1;
+                }
+                if (!is_readable($socket_path)) {
+			$this->logger->addError('Socket is not readable.', array($socket_path));
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Socket is not readable: ".$socket_path);
+                        return 1;
+                }
+                if (!is_writable($socket_path)) {
+			$this->logger->addError('Socket is not writable.', array($socket_path));
+			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Socket is not writable: ".$socket_path);
+                        return 1;
+                }
+                $socket_path = 'unix://'.$socket_path;
 		try {
-			$sock = fsockopen('unix:///var/run/mod_netconf.sock', NULL, $errno, $errstr);
+			$sock = fsockopen($socket_path, NULL, $errno, $errstr);
 		} catch (\ErrorException $e) {
 			$this->logger->addError('Could not connect to socket.', array($errstr));
 			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Could not connect to socket. Error: $errstr");
