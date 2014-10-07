@@ -1,3 +1,5 @@
+<div class="modal-dialog">
+<div class="modal-content">
 <div class="modal-header">
 	<button type="button" class="button small grey close right" data-dismiss="modal">×</button>
 	<h3>
@@ -9,7 +11,7 @@
 	</h3>
 </div>
 <div class="modal-body">
-	<section id="ip-info-cover">
+	<div id="ip-info-cover">
 		<div id="map-canvas" class="left"></div>
 		<div class="ip-info right">
 			{% if (ipInfo is defined) %}
@@ -20,7 +22,9 @@
 				<p>No info available</p>
 			{% endif %}
 		</div>
-	</section>
+	</div>
+</div>
+</div>
 </div>
 
 {% if (latitude is defined) and (longitude is defined) %}

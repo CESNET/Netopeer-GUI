@@ -336,7 +336,7 @@ class DefaultController extends BaseController
 		}
 
 		// if something goes wrong, we will redirect to connections page
-		if ( in_array($command, array("connect", "disconnect", "getschema")) ) {
+		if ( in_array($command, array("get", "connect", "disconnect", "getschema")) ) {
 			return $this->redirect($this->generateUrl('connections'));
 		} else {
 			$url = $this->get('request')->headers->get('referer');

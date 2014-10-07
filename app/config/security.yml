@@ -28,6 +28,17 @@ security:
             pattern:  ^/(_(profiler|wdt)|css|images|js)/
             security: false
 
+        secured_area:
+            pattern:    ^/(?!saml)
+            anonymous:  ~
+            form_login:
+                check_path: /login_check
+                login_path: /login/
+            logout:
+                path:   /logout/
+                target: /
+            context: commont_context
+
         saml:
             pattern: ^/(?!login_check)
             anonymous: true
@@ -39,6 +50,7 @@ security:
                 metadata_path: /saml/sp/FederationMetadata.xml
                 discovery_path: /saml/sp/discovery
                 local_logout_path: /logout/
+                default_target_path: /
                 provider: saml_user_provider
                 create_user_if_not_exists: true
                 services:
@@ -73,18 +85,10 @@ security:
                                     logout_request: post
             logout:
                 path: /logout/
+                success_handler: authentication_handler
+                invalidate_session: false
 
-            context: commont_context
 
-        secured_area:
-            pattern:    ^
-            anonymous:  ~
-            form_login:
-                check_path: /login_check
-                login_path: /login/
-            logout:
-                path:   /logout/
-                target: /
             context: commont_context
 
     access_control:
