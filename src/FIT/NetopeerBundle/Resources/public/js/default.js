@@ -1058,9 +1058,15 @@ function bindEditBarModification($editBar, $form) {
 	$editBar.addClass('generated');
 	$editBar.children("img.sibling, img.sort-item").remove();
 	$editBar.children("img.remove-child").on('click', function() {
-		// remove all children and itself
-		$(this).parents(".leaf-line").next("div[class*='level-']").remove();
-		$(this).parents(".leaf-line").remove();
+		var confirmBox = confirm("Are you sure you want to delete this element and all his children? This can not be undone!");
+		if (confirmBox) {
+			// remove all children and itself
+			$(this).parents(".leaf-line").next("div[class*='level-']").remove();
+			$(this).parents(".leaf-line").remove();
+		} else {
+			return false;
+		}
+
 
 		modifyAllInputsXPath($form.find('.leaf-line'), true);
 	});
