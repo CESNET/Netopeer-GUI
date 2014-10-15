@@ -45,7 +45,7 @@ if advised of the possibility of such damage.
 	<div id="login-hp">
 
 		{# data odesíláme na login_check #}
-		<form action="{% if isSingleInstance %}{{ path('single_instance_login') }}{% else %}{{ path('login_check') }}{% endif %}" method="post" id="login-form">
+		<form action="{% if isSingleInstance %}{{ path('single_instance_login') }}{% else %}{{ path('login_check') }}{% endif %}" method="post" id="login-form" class="{% if isSingleInstance %}delayed-submit{% endif %}">
 			<legend>
 				{% if isSingleInstance %}
 					Connect to the local device!
