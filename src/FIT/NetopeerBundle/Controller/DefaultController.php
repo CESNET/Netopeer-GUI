@@ -221,6 +221,10 @@ class DefaultController extends BaseController
 			//if (!$this->getRequest()->isXmlHttpRequest()) {
 				return $this->redirect($url);
 			//}
+		} elseif ($singleInstance) {
+			// auto redirect on configure device action for singleInstance user.
+			// We don't want to have this route available at all for these users.
+			return $this->redirect($this->generateUrl('handleConnection', array('command' => 'get', 'key' => 0)));
 		}
 		$connArray = $this->getRequest()->getSession()->get('session-connections');
 		$connections = array();

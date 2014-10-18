@@ -420,6 +420,7 @@ function removeNode($elem) {
 	var xPath = $elem.attr('rel');	// parent XPath - from attribute rel
 	var level = findLevelValue($elem);
 	var $currentParentLevel = $elem.parents('.level-' + level);
+	$elem.parents('.leaf-line').addClass('active');
 
 	// generate new form
 	var $form = generateFormObject('removeNodeForm');
@@ -438,7 +439,7 @@ function removeNode($elem) {
 	createCloseButton($cover, $form);
 
 	// append created form into the parent
-	$currentParentLevel.append($form);
+	$form.insertAfter($currentParentLevel);
 
 	unwrapCoverForm($currentParentLevel, $cover);
 	scrollToGeneratedForm($elem, $form);
@@ -665,7 +666,7 @@ function createCloseButton($cover, $form) {
 	if ( $form.children("a.close").length ) {
 		$form.children("a.close").remove();
 	}
-	var $closeButton = $("<a href='#' title='Close' class='close red button'>Close</a>");
+	var $closeButton = $("<a href='#' title='Close' class='close red button-link'>Close</a>");
 	$form.append($closeButton);
 
 	// bind click and keydown event
@@ -1058,9 +1059,15 @@ function bindEditBarModification($editBar, $form) {
 	$editBar.addClass('generated');
 	$editBar.children("img.sibling, img.sort-item").remove();
 	$editBar.children("img.remove-child").on('click', function() {
-		// remove all children and itself
-		$(this).parents(".leaf-line").next("div[class*='level-']").remove();
-		$(this).parents(".leaf-line").remove();
+		var confirmBox = confirm("Are you sure you want to delete this element and all his children? This can not be undone!");
+		if (confirmBox) {
+			// remove all children and itself
+			$(this).parents(".leaf-line").next("div[class*='level-']").remove();
+			$(this).parents(".leaf-line").remove();
+		} else {
+			return false;
+		}
+
 
 		modifyAllInputsXPath($form.find('.leaf-line'), true);
 	});
