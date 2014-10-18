@@ -78,7 +78,7 @@ jQuery.extend({
 		},
 
 		setActiveLink: function($link) {
-			if ($link.data('doNotActivate') === true) {
+			if ($link.data().doNotActivate === true) {
 				return;
 			}
 
@@ -128,18 +128,15 @@ jQuery(function($) {
 		loadAjaxLink(e, $(this), $(this).attr('href'), "GET", '');
 	});
 
-	$('.delayed-submit').submit(function(e) {
-		e.preventDefault();
-		$('#ajax-spinner').fadeIn();
-		var $form = $(this);
-		setTimeout(function() {
-			$form.removeClass('delayed-submit');
-			$form.unbind('submit').submit();
-		}, 400);
-	});
-
 	$("section").on('submit', 'form', function(e) {
-		loadAjaxForm(e);
+		if ($(this).data().disableActiveLink == undefined) {
+			$(this).attr('data-disable-active-link', true);
+		}
+		var formAction = $(this).attr('action');
+		if (formAction == "") {
+			formAction = window.location.href;
+		}
+		loadAjaxLink(e, $(this), formAction, 'POST', $(this).serialize());
 	});
 
 	$("body").on('submit', '.modal form', function(e) {
@@ -148,17 +145,6 @@ jQuery(function($) {
 		
 	});
 });
-
-function loadAjaxForm(form) {
-	if ($(form).data('disableActiveLink') == undefined) {
-		$(form).attr('data-disable-active-link', true);
-	}
-	var formAction = $(form).attr('action');
-	if (formAction == "") {
-		formAction = window.location.href;
-	}
-	loadAjaxLink(form, $(form), formAction, 'POST', $(form).serialize());
-}
 
 function loadAjaxLink(e, $THIS, href, type, data) {
 	e.preventDefault();
@@ -196,7 +182,7 @@ function loadAjaxLink(e, $THIS, href, type, data) {
 }
 
 function successAjaxFunction(data, textStatus, jqXHR, href, $elem) {
-	if ($elem.data('ajaxRedirect')) {
+	if ($elem.data().ajaxRedirect) {
 		data.redirect = href;
 	}
 	$('#ajax-spinner').fadeOut();
@@ -206,11 +192,11 @@ function successAjaxFunction(data, textStatus, jqXHR, href, $elem) {
 //	l($elem);
 
 	$.nette.success(data);
-	if ($('a[href="'+ href +'"]').length && $elem.data('disableActiveLink') !== true) {
+	if ($('a[href="'+ href +'"]').length && $elem.data().disableActiveLink !== true) {
 		$.nette.setActiveLink($('a[href="'+ href +'"]'));
 	}
 
-	if ($elem.data('disableHistory') !== true) {
+	if ($elem.data().disableHistory !== true) {
 		var historyHref = href;
 		if (data.historyHref !== "") {
 			historyHref = data.historyHref;
@@ -218,7 +204,7 @@ function successAjaxFunction(data, textStatus, jqXHR, href, $elem) {
 		history.pushState(historyHref, "", historyHref);
 	}
 
-	if ($elem.data('callback') !== undefined) {
-		eval($elem.data('callback') + ';');
+	if ($elem.data().callback !== undefined) {
+		eval($elem.data().callback + ';');
 	}
 }
