@@ -1071,7 +1071,7 @@ function bindEditBarModification($editBar, $form) {
 
 		modifyAllInputsXPath($form.find('.leaf-line'), true);
 	});
-	$editBar.children("img.create-child").on('click', function() {
+	$editBar.children("img.create-child").unbind('click').on('click', function() {
 		createNode($(this));
 	});
 

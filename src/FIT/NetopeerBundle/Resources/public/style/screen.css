@@ -1344,7 +1344,9 @@ form.generatedForm input[type="submit"] {
   margin-right: 15px; }
 form.generatedForm .close {
   float: left;
-  margin-left: 15px; }
+  margin-left: 15px;
+  margin-top: 25px;
+ }
 form.generatedForm #modelTreeDump {
   display: none;
   width: 94%;
