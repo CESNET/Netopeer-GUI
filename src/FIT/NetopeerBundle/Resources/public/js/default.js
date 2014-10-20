@@ -71,7 +71,7 @@ function initJS() {
 	// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
 	$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
 
-	$('.edit-bar').on('click', '.sibling', function() {
+	$('.edit-bar').unbind('click').on('click', '.sibling', function() {
 		duplicateNode($(this));
 	}).on('click', ".remove-child", function() {
 				removeNode($(this));
