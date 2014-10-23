@@ -1153,6 +1153,14 @@ public function mergeRecursive(&$model, $root_el) {
 
 	}
 
+	/**
+	 * loads available values for element from model
+	 *
+	 * @param $formId     unique form identifier (for caching response)
+	 * @param $xPath
+	 *
+	 * @return array
+	 */
 	public function getAvailableLabelValuesForXPath($formId, $xPath) {
 
 		/**
@@ -1195,13 +1203,53 @@ public function mergeRecursive(&$model, $root_el) {
 
 			if (!is_null($elements)) {
 				foreach ($elements as $element) {
-					array_push($labelsArr, $element->nodeName);
+					$isChoice = false;
 					$elemsArr[$element->nodeName] = simplexml_import_dom($element, 'SimpleXMLIterator');
 					if ($element->hasAttributes()) {
 						foreach ($element->attributes as $attr) {
+							// if element is choice, we should load case statements bellow
+							if ($attr->nodeName == "eltype" && $attr->nodeValue == "choice") {
+								$isChoice = true;
+							}
 							$attributesArr[$element->nodeName][$attr->nodeName] = $attr->nodeValue;
 						}
 					}
+
+					// load case statement (children of element choice)
+					if ($isChoice) {
+						if ($element->hasChildNodes()) {
+							foreach ($element->childNodes as $child) {
+								if ($child->hasAttributes()) {
+									foreach ($child->attributes as $attr) {
+										$isSubCase = false;
+
+										// load only available elementtypes
+										if ($attr->nodeName == "eltype" && in_array($attr->nodeValue, array('case', 'container', 'leaf', 'leaf-list', 'list'))) {
+
+											// if its case statement, try to load child with same name and complete its attributes
+											if ($attr->nodeValue == "case" && $child->hasChildNodes()) {
+												foreach ($child->childNodes as $subchild) {
+													if ($subchild->nodeName == $child->nodeName && $subchild->hasAttributes()) {
+														$isSubCase = true;
+														foreach ($subchild->attributes as $attr) {
+															$attributesArr[$child->nodeName][$attr->nodeName] = $attr->nodeValue;
+														}
+													}
+												}
+											}
+											array_push($labelsArr, $child->nodeName);
+										}
+										if (!$isSubCase) {
+											$attributesArr[$child->nodeName][$attr->nodeName] = $attr->nodeValue;
+										}
+									}
+								}
+							}
+						}
+					} else {
+						array_push($labelsArr, $element->nodeName);
+					}
+
 				}
 			}
 		}
