@@ -982,6 +982,12 @@ public function isResponseValidXML(&$xmlString) {
  * @return bool|\SimpleXMLElement
  */
 public function getElementParent($element) {
+
+	$parentsChoice = $element->xpath("parent::*[@eltype='case']/parent::*[@eltype='choice']/parent::*");
+	if (sizeof($parentsChoice)) {
+		return $parentsChoice[0];
+	}
+
 	$parents = $element->xpath("parent::*");
 	if ($parents) {
 		return $parents[0];
@@ -1023,7 +1029,8 @@ public function checkElemMatch($model_el, $possible_el) {
 public function completeAttributes(&$source, &$target) {
 	if ($source->attributes()) {
 		$attrs = $source->attributes();
-		if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container"))) {
+//		var_dump($source->getName());
+		if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container", "choice", "case"))) {
 			foreach ($source->attributes() as $key => $val) {
 				try {
 					@$target->addAttribute($key, $val);
@@ -1046,12 +1053,13 @@ public function findAndComplete(&$model, $el) {
 	$modelns = $model->getNamespaces();
 	$model->registerXPathNamespace("c", $modelns[""]);
 	$found = $model->xpath("//c:". $el->getName());
+
 	if (sizeof($found) == 1) {
 		$this->completeAttributes($found[0], $el);
 	} else {
-		//echo "Not found unique<br>";
+//		echo "Not found unique<br>";
 		foreach ($found as $found_el) {
-			if ($this->checkElemMatch($el, $found_el)) {
+			if ($this->checkElemMatch($found_el, $el)) {
 				$this->completeAttributes($found_el, $el);
 				break;
 			}
