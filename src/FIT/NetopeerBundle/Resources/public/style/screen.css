@@ -1455,7 +1455,7 @@ table tr:nth-child(even) th, table tr:nth-child(even) td {
   display: none; }
 
 .gips-container {
-  max-width: 252px;
+  max-height: 200px;
   position: absolute;
   z-index: 10;
   margin-left: 2px;
