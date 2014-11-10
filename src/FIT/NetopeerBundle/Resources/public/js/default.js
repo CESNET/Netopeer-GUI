@@ -990,7 +990,6 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 		});
 	$coverDiv.append($("<span>").addClass('label').append($("<span>").addClass('dots')).append($elementName));
 	if (editBarAttributes !== false) removeEditBarIcons($editBar, $(editBarAttributes), labelAttributes);
-	if (labelAttributes !== false) refreshTooltipData($elementName, labelAttributes);
 
 	// append edit bar to cover
 	$editBar = bindEditBarModification($editBar, $form);
@@ -1003,6 +1002,9 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 		createInputValue();
 	}
 	appendCoverDivToParent();
+
+	// must be at the end because of right position compute
+	if (labelAttributes !== false) refreshTooltipData($elementName, labelAttributes);
 }
 
 function reloadModalTreeDumpContent($cover, $form) {

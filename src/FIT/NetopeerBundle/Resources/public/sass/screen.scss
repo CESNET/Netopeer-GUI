@@ -507,7 +507,7 @@ table { width: 100%; margin: 15px 0px;
 	}
 	.tooltip-description { display: none; }
 }
-.gips-container { max-width: 252px; position: absolute; z-index: 10; margin-left: 2px; @include single-box-shadow(rgba(0,0,0,0.4), 0px, 0px, 7px); @include border-radius(4px); }
+.gips-container { max-height: 200px; position: absolute; z-index: 10; margin-left: 2px; @include single-box-shadow(rgba(0,0,0,0.4), 0px, 0px, 7px); @include border-radius(4px); }
 .gips-body { color: #fff; font-size: 13px; line-height: 1.55em; padding: 10px; padding-right: 20px; position: relative; float: left; @include border-radius(4px);
 	&.blue { background-color: $cBase; }
 }
