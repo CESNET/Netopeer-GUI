@@ -310,9 +310,12 @@ def emit_stmt(ctx, module, stmt, fd, indent, indentstep, keys = []):
             fd.write(fmt_text(indent + indentstep + indentstep, stmt.arg))
             fd.write('\n' + indent + indentstep + '</' + argname + '>\n')
         else:
-            fd.write(indent + indentstep + '<' + argname + '>' + \
+            try:
+                fd.write(indent + indentstep + '<' + argname + '>' + \
                        escape(stmt.arg) + \
                        '</' + argname + '>\n')
+            except Exception as e:
+                 print argname
         if ctx.opts.wyin_canonical:
             substmts = grammar.sort_canonical(stmt.keyword, stmt.substmts)
         else:
@@ -430,7 +433,7 @@ def getAttrs(ctx, s):
     if s.keyword == 'leaf' and s.search_one('mandatory') is not None:
         attrs += " mandatory=\"%s\"" % s.search_one('mandatory').arg.__str__().lower()
 
-    if hasattr(s, "i_default") and s.i_default:
+    if hasattr(s, "i_default") and s.i_default and s.search_one('default') and s.search_one('default').arg:
         attrs += " default=\"%s\"" % s.search_one('default').arg.__str__()
     if hasattr(s, "i_range") and s.i_range:
         attrs += " range=\"%s\"" % s.i_range
