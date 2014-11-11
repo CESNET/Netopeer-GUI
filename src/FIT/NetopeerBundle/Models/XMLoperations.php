@@ -1203,28 +1203,42 @@ public function mergeRecursive(&$model, $root_el) {
 
 			if (!is_null($elements)) {
 				foreach ($elements as $element) {
-					$isChoice = false;
+					$isChoice = $isConfig = false;
 					$elemsArr[$element->nodeName] = simplexml_import_dom($element, 'SimpleXMLIterator');
 					if ($element->hasAttributes()) {
 						foreach ($element->attributes as $attr) {
 							// if element is choice, we should load case statements bellow
 							if ($attr->nodeName == "eltype" && $attr->nodeValue == "choice") {
 								$isChoice = true;
+							} else if ($attr->nodeName == "config" && $attr->nodeValue == "true") {
+								$isConfig = true;
 							}
 							$attributesArr[$element->nodeName][$attr->nodeName] = $attr->nodeValue;
 						}
 					}
 
+					if (!$isConfig) {
+						continue;
+					}
+					
 					// load case statement (children of element choice)
 					if ($isChoice) {
 						if ($element->hasChildNodes()) {
 							foreach ($element->childNodes as $child) {
+								$isAllowedEltype = $isConfig = false;
+
 								if ($child->hasAttributes()) {
 									foreach ($child->attributes as $attr) {
 										$isSubCase = false;
 
+										// check if is confing
+										if ($attr->nodeName == "config" && $attr->nodeValue == "true") {
+											$isConfig = true;
+										}
+
 										// load only available elementtypes
 										if ($attr->nodeName == "eltype" && in_array($attr->nodeValue, array('case', 'container', 'leaf', 'leaf-list', 'list'))) {
+											$isAllowedEltype = true;
 
 											// if its case statement, try to load child with same name and complete its attributes
 											if ($attr->nodeValue == "case" && $child->hasChildNodes()) {
@@ -1237,10 +1251,13 @@ public function mergeRecursive(&$model, $root_el) {
 													}
 												}
 											}
-											array_push($labelsArr, $child->nodeName);
 										}
 										if (!$isSubCase) {
 											$attributesArr[$child->nodeName][$attr->nodeName] = $attr->nodeValue;
+										}
+										if ($isAllowedEltype && $isConfig) {
+											array_push($labelsArr, $child->nodeName);
+											break;
 										}
 									}
 								}
