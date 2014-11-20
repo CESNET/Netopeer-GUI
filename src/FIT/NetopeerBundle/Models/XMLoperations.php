@@ -578,6 +578,8 @@ class XMLoperations {
 				$xmlNameSpaces = $configXml->getNamespaces();
 				if ( isset($xmlNameSpaces[""]) ) {
 					$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+				} elseif (sizeof($xmlNameSpaces) == 0) {
+					$configXml->registerXPathNamespace("xmlns", 'urn:ietf:params:xml:ns:yang:yin:1');
 				}
 			}
 
@@ -784,7 +786,7 @@ class XMLoperations {
 		 * @var \SimpleXMLElement $node
 		 */
 		$node = $configXml->xpath('/'.$xPathPrefix.$xpath);
-		if (!$value || $value === "") {
+		if ($value === "" || $value === false) {
 			$elem = $node[0]->addChild($label);
 		} else {
 			$elem = $node[0]->addChild($label, $value);
