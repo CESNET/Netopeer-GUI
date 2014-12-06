@@ -286,16 +286,32 @@ function prepareAlerts() {
 	// refresh number of flash messages, change background color according to last flash state
 	setInterval(function() {
 		var $icon = $("#alerts-icon .ico-alerts");
-		var $alerts = $("#block--alerts").children();
+		var $alertsBlock = $("#block--alerts");
+		var $alerts = $alertsBlock.children();
 		var previousCnt = parseInt($("#alerts-icon .count").text(), 10);
 		var cnt = $alerts.length;
+
 		$icon.find('.count').text(cnt);
 		if (cnt) {
-			var $lastCh = $alerts.last();
-			if ($lastCh.hasClass('success')) {
-				$icon.addClass('green').removeClass('red');
-			} else if ($lastCh.hasClass('error')) {
+			if ($alertsBlock.find('.error').length) {
 				$icon.addClass('red').removeClass('green');
+
+				$alertsBlock.find('.error:not(.no-popup)').each(function(i, e) {
+					$(e).addClass('popup');
+					$(e).stop(true,true).animate({
+						"left": 0 - $("#block--alerts").width()
+					}, 300, "linear");
+					setTimeout(function() {
+						if ($(e).hasClass('popup')) {
+							$(e).fadeOut(100, function() {
+								$(e).removeClass('popup').addClass('no-popup').show();
+							});
+						}
+					}, 1500);
+				});
+
+			} else if ($alertsBlock.find('.success').length) {
+				$icon.addClass('green').removeClass('red');
 			}
 		} else {
 			$icon.removeClass('red').removeClass('green');
@@ -309,6 +325,9 @@ function prepareAlerts() {
 		$(this).parents('.message').stop(true,true).fadeOut('fast', function() {
 			$(this).remove();
 		});
+	}).on('click', '.message.popup', function(e) {
+		$(e).stop(true,true).removeClass('popup').addClass('no-popup');
+		$("#alerts-icon .header-icon").click();
 	});
 }
 

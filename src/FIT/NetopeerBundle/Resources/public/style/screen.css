@@ -593,6 +593,7 @@ body section#block--alerts .message:hover .close {
   display: block; }
 body section#block--alerts .message:hover .circle {
   display: none; }
+.message.popup { position: relative; background: #333; }
 body section#block--alerts .message span {
   float: right;
   margin-left: 5px; }
