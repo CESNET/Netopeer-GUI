@@ -74,6 +74,11 @@ services:
         tags:
             - { name: twig.extension }
 
+    moduleListener:
+        class: FIT\NetopeerBundle\EventListener\ModuleListener
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelController }
+
     winzou_cache:
         factory_service: winzou_cache.factory
         factory_method:  get

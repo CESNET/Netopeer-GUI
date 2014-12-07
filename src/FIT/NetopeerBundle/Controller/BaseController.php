@@ -44,13 +44,8 @@
 namespace FIT\NetopeerBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Response;
-
-// these import the "@Route" and "@Template" annotations
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * BaseController - parent of all other controllers in this Bundle.
@@ -75,6 +70,16 @@ class BaseController extends Controller
 	 * @var array   array of template blocks for ajax requests
 	 */
 	private $ajaxBlocksArr;
+
+	/**
+	 * @var array $rpcs         holds XML for rpc methods
+	 */
+	protected static $rpcs;
+	/**
+	 * @var array $paramState   array of parameters for <get> command
+	 * @var array $paramsConfig array of parameters for <get-config> command
+	 */
+	private $paramsState, $paramsConfig;
 
 	/**
 	 * Assignees variable to array, which will be send to template
@@ -129,13 +134,15 @@ class BaseController extends Controller
 	 * Prepares global and common variables for twig
 	 */
 	protected function prepareGlobalTwigVariables() {
-		if ( $this->getRequest()->getSession()->get('singleColumnLayout') == null ) {
-			$this->getRequest()->getSession()->set('singleColumnLayout', true);
+		/** @var Session $session */
+		$session = $this->getRequest()->getSession();
+		if ( $session->get('singleColumnLayout') == null ) {
+			$session->set('singleColumnLayout', true);
 		}
 
 		// if singleColumnLayout is not set, we will set default value
 		if ( !array_key_exists('singleColumnLayout', $this->twigArr) ) {
-			$this->assign('singleColumnLayout', $this->getRequest()->getSession()->get('singleColumnLayout'));
+			$this->assign('singleColumnLayout', $session->get('singleColumnLayout'));
 		}
 
 		$this->assign("topmenu", array());
@@ -147,7 +154,7 @@ class BaseController extends Controller
 		$app = array(
 			'user' => $this->get('security.context')->getToken()->getUser(),
 			'request' => $this->getRequest(),
-			'session' => $this->getRequest()->getSession(),
+			'session' => $session,
 		);
 		$this->assign('app', $app);
 
@@ -176,10 +183,197 @@ class BaseController extends Controller
 			}
 		} catch (\ErrorException $e) {
 			$this->get('logger')->notice('Trying to use foreign session key', array('error' => $e->getMessage()));
-			$this->getRequest()->getSession()->getFlashBag()->add('error', "Trying to use unknown connection. Please, connect to the device.");
+			$session->getFlashBag()->add('error', "Trying to use unknown connection. Please, connect to the device.");
 		}
 
 		$this->assign("ncFeatures", $dataClass->getCapabilitiesArrForKey($key));
+	}
+
+	/**
+	 * Set default values to config and state arrays
+	 *
+	 * @param int     $key          key of connected server
+	 * @param string  $filterState  state filter
+	 * @param string  $filterConfig config filter
+	 * @param string  $sourceConfig source param of config
+	 */
+	protected function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = "") {
+		/**
+		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
+		 */
+		$dataClass = $this->get('DataModel');
+		$conn = $dataClass->getConnFromKey($key);
+
+		if ($conn) {
+			if ($sourceConfig !== "") {
+				$conn->setCurrentDatastore($sourceConfig);
+			}
+			$this->setConfigParams('source', $conn->getCurrentDatastore());
+		}
+
+		$this->setStateParams('key', $key);
+		$this->setStateParams('filter', $filterState);
+
+		$this->setConfigParams('key', $key);
+		$this->setConfigParams('filter', $filterConfig);
+	}
+
+	/**
+	 * prepares form for empty module (root element) insertion
+	 *
+	 * @param $key
+	 */
+	protected function setEmptyModuleForm($key) {
+		$dataClass = $this->get("DataModel");
+		$tmpArr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
+		$tmpArr = $dataClass->getRootNamesForModuleIdentifiers($key, $tmpArr);
+
+		// use small hack when appending space at the end of key, which will fire all options in typeahead
+		$nsArr = array();
+		if (!empty($tmpArr)) {
+			foreach ($tmpArr as $key => $item) {
+				if ($item['rootElem'] != "") {
+					$modulesArr[$item['rootElem']] = (array)$key;
+					$nsArr[] = $key;
+				}
+			}
+		}
+
+		$form = $this->createFormBuilder()
+				->add('name', 'text', array(
+								'label' => "Module name",
+								'attr' => array(
+										'class' => 'typeaheadName percent-width w-50',
+										'autocomplete' => false
+								)
+						))
+				->add('namespace', 'text', array(
+								'label' => "Namespace",
+								'attr' => array(
+										'class' => 'typeaheadNS percent-width w-50',
+										'autocomplete' => false
+								)
+						))
+				->getForm();
+
+		$this->assign('rootName2NS', json_encode($modulesArr));
+		$this->assign('rootNames', json_encode(array_keys($modulesArr)));
+		$this->assign('NS', json_encode($nsArr));
+		$this->assign('emptyModuleForm', $form->createView());
+	}
+
+	/**
+	 * sets all necessary steps for display config part in single column mode
+	 */
+	protected function setOnlyConfigSection() {
+		$this->get('session')->set('singleColumnLayout', false);
+		$this->assign('singleColumnLayout', false);
+		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
+		$this->assign('hideColumnControl', true);
+		$this->assign('showConfigFilter', true);
+
+		$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:section.html.twig');
+		$html = $template->renderBlock('config', $this->getAssignedVariablesArr());
+		$this->assign('configSingleContent', $html);
+
+		$this->get('session')->set('singleColumnLayout', true);
+		$this->assign('singleColumnLayout', true);
+	}
+
+	/**
+	 * @param $module
+	 * @param $subsection
+	 *
+	 * @return array
+	 */
+	protected function createRPCListFromModel($module, $subsection = "")
+	{
+		if (!empty($this::$rpcs)) return $this::$rpcs;
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
+		$dataClass = $this->get('DataModel');
+		$rpcs = $dataClass->loadRPCsModel($module, $subsection);
+		$rpcxml = simplexml_load_string($rpcs["rpcs"]);
+		$rpcs = array();
+		if ($rpcxml) {
+			foreach ($rpcxml as $rpc) {
+				$name = (string) $rpc->attributes()->name;
+				if (isset($rpcs[$name])) {
+					continue;
+				}
+
+				$xmlEl = new \SimpleXMLElement("<".$name."></".$name.">");
+				$xmlEl->addAttribute('description', $rpc->description->text);
+
+				$ns = $rpc->getNamespaces();
+				$xmlEl->addAttribute('namespace', !empty($ns) ? array_pop($ns) : 'false');
+
+				if ($rpc->input) {
+					foreach ($rpc->input->children() as $leafs) {
+						$this->getRPCinputAttributesAndChildren($leafs, $xmlEl);
+					}
+				}
+				$rpcs[$name] = $xmlEl;
+			}
+		}
+		$this::$rpcs = $rpcs;
+		return $rpcs;
+	}
+
+	/**
+	Create array (with subarrays) of input elements of RPC method
+	 */
+	private function getRPCinputAttributesAndChildren(\SimpleXMLElement $root_elem, \SimpleXMLElement &$xmlEl) {
+		$attr = $root_elem->attributes();
+		$inputName = (string) $root_elem->getName();
+		$child = $xmlEl->addChild($inputName);
+		foreach ($attr as $n => $a) {
+			$child->addAttribute($n, $a);
+		}
+	}
+
+	protected function getCurrentDatastoreForKey($key) {
+		/**
+		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
+		 */
+		$dataClass = $this->get('DataModel');
+		$conn = $dataClass->getConnFromKey($key);
+
+		if ($conn) {
+			return $conn->getCurrentDatastore();
+		} else {
+			return false;
+		}
+
+	}
+
+	/**
+	 * Set values of state array
+	 *
+	 * @param mixed $key   key of associative array
+	 * @param mixed $value value of associative array
+	 */
+	protected  function setStateParams($key, $value) {
+		$this->paramsState[$key] = $value;
+	}
+
+	protected function getStateParams() {
+		return $this->paramsState;
+	}
+
+	/**
+	 * Set values of config array
+	 *
+	 * @param mixed $key   key of associative array
+	 * @param mixed $value value of associative array
+	 */
+	protected function setConfigParams($key, $value) {
+		$this->paramsConfig[$key] = $value;
+	}
+
+	protected function getConfigParams() {
+		return $this->paramsConfig;
 	}
 
 	/**
