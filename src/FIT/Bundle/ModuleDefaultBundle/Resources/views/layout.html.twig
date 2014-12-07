@@ -1,0 +1,11 @@
+{% extends 'FITNetopeerBundle::layout.html.twig' %}
+
+{% block moduleJavascripts %}
+	{% javascripts
+	'@FITModuleDefaultBundle/Resources/public/js/tooltip/gips.js'
+	'@FITModuleDefaultBundle/Resources/public/js/*'
+	output='js/compiled/module-default.js'
+	%}
+	<script src="{{ asset_url }}"></script>
+	{% endjavascripts %}
+{% endblock %}

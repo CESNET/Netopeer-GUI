@@ -36,7 +36,7 @@ otherwise) arising in any way out of the use of this software, even
 if advised of the possibility of such damage.
 #}
 
-{% extends 'FITNetopeerBundle::layout.html.twig' %}
+{% extends 'FITModuleDefaultBundle::layout.html.twig' %}
 {% block title %}Section {% if sectionName is defined and not(sectionName is empty) %}- {{sectionName}}{% endif %}{% endblock title %}
 
 {% block topPart %}
@@ -107,14 +107,14 @@ if advised of the possibility of such damage.
 					{# new item insertion#}
 					{% if isEmptyModule is defined and isEmptyModule == true %}
 
-						{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
+						{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
 					{% elseif showRootElem is defined and showRootElem == true %}
-						{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
+						{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
 					{% endif %}
 
 					{% set iterator = 1 %}
 					{% for key, element in stateArr %}
-						{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
+						{% include 'FITModuleDefaultBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
 						{% set iterator = iterator + 1 %}
 					{% endfor %}
 
@@ -165,15 +165,15 @@ if advised of the possibility of such damage.
 		<form action="" method="post" name="formConfigData" data-disable-history="true">
 			<div class="root">
 				{% if isEmptyModule is defined and isEmptyModule == true %}
-					{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
+					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
 
 				{% elseif showRootElem is defined and showRootElem == true %}
-					{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
+					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
 				{% endif %}
 
 				{% set iterator = 1 %}
 				{% for key, element in configArr %}
-					{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
+					{% include 'FITModuleDefaultBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
 					{% set iterator = iterator + 1 %}
 				{% endfor %}
 				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}

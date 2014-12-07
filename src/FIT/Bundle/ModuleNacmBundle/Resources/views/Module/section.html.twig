@@ -36,36 +36,18 @@ otherwise) arising in any way out of the use of this software, even
 if advised of the possibility of such damage.
 #}
 
+{% extends 'FITModuleNacmBundle::layout.html.twig' %}
+{% block title %}Section {% if sectionName is defined and not(sectionName is empty) %}- {{sectionName}}{% endif %}{% endblock title %}
 
-{% set outIterator = 0 %}
-{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
-{% if hasChildren is not defined %}
-	{% set hasChildren = false %}
-{% endif %}
+{% set stateDefined = 'false' %}
 
-{% if element|length %}	
-	<div class="level-{{ level }} {{key}}">
-		
-		{% if key == 'container' %}
-			{% set useLevel = true %}
-		{% else %}
-			{% set useLevel = false %}
-		{% endif %}
+{% block state %}
+{% block singleContent %}
+	super nacm content
+{% endblock singleContent %}
+{% endblock state %}
 
-		{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': useLevel, 'iterator': iterator, 'hasChildren': hasChildren} %}
-		{% set hasChildren = false %}
+{% block config %}
+	config part
+{% endblock config %}
 
-		{% for key, el in element %}
-			{% set outIterator = outIterator + 1 %}
-
-			{% if element.hasChildren() %}
-				{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': element.getChildren(), 'xpath': outXpath, 'key': key, 'level': level + 1, 'iterator': outIterator, 'hasChildren': true} %}
-			{% else %}
-				{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']' %}
-				{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element.current(), 'xpath': tmpXpath, 'key': key, 'level': level + 1, 'addLevel': true, 'iterator': outIterator} %}
-			{% endif %}
-		{% endfor %}
-	</div>
-{% else %}	
-	{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': true, 'iterator': iterator } %}	
-{% endif %}

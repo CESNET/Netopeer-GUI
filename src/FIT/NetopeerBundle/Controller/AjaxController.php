@@ -287,7 +287,7 @@ class AjaxController extends BaseController
 					}
 
 					if (isset($res['elems'][$_GET['label']])) {
-						$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Config:leaf.html.twig');
+						$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Config:leaf.html.twig');
 						$twigArr = array();
 
 						$twigArr['key'] = "";
@@ -382,7 +382,7 @@ class AjaxController extends BaseController
 
 		$this->assign('dataStore', $target);
 		$this->assign('isSourceValid', !$res);
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'sourceValidation');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'sourceValidation');
 		return $this->getTwigArr();
 	}
 

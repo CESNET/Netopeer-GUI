@@ -39,14 +39,37 @@
 
 namespace FIT\NetopeerBundle\EventListener;
 
+use Doctrine\ORM\EntityManager;
+use Monolog\Logger;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 
 class ModuleListener
 {
+	/**
+	 * @var EntityManager
+	 */
+	private $em;
+	/**
+	 * @var \Monolog\Logger
+	 */
+	private $logger;
+
+	public function __construct(EntityManager $em, Logger $logger) {
+		$this->em = $em;
+		$this->logger = $logger;
+	}
+
 	public function onKernelController(GetResponseEvent $event) {
 		$attributes = $event->getRequest()->attributes;
 		if ($attributes->get("_route") == "module") {
-//			$event->getRequest()->attributes->set("_controller", "FIT\NetopeerBundle\Controller\ShitController:shitAction");
+			$repository = $this->em->getRepository("FITNetopeerBundle:ModuleController");
+			$record = $repository->findOneBy(array('moduleName' => $attributes->get('module'))); // TODO: search by namespace
+
+			if ($record) {
+				$controllers = $record->getControllerActions();
+				$event->getRequest()->attributes->set("_controller", $controllers[0]);
+			}
+
 		}
 	}
 }

@@ -55,12 +55,12 @@ if advised of the possibility of such damage.
 	%}
 	<link rel="stylesheet" href="{{ asset_url }}" />
 	{% endstylesheets %}
+	{% block moduleStylesheet %}{% endblock moduleStylesheet %}
 	{% block stylesheet %}{% endblock stylesheet %}
 
 	{% javascripts
 		'@FITNetopeerBundle/Resources/public/js/jquery-1.11.1.min.js'
 		'@FITNetopeerBundle/Resources/public/js/jquery-migrate-1.2.1.min.js'
-		'@FITNetopeerBundle/Resources/public/js/tooltip/gips.js'
 		'@FITNetopeerBundle/Resources/public/js/*'
 		'@FITNetopeerBundle/Resources/public/js/bootstrap/js/bootstrap.min.js'
 		'@FITNetopeerBundle/Resources/public/js/bootstrap/Bootstrap-3-Typeahead/bootstrap3-typeahead.min.js'
@@ -73,6 +73,7 @@ if advised of the possibility of such damage.
 </head>
 <body>
 	<div id="block--javascripts">{% block javascripts %}{% endblock javascripts %}</div>
+	<div id="block--moduleJavascripts">{% block moduleJavascripts %}{% endblock moduleJavascripts %}</div>
 
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="block--topMenu">

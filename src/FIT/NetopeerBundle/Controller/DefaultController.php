@@ -366,7 +366,7 @@ class DefaultController extends BaseController
 	 * Shows info page with information
 	 *
 	 * @Route("/info-page/{key}/{action}/", name="infoPage")
-	 * @Template("FITNetopeerBundle:Default:section.html.twig")
+	 * @Template("FITModuleDefaultBundle:Module:section.html.twig")
 	 *
 	 * @param int     $key          key of connected server
 	 * @param string  $action       name of the action ("session"|"reload")
@@ -381,11 +381,11 @@ class DefaultController extends BaseController
 		parent::setActiveSectionKey($key);
 		$dataClass->buildMenuStructure($key);
 
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'singleContent');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'title');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'additionalTitle');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'singleContent');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'alerts');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'topMenu');
 
 		if ( $action == "session" ) {
 			/**
@@ -446,7 +446,7 @@ class DefaultController extends BaseController
 
 	/**
 	 * @Route("/sections/rpc/{key}/{module}/{rpcName}/", name="showRPCForm", requirements={"key" = "\d+"})
-	 * @Template("FITNetopeerBundle:Default:showRPCForm.html.twig")
+	 * @Template("FITModuleDefaultBundle:Module:showRPCForm.html.twig")
 	 *
 	 * @param $key
 	 * @param $module
@@ -461,7 +461,7 @@ class DefaultController extends BaseController
 		$session = $this->getRequest()->getSession();
 		$session->getFlashBag()->clear();
 
-		$this->addAjaxBlock('FITNetopeerBundle:Default:showRPCForm.html.twig', 'modalWindow');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:showRPCForm.html.twig', 'modalWindow');
 		$this->assign('key', $key);
 		$this->assign('module', $module);
 		$this->assign('rpcName', $rpcName);

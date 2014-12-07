@@ -164,7 +164,7 @@ class ModuleController extends BaseController {
 		try {
 			$dataClass = $this->get('dataModel');
 			if ($addConfigSection) {
-				$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'config');
+				$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'config');
 			}
 
 			// getcofig part

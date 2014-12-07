@@ -1,6 +1,6 @@
 <?php
 
-namespace FIT\Bundle\ModuleDefaultBundle\Controller;
+namespace FIT\Bundle\ModuleNacmBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\ModuleControllerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -12,30 +12,26 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	/**
 	 * @inheritdoc
 	 *
-	 * @Route("/sections/{key}/", name="section")
-	 * @Route("/sections/{key}/{module}/", name="module", requirements={"key" = "\d+"})
-	 * @Route("/sections/{key}/{module}/{subsection}/", name="subsection")
-	 * @Template("FITModuleDefaultBundle:Module:section.html.twig")
-	 *
+	 * @Template("FITModuleNacmBundle:Module:section.html.twig")
 	 */
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
 		$dataClass = $this->get('DataModel');
 
 		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
-			$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'title');
-			$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'additionalTitle');
-			$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'state');
-			$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'leftColumn');
-			$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'topPart');
-			$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
+			$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'title');
+			$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'additionalTitle');
+			$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'state');
+			$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'leftColumn');
+			$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'topPart');
+			$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'moduleJavascripts');
 			$this->assign('historyHref', $this->getRequest()->getRequestUri());
 		}
 		$this->getRequest()->getSession()->remove('isLocking');
-		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'alerts');
+		$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'alerts');
 
 		if ($this->getRequest()->getSession()->get('isAjax') === true) {
-			$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'topMenu');
+			$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'topMenu');
 		}
 
 		if ($dataClass->checkLoggedKeys() === 1) {
@@ -107,7 +103,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 		if ( !isset($activeNotifications[$key]) || $activeNotifications[$key] !== true ) {
 			$activeNotifications[$key] = true;
 			$this->getRequest()->getSession()->set('activeNotifications', $activeNotifications);
-			$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'notifications');
+			$this->addAjaxBlock('FITModuleNacmBundle:Module:section.html.twig', 'notifications');
 		}
 
 		// if we have module, we are definitely in module or subsection action, so we could load names

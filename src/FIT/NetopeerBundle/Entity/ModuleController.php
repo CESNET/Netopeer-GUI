@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * ModuleController
  *
  * @ORM\Table()
- * @ORM\Entity(repositoryClass="FIT\NetopeerBundle\Entity\ModuleControllerRepository")
+ * @ORM\Entity
  */
 class ModuleController
 {

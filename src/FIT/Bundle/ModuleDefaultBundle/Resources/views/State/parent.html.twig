@@ -52,9 +52,9 @@ if advised of the possibility of such damage.
 		{% endif %}
 
 		{% if element.attributes.config is defined and element.attributes.config == "true" %}
-			{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': useLevel, 'iterator': iterator, 'hasChildren': hasChildren} %}
+			{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': useLevel, 'iterator': iterator, 'hasChildren': hasChildren} %}
 		{% else %}
-			{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element, 'key': key, 'level': level, 'addLevel': useLevel, 'hasChildren': hasChildren} %}
+			{% include 'FITModuleDefaultBundle:State:leaf.html.twig' with {'element': element, 'key': key, 'level': level, 'addLevel': useLevel, 'hasChildren': hasChildren} %}
 		{% endif %}
 		{% set hasChildren = false %}
 
@@ -64,24 +64,24 @@ if advised of the possibility of such damage.
 			{% set outIterator = outIterator + 1 %}
 
 			{% if element.hasChildren() %}
-				{% include 'FITNetopeerBundle:State:parent.html.twig' with {'element': element.getChildren(), 'xpath': outXpath, 'key': key, 'level': level + 1, 'iterator': outIterator, 'hasChildren': true } %}
+				{% include 'FITModuleDefaultBundle:State:parent.html.twig' with {'element': element.getChildren(), 'xpath': outXpath, 'key': key, 'level': level + 1, 'iterator': outIterator, 'hasChildren': true } %}
 			{% else %}
 				{# next line is commented because issue #763, please visit for more informations #}
 				{#{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']/*[' ~ outIterator2 ~ ']' %}#}
 
 				{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']' %}
 				{% if element.current().attributes.config is defined and element.current().attributes.config == "true" %}
-					{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element.current(), 'xpath': tmpXpath, 'key': key, 'level': level + 1, 'addLevel': true, 'iterator': outIterator} %}
+					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': element.current(), 'xpath': tmpXpath, 'key': key, 'level': level + 1, 'addLevel': true, 'iterator': outIterator} %}
 				{% else %}
-					{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element.current(), 'key': key, 'level': level + 1, 'addLevel': true} %}
+					{% include 'FITModuleDefaultBundle:State:leaf.html.twig' with {'element': element.current(), 'key': key, 'level': level + 1, 'addLevel': true} %}
 				{% endif %}
 			{% endif %}
 		{% endfor %}
 	</div>
 {% else %}	
 	{% if element.attributes.config is defined and element.attributes.config == "true" %}
-		{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': true, 'iterator': iterator } %}
+		{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': true, 'iterator': iterator } %}
 	{% else %}
-		{% include 'FITNetopeerBundle:State:leaf.html.twig' with {'element': element, 'key': key, 'level': level, 'addLevel': true} %}
+		{% include 'FITModuleDefaultBundle:State:leaf.html.twig' with {'element': element, 'key': key, 'level': level, 'addLevel': true} %}
 	{% endif %}
 {% endif %}

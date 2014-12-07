@@ -78,7 +78,7 @@ class SecurityController extends BaseController
 	/**
 	 * Login page action.
 	 *
-	 * @Route("/login/", name="_login")
+	 * @Route("/login", name="_login")
 	 * @Template()
 	 */
 	public function loginAction()

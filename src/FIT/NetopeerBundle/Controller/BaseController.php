@@ -268,11 +268,11 @@ class BaseController extends Controller
 	protected function setOnlyConfigSection() {
 		$this->get('session')->set('singleColumnLayout', false);
 		$this->assign('singleColumnLayout', false);
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'state');
 		$this->assign('hideColumnControl', true);
 		$this->assign('showConfigFilter', true);
 
-		$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:section.html.twig');
+		$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Module:section.html.twig');
 		$html = $template->renderBlock('config', $this->getAssignedVariablesArr());
 		$this->assign('configSingleContent', $html);
 
@@ -434,7 +434,7 @@ class BaseController extends Controller
 	 * @return Response   json encoded array of ajax blocks
 	 */
 	protected function getAjaxAlertsRespose() {
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
+		$this->addAjaxBlock('FITNetopeerBundle:layout.html.twig', 'alerts');
 		return $this->getAjaxBlocksResponse();
 	}
 

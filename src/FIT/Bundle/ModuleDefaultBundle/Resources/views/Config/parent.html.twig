@@ -36,28 +36,36 @@ otherwise) arising in any way out of the use of this software, even
 if advised of the possibility of such damage.
 #}
 
-{% block modalWindow %}
-	<div class="modal-dialog">
-	<div class="modal-content">
-	<form action="{{ path('showRPCForm', {'key': key, 'module': module, 'rpcName': rpcName}) }}" method="post" class="show-rpc-form" name="formRPC">
-		<div class="modal-header">
-			<button type="button" class="button small grey close right" data-dismiss="modal">×</button>
-			<h3>RPC method</h3>
-		</div>
-		<div class="modal-body">
-			{% set iterator = 1 %}
-			<input type="hidden" name="configDataForm[rootElemName]" value="{{ rpcArr.getName }}" />
-			<input type="hidden" name="configDataForm[rootElemNamespace]" value="{{ rpcArr.attributes.namespace }}" />
-			{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': rpcArr, 'xpath': '/*[1]', 'key': rpcArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': false, 'isRootElem': true} %}
-			{% for key, element in rpcArr %}
-				{% include 'FITNetopeerBundle:Config:leaf.html.twig' with {'element': element, 'xpath': '/*[1]', 'key': element.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': false, 'isRootElem': true} %}
-				{% set iterator = iterator + 1 %}
-			{% endfor %}
-			<hr class="cleaner" />
-		</div>
-		<div class="modal-footer">
-			<input type="submit" value="Send" class="button right" />
-		</div>
-	</form>
-	</div></div>
-{% endblock modalWindow %}
+
+{% set outIterator = 0 %}
+{% set outXpath = xpath ~ '/*' ~ '[' ~ iterator ~ ']' %}
+{% if hasChildren is not defined %}
+	{% set hasChildren = false %}
+{% endif %}
+
+{% if element|length %}	
+	<div class="level-{{ level }} {{key}}">
+		
+		{% if key == 'container' %}
+			{% set useLevel = true %}
+		{% else %}
+			{% set useLevel = false %}
+		{% endif %}
+
+		{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': useLevel, 'iterator': iterator, 'hasChildren': hasChildren} %}
+		{% set hasChildren = false %}
+
+		{% for key, el in element %}
+			{% set outIterator = outIterator + 1 %}
+
+			{% if element.hasChildren() %}
+				{% include 'FITModuleDefaultBundle:Config:parent.html.twig' with {'element': element.getChildren(), 'xpath': outXpath, 'key': key, 'level': level + 1, 'iterator': outIterator, 'hasChildren': true} %}
+			{% else %}
+				{% set tmpXpath = outXpath ~ '/*[' ~ outIterator ~ ']' %}
+				{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': element.current(), 'xpath': tmpXpath, 'key': key, 'level': level + 1, 'addLevel': true, 'iterator': outIterator} %}
+			{% endif %}
+		{% endfor %}
+	</div>
+{% else %}	
+	{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': element, 'xpath': outXpath, 'key': key, 'level': level, 'addLevel': true, 'iterator': iterator } %}
+{% endif %}
