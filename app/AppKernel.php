@@ -20,7 +20,7 @@ class AppKernel extends Kernel
 				new winzou\CacheBundle\winzouCacheBundle(),
 				new AerialShip\SamlSPBundle\AerialShipSamlSPBundle(),
 				new FIT\Bundle\ModuleDefaultBundle\FITModuleDefaultBundle(),
-				new FIT\Bundle\ModuleNacmBundle\FITModuleNacmBundle(),
+				new FIT\Bundle\ModuleXmlBundle\FITModuleXmlBundle,
 		);
 
 		if (in_array($this->getEnvironment(), array('dev', 'test'))) {

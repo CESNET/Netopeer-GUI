@@ -55,7 +55,6 @@ if advised of the possibility of such damage.
 	%}
 	<link rel="stylesheet" href="{{ asset_url }}" />
 	{% endstylesheets %}
-	{% block moduleStylesheet %}{% endblock moduleStylesheet %}
 	{% block stylesheet %}{% endblock stylesheet %}
 
 	{% javascripts
@@ -74,6 +73,9 @@ if advised of the possibility of such damage.
 <body>
 	<div id="block--javascripts">{% block javascripts %}{% endblock javascripts %}</div>
 	<div id="block--moduleJavascripts">{% block moduleJavascripts %}{% endblock moduleJavascripts %}</div>
+	<div id="block--moduleStylesheet">
+		{% block moduleStylesheet %}{% endblock moduleStylesheet %}
+	</div>
 
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="block--topMenu">

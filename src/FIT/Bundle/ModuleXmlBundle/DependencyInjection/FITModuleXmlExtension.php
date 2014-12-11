@@ -1,6 +1,6 @@
 <?php
 
-namespace FIT\Bundle\ModuleDefaultBundle\DependencyInjection;
+namespace FIT\Bundle\ModuleXmlBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
@@ -12,7 +12,7 @@ use Symfony\Component\DependencyInjection\Loader;
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class FITModuleDefaultExtension extends Extension
+class FITModuleXmlExtension extends Extension
 {
     /**
      * {@inheritDoc}

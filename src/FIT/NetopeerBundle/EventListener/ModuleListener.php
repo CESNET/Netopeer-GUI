@@ -54,22 +54,32 @@ class ModuleListener
 	 */
 	private $logger;
 
-	public function __construct(EntityManager $em, Logger $logger) {
+	/**
+	 * @param EntityManager $em
+	 * @param Logger        $logger
+	 */
+	public function __construct($em = null, $logger = null)
+	{
 		$this->em = $em;
 		$this->logger = $logger;
 	}
 
-	public function onKernelController(GetResponseEvent $event) {
-		$attributes = $event->getRequest()->attributes;
-		if ($attributes->get("_route") == "module") {
-			$repository = $this->em->getRepository("FITNetopeerBundle:ModuleController");
-			$record = $repository->findOneBy(array('moduleName' => $attributes->get('module'))); // TODO: search by namespace
+	public function onKernelController(GetResponseEvent $event)
+	{
+		if ($this->em) {
+			$attributes = $event->getRequest()->attributes;
+			if ($attributes->get("_route") == "module") {
+				$repository = $this->em->getRepository("FITNetopeerBundle:ModuleController");
+				$record     = $repository->findOneBy(
+						array('moduleName' => $attributes->get('module'))
+				); // TODO: search by namespace
 
-			if ($record) {
-				$controllers = $record->getControllerActions();
-				$event->getRequest()->attributes->set("_controller", $controllers[0]);
+				if ($record) {
+					$controllers = $record->getControllerActions();
+					$event->getRequest()->attributes->set("_controller", $controllers[0]);
+				}
+
 			}
-
 		}
 	}
 }

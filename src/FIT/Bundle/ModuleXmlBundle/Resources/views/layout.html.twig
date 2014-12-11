@@ -1,0 +1,22 @@
+{% extends 'FITNetopeerBundle::layout.html.twig' %}
+
+{% block moduleJavascripts %}
+	{% javascripts
+	'@FITModuleXmlBundle/Resources/public/js/*'
+	output='js/compiled/module-xml.js'
+	%}
+	<script src="{{ asset_url }}"></script>
+	{% endjavascripts %}
+
+	<script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?lang=xml"></script>
+{% endblock %}
+
+{% block moduleStylesheet %}
+	{% stylesheets
+	'bundles/fitmodulexml/style/*'
+	filter='cssrewrite'
+	output='css/module-xml.css'
+	%}
+	<link rel="stylesheet" href="{{ asset_url }}" />
+	{% endstylesheets %}
+{% endblock %}
