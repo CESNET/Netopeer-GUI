@@ -71,7 +71,7 @@ if advised of the possibility of such damage.
 		) %}
 			{% if formConfig is defined %}
 				{% block filterConfig %}
-					<form action="" method="post" {{ form_enctype(formConfig) }} class="filter left" name="formConfig" data-disable-active-link="true">
+					<form action="" method="post" {{ form_enctype(formConfig) }} class="form filter left" name="formConfig" data-disable-active-link="true">
 						{{ form_widget(formConfig) }}
 				    <input type="submit" value="Change" class="button small grey left" />
 						<script type="text/javascript">
@@ -94,7 +94,7 @@ if advised of the possibility of such damage.
 				</div>
 			{% endif %}
 			{% if formCopyConfig is defined %}
-			<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
+			<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="form filter left" name="formCopyConfig">
 				{{ form_widget(formCopyConfig) }}
 			    <input type="submit" value="Copy" class="button small grey left" />
 			</form>
@@ -102,7 +102,7 @@ if advised of the possibility of such damage.
 		{% endif %}
 		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
 			<hr class="cleaner" />
-			<form action="" method="post" name="formConfigData" data-disable-history="true">
+			<form action="" method="post" name="formConfigData" data-disable-history="true" class="form">
 				<div class="root">
 					{# new item insertion#}
 					{% if isEmptyModule is defined and isEmptyModule == true %}
@@ -154,7 +154,7 @@ if advised of the possibility of such damage.
 			{{ block('sourceValidation') }}
 		</div>
 
-		<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter left" name="formCopyConfig">
+		<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="form filter left" name="formCopyConfig">
 			{{ form_widget(formCopyConfig) }}
 			<input type="submit" value="Copy" class="button small grey left" />
 		</form>
@@ -162,7 +162,7 @@ if advised of the possibility of such damage.
 
 	<hr class="cleaner" />
 	{% if (configArr is defined and not(configArr is empty)) or (isEmptyModule is defined and isEmptyModule == true) %}
-		<form action="" method="post" name="formConfigData" data-disable-history="true">
+		<form action="" method="post" name="formConfigData" data-disable-history="true" class="form">
 			<div class="root">
 				{% if isEmptyModule is defined and isEmptyModule == true %}
 					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}

@@ -125,7 +125,7 @@ jQuery(function($) {
 	$.nette.createSpinner();
 
 	$(document).on('click', 'a.ajaxLink', function(e) {
-//		loadAjaxLink(e, $(this), $(this).attr('href'), "GET", '');
+		loadAjaxLink(e, $(this), $(this).attr('href'), "GET", '');
 	});
 
 	$("section").on('submit', 'form', function(e) {
@@ -136,12 +136,12 @@ jQuery(function($) {
 		if (formAction == "") {
 			formAction = window.location.href;
 		}
-//		loadAjaxLink(e, $(this), formAction, 'POST', $(this).serialize());
+		loadAjaxLink(e, $(this), formAction, 'POST', $(this).serialize());
 	});
 
 	$("body").on('submit', '.modal form', function(e) {
 		$(this).attr('data-callback', 'hideAndEmptyModalWindow()');
-//		loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
+		loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
 		
 	});
 });

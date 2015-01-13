@@ -44,7 +44,6 @@ var typeaheadALLconst = '__ALL__';
 
 $(window).resize(function() {
 	changeSectionHeight();
-	showIconsOnLeafLine();
 	collapseTopNav();
 	prepareAlertsVariables();
 	hideAlertsPanel();

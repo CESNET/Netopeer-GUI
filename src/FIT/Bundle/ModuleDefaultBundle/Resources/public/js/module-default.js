@@ -317,7 +317,7 @@ function generateFormObject(formName) {
 				action: "",
 				method: "POST",
 				name: formName,
-				'class': 'generatedForm'
+				'class': 'generatedForm form'
 			});
 		$form.append($("<input>").attr({
 			type: 'hidden',

@@ -9,3 +9,13 @@
 	<script src="{{ asset_url }}"></script>
 	{% endjavascripts %}
 {% endblock %}
+
+{% block moduleStylesheet %}
+	{% stylesheets
+	'bundles/fitmoduledefault/style/*'
+	filter='cssrewrite'
+	output='css/module-default.css'
+	%}
+	<link rel="stylesheet" href="{{ asset_url }}" />
+	{% endstylesheets %}
+{% endblock %}
