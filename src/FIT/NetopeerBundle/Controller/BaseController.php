@@ -1,7 +1,8 @@
 <?php
 /**
- * BaseController as parent of  all controllers in this bundle handles all common functions
- * such as assigning template variables, menu structure...
+ * BaseController as parent of  all controllers in this bundle handles
+ * all common functions such as assigning template variables, menu
+ * structure...
  *
  * @file BaseController.php
  * @author David Alexa <alexa.david@me.com>
@@ -221,7 +222,7 @@ class BaseController extends Controller
 	/**
 	 * prepares form for empty module (root element) insertion
 	 *
-	 * @param $key
+	 * @param $key    Identifier of connection (connected device ID)
 	 */
 	protected function setEmptyModuleForm($key) {
 		$dataClass = $this->get("DataModel");
@@ -281,6 +282,8 @@ class BaseController extends Controller
 	}
 
 	/**
+	 * Load all RPC methods (list) from current model
+	 *
 	 * @param $module
 	 * @param $subsection
 	 *
@@ -322,7 +325,10 @@ class BaseController extends Controller
 	}
 
 	/**
-	Create array (with subarrays) of input elements of RPC method
+	 * Create array (with subarrays) of input elements of RPC method
+	 *
+	 * @param \SimpleXMLElement $root_elem
+	 * @param \SimpleXMLElement $xmlEl
 	 */
 	private function getRPCinputAttributesAndChildren(\SimpleXMLElement $root_elem, \SimpleXMLElement &$xmlEl) {
 		$attr = $root_elem->attributes();
@@ -333,6 +339,13 @@ class BaseController extends Controller
 		}
 	}
 
+	/**
+	 * Get datastore (active datastore) for key
+	 *
+	 * @param $key  ID of connection
+	 *
+	 * @return bool|string
+	 */
 	protected function getCurrentDatastoreForKey($key) {
 		/**
 		 * @var $dataClass \FIT\NetopeerBundle\Models\Data

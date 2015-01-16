@@ -60,6 +60,8 @@ class DefaultController extends BaseController
 {
 
 	/**
+	 * Shows index page = connections page if logged, login page if not
+	 *
 	 * @Route("/", name="_home")
 	 *
 	 * @return RedirectResponse
@@ -439,16 +441,27 @@ class DefaultController extends BaseController
 	}
 
 
+	/**
+	 * Gets XML file with requested RPC method only.
+	 *
+	 * @param        $rpcMethod
+	 * @param        $module
+	 * @param string $subsection
+	 *
+	 * @return bool
+	 */
 	private function getRPCXmlForMethod($rpcMethod, $module, $subsection = "") {
 		$rpcs = $this->createRPCListFromModel($module, $subsection);
 		return isset($rpcs[$rpcMethod]) ? $rpcs[$rpcMethod] : false;
 	}
 
 	/**
+	 * Prepares view for RPC form (generates RPC form)
+	 *
 	 * @Route("/sections/rpc/{key}/{module}/{rpcName}/", name="showRPCForm", requirements={"key" = "\d+"})
 	 * @Template("FITModuleDefaultBundle:Module:showRPCForm.html.twig")
 	 *
-	 * @param $key
+	 * @param $key    Identifier of connection (connected device ID)
 	 * @param $module
 	 * @param $rpcName
 	 *
@@ -485,10 +498,12 @@ class DefaultController extends BaseController
 	}
 
 	/**
+	 * Action for empty module creation.
+	 *
 	 * @Route("/sections/create-empty-module/{key}/", name="createEmptyModule")
 	 * @Template("FITNetopeerBundle:Default:createEmptyModule.html.twig")
 	 *
-	 * @param $key
+	 * @param $key    Identifier of connection (connected device ID)
 	 *
 	 * @return array|Response
 	 */

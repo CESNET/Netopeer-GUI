@@ -88,8 +88,10 @@ class UserCommand extends ContainerAwareCommand
 	/**
 	 * Executes adding, removing or editing user in DB
 	 *
-	 * @param InputInterface $intput
-	 * @param OutputInterface $output
+	 * @param \Symfony\Component\Console\Input\InputInterface $input
+	 * @param OutputInterface                                 $output
+	 *
+	 * @internal param \Symfony\Component\Console\Input\InputInterface $intput
 	 * @return int|null|void
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {

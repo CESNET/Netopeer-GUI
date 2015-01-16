@@ -64,6 +64,12 @@ class ModuleListener
 		$this->logger = $logger;
 	}
 
+	/**
+	 * This method checks module name, loads mapping info from ModuleController
+	 * entity, and calls specified controller from custom ModuleBundle	 *
+	 *
+	 * @param GetResponseEvent $event
+	 */
 	public function onKernelController(GetResponseEvent $event)
 	{
 		if ($this->em) {

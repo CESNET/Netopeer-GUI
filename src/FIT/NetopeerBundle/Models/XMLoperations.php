@@ -95,7 +95,7 @@ class XMLoperations {
 	}
 
 	/**
-	 * decodes XPath value
+	 * decodes XPath value (custom coding from JS)
 	 *
 	 * @param  string $value encoded XPath string
 	 * @return string        decoded XPath string
@@ -356,6 +356,15 @@ class XMLoperations {
 		return $res;
 	}
 
+	/**
+	 * handles form for creating empty module
+	 *
+	 * @param $key    Identifier of connection (connected device ID)
+	 * @param $configParams
+	 * @param $postVals
+	 *
+	 * @return int
+	 */
 	public function handleCreateEmptyModuleForm($key, $configParams, $postVals) {
 		$name = $postVals['name'];
 		$namespace = $postVals['namespace'];
@@ -383,6 +392,16 @@ class XMLoperations {
 		return $res;
 	}
 
+	/**
+	 * Handles form for RPC method call
+	 *
+	 * @param $key    Identifier of connection (connected device ID)
+	 * @param $configParams
+	 * @param $postVals
+	 *
+	 * @return int
+	 * @throws \ErrorException
+	 */
 	public function handleRPCMethodForm($key, $configParams, $postVals) {
 		$name = $postVals['rootElemName'];
 		$namespace = $postVals['rootElemNamespace'];
@@ -864,6 +883,8 @@ class XMLoperations {
 	 * @param  int    $key    session key of current connection
 	 * @param  string $config XML document which will be send
 	 * @param  string $target = "running" target source
+	 *
+	 * @param array   $additionalParams
 	 *
 	 * @return int              return 0 on success, 1 on error
 	 */

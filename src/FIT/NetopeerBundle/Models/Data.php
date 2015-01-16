@@ -250,6 +250,14 @@ class Data {
 		return false;
 	}
 
+	/**
+	 * Get names of root element for specified module identifiers
+	 *
+	 * @param       $key
+	 * @param array $identifiers
+	 *
+	 * @return array
+	 */
 	public function getRootNamesForModuleIdentifiers($key, array $identifiers) {
 		$newArr = array();
 		foreach ($identifiers as $ns => $ident) {
@@ -260,6 +268,14 @@ class Data {
 		return $newArr;
 	}
 
+	/**
+	 * Get name of root element for module NS
+	 *
+	 * @param $key    Identifier of connection (connected device ID)
+	 * @param $ns
+	 *
+	 * @return string
+	 */
 	public function getRootNameForNS($key, $ns) {
 		$path = $this->getModelsDir().$this->getModulePathByNS($key, $ns);
 		$file = $path . '/filter.txt';
@@ -305,7 +321,7 @@ class Data {
 	/**
 	 * get path for module namespace
 	 *
-	 * @param $key
+	 * @param $key    Identifier of connection (connected device ID)
 	 * @param $ns
 	 *
 	 * @return bool|string
@@ -448,6 +464,8 @@ class Data {
 	}
 
 	/**
+	 * serializes ConnectionSession object into session
+	 *
 	 * @param  int $key      session key
 	 * @param  ConnectionSession $conn
 	 */
@@ -460,6 +478,7 @@ class Data {
 
 	/**
 	 * Read response from socket
+	 *
 	 * @param  resource &$sock 		socket descriptor
 	 * @return string             trimmed string that was read
 	 */
@@ -489,6 +508,7 @@ class Data {
 
 		return trim($response);
 	}
+
 	/**
 	 * Read response from socket
 	 *
@@ -576,6 +596,7 @@ class Data {
 
 	/**
 	 * Handles connection to the socket
+	 *
 	 * @param  resource &$sock     socket descriptor
 	 * @param  array    &$params  connection params for mod_netconf
 	 * @param  mixed    &$result  result of searching of new connection in all connections
@@ -887,6 +908,7 @@ class Data {
                         return 1;
 		}
 	}
+
 	/**
 	 * handle reload info action
 	 *
@@ -1060,6 +1082,14 @@ class Data {
 		}
 	}
 
+	/**
+	 * validates datastore on server
+	 *
+	 * @param $sock
+	 * @param $params
+	 *
+	 * @return int|mixed
+	 */
 	public function handle_validate(&$sock, &$params) {
 		if ( $this->checkLoggedKeys() != 0) {
 			return 1;
@@ -1224,6 +1254,8 @@ class Data {
 
 	/**
 	 * handles all actions, which are allowed on socket
+	 * this is the only one entry point for calling methods such a <get>, <get-config>, <validate>...
+	 *
 	 * @param  string   $command 			kind of action (command)
 	 * @param  array    $params       parameters for mod_netconf
 	 * @param  bool     $merge        should be action handle with merge with model
@@ -1382,39 +1414,6 @@ class Data {
 		return 0;
 	}
 
-
-	/**
-	 * Get XML code of model for creating new node.
-	 *
-	 * @todo  implement this method (load XML from model)
-	 *
-	 * @param $xPath
-	 * @param $key
-	 * @param $module
-	 * @param $subsection
-	 * @return string
-	 */
-	public function getXMLFromModel($xPath, $key, $module, $subsection) {
-		$xml = <<<XML
-<?xml version="1.0"?>
-<root>
-	<exporter eltype="list" config="true" key="id host port" iskey="false">
-	  <id eltype="leaf" config="true" type="uint8" description="Exporter identification sent to the collector." iskey="true">0</id>
-	  <host eltype="leaf" config="true" type="string" description="Hostname (or IPv4/6 address) of the collector where to send data." iskey="true">collector-test.ipv4.liberouter.org</host>
-	  <port eltype="leaf" config="true" type="uint16" description="Port of the collector where to send data." iskey="true">3010</port>
-	  <timeout_active eltype="leaf" config="true" type="uint16" default="180" iskey="false">300</timeout_active>
-	  <timeout_inactive eltype="leaf" config="true" type="uint8" default="10" iskey="false">30</timeout_inactive>
-	  <cpu_mask eltype="leaf" config="true" type="uint8" default="1" description="Mask of allowed CPUs." iskey="false">12</cpu_mask>
-	  <flowcache_size eltype="leaf" config="true" type="uint8" default="19" description="Queue (flowcache) size in power of 2." iskey="false">25</flowcache_size>
-	  <protocol_export eltype="leaf" config="true" type="enumeration" default="NetFlow v9" description="Flow information export protocol." iskey="false">NetFlow v9</protocol_export>
-	  <protocol_ip eltype="leaf" config="true" type="enumeration" default="IPv4" description="Force IP protocol when connecting to the collector." iskey="false">IPv4</protocol_ip>
-	  <protocol_transport eltype="leaf" config="true" type="enumeration" default="TCP" description="Transport protocol for the IPFIX protocol." iskey="false">UDP</protocol_transport>
-	</exporter>
-</root>
-XML;
-
-		return $xml;
-	}
 
 	/**
 	 * Prepares top menu - gets items from server response
@@ -1691,7 +1690,7 @@ XML;
 	/**
 	 * Invalidates and rebuild menu structure
 	 *
-	 * @param $key
+	 * @param $key    Identifier of connection (connected device ID)
 	 */
 	public function invalidateAndRebuildMenuStructureForKey($key) {
 		$this->invalidateMenuStructureForKey($key);
@@ -1722,6 +1721,8 @@ XML;
 
 	/**
 	 * Get model tree file from models dir.
+	 *
+	 * @param string $moduleName
 	 *
 	 * @return string|int
 	 */

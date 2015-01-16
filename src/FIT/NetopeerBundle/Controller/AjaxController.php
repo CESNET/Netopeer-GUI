@@ -44,8 +44,6 @@ namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
 use FIT\NetopeerBundle\Models\AjaxSharedData;
-
-// these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -358,9 +356,11 @@ class AjaxController extends BaseController
 	}
 
 	/**
+	 * Call validate in mod_netconf
+	 *
 	 * @Route("/ajax/validate-source/{key}/{target}/{module}", name="validateSource")
 	 *
-	 * @param $key
+	 * @param $key    Identifier of connection (connected device ID)
 	 * @param $target
 	 * @param $module
 	 * @return array
