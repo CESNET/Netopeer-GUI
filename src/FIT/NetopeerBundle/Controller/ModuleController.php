@@ -69,7 +69,7 @@ class ModuleController extends BaseController {
 	 * @param null $module
 	 * @param null $subsection
 	 *
-	 * @return RedirectResponse
+	 * @return null|RedirectResponse
 	 */
 	protected function prepareDataForModuleAction($bundleName, $key, $module = null, $subsection = null)
 	{
@@ -100,16 +100,22 @@ class ModuleController extends BaseController {
 			}
 			return $this->redirect($url);
 		}
-		$this->setActiveSectionKey($key);
-		$dataClass->buildMenuStructure($key);
+
+		/* Show the first module we have */
+		if ( $module == null ) {
+			return $this->redirectToFirstModule($key);
+		}
 
 		// now, we could set forms params with filter (even if we don't have module or subsection)
 		// filter will be empty
 		$filters = $dataClass->loadFilters($module, $subsection);
-
-		$this->assign('rpcMethods', $this->createRPCListFromModel($module, $subsection));
-
 		$this->setSectionFormsParams($key, $filters['state'], $filters['config']);
+
+		/* build correct menu structure for this module */
+		$this->setActiveSectionKey($key);
+		$dataClass->buildMenuStructure($key);
+		$this->setModuleOrSectionName($key, $module, $subsection);
+		$this->assign('rpcMethods', $this->createRPCListFromModel($module, $subsection));
 
 		// if form has been send, we well process it
 		if ($this->getRequest()->getMethod() == 'POST') {
@@ -120,43 +126,7 @@ class ModuleController extends BaseController {
 
 		// we will prepare filter form in column
 		$this->setSectionFilterForms($key);
-
-		// path for creating node typeahead
-		$typeaheadParams = array(
-				'formId' => "FORMID",
-				'key' => $key,
-				'xPath' => "XPATH"
-		);
-		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabel', $typeaheadParams);
-		if (!is_null($module)) {
-			$typeaheadParams['module'] = $module;
-			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
-		}
-		if (!is_null($subsection)) {
-			$typeaheadParams['subsection'] = $subsection;
-			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithSubsection', $typeaheadParams);
-		}
-
-
-		/* Show the first module we have */
-		if ( $module == null ) {
-			$retArr['key'] = $key;
-			$routeName = 'module';
-			$modules = $dataClass->getModels();
-			if (count($modules)) {
-				$module1st = array_shift($modules);
-				if (!isset($module1st["params"]["module"])) {
-					/* ERROR - wrong structure of model entry */
-					$this->get('data_logger')
-							->err("Cannot get first model (redirect to 1st tab).",
-									array("message" => "\$module1st[\"params\"][\"module\"] is not set"));
-				}
-				$retArr['module'] = $module1st["params"]["module"];
-				return $this->redirect($this->generateUrl($routeName, $retArr));
-			} else {
-				return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'All')));
-			}
-		}
+		$this->generateTypeaheadPath($key, $module, $subsection);
 
 		$activeNotifications = $this->getRequest()->getSession()->get('activeNotifications');
 		if ( !isset($activeNotifications[$key]) || $activeNotifications[$key] !== true ) {
@@ -165,33 +135,6 @@ class ModuleController extends BaseController {
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'notifications');
 		}
 
-		// if we have module, we are definitely in module or subsection action, so we could load names
-		if ( $module ) {
-			parent::setSubmenuUrl($module);
-			$this->assign('sectionName', $dataClass->getSectionName($module));
-
-			if ( $subsection ) {
-				$this->assign('subsectionName', $dataClass->getSubsectionName($subsection));
-			}
-
-			// we are in section
-		} else {
-			$connArray = $this->getRequest()->getSession()->get('session-connections');
-			if (isset($connArray[$key])) {
-				$host = unserialize($connArray[$key]);
-				$this->assign('sectionName', $host->host);
-			} else {
-				$this->getRequest()->getSession()->getFlashBag()->add('state error', "You try to load device you are not connected to.");
-				return $this->redirect($this->generateUrl("connections", array()));
-			}
-
-			// because we do not allow changing layout in section, controls will be hidden
-			$this->assign('hideColumnControl', true);
-		}
-
-		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
-		$this->assign('routeParams', $routeParams);
-		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
 
 		// loading state part = get Action
 		// we will load it every time, because state column will we show everytime
@@ -263,6 +206,99 @@ class ModuleController extends BaseController {
 				$this->setOnlyConfigSection();
 			}
 			$this->assign('singleColumnLayout', true);
+		}
+	}
+
+	/**
+	 * Sets section and subsection names for current module or section
+	 *
+	 * @param $key
+	 * @param $module
+	 * @param $subsection
+	 *
+	 * @return null|RedirectResponse
+	 */
+	protected function setModuleOrSectionName($key, $module, $subsection) {
+		$dataClass = $this->get('DataModel');
+		// if we have module, we are definitely in module or subsection action, so we could load names
+		if ( $module ) {
+			parent::setSubmenuUrl($module);
+			$this->assign('sectionName', $dataClass->getSectionName($module));
+
+			if ( $subsection ) {
+				$this->assign('subsectionName', $dataClass->getSubsectionName($subsection));
+			}
+
+			// we are in section
+		} else {
+			$connArray = $this->getRequest()->getSession()->get('session-connections');
+			if (isset($connArray[$key])) {
+				$host = unserialize($connArray[$key]);
+				$this->assign('sectionName', $host->host);
+			} else {
+				$this->getRequest()->getSession()->getFlashBag()->add('state error', "You try to load device you are not connected to.");
+				return $this->redirect($this->generateUrl("connections", array()));
+			}
+
+			// because we do not allow changing layout in section, controls will be hidden
+			$this->assign('hideColumnControl', true);
+		}
+
+		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
+		$this->assign('routeParams', $routeParams);
+	}
+
+	/**
+	 * generates and assign typeahead placeholder path (for using in JS typeadhead function)
+	 *
+	 * @param $key
+	 * @param $module
+	 * @param $subsection
+	 */
+	protected function generateTypeaheadPath($key, $module, $subsection) {
+		// path for creating node typeahead
+		$typeaheadParams = array(
+				'formId' => "FORMID",
+				'key' => $key,
+				'xPath' => "XPATH"
+		);
+		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabel', $typeaheadParams);
+		if (!is_null($module)) {
+			$typeaheadParams['module'] = $module;
+			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
+		}
+		if (!is_null($subsection)) {
+			$typeaheadParams['subsection'] = $subsection;
+			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithSubsection', $typeaheadParams);
+		}
+
+		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
+	}
+
+	/**
+	 * Redirect to first available module or All section if no module is available
+	 *
+	 * @param $key      ID of connection
+	 *
+	 * @return RedirectResponse
+	 */
+	protected function redirectToFirstModule($key) {
+		$dataClass = $this->get('DataModel');
+		$retArr['key'] = $key;
+		$routeName = 'module';
+		$modules = $dataClass->getModels();
+		if (count($modules)) {
+			$module1st = array_shift($modules);
+			if (!isset($module1st["params"]["module"])) {
+				/* ERROR - wrong structure of model entry */
+				$this->get('data_logger')
+						->err("Cannot get first model (redirect to 1st tab).",
+								array("message" => "\$module1st[\"params\"][\"module\"] is not set"));
+			}
+			$retArr['module'] = $module1st["params"]["module"];
+			return $this->redirect($this->generateUrl($routeName, $retArr));
+		} else {
+			return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'All')));
 		}
 	}
 
