@@ -128,7 +128,7 @@ jQuery(function($) {
 		loadAjaxLink(e, $(this), $(this).attr('href'), "GET", '');
 	});
 
-	$("section").on('submit', 'form', function(e) {
+	$("section, #block--leftColumn").on('submit', 'form', function(e) {
 		if ($(this).data().disableActiveLink == undefined) {
 			$(this).attr('data-disable-active-link', true);
 		}

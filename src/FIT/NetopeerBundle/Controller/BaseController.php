@@ -175,7 +175,7 @@ class BaseController extends Controller
 		try {
 			$key = $this->getRequest()->get('key');
 			if ($key != "") {
-				$conn = $dataClass->getConnFromKey($key);
+				$conn = $dataClass->getConnectionSessionForKey($key);
 				if ($conn !== false) {
 					$this->assign('lockedConn', $conn->getLockForDatastore());
 					$this->assign('sessionStatus', $conn->sessionStatus);
@@ -203,7 +203,7 @@ class BaseController extends Controller
 		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
 		 */
 		$dataClass = $this->get('DataModel');
-		$conn = $dataClass->getConnFromKey($key);
+		$conn = $dataClass->getConnectionSessionForKey($key);
 
 		if ($conn) {
 			if ($sourceConfig !== "") {
@@ -351,7 +351,7 @@ class BaseController extends Controller
 		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
 		 */
 		$dataClass = $this->get('DataModel');
-		$conn = $dataClass->getConnFromKey($key);
+		$conn = $dataClass->getConnectionSessionForKey($key);
 
 		if ($conn) {
 			return $conn->getCurrentDatastore();

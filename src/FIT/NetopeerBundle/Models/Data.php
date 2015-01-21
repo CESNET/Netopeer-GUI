@@ -42,6 +42,7 @@
  */
 namespace FIT\NetopeerBundle\Models;
 
+use FIT\Bundle\ModuleDefaultBundle\Controller\ModuleController;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -206,7 +207,7 @@ class Data {
 	 * @return string
 	 */
 	private function getHashFromKey($key) {
-		$conn = $this->getConnFromKey($key);
+		$conn = $this->getConnectionSessionForKey($key);
 
 		if (isset($conn->hash)) {
 			return $conn->hash;
@@ -222,7 +223,7 @@ class Data {
 	 * @return array  return array of identifiers on success, false on error
 	 */
 	public function getModuleIdentifiersForCurrentDevice($key) {
-		$conn = $this->getConnFromKey($key);
+		$conn = $this->getConnectionSessionForKey($key);
 		if (!$conn) {
 			return false;
 		}
@@ -344,13 +345,31 @@ class Data {
 	 * @param  int $key      session key
 	 * @return bool|ConnectionSession
 	 */
-	public function getConnFromKey($key) {
+	public function getConnectionSessionForKey($key) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
 		if (isset($sessionConnections[$key]) && $key !== '') {
 			return unserialize($sessionConnections[$key]);
 		}
 		return false;
+	}
+
+	/**
+	 * get ModuleControllers instance for given module namespace and ID of connection
+	 *
+	 * @param string $module    module name
+	 * @param string $namespace module namespace
+	 *
+	 * @return ModuleController|null
+	 */
+	public function getModuleControllers($module, $namespace) {
+		$em = $this->container->get('doctrine')->getEntityManager();
+		$repository = $em->getRepository("FITNetopeerBundle:ModuleController");
+
+		return $repository->findOneBy(array(
+				'moduleName' => $module,
+				'moduleNamespace' => $namespace
+		));
 	}
 
 	/**
@@ -409,7 +428,7 @@ class Data {
 	 * @return bool
 	 */
 	protected function checkCapabilityForKey($key, $feature) {
-		$con = $this->getConnFromKey($key);
+		$con = $this->getConnectionSessionForKey($key);
 		if ($con) {
 			$cpblts =  json_decode($con->sessionStatus);
 			foreach ($cpblts->capabilities as $cpblt) {
@@ -453,14 +472,14 @@ class Data {
 	 * @param  string $targetDataStore    target datastore identifier
 	 */
 	private function updateConnLock($key, $targetDataStore) {
-		$conn = $this->getConnFromKey($key);
+		$conn = $this->getConnectionSessionForKey($key);
 
 		if ($conn == false) {
 			return;
 		}
 
 		$conn->toggleLockOfDatastore($targetDataStore);
-		$this->persistConnectionForKey($key, $conn);
+		$this->persistConnectionSessionForKey($key, $conn);
 	}
 
 	/**
@@ -469,7 +488,7 @@ class Data {
 	 * @param  int $key      session key
 	 * @param  ConnectionSession $conn
 	 */
-	public function persistConnectionForKey($key, $conn) {
+	public function persistConnectionSessionForKey($key, $conn) {
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
 		$sessionConnections[$key] = serialize($conn);
@@ -1668,6 +1687,23 @@ class Data {
 			return $cache->fetch('modelNamespaces_'.$hashedKey);
 		}
 		return $this->modelNamespaces;
+	}
+
+	/**
+	 * get namespace for given module name
+	 *
+	 * @param int $key      ID of connection
+	 * @param string $module   name of module
+	 *
+	 * @return bool
+	 */
+	public function getNamespaceForModule($key, $module) {
+		$namespaces = $this->getModelNamespaces($key);
+		if (isset($namespaces[$module])) {
+			return $namespaces[$module];
+		} else {
+			return false;
+		}
 	}
 
 	/**

@@ -106,7 +106,6 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'leftColumn');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'notifications');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topPart');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'javascripts');
 
 		//TODO: delete only session from refferer
@@ -273,7 +272,6 @@ class DefaultController extends BaseController
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'alerts');
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
 			ob_clean();
 			$this->getRequest()->getSession()->set('isAjax', true);
 		}

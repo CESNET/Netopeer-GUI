@@ -61,17 +61,16 @@ hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: tra
 
 .cover-wo-alerts { position: relative; height: 100%; min-height: 100%; width: 100%; }
 
-.button { @include background( linear-gradient(lighten($cBase, 10%), darken($cBase, 4%)) ); @include border-radius(5px); padding: 8px 20px; color: #fff; @include text-shadow(1px, 1px, 2px, #333); font-size: 1em; font-weight: normal; border: 1px solid darken($cBase, 4%); cursor: pointer; @include single-box-shadow(0px, 0px, 8px, 0px, #aaa); margin: 15px 0px; position: relative; z-index: 1; text-decoration: none;
-	&:before { position: absolute; z-index: -1; content: ""; top: 1px; left: 0px; right: 0px; bottom: 0px; border-top: 1px solid rgba(255,255,255,0.2); }
+.button { background: $cBase; @include border-radius(5px); padding: 8px 20px; color: #fff; @include text-shadow(1px, 1px, 2px, #333); font-size: 1em; font-weight: normal; border: 1px solid darken($cBase, 5%); cursor: pointer; @include single-box-shadow(0px, 0px, 8px, 0px, #aaa); margin: 15px 0px; position: relative; z-index: 1; text-decoration: none;
 	&:active { @include single-box-shadow(0px, 2px, 5px, 0px, rgba(255,255,255,0.25), true);  }
-	&:hover { @include background( linear-gradient($cBase, darken($cBase, 14%)) ); }
-	&.red { @include background( linear-gradient($cAlert, darken($cAlert, 5%)) ); border: 1px solid darken($cAlert, 30%); color: #fff; 
-		&:hover { @include background( linear-gradient($cAlert, darken($cAlert, 15%)) ); }
+	&:hover { background: darken($cBase, 14%); }
+	&.red { background: $cAlert; border: 1px solid darken($cAlert, 5%); color: #fff;
+		&:hover { background: darken($cAlert, 15%); }
 	}
-	&.grey { @include background( linear-gradient(#666, darken(#666, 8%)) ); border: 1px solid darken(#555, 30%); color: #fff;
-		&:hover { @include background( linear-gradient(#555, darken(#555, 15%)) ); }
+	&.grey { background: #666; border: 1px solid darken(#666, 5%); color: #fff;
+		&:hover { background: darken(#555, 15%); }
 	}
-	&.small { padding: 4px 6px; font-size: 0.85em; }
+	&.small { padding: 4px 6px; font-size: 0.9em; }
 }
 .button-link { cursor: pointer; @include inline-block;
 	&.red { color: $cAlert; }
@@ -82,7 +81,7 @@ hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: tra
 #ajax-spinner { position: absolute; width: 100%; height: 100%; @include background( url($img + 'ajax-loader.gif'), rgba(0,0,0,0.5) ); background-repeat: no-repeat; background-position: center center; top: 0; left: 0; z-index: 30; }
 
 /* navigation */
-nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(darken($cBase, 5%), darken($cBase, 10%))); height: $hNavTop; line-height: $hNavTop; color: #fff; border-bottom: 1px solid #000; @include box-shadow( 0px 0px 7px rgba(0,0,0,0.9)); position: absolute; z-index: 100; top: 0px; width: 100%;
+nav#block--topMenu, div#block--topMenu { background: darken($cBase, 5%); height: $hNavTop; line-height: $hNavTop; color: #fff; border-bottom: 1px solid #000; @include box-shadow( 0px 0px 7px rgba(0,0,0,0.9)); position: absolute; z-index: 100; top: 0px; width: 100%;
 	> a { color: #fff; text-decoration: none; @include text-shadow(1px 1px 2px #000); padding: 0px 20px; border-left: 1px solid $cBase; float: left; font-size: 1.3em; position: relative;
 		&:first-child + a { border-left: 1px solid #000; }
 		&:hover, &.active { background: darken($cBase, 20%); }
@@ -168,17 +167,10 @@ nav#block--topMenu, div#block--topMenu { @include background( linear-gradient(da
 
 nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa; background: #dadada; @include single-box-shadow(0px, 0px, 10px, 0px, darken(#dadada, 10%), true); min-height: 100%; padding: $hNavTop 0px 0px 0px; font-size: 1.3em; position: relative; margin-left: -1px;
 	> *:first-child { margin-top: $sContentPadding; }
-	h3 { padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1.1em; border-bottom: 1px solid #888; margin-bottom: 5px; }
+	> div { clear: both; }
+	h3 { padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1.15em; border-bottom: 2px solid #888; margin-bottom: 5px; margin-top: 25px; }
 	h4 { margin-top: 25px; padding: 0px $sContentPadding 10px $sContentPadding; font-weight:bold; font-size: 1em; border-bottom: 1px solid #bbb; margin-bottom: 5px; }
-	a { display: block; padding: 9px $sContentPadding; @include link-colors($cFont, #000); text-decoration: none;
-		&:hover, &.active { padding-left: $sContentPadding - 5px; margin-left: 5px; }
-		&:hover { background: #bbb;  }
-		&.active { background: #f5f5f5; color: $cComp2Dark; margin-right: -1px; padding: 9px $sContentPadding + 1px 8px $sContentPadding - 6px; border: 1px solid #bababa; border-right: 0px none; }
-	}
-	.item { display: block; padding: 6px $sContentPadding; color: #555;
-		.bullet { @include inline-block; width: 7px; height: 7px; margin-right: 8px; background: #777; margin-top: -1px; }
-	}
-
+	h5 { margin: 15px 0px 5px 0px; font-weight: bold; font-size: 1em; }
 	#history-and-profiles { height: 100%; min-height: 100%; max-width: 100%; position: relative; margin-top: 0px;
 		#block--historyOfConnectedDevices, #block--profilesOfConnectedDevices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; @include box-sizing(border-box); }
 		#block--historyOfConnectedDevices { height: 50%; padding-top: $sContentPadding; }
@@ -193,6 +185,24 @@ nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa
 			}
 		}
 	}
+	.button { margin: 5px auto; clear: both; }
+}
+.nav-left {
+	a { display: block; padding: 9px $sContentPadding; @include link-colors($cFont, #000); text-decoration: none;
+		&:hover { background: #bbb;  }
+		&.active { background: #f5f5f5; color: $cComp2Dark; margin-right: -1px; padding: 9px $sContentPadding + 1px 8px $sContentPadding; border: 1px solid #bababa; border-right: 0px none; }
+
+		&.item { display: block; padding: 6px $sContentPadding; color: #555;
+
+			.bullet { @include inline-block; width: 7px; height: 7px; margin-right: 8px; background: #777; margin-top: -1px; }
+		}
+	}
+}
+.left-column-base { padding: 0px $sContentPadding; @include clearfix; }
+form.filter-form {
+	label { display: none; }
+	select { width: 100%; min-height: 30px; }
+	.note { font-size: 0.8em; font-style: italic; margin-top: 7px; }
 }
 
 .scrollable-cover { overflow-y: scroll; }
@@ -312,7 +322,7 @@ form.form { margin: 15px 0px;
 		&.percent-width { width: 15%; }
 	}
 	input { @include box-sizing(border-box);
-		&[type="text"], &[type="password"], &.text { width: 200px; height: $hInput; line-height: $hInput; padding: 0px 5px; border: 1px solid #aaa; @include background( linear-gradient(#fff, #fafafa) ); margin-top: 10px; @include inline-block; @include border-radius(3px); font-size: 1em; font-size: 13px;
+		&[type="text"], &[type="password"], &.text { width: 200px; height: $hInput; line-height: $hInput; padding: 0px 5px; border: 1px solid #aaa; background: #fafafa; margin-top: 10px; @include inline-block; @include border-radius(3px); font-size: 1em; font-size: 13px;
 			&[disabled="true"] { border-color: #ccc; }
 		}
 		&[type="submit"] { @extend .button; }
@@ -321,7 +331,7 @@ form.form { margin: 15px 0px;
 			&.w-50 { width: 50%; }
 		}
 	} 
-	textarea { @include box-sizing(border-box); @extend input[type="text"]; @include background( linear-gradient(#fff, #fafafa) ); height: 80px; line-height: 1.2em; font-size: 12px; }
+	textarea { @include box-sizing(border-box); @extend input[type="text"]; background: #fafafa; height: 80px; line-height: 1.2em; font-size: 12px; }
 	select { @include box-sizing(border-box); width: 200px; font-size: 12px; }
 }
 
@@ -337,6 +347,9 @@ table { width: 100%; margin: 15px 0px;
 		th, td { background: #eaeaea; }
 	}
 }
+
+/** connections page **/
+.configure .loading { background: url($img + "loading-bar.gif") repeat-x; display:block; height: 20px; line-height: 20px; color: #fff; padding: 0px 3%; width: 94%; border: 1px solid darken($cBase, 10%); @include border-radius(5px); }
 
 /** ip lookup **/
 #ip-info-cover { width: 100%; @include clearfix; padding-bottom: 20px;

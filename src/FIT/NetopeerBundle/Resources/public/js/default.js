@@ -74,6 +74,10 @@ function initJS() {
 	}).on("submit", function(event){
 		formInputChanged = false;
 	});
+
+	$("form").on("change", ".js-auto-submit-on-change", function() {
+		$(this).parents('form').submit();
+	});
 }
 
 function initPopupMenu($cover) {

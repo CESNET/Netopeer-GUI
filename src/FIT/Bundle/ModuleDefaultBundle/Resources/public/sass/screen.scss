@@ -128,11 +128,6 @@
 	&.has-tooltip {  }
 }
 
-.top-part { position: absolute; right: 2 * $sContentPadding; top: $hNavTop + $sContentPadding; font-size: 1.2em; @include opacity(0.7); z-index: 10;
-	&:hover { @include opacity(1); }
-}
-.configure .loading { background: url($img + "loading-bar.gif") repeat-x; display:block; height: 20px; line-height: 20px; color: #fff; padding: 0px 3%; width: 94%; border: 1px solid darken($cBase, 10%); @include border-radius(5px); }
-
 // model tree dump
 #hiddenModelTreeDump { display: none; }
 pre { font-family: "Courier New", Courier, monospace; line-height: 1.4em; }
@@ -142,16 +137,6 @@ pre { font-family: "Courier New", Courier, monospace; line-height: 1.4em; }
 
 form.form {
 	.radio-cover { margin-top: 0px; }
-}
-
-form.filter { margin-top: 20px;
-	> div { float: left; margin-left: 30px; }
-	label { @include inline-block; margin: 0px 10px 0px 0px; width: auto; height: auto; line-height: 1em;
-		&.required:after { content: " "; }
-	}
-	select { margin-top: 5px; width: 100px; }
-	input[type="submit"] { margin: 1px 10px; }
-	.note { font-size: 0.8em; font-style: italic; margin-top: 7px; }
 }
 
 form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 0px 0px 15px 0px; float: left; width: 100%; @include single-box-shadow(0px, 0px, 10px, 0px, rgba(0,0,0,0.7));

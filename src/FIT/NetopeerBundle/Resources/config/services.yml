@@ -76,7 +76,7 @@ services:
 
     moduleListener:
         class: FIT\NetopeerBundle\EventListener\ModuleListener
-        arguments: [@doctrine.orm.entity_manager, @data_logger]
+        arguments: [@DataModel, @doctrine.orm.entity_manager, @data_logger]
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelController }
 

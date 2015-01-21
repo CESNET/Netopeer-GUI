@@ -136,26 +136,94 @@ if advised of the possibility of such damage.
 		{# if submenu is defined and submenu #}
 		<nav id="block--leftColumn">
 			{% block leftColumn %}
-				{% if sectionName is defined %}<h3>{{ sectionName }}</h3>{% endif %}
+				{% if sectionName is defined %}<h3>
+					{% if app.request.get('module') is defined %}
+					<a href="{{ path("module", {"key":app.request.get('key'),"module":app.request.get('module')} ) }}" class="ajaxLink">
+						{{ sectionName }}
+					</a>
+					{% else %}
+						{{ sectionName }}
+					{% endif %}
+					</h3>{% endif %}
+				<div class="nav-left">
 				{% for subsection in submenu %}
 					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="ajaxLink {% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 				{% endfor %}
-				{% block leftColumnAdditional %}
+				</div>
+
+				{% block rpcMethods %}
 					{% if rpcMethods is defined and rpcMethods|length > 0 %}
-					<h4>RPC methods defined in model:</h4>
-					{% for rpc in rpcMethods %}
-						<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc.name}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc.name }}</a>
-					{% endfor %} {% endif %}
+						<h4>RPC methods defined in model:</h4>
+						<div class="nav-left">
+						{% for rpc in rpcMethods %}
+							<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc.name}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc.name }}</a>
+						{% endfor %}
+						</div>
+					{% endif %}
+				{% endblock rpcMethods%}
+
+				<div id="block--copyConfig">
+					{% block copyConfig %}
+					<h4>Change datastore</h4>
+					{% if stateArr is defined
+					and (
+					not(stateArr is empty)
+					or (isEmptyModule is defined and isEmptyModule == true)
+					or (forceShowFormConfig is defined and forceShowFormConfig == true)
+					) %}
+						<div class="left-column-base">
+						{% if formConfig is defined %}
+							{% block filterConfig %}
+								<form action="" method="post" {{ form_enctype(formConfig) }} class="filter-form" name="formConfig" data-disable-active-link="true">
+									{{ form_widget(formConfig) }}
+								</form>
+							{% endblock filterConfig %}
+
+							<div id="block--sourceValidation">
+								{% block sourceValidation %}
+									{# duplicated in config form filter !#}
+									<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink button grey small left" data-disable-history="true">Validate this datastore</a>
+									{% if isSourceValid is defined %}
+										<span class="source-validation bubble {{ (isSourceValid) ? 'green' : 'red' }}">{{ (isSourceValid) ? 'valid' : 'invalid' }}</span>
+									{% endif %}
+								{% endblock %}
+							</div>
+						{% endif %}
+						{% if formCopyConfig is defined %}
+							<hr class="cleaner" />
+							<h5>Copy active datastore to:</h5>
+							<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter-form" name="formCopyConfig">
+								{{ form_widget(formCopyConfig) }}
+								<input type="submit" value="Copy active datastore" class="button small grey left" />
+							</form>
+						{% endif %}
+						</div>
+					{% endif %}
+					{% endblock %}
+				</div>
+
+				<div id="block--moduleOutputStyleChange">
+				{% block moduleOutputStyleChange %}
+					{% if moduleStylesForm is defined %}
+					<h3>Change output style</h3>
+						<div class="left-column-base">
+						<form action="" method="post" {{ form_enctype(moduleStylesForm) }} class="filter-form" name="outputStyle">
+							{{ form_widget(moduleStylesForm.controllerAction) }}
+						</form>
+						</div>
+					{% endif %}
+				{% endblock moduleOutputStyleChange %}
+				</div>
+
+				<div id="block--leftColumnAdditional">
+				{% block leftColumnAdditional %}
 				{% endblock leftColumnAdditional %}
+				</div>
+
 			{% endblock leftColumn %}
 		</nav>
 		{% set addToColumnClass = ' left-nav-defined' %}
 		{# endif #}
-
-		<div id="block--topPart">
-			{% block topPart %}
-			{% endblock topPart %}
-		</div>
 
 		{#<div class="alert-cover">#}
 		{#</div>#}

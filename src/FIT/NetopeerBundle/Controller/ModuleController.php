@@ -60,6 +60,7 @@ class ModuleController extends BaseController {
 	 */
 	private $filterForms;
 	private $bundleName;
+	static protected $defaultModuleAction = "FIT\Bundle\ModuleDefaultBundle\Controller\ModuleController::moduleAction";
 
 	/**
 	 * base method for getting data for module action
@@ -69,7 +70,7 @@ class ModuleController extends BaseController {
 	 * @param null $module
 	 * @param null $subsection
 	 *
-	 * @return null|RedirectResponse
+	 * @return \SimpleXMLIterator|RedirectResponse|null   SimpleXMLIterator with state XML, redirectResponse when current page is not correct, null on some failure
 	 */
 	protected function prepareDataForModuleAction($bundleName, $key, $module = null, $subsection = null)
 	{
@@ -81,7 +82,6 @@ class ModuleController extends BaseController {
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'additionalTitle');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'state');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'leftColumn');
-			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'topPart');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleJavascripts');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleStylesheet');
 			$this->assign('historyHref', $this->getRequest()->getRequestUri());
@@ -116,12 +116,11 @@ class ModuleController extends BaseController {
 		$dataClass->buildMenuStructure($key);
 		$this->setModuleOrSectionName($key, $module, $subsection);
 		$this->assign('rpcMethods', $this->createRPCListFromModel($module, $subsection));
+		$this->setModuleOutputStyles($key, $module);
 
 		// if form has been send, we well process it
 		if ($this->getRequest()->getMethod() == 'POST') {
-			$this->processSectionForms($key, $module, $subsection);
-			// the code below wont be precess, because at the end of processSectionForms
-			// is redirect executed
+			return $this->processSectionForms($key, $module, $subsection);
 		}
 
 		// we will prepare filter form in column
@@ -135,6 +134,11 @@ class ModuleController extends BaseController {
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'notifications');
 		}
 
+		// load model tree dump
+		$modelTree = $dataClass->getModelTreeDump($module);
+		if ($modelTree) {
+			$this->assign('modelTreeDump', $modelTree);
+		}
 
 		// loading state part = get Action
 		// we will load it every time, because state column will we show everytime
@@ -145,68 +149,78 @@ class ModuleController extends BaseController {
 			} else {
 				$merge = true;
 			}
-			$isEmptyModule = false;
 
 			if ( ($xml = $dataClass->handle('get', $this->getStateParams(), $merge)) != 1 ) {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-
-				// we have only root module
-				if ($xml->count() == 0) {
-					$isEmptyModule = true;
-					if ($xml->getName() == 'root') {
-						$this->setEmptyModuleForm($this->getRequest()->get('key'));
-						$isEmptyModule = false;
-						$this->assign('forceShowFormConfig', true);
-					}
-					$this->assign('isEmptyModule', $isEmptyModule);
-					$this->assign('key', $this->getRequest()->get('key'));
-					$this->assign('additionalTitle', 'Create empty root element');
-					$this->assign('redirectUrl', $this->getRequest()->getRequestUri());
-					$this->setEmptyModuleForm($key);
-					$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Module:createEmptyModule.html.twig');
-					$html = $template->renderBlock('singleContent', $this->getAssignedVariablesArr());
-
-					$this->assign('additionalForm', $html);
-				} else {
-					$this->assign('showRootElem', true);
-				}
-
 				$this->assign("stateArr", $xml);
+				return $xml;
 			}
 		} catch (\ErrorException $e) {
 			$this->get('data_logger')->err("State: Could not parse filter correctly.", array("message" => $e->getMessage()));
 			$this->getRequest()->getSession()->getFlashBag()->add('state error', "Could not parse filter correctly. ");
 		}
 
-		// load model tree dump
-		$modelTree = $dataClass->getModelTreeDump($module);
-		if ($modelTree) {
-			$this->assign('modelTreeDump', $modelTree);
+		return null;
+	}
+
+	/**
+	 * @param int    $key    ID of connection
+	 * @param string $module name of current module
+	 *
+	 * @return array
+	 */
+	protected function setModuleOutputStyles($key, $module) {
+		/**
+		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 */
+		$dataClass = $this->get('DataModel');
+		$controllers = array();
+
+		$namespace = $dataClass->getNamespaceForModule($key, $module);
+		$record = $dataClass->getModuleControllers($module, $namespace);
+		if ($record) {
+			$controllers = $record->getControllerActions();
 		}
 
-		// we will load config part only if two column layout is enabled or we are on section (which has two column always)
-		$tmp = $this->getConfigParams();
-		if ($module == null || ($module != null && $tmp['source'] !== "running" && !$isEmptyModule)) {
-			$this->loadConfigArr(false, $merge);
-			$this->setOnlyConfigSection();
-		} else if ( $module == null || $module == 'all' || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
-			$this->loadConfigArr(true, $merge);
-			$this->assign('singleColumnLayout', false);
-			if ($module == 'all') {
-				$this->assign('hideColumnControl', true);
-			}
-		} else if ($this->get('session')->get('singleColumnLayout') != "true") {
-			$this->loadConfigArr(false, $merge);
-			$this->assign('singleColumnLayout', true);
-			$this->setOnlyConfigSection();
-		} else {
-			$conn = $dataClass->getConnFromKey($key);
-			if ($conn->getCurrentDatastore() !== "running") {
-				$this->loadConfigArr(false, $merge);
-				$this->setOnlyConfigSection();
-			}
-			$this->assign('singleColumnLayout', true);
+		// always add ModuleDefaultBundle at the end (if is not included already)
+		if (!in_array(self::$defaultModuleAction, $controllers)) {
+			$controllers[] = self::$defaultModuleAction;
 		}
+
+		// prepare array with ModuleControllers for choice element in form
+		$modifiedControllers = array();
+		foreach ($controllers as $controller) {
+			$parts = explode("\\", $controller);
+			$name = str_replace(array('Module', 'Bundle'), '', $parts[2]);
+			$modifiedControllers[$controller] = $name;
+		}
+
+		// build form for controller output change
+		$conn = $dataClass->getConnectionSessionForKey($key);
+		$controllerAction = $conn->getActiveControllersForNS($dataClass->getNamespaceForModule($key, $module));
+
+		$form = $this->createFormBuilder(null, array('csrf_protection' => false))
+				->add('controllerAction', 'choice', array(
+								'choices' => $modifiedControllers,
+								'required' => true,
+								'data' => $controllerAction,
+								'attr' => array(
+										'class' => 'js-auto-submit-on-change'
+								)
+						))
+				->getForm();
+		$this->assign('moduleStylesForm', $form->createView());
+
+		// handle change controller output style
+		if ($this->getRequest()->getMethod() == 'POST') {
+			$postVals = $this->getRequest()->get("form");
+			if ( isset($postVals['controllerAction']) ) {
+				$conn->setActiveController($namespace, $postVals['controllerAction']);
+				$dataClass->persistConnectionSessionForKey($key, $conn);
+			}
+		}
+
+		return $modifiedControllers;
 	}
 
 	/**
@@ -239,9 +253,6 @@ class ModuleController extends BaseController {
 				$this->getRequest()->getSession()->getFlashBag()->add('state error', "You try to load device you are not connected to.");
 				return $this->redirect($this->generateUrl("connections", array()));
 			}
-
-			// because we do not allow changing layout in section, controls will be hidden
-			$this->assign('hideColumnControl', true);
 		}
 
 		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
@@ -406,14 +417,11 @@ class ModuleController extends BaseController {
 				->add('formType', 'hidden', array(
 								'data' => 'formConfig',
 						))
-//			->add('filter', 'text', array(
-//				'label' => "Filter",
-//				'required' => false
-//			))
 				->add('source', 'choice', array(
 								'label' => "Source:",
 								'choices' => $datastores,
-								'data' => $this->getCurrentDatastoreForKey($key)
+								'data' => $this->getCurrentDatastoreForKey($key),
+				        'attr' => array('class' => 'js-auto-submit-on-change')
 						))
 				->getForm();
 
@@ -527,9 +535,9 @@ class ModuleController extends BaseController {
 			 * @var $dataClass \FIT\NetopeerBundle\Models\Data
 			 */
 			$dataClass = $this->get('DataModel');
-			$conn = $dataClass->getConnFromKey($key);
+			$conn = $dataClass->getConnectionSessionForKey($key);
 			$conn->setCurrentDatastore($post_vals['source']);
-			$dataClass->persistConnectionForKey($key, $conn);
+			$dataClass->persistConnectionSessionForKey($key, $conn);
 
 			$this->setConfigParams("source", $post_vals['source']);
 

@@ -40,8 +40,10 @@
 namespace FIT\NetopeerBundle\EventListener;
 
 use Doctrine\ORM\EntityManager;
+use FIT\NetopeerBundle\Entity\ConnectionSession;
 use Monolog\Logger;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use FIT\NetopeerBundle\Models\Data;
 
 class ModuleListener
 {
@@ -53,20 +55,27 @@ class ModuleListener
 	 * @var \Monolog\Logger
 	 */
 	private $logger;
+	/**
+	 * @var Data
+	 */
+	private $dataModel;
 
 	/**
+	 * @param Data          $dataModel
 	 * @param EntityManager $em
 	 * @param Logger        $logger
+	 * @param
 	 */
-	public function __construct($em = null, $logger = null)
+	public function __construct($dataModel = null, $em = null, $logger = null)
 	{
+		$this->dataModel = $dataModel;
 		$this->em = $em;
 		$this->logger = $logger;
 	}
 
 	/**
 	 * This method checks module name, loads mapping info from ModuleController
-	 * entity, and calls specified controller from custom ModuleBundle	 *
+	 * entity, and calls specified controller from custom ModuleBundle
 	 *
 	 * @param GetResponseEvent $event
 	 */
@@ -74,15 +83,30 @@ class ModuleListener
 	{
 		if ($this->em) {
 			$attributes = $event->getRequest()->attributes;
-			if ($attributes->get("_route") == "module") {
-				$repository = $this->em->getRepository("FITNetopeerBundle:ModuleController");
-				$record     = $repository->findOneBy(
-						array('moduleName' => $attributes->get('module'))
-				); // TODO: search by namespace
+			if (in_array($attributes->get("_route"), array("module", "subsection"))) {
 
-				if ($record) {
-					$controllers = $record->getControllerActions();
-					$event->getRequest()->attributes->set("_controller", $controllers[0]);
+				// get available namespaces for this connection
+				$namespace = $this->dataModel->getNamespaceForModule($attributes->get('key'), $attributes->get('module'));
+				if ($namespace !== false) {
+					$record = $this->dataModel->getModuleControllers($attributes->get('module'), $namespace);
+
+					if ($record) {
+						// get all saved controllers from DB
+						$controllers = $record->getControllerActions();
+
+						/**
+						 * @var ConnectionSession $conn
+						 */
+						$conn = $this->dataModel->getConnectionSessionForKey($attributes->get('key'));
+						$activeController = $conn->getActiveControllersForNS($namespace);
+
+						// if we don't have any saved (preferred) controller, we will use first from DB
+						if (!$activeController) {
+							$activeController = $controllers[0];
+						}
+
+						$event->getRequest()->attributes->set("_controller", $activeController);
+					}
 				}
 
 			}
