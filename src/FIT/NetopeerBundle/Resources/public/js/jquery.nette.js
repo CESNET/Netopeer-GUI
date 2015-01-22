@@ -31,6 +31,10 @@ jQuery.extend({
 				;
 				$afterEl.attr('id', 'block--state').addClass('left-nav-defined');
 			}
+
+			if ((id === "block--moduleJavascripts" || id === "block--moduleStylesheet") && window.location.href.indexOf("app_dev.php") !== -1) {
+				html = html.replace('_controller', 'app_dev.php');
+			}
 			if (id === "block--alerts") {
 				$("#" + id).append(html);
 			} else {

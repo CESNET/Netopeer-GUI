@@ -110,7 +110,7 @@ class UserCommand extends ContainerAwareCommand
 			return;
 		}
 
-		$em = $this->getContainer()->get('doctrine')->getEntityManager();
+		$em = $this->getContainer()->get('doctrine')->getManager();
 
 		if ($command == "add") {
 			if ($password) {

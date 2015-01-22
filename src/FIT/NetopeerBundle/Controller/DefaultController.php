@@ -107,6 +107,8 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'notifications');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'javascripts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'moduleJavascripts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'moduleStylesheet');
 
 		//TODO: delete only session from refferer
 		$this->getRequest()->getSession()->set('activeNotifications', array());
@@ -320,7 +322,7 @@ class DefaultController extends BaseController
 
 		$res = $dataClass->handle($command, $params, false);
 
-		if ( $res != 1 ) {
+		if ( $res != 1 && !in_array($command, array("connect", "disconnect"))) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 
@@ -381,11 +383,14 @@ class DefaultController extends BaseController
 		parent::setActiveSectionKey($key);
 		$dataClass->buildMenuStructure($key);
 
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleStylesheet');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'title');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'additionalTitle');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'singleContent');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'alerts');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'leftColumn');
 
 		if ( $action == "session" ) {
 			/**
@@ -400,7 +405,21 @@ class DefaultController extends BaseController
 				foreach ($sessionArr['session-connections'] as $connKey => $conn) {
 					if ($connKey != $key) continue;
 
-					$connVarsArr['connection-'.$connKey][$connKey] = (array) unserialize($conn);
+					$tmp = unserialize($conn);
+
+
+					$unserialized = (array) unserialize($conn);
+					foreach ($unserialized as $key => $value) {
+						if (strrpos($key, 'activeController')) {
+							$tmpArr = array();
+							foreach ($value as $k => $v) {
+								$tmpArr[str_replace(":", "_", $k)] = $v;
+							}
+							$unserialized['activeController'] = $tmpArr;
+							unset($unserialized[$key]);
+						}
+					}
+					$connVarsArr['connection-'.$connKey][$connKey] = $unserialized;
 					if ($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']) {
 						$connVarsArr['connection-'.$connKey][$connKey]['sessionStatus'] = (array) json_decode($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']);
 						if (isset($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']['capabilities'])) {
@@ -408,13 +427,14 @@ class DefaultController extends BaseController
 							unset($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']['capabilities']);
 						}
 					}
-					
+
 					$connVarsArr['connection-'.$connKey][$connKey]['nc_features'] = $dataClass->getCapabilitiesArrForKey($connKey);
 				}
 				$sessionArr['session-connections'] = $connVarsArr;
 			}
 
 			unset($sessionArr['_security_secured_area']);
+			unset($sessionArr['_security_commont_context']);
 
 			$xml = Array2XML::createXML("session", $sessionArr);
 			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');

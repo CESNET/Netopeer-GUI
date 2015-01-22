@@ -78,20 +78,17 @@ class ModuleController extends BaseController {
 		$this->bundleName = $bundleName;
 
 		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
+			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleJavascripts');
+			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleStylesheet');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'title');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'additionalTitle');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'state');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'leftColumn');
-			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleJavascripts');
-			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleStylesheet');
 			$this->assign('historyHref', $this->getRequest()->getRequestUri());
 		}
 		$this->getRequest()->getSession()->remove('isLocking');
 		$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'alerts');
-
-		if ($this->getRequest()->getSession()->get('isAjax') === true) {
-			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'topMenu');
-		}
+		$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'topMenu');
 
 		if ($dataClass->checkLoggedKeys() === 1) {
 			$url = $this->get('request')->headers->get('referer');
@@ -100,6 +97,9 @@ class ModuleController extends BaseController {
 			}
 			return $this->redirect($url);
 		}
+
+		/* build correct menu structure for this module, generates module structure too */
+		$dataClass->buildMenuStructure($key);
 
 		/* Show the first module we have */
 		if ( $module == null ) {
@@ -111,9 +111,8 @@ class ModuleController extends BaseController {
 		$filters = $dataClass->loadFilters($module, $subsection);
 		$this->setSectionFormsParams($key, $filters['state'], $filters['config']);
 
-		/* build correct menu structure for this module */
+		/** prepare necessary data for left column */
 		$this->setActiveSectionKey($key);
-		$dataClass->buildMenuStructure($key);
 		$this->setModuleOrSectionName($key, $module, $subsection);
 		$this->assign('rpcMethods', $this->createRPCListFromModel($module, $subsection));
 		$this->setModuleOutputStyles($key, $module);
@@ -257,6 +256,7 @@ class ModuleController extends BaseController {
 
 		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
 		$this->assign('routeParams', $routeParams);
+		$this->assign('isModule', true);
 	}
 
 	/**
@@ -309,7 +309,7 @@ class ModuleController extends BaseController {
 			$retArr['module'] = $module1st["params"]["module"];
 			return $this->redirect($this->generateUrl($routeName, $retArr));
 		} else {
-			return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'All')));
+			return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'all')));
 		}
 	}
 

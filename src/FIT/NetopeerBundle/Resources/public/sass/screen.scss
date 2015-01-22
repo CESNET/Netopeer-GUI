@@ -175,6 +175,7 @@ nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid #bababa
 		#block--historyOfConnectedDevices, #block--profilesOfConnectedDevices { position: relative; height: 50%; width: 100%; min-height: 50%; margint-top: 0px; @include box-sizing(border-box); }
 		#block--historyOfConnectedDevices { height: 50%; padding-top: $sContentPadding; }
 		#block--profilesOfConnectedDevices { border-top: 1px solid #333; padding-top: 5%; height: 50%; }
+		h3 { margin-top: 0px; }
 		a { position: relative; @include ellipsis(); padding-top: 7px; padding-bottom: 7px;
 			&.active { margin-right:  0px; }
 			.icon { width: 18px; height: 18px; padding: 0px; @include border-radius(3px); background: #fff; line-height: 18px; text-align: center; border: 1px solid #aaa; display: none; margin-top: -7px; margin-bottom: -4px; margin-right: -3px;

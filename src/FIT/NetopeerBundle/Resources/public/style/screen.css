@@ -480,6 +480,8 @@ nav#block--leftColumn #history-and-profiles #block--profilesOfConnectedDevices {
   border-top: 1px solid #333;
   padding-top: 5%;
   height: 50%; }
+nav#block--leftColumn #history-and-profiles h3 {
+  margin-top: 0px; }
 nav#block--leftColumn #history-and-profiles a {
   position: relative;
   white-space: nowrap;

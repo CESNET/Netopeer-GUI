@@ -363,7 +363,7 @@ class Data {
 	 * @return ModuleController|null
 	 */
 	public function getModuleControllers($module, $namespace) {
-		$em = $this->container->get('doctrine')->getEntityManager();
+		$em = $this->container->get('doctrine')->getManager();
 		$repository = $em->getRepository("FITNetopeerBundle:ModuleController");
 
 		return $repository->findOneBy(array(

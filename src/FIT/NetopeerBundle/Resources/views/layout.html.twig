@@ -109,7 +109,7 @@ if advised of the possibility of such damage.
 
 				{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and
 				not isSingleInstance %}
-					<a href='{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="ajaxLink static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
+					<a href='{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
 				{% endif %}
 
 				<div id="userpane" class="static dropdown">
@@ -137,7 +137,7 @@ if advised of the possibility of such damage.
 		<nav id="block--leftColumn">
 			{% block leftColumn %}
 				{% if sectionName is defined %}<h3>
-					{% if app.request.get('module') is defined %}
+					{% if isModule is defined and isModule %}
 					<a href="{{ path("module", {"key":app.request.get('key'),"module":app.request.get('module')} ) }}" class="ajaxLink">
 						{{ sectionName }}
 					</a>
@@ -164,13 +164,14 @@ if advised of the possibility of such damage.
 
 				<div id="block--copyConfig">
 					{% block copyConfig %}
-					<h4>Change datastore</h4>
 					{% if stateArr is defined
+					and formConfig is defined
 					and (
 					not(stateArr is empty)
 					or (isEmptyModule is defined and isEmptyModule == true)
 					or (forceShowFormConfig is defined and forceShowFormConfig == true)
 					) %}
+						<h4>Change datastore</h4>
 						<div class="left-column-base">
 						{% if formConfig is defined %}
 							{% block filterConfig %}
