@@ -73,6 +73,9 @@ jQuery.extend({
 				}
 
 				initJS();
+				if (typeof initModuleDefaultJS !== "undefined") {
+					initModuleDefaultJS();
+				}
 			}
 		},
 

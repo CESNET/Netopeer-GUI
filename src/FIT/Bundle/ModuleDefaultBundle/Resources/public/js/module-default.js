@@ -20,7 +20,9 @@ function initModuleDefaultJS() {
 
 	// line of XML output
 	$(".leaf-line").hover(function() {
-		$(this).toggleClass("hover");
+		$(this).addClass("hover");
+	}, function() {
+		$(this).removeClass("hover");
 	});
 
 	prepareTooltipActions();

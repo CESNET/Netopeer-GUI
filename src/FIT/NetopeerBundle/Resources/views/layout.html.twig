@@ -134,7 +134,7 @@ if advised of the possibility of such damage.
 		<div class="cover-wo-alerts">
 		{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
 		{# if submenu is defined and submenu #}
-		<nav id="block--leftColumn">
+		<nav id="block--leftColumn" class="scrollable-cover" data-add-scrollable="true">
 			{% block leftColumn %}
 				{% if sectionName is defined %}<h3>
 					{% if isModule is defined and isModule %}

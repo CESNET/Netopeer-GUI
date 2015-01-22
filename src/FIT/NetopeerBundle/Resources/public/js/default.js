@@ -155,6 +155,7 @@ function changeSectionHeight() {
 		h -= $(notifOutput).outerHeight();
 	}
 
+	$("#block--leftColumn").css('min-height', '0%').css('height', $(window).height() + 'px');
 	$("body section, body section#content").css('min-height', '0%').css('height', h + 'px');
 	$(notifOutput).css('top', h);
 

@@ -36,22 +36,58 @@
 * if advised of the possibility of such damage.
 */
 
-$cBase:					#004F80;
-$cComp1Light: 			#1486CD;
-$cComp1Dark: 			#002034;
-$cComp2Light: 			#804B00;
-$cComp2Dark: 			#341E00;
-$cAlert:				#820101;
-$cGreen:				#007711;
-$cFont: 				#333;
+$img: '../images/';
 
-// basic sizes
-$hNavTop:				40px;
-$sContentPadding:		15px;
+// colors
+$color-primary: #004f80;
+$color-primary-light: #1486cd;
+$color-primary-dark: #002034;
+$color-danger: #820101;
+$color-success: #007711;
+
+// main layout colors
+$background-color: #f0f0f0;
+$text-color: #333;
+$link-color: $color-primary;
+$link-color-hover: #000;
+
+// buttons
+$button-primary-background: $color-primary;
+$button-danger-background: $color-danger;
+$button-secondary-background: #666;
 
 // fonts
-$fBody: 		Arial, Trebuchet, Verdana, sans-serif;
-$fHeadings:		Arial, Trebuchet, Verdana, sans-serif;
-$fMonospace:	"Courier New", Courier, monospace;
+$font-body: Arial, Trebuchet, Verdana, sans-serif;
+$font-headings: $font-body;
+$font-buttons: $font-body;
+$font-monospace: "Courier New", Courier, monospace;
 
-$img:			'../images/';
+// navs
+$nav-top-background: darken($color-primary, 5%);
+$nav-top-color: #fff;
+$nav-top-link-background: transparent;
+$nav-top-link-hover-background: darken($color-primary, 20%);
+$nav-top-link-color: $nav-top-color;
+$nav-top-link-color-hover: $nav-top-color;
+$nav-top-height: 40px;
+$nav-top-bottom-border: 1px solid #000;
+$nav-top-icon-background-color: $color-primary-dark;
+$nav-top-icon-color: #ccc;
+$nav-top-icon-home-background-color: $color-primary;
+$nav-top-icon-alerts-background-color: #000;
+
+$nav-left-background: #dadada;
+$nav-left-border-color: #bbb;
+$nav-left-title-border-color: #888;
+$nav-left-link-background: transparent;
+$nav-left-link-hover-background: #bbb;
+$nav-left-link-active-background: #f5f5f5;
+$nav-left-link-color: $text-color;
+$nav-left-link-color-hover: #000;
+$nav-left-link-color-active: #000;
+
+// basic sizes
+$sContentPadding: 15px;
+
+
+
