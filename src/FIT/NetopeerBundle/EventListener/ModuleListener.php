@@ -2,7 +2,7 @@
 /*
 * @author David Alexa <alexa.david@me.com>
 *
-* Copyright (C) 2012-2014 CESNET
+* Copyright (C) 2012-2015 CESNET
 *
 * LICENSE TERMS
 *

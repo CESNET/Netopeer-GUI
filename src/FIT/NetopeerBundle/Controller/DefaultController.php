@@ -6,7 +6,7 @@
  * @author David Alexa <alexa.david@me.com>
  * @author Tomas Cejka <cejkat@cesnet.cz>
  *
- * Copyright (C) 2012-2013 CESNET
+ * Copyright (C) 2012-2015 CESNET
  *
  * LICENSE TERMS
  *
