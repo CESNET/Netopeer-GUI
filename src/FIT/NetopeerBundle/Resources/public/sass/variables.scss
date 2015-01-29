@@ -1,4 +1,4 @@
-/*
+/**
 * @author David Alexa <alexa.david@me.com>
 *
 * Copyright (C) 2012-2013 CESNET
@@ -36,6 +36,7 @@
 * if advised of the possibility of such damage.
 */
 
+// paths
 $img: '../images/';
 
 // colors
@@ -45,16 +46,31 @@ $color-primary-dark: #002034;
 $color-danger: #820101;
 $color-success: #007711;
 
+$white: #fff;
+$grey-lightest: #f5f5f5;
+$grey-lighter: #eaeaea;
+$grey-light: #ccc;
+$grey-dark: #999;
+$grey-darker: #666;
+$grey-darkest: #333;
+$black: #000;
+
+
 // main layout colors
 $background-color: #f0f0f0;
-$text-color: #333;
+$text-color: $grey-darkest;
 $link-color: $color-primary;
-$link-color-hover: #000;
+$link-color-hover: $black;
 
 // buttons
 $button-primary-background: $color-primary;
 $button-danger-background: $color-danger;
-$button-secondary-background: #666;
+$button-secondary-background: $grey-darker;
+
+// basic sizes
+$content-padding-base: 15px;
+$border-radius-base: 5px;
+$border-radius-small: 3px;
 
 // fonts
 $font-body: Arial, Trebuchet, Verdana, sans-serif;
@@ -64,30 +80,69 @@ $font-monospace: "Courier New", Courier, monospace;
 
 // navs
 $nav-top-background: darken($color-primary, 5%);
-$nav-top-color: #fff;
+$nav-top-color: $white;
 $nav-top-link-background: transparent;
 $nav-top-link-hover-background: darken($color-primary, 20%);
 $nav-top-link-color: $nav-top-color;
 $nav-top-link-color-hover: $nav-top-color;
 $nav-top-height: 40px;
-$nav-top-bottom-border: 1px solid #000;
+$nav-top-bottom-border: 1px solid $black;
 $nav-top-icon-background-color: $color-primary-dark;
-$nav-top-icon-color: #ccc;
+$nav-top-icon-color: $grey-light;
 $nav-top-icon-home-background-color: $color-primary;
-$nav-top-icon-alerts-background-color: #000;
+$nav-top-icon-alerts-background-color: $black;
 
 $nav-left-background: #dadada;
-$nav-left-border-color: #bbb;
-$nav-left-title-border-color: #888;
+$nav-left-border-color: darken($grey-light, 10%);
+$nav-left-title-border-color: $grey-dark;
 $nav-left-link-background: transparent;
-$nav-left-link-hover-background: #bbb;
-$nav-left-link-active-background: #f5f5f5;
+$nav-left-link-hover-background: $grey-light;
+$nav-left-link-active-background: $grey-lightest;
+$nav-left-link-active-border: darken($grey-light, 10%);
 $nav-left-link-color: $text-color;
-$nav-left-link-color-hover: #000;
-$nav-left-link-color-active: #000;
+$nav-left-link-color-hover: $black;
+$nav-left-link-color-active: $black;
+$nav-left-link-bullet-color: $grey-darker;
 
-// basic sizes
-$sContentPadding: 15px;
+// sections
+$section-background: $grey-lightest;
+$section-border: darken($grey-light, 10%);
+
+// right pane notifications
+$alerts-background: $grey-darkest;
+$alerts-border: $black;
+$alerts-message-color: $grey-dark;
+$alerts-message-color-hover: $white;
+$alerts-message-border: $grey-darker;
+
+// main content alerts
+$alert-border: $grey-light;
+$alert-background: $white;
+
+// bottom notifications
+$notifications-background: $grey-darkest;
+$notifications-border: $black;
+$notifications-color: $grey-light;
+$notifications-color-active: $white;
+$notifications-color-secondary: $grey-dark;
+$notifications-history-background: lighten($grey-darkest, 10%);
+
+// forms
+$form-login-border: $grey-light;
+$form-login-background: $background-color;
+$form-input-width: 200px;
+$form-input-height: 30px;
+$form-input-padding: 0px 5px;
+$form-input-border: $grey-dark;
+$form-input-background: $white;
+$form-input-radius: $border-radius-small;
+$form-input-font-size: 1em;
+
+// tables
+$table-border: $grey-light;
+$table-tr-background-even: $grey-lighter;
 
 
 
+/** enable overriding this file **/
+@import "custom-variables";
