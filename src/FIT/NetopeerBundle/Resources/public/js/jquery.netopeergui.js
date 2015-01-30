@@ -64,10 +64,14 @@ jQuery.extend({
 			if ((id === "block--moduleJavascripts" || id === "block--moduleStylesheet") && window.location.href.indexOf("app_dev.php") !== -1) {
 				html = html.replace('_controller', 'app_dev.php');
 			}
+
 			if (id === "block--alerts") {
 				$("#" + id).append(html);
+			} else if ((id === "block--moduleJavascripts" || id === "block--moduleStylesheet") && $("#" + id).html().trim() == html.replace(" \/>", ">").trim()) {
+				// do not change content of styles or js if did not changed
 			} else {
-				$("#" + id).html(html);
+				var $blockEl = $("#" + id);
+				$blockEl.html(html);
 			}
 
 			if (id === "block--modalWindow") {
@@ -78,7 +82,7 @@ jQuery.extend({
 
 		},
 
-		success: function (payload) {
+		success: function (payload, callback) {
 			// redirect
 			if (payload.redirect) {
 				window.location.href = payload.redirect;
@@ -106,6 +110,8 @@ jQuery.extend({
 					initModuleDefaultJS();
 				}
 			}
+
+			callback();
 		},
 
 		// create animated spinner
@@ -221,13 +227,14 @@ function successAjaxFunction(data, textStatus, jqXHR, href, $elem) {
 	if ($elem.data().ajaxRedirect) {
 		data.redirect = href;
 	}
-	$('#ajax-spinner').fadeOut();
-	clearTimeout($.netopeergui.spinnerTimer);
 
-//	l(data);
-//	l($elem);
+	$.netopeergui.success(data, function() {
+		setTimeout(function() {
+			$('#ajax-spinner').fadeOut();
+			clearTimeout($.netopeergui.spinnerTimer);
+		}, 150);
+	});
 
-	$.netopeergui.success(data);
 	if ($('a[href="'+ href +'"]').length && $elem.data().disableActiveLink !== true) {
 		$.netopeergui.setActiveLink($('a[href="'+ href +'"]'));
 	}

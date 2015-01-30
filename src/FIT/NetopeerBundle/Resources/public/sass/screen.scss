@@ -181,7 +181,7 @@ nav#block--leftColumn { float: left; width: 10%; border-right: 1px solid $nav-le
 .nav-left {
 	a { display: block; padding: 9px $content-padding-base; @include link-colors($nav-left-link-color, $nav-left-link-color-hover); text-decoration: none; background-color: $nav-left-link-background;
 		&:hover { background: $nav-left-link-hover-background;  }
-		&.active { background: $nav-left-link-active-background; color: $nav-left-link-color-active; margin-right: -1px; padding: 9px $content-padding-base + 1px 8px $content-padding-base; border: 1px solid $nav-left-link-active-border; border-right: 0px none; }
+		&.active { background: $nav-left-link-active-background; color: $nav-left-link-color-active; padding: 9px $content-padding-base + 1px 8px $content-padding-base; border: 1px solid $nav-left-link-active-border; border-right: 0px none; }
 
 		&.item { display: block; padding: 6px $content-padding-base; color: lighten($nav-left-link-color, 10%);
 			.bullet { @include inline-block; width: 7px; height: 7px; margin-right: 8px; background: $nav-left-link-bullet-color; margin-top: -1px; }

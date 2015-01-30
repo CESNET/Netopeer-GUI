@@ -596,7 +596,6 @@ nav#block--leftColumn .button, nav#block--leftColumn form.form input[type="submi
 .nav-left a.active {
   background: #f5f5f5;
   color: #000;
-  margin-right: -1px;
   padding: 9px 16px 8px 15px;
   border: 1px solid #b3b3b3;
   border-right: 0px none; }
