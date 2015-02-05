@@ -48,7 +48,7 @@ $(window).resize(function() {
 	prepareAlertsVariables();
 	hideAlertsPanel();
 }).bind('beforeunload', function() {
-	var shouldLoadingContinue = formInputChangeConfirm(false);
+	var shouldLoadingContinue = $.netopeergui.formInputChangeConfirm(false);
 	if (!shouldLoadingContinue) {
 		return formChangeAlert;
 	}
@@ -299,17 +299,6 @@ function bindModalWindowActions() {
 
 function l (str) {
 	if (console !== null) { console.log(str); }
-}
-
-function formInputChangeConfirm(showDialog) {
-	if (formInputChanged === true) {
-		if ( (showDialog && !confirm(formChangeAlert)) || !showDialog) {
-			return false;
-		} else {
-			formInputChanged = false;
-		}
-	}
-	return true;
 }
 
 // generates unique id (in sequence)

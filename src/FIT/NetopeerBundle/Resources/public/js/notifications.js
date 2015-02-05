@@ -72,7 +72,7 @@ function processNotifFromHistory(key, href) {
 					});
 				}
 			} else if (data['snippets'] !== undefined) {
-				$.netopeergui.success(data);
+				$.netopeergui.processResponseData(data);
 			} else {
 				$.each(data.notifications, function(i, el) {
 					notifications[key].addMessage(el, true);
