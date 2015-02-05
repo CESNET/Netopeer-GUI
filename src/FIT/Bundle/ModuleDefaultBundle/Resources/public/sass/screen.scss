@@ -1,0 +1,167 @@
+/*
+* @author David Alexa <alexa.david@me.com>
+*
+* Copyright (C) 2012-2015 CESNET
+*
+* LICENSE TERMS
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+* 1. Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in
+*    the documentation and/or other materials provided with the
+*    distribution.
+* 3. Neither the name of the Company nor the names of its contributors
+*    may be used to endorse or promote products derived from this
+*    software without specific prior written permission.
+*
+* ALTERNATIVELY, provided that this notice is retained in full, this
+* product may be distributed under the terms of the GNU General Public
+* License (GPL) version 2 or later, in which case the provisions
+* of the GPL apply INSTEAD OF those given above.
+*
+* This software is provided ``as is'', and any express or implied
+* warranties, including, but not limited to, the implied warranties of
+* merchantability and fitness for a particular purpose are disclaimed.
+* In no event shall the company or contributors be liable for any
+* direct, indirect, incidental, special, exemplary, or consequential
+* damages (including, but not limited to, procurement of substitute
+* goods or services; loss of use, data, or profits; or business
+* interruption) however caused and on any theory of liability, whether
+* in contract, strict liability, or tort (including negligence or
+* otherwise) arising in any way out of the use of this software, even
+* if advised of the possibility of such damage.
+*/
+
+@import "compass/css3";
+@import "compass/typography/text/ellipsis";
+@import "compass/utilities/general";
+@import "variables";
+
+
+*[class*='level'] { position: relative; float: left; width: 100%;
+	.dots { background: url($img + 'dot.png') left top repeat transparent; @include inline-block; position: absolute; left: 0px; top: 0px; min-height: 28px; height: 100%; }
+}
+@for $i from 0 through 15 {
+	.level-#{$i} {
+		.dots { width: 8px * $i; }
+		.label { padding-left: 6px + (8px * $i); }
+		input.label { margin-left: 6px + (8px * $i); padding-left: 0px; }
+	}
+}
+
+
+.level-0:not(.container):not(.list) { margin: 0px; border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f4f4f4; @include box-sizing(border-box); width: 100%;
+	&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
+		//.even { background: #f8f8f8; }
+		> .leaf-line:first-child { border-top: 1px solid #666; }
+	}
+	&:nth-child(odd) {
+		//.even { background: #f8f8f8; }
+		> .leaf-line:first-child { border-top: 1px solid #aaa; }
+	}
+}
+.level-0> .leaf-line > .label > .label-cover {
+	> span.dash { display: none; }
+}
+.sortable-placeholder { height: 40px; width: 100%; display: block; min-height: 40px; float: left; clear: left; }
+.ui-sortable-helper { background: #fff; }
+.leaf-line { padding: 6px 0.5% 5px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
+	&.hover { background-color: #dadada; border-color: #aaa; }
+	&.is-root-elem { border-left: 0px none !important; border-right: 0px none !important;  margin-bottom: 15px !important;
+		.dots, .dash { display: none; }
+		.edit-bar .sibling { display: none; }
+	}
+	.label { width: 35%; float: left; @include box-sizing(border-box); color: #333; }
+	.value { width: 59%; float: left; color: #000; margin-left: 2%; }
+	.range { width: 42%; float: left; }
+	.range-cover-number { width: 6%; float: left; margin-right: 1.8%; text-align: right; padding: 3px 5px; margin-top: -2px; margin-bottom: -2px; @include box-sizing(border-box); border: 1px solid #ccc; @include background( linear-gradient(#fff, #f4f4f4) ); @include inline-block; @include border-radius(3px); }
+	.config-value-cover, .value-cover { width: 45%; float: left; margin-top: -3px; margin-left: 2%;
+		label { margin: 0px; padding: 0px; width: auto; padding-right: 10px; line-height: 18px; height: 18px; }
+	}
+	input.value.text { width: 45%; margin: -4px 0px; height: 22px; line-height: 22px; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
+	textarea.value { width: 50%; margin: -4px 0px; border: 1px solid #ccc; padding: 0px 3px; font-size: 0.9em; margin-left: 2%; }
+	select { margin-bottom: -1px; max-width: 70%; }
+
+	&.generated {
+		input.value.text, textarea.value { margin-top: 0px; margin-bottom: 0px; }
+		.tooltip-cover { margin-top: 3px; }
+	}
+
+	.edit-bar { min-height: 22px; margin: -3px 0px -5px 2%; float: right; text-align: right;
+		.child { display: none; }
+		img { @include opacity(0.4); cursor: pointer; margin-left: -2px;
+			&:hover { @include opacity(1); }
+		}
+		&.generated { margin-top: 0px; }
+	}
+	+ .leaf { }
+	&.state .edit-bar {	width: auto; }
+
+	&.active { position: relative; z-index: 25; background: #fff; }
+	&.has-children {
+		span.bull { width: 5px; height: 5px; position: absolute; left: -9px; top: 6px; background-color: #666; }
+	}
+	.label-cover { position: relative;
+		span.dash { width: 5px; height: 1px; position: absolute; left: -9px; top: 8px; background-color: #666; }
+		strong { font-weight: 600; }
+	}
+	//		&.config { background: #ccc; }
+}
+
+.container, .list { margin: 25px 0px;
+	> *:not(.container):not(.list) { border-left: 2px solid #aaa; border-right: 2px solid #aaa; background: #f0f0f0;
+		&:nth-child(even) { background: #fff; border-left: 2px solid #333; border-right: 2px solid #333;
+			.dots { background-color: #fff; }
+		}
+	}
+	.container, .list { border-top: 1px solid #ddd; }
+
+	+ * > .leaf-line:first-child { margin-top: 0px; }
+}
+.mandatory { color: #888; }
+.tooltip-cover { float: right; margin: 0px 0px 0px 4px; }
+.label-cover {
+	&.has-tooltip {  }
+}
+
+// model tree dump
+#hiddenModelTreeDump { display: none; }
+pre { font-family: "Courier New", Courier, monospace; line-height: 1.4em; }
+
+.form-underlay { width: 100%; height: 100%; @include background(rgba(0,0,0,0.4)); position: absolute; top: 0px; right: 0px; z-index: 20; }
+.form-cover { width: 100%; height: 100%; position: absolute; top: 0px; right: 0px; z-index: 21; display: none; }
+
+form.form {
+	.radio-cover { margin-top: 0px; }
+}
+
+form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 0px 0px 15px 0px; float: left; width: 100%; @include single-box-shadow(0px, 0px, 10px, 0px, rgba(0,0,0,0.7));
+
+	.leaf-line {
+		input {
+			&.label, &.value { margin-top: 0px; height: 22px; line-height: 22px; }
+		}
+	}
+	input[type="submit"] { float: right; margin-right: 15px; }
+	.close { float: left; margin-left: 15px; }
+
+	#modelTreeDump { display: none; width: 94%; overflow: hidden; clear: both; padding: 15px 3%; background: #f0f0f0; border-top: 1px solid #ccc; }
+	.model-tree-opener { float: right; margin: 25px 25px 0px 0px; cursor: pointer; }
+}
+
+/* tooltip */
+.tooltip-cover { cursor: help;
+	.icon-help { @include background(rgba(255,255,255,0.3)); border: 1px solid #ddd; color: #888; text-shadow: 1px 1px 2px #ccc; width: 16px; height: 16px; line-height: 16px; text-align: center; @include inline-block; @include border-radius(3px); font-size: 13px; margin: -5px 0px -2px 0px;
+		&:hover { @include background(rgba(255,255,255,0.7)); border: 1px solid #bbb; }
+	}
+	.tooltip-description { display: none; }
+}
+.gips-container { max-height: 200px; position: absolute; z-index: 10; margin-left: 2px; @include single-box-shadow(0px, 0px, 7px, 0px, rgba(0,0,0,0.4)); @include border-radius(4px); }
+.gips-body { color: #fff; font-size: 13px; line-height: 1.55em; padding: 10px; padding-right: 20px; position: relative; float: left; @include border-radius(4px);
+	&.blue { background-color: $color-primary; }
+}
+.gips-icon { width: 0; height: 0; border-style: solid; border-width: 6px; position: absolute; bottom: -6px; border-color: $color-primary transparent transparent transparent; margin-left: 20px; }

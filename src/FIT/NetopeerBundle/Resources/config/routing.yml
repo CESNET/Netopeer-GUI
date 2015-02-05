@@ -1,6 +1,6 @@
 # @author David Alexa <alexa.david@me.com>
 #
-# Copyright (C) 2012-2013 CESNET
+# Copyright (C) 2012-2015 CESNET
 #
 # LICENSE TERMS
 #
@@ -36,11 +36,11 @@
  
 homepage:
     pattern:  /
-    defaults: { _controller: NetopeerBundle:Default:index }
+    defaults: { _controller: FITNetopeerBundle:Default:index }
 
 _login:
     pattern:   /login
-    defaults:  { _controller: NetopeerBundle:Security:login }
+    defaults:  { _controller: FITNetopeerBundle:Security:login }
 _login_check:
     pattern:   /login_check
 _logout:

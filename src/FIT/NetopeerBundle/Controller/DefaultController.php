@@ -2,11 +2,11 @@
 /**
  * Default controller for all pages directly visible from  webGUI.
  *
- * @file DefaultController.php
+ * @file ModuleController.php
  * @author David Alexa <alexa.david@me.com>
  * @author Tomas Cejka <cejkat@cesnet.cz>
  *
- * Copyright (C) 2012-2013 CESNET
+ * Copyright (C) 2012-2015 CESNET
  *
  * LICENSE TERMS
  *
@@ -43,42 +43,25 @@
  */
 namespace FIT\NetopeerBundle\Controller;
 
-use FIT\NetopeerBundle\Controller\BaseController;
+
 use FIT\NetopeerBundle\Models\Array2XML;
-use FIT\NetopeerBundle\Entity\BaseConnection;
 
 // these import the "@Route" and "@Template" annotations
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-use Symfony\Component\DependencyInjection\SimpleXMLElement;
-use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
- * Default controller for all pages directly visible from
- * webGUI. For example connection management, section detail etc.
+ * Default controller for all base pages except of module configuration.
  */
 class DefaultController extends BaseController
 {
 
 	/**
-	 * @var array $paramState   array of parameters for <get> command
-	 * @var array $paramsConfig array of parameters for <get-config> command
-	 */
-	private $paramsState, $paramsConfig;
-
-	/**
-	 * @var holds configuration of filter form (in both section)
-	 */
-	private $filterForms;
-
-	/**
-	 * @var array $rpcs         holds XML for rpc methods
-	 */
-	private static $rpcs;
-
-	/**
+	 * Shows index page = connections page if logged, login page if not
+	 *
 	 * @Route("/", name="_home")
 	 *
 	 * @return RedirectResponse
@@ -104,6 +87,10 @@ class DefaultController extends BaseController
 	 */
 	public function connectionsAction($connectedDeviceId = NULL)
 	{
+		/**
+		 * @var Session $session
+		 */
+		$session = $this->getRequest()->getSession();
 		$singleInstance = $this->container->getParameter('fit_netopeer.single_instance');
 		// DependencyInjection (DI) - defined in Resources/config/services.yml
 		/**
@@ -119,8 +106,9 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'leftColumn');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'notifications');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topPart');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'javascripts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'moduleJavascripts');
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'moduleStylesheet');
 
 		//TODO: delete only session from refferer
 		$this->getRequest()->getSession()->set('activeNotifications', array());
@@ -195,7 +183,7 @@ class DefaultController extends BaseController
 					}
 
 					$this->get('session')->set('getSchemaWithAjax', $arr);
-					$this->getRequest()->getSession()->getFlashBag()->add('state success', 'Form has been filled up correctly.');
+					$session->getFlashBag()->add('state success', 'Form has been filled up correctly.');
 
 					if (!$singleInstance) {
 						$baseConn = $this->get('BaseConnection');
@@ -211,7 +199,7 @@ class DefaultController extends BaseController
 					return $this->redirect($this->generateUrl('_logout'));
 				}
 			} else {
-				$this->getRequest()->getSession()->getFlashBag()->add('state error', 'Connection - you have not filled up form correctly.');
+				$session->getFlashBag()->add('state error', 'Connection - you have not filled up form correctly.');
 				if ($singleInstance) {
 					setcookie("singleInstanceLoginFailed", true, time() + 60);
 					return $this->redirect($this->generateUrl('_logout'));
@@ -286,7 +274,6 @@ class DefaultController extends BaseController
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'alerts');
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'leftColumn');
 			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topMenu');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:index.html.twig', 'topPart');
 			ob_clean();
 			$this->getRequest()->getSession()->set('isAjax', true);
 		}
@@ -335,7 +322,7 @@ class DefaultController extends BaseController
 
 		$res = $dataClass->handle($command, $params, false);
 
-		if ( $res != 1 ) {
+		if ( $res != 1 && !in_array($command, array("connect", "disconnect"))) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
 		}
 
@@ -381,7 +368,7 @@ class DefaultController extends BaseController
 	 * Shows info page with information
 	 *
 	 * @Route("/info-page/{key}/{action}/", name="infoPage")
-	 * @Template("FITNetopeerBundle:Default:section.html.twig")
+	 * @Template("FITModuleDefaultBundle:Module:section.html.twig")
 	 *
 	 * @param int     $key          key of connected server
 	 * @param string  $action       name of the action ("session"|"reload")
@@ -396,13 +383,19 @@ class DefaultController extends BaseController
 		parent::setActiveSectionKey($key);
 		$dataClass->buildMenuStructure($key);
 
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'singleContent');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleStylesheet');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'title');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'additionalTitle');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'singleContent');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'alerts');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'topMenu');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'leftColumn');
 
 		if ( $action == "session" ) {
+			/**
+			 * @var Session $session
+			 */
 			$session = $this->container->get('request')->getSession();
 			$sessionArr = $session->all();
 
@@ -412,7 +405,21 @@ class DefaultController extends BaseController
 				foreach ($sessionArr['session-connections'] as $connKey => $conn) {
 					if ($connKey != $key) continue;
 
-					$connVarsArr['connection-'.$connKey][$connKey] = (array) unserialize($conn);
+					$tmp = unserialize($conn);
+
+
+					$unserialized = (array) unserialize($conn);
+					foreach ($unserialized as $key => $value) {
+						if (strrpos($key, 'activeController')) {
+							$tmpArr = array();
+							foreach ($value as $k => $v) {
+								$tmpArr[str_replace(":", "_", $k)] = $v;
+							}
+							$unserialized['activeController'] = $tmpArr;
+							unset($unserialized[$key]);
+						}
+					}
+					$connVarsArr['connection-'.$connKey][$connKey] = $unserialized;
 					if ($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']) {
 						$connVarsArr['connection-'.$connKey][$connKey]['sessionStatus'] = (array) json_decode($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']);
 						if (isset($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']['capabilities'])) {
@@ -420,13 +427,14 @@ class DefaultController extends BaseController
 							unset($connVarsArr['connection-'.$connKey][$connKey]['sessionStatus']['capabilities']);
 						}
 					}
-					
+
 					$connVarsArr['connection-'.$connKey][$connKey]['nc_features'] = $dataClass->getCapabilitiesArrForKey($connKey);
 				}
 				$sessionArr['session-connections'] = $connVarsArr;
 			}
 
 			unset($sessionArr['_security_secured_area']);
+			unset($sessionArr['_security_commont_context']);
 
 			$xml = Array2XML::createXML("session", $sessionArr);
 			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
@@ -450,289 +458,41 @@ class DefaultController extends BaseController
 		return $this->getTwigArr();
 	}
 
-	/**
-	  Create array (with subarrays) of input elements of RPC method
-	*/
-	private function getRPCinputAttributesAndChildren(\SimpleXMLElement $root_elem, \SimpleXMLElement &$xmlEl) {
-                $attr = $root_elem->attributes();
-                $inputName = (string) $root_elem->getName();
-                $child = $xmlEl->addChild($inputName);
-                foreach ($attr as $n => $a) {
-                        $child->addAttribute($n, $a);
-                }
-	}
 
 	/**
-	 * @param $module
-	 * @param $subsection
+	 * Gets XML file with requested RPC method only.
 	 *
-	 * @return array
+	 * @param        $rpcMethod
+	 * @param        $module
+	 * @param string $subsection
+	 *
+	 * @return bool
 	 */
-	private function createRPCListFromModel($module, $subsection = "")
-	{
-		if (!empty($this::$rpcs)) return $this::$rpcs;
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
-		$rpcs = $dataClass->loadRPCsModel($module, $subsection);
-		$rpcxml = simplexml_load_string($rpcs["rpcs"]);
-		$rpcs = array();
-		if ($rpcxml) {
-			foreach ($rpcxml as $rpc) {
-				$name = (string) $rpc->attributes()->name;
-				if (isset($rpcs[$name])) {
-					continue;
-				}
-
-				$xmlEl = new SimpleXMLElement("<".$name."></".$name.">");
-				$xmlEl->addAttribute('description', $rpc->description->text);
-
-				$ns = $rpc->getNamespaces();
-				$xmlEl->addAttribute('namespace', !empty($ns) ? array_pop($ns) : 'false');
-
-				if ($rpc->input) {
-					foreach ($rpc->input->children() as $leafs) {
-						$this->getRPCinputAttributesAndChildren($leafs, $xmlEl);
-					}
-				}
-				$rpcs[$name] = $xmlEl;
-			}
-		}
-		$this::$rpcs = $rpcs;
-		return $rpcs;
-	}
-
 	private function getRPCXmlForMethod($rpcMethod, $module, $subsection = "") {
 		$rpcs = $this->createRPCListFromModel($module, $subsection);
 		return isset($rpcs[$rpcMethod]) ? $rpcs[$rpcMethod] : false;
 	}
 
 	/**
-	 * Prepares section, module or subsection action data
+	 * Prepares view for RPC form (generates RPC form)
 	 *
-	 * @Route("/sections/{key}/", name="section")
-	 * @Route("/sections/{key}/{module}/", name="module", requirements={"key" = "\d+"})
-	 * @Route("/sections/{key}/{module}/{subsection}/", name="subsection")
-	 * @Template("FITNetopeerBundle:Default:section.html.twig")
-	 *
-	 * Prepares section = whole get&get-config part of server
-	 * Shows module part = first level of connected server (except of root)
-	 * Prepares subsection = second level of connected server tree
-	 *
-	 * @param int           $key          key of connected server
-	 * @param null|string   $module       name of the module
-	 * @param null|string   $subsection   name of the subsection
-	 * @return array|\Symfony\Component\HttpFoundation\RedirectResponse
-	 */
-	public function moduleAction($key, $module = null, $subsection = null)
-	{
-		$dataClass = $this->get('DataModel');
-
-		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'title');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'additionalTitle');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'leftColumn');
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topPart');
-			$this->assign('historyHref', $this->getRequest()->getRequestUri());
-		}
-		$this->getRequest()->getSession()->remove('isLocking');
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'alerts');
-
-		if ($this->getRequest()->getSession()->get('isAjax') === true) {
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'topMenu');
-		}
-
-		if ($dataClass->checkLoggedKeys() === 1) {
-			$url = $this->get('request')->headers->get('referer');
-			if (!strlen($url)) {
-				$url = $this->generateUrl('connections');
-			}
-			return $this->redirect($url);
-		}
-		$this->setActiveSectionKey($key);
-		$dataClass->buildMenuStructure($key);
-
-		// now, we could set forms params with filter (even if we don't have module or subsection)
-		// filter will be empty
-		$filters = $dataClass->loadFilters($module, $subsection);
-
-		$this->assign('rpcMethods', $this->createRPCListFromModel($module, $subsection));
-
-		$this->setSectionFormsParams($key, $filters['state'], $filters['config']);
-
-		// if form has been send, we well process it
-		if ($this->getRequest()->getMethod() == 'POST') {
-			$this->processSectionForms($key, $module, $subsection);
-			// the code below wont be precess, because at the end of processSectionForms
-			// is redirect executed
-		}
-
-		// we will prepare filter form in column
-		$this->setSectionFilterForms($key);
-
-		// path for creating node typeahead
-		$typeaheadParams = array(
-				'formId' => "FORMID",
-				'key' => $key,
-				'xPath' => "XPATH"
-		);
-		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabel', $typeaheadParams);
-		if (!is_null($module)) {
-			$typeaheadParams['module'] = $module;
-			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
-		}
-		if (!is_null($subsection)) {
-			$typeaheadParams['subsection'] = $subsection;
-			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithSubsection', $typeaheadParams);
-		}
-
-
-		/* Show the first module we have */
-		if ( $module == null ) {
-			$retArr['key'] = $key;
-			$routeName = 'module';
-			$modules = $dataClass->getModels();
-			if (count($modules)) {
-				$module1st = array_shift($modules);
-				if (!isset($module1st["params"]["module"])) {
-					/* ERROR - wrong structure of model entry */
-					$this->get('data_logger')
-						->err("Cannot get first model (redirect to 1st tab).",
-						array("message" => "\$module1st[\"params\"][\"module\"] is not set"));
-				}
-				$retArr['module'] = $module1st["params"]["module"];
-				return $this->redirect($this->generateUrl($routeName, $retArr));
-			} else {
-				return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'All')));
-			}
-		}
-
-		$activeNotifications = $this->getRequest()->getSession()->get('activeNotifications');
-		if ( !isset($activeNotifications[$key]) || $activeNotifications[$key] !== true ) {
-			$activeNotifications[$key] = true;
-			$this->getRequest()->getSession()->set('activeNotifications', $activeNotifications);
-			$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'notifications');
-		}
-
-		// if we have module, we are definitely in module or subsection action, so we could load names
-		if ( $module ) {
-			parent::setSubmenuUrl($module);
-			$this->assign('sectionName', $dataClass->getSectionName($module));
-
-			if ( $subsection ) {
-				$this->assign('subsectionName', $dataClass->getSubsectionName($subsection));
-			}
-
-		// we are in section
-		} else {
-			$connArray = $this->getRequest()->getSession()->get('session-connections');
-			if (isset($connArray[$key])) {
-				$host = unserialize($connArray[$key]);
-				$this->assign('sectionName', $host->host);
-			} else {
-				$this->getRequest()->getSession()->getFlashBag()->add('state error', "You try to load device you are not connected to.");
-				return $this->redirect($this->generateUrl("connections", array()));
-			}
-
-			// because we do not allow changing layout in section, controls will be hidden
-			$this->assign('hideColumnControl', true);
-		}
-
-		$routeParams = array('key' => $key, 'module' => $module, 'subsection' => $subsection);
-		$this->assign('routeParams', $routeParams);
-		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
-
-		// loading state part = get Action
-		// we will load it every time, because state column will we show everytime
-		try {
-
-			if ($module === 'all') {
-				$merge = false;
-			} else {
-				$merge = true;
-			}
-			$isEmptyModule = false;
-
-			if ( ($xml = $dataClass->handle('get', $this->getStateParams(), $merge)) != 1 ) {
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-
-				// we have only root module
-				if ($xml->count() == 0) {
-					$isEmptyModule = true;
-					if ($xml->getName() == 'root') {
-						$this->setEmptyModuleForm($this->getRequest()->get('key'));
-						$isEmptyModule = false;
-						$this->assign('forceShowFormConfig', true);
-					}
-					$this->assign('isEmptyModule', $isEmptyModule);
-					$this->assign('key', $this->getRequest()->get('key'));
-					$this->assign('additionalTitle', 'Create empty root element');
-					$this->assign('redirectUrl', $this->getRequest()->getRequestUri());
-					$this->setEmptyModuleForm($key);
-					$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:createEmptyModule.html.twig');
-					$html = $template->renderBlock('singleContent', $this->getAssignedVariablesArr());
-
-					$this->assign('additionalForm', $html);
-				} else {
-					$this->assign('showRootElem', true);
-				}
-
-				$this->assign("stateArr", $xml);
-			}
-		} catch (\ErrorException $e) {
-			$this->get('data_logger')->err("State: Could not parse filter correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->getFlashBag()->add('state error', "Could not parse filter correctly. ");
-		}
-
-		// load model tree dump
-		$modelTree = $dataClass->getModelTreeDump($module);
-		if ($modelTree) {
-			$this->assign('modelTreeDump', $modelTree);
-		}
-
-		// we will load config part only if two column layout is enabled or we are on section (which has two column always)
-		$tmp = $this->getConfigParams();
-		if ($module == null || ($module != null && $tmp['source'] !== "running" && !$isEmptyModule)) {
-			$this->loadConfigArr(false, $merge);
-			$this->setOnlyConfigSection();
-		} else if ( $module == null || $module == 'all' || ($module != null && $this->get('session')->get('singleColumnLayout') != "true") ) {
-			$this->loadConfigArr(true, $merge);
-			$this->assign('singleColumnLayout', false);
-			if ($module == 'all') {
-				$this->assign('hideColumnControl', true);
-			}
-		} else if ($this->get('session')->get('singleColumnLayout') != "true") {
-			$this->loadConfigArr(false, $merge);
-			$this->assign('singleColumnLayout', true);
-			$this->setOnlyConfigSection();
-		} else {
-			$conn = $dataClass->getConnFromKey($key);
-			if ($conn->getCurrentDatastore() !== "running") {
-				$this->loadConfigArr(false, $merge);
-				$this->setOnlyConfigSection();
-			}
-			$this->assign('singleColumnLayout', true);
-		}
-
-		return $this->getTwigArr();
-	}
-
-	/**
 	 * @Route("/sections/rpc/{key}/{module}/{rpcName}/", name="showRPCForm", requirements={"key" = "\d+"})
-	 * @Template("FITNetopeerBundle:Default:showRPCForm.html.twig")
+	 * @Template("FITModuleDefaultBundle:Module:showRPCForm.html.twig")
 	 *
-	 * @param $key
+	 * @param $key    Identifier of connection (connected device ID)
 	 * @param $module
 	 * @param $rpcName
 	 *
 	 * @return array|Response
 	 */
 	public function showRPCFormAction($key, $module, $rpcName) {
-		$this->getRequest()->getSession()->getFlashBag()->clear();
+		/**
+		 * @var Session $session
+		 */
+		$session = $this->getRequest()->getSession();
+		$session->getFlashBag()->clear();
 
-		$this->addAjaxBlock('FITNetopeerBundle:Default:showRPCForm.html.twig', 'modalWindow');
+		$this->addAjaxBlock('FITModuleDefaultBundle:Module:showRPCForm.html.twig', 'modalWindow');
 		$this->assign('key', $key);
 		$this->assign('module', $module);
 		$this->assign('rpcName', $rpcName);
@@ -745,8 +505,7 @@ class DefaultController extends BaseController
 			$postVals = $this->getRequest()->get("configDataForm");
 			$this->setSectionFormsParams($key);
 
-			$result = "";
-			$res = $xmlOperations->handleRPCMethodForm($key, $this->getConfigParams(), $postVals);
+			$xmlOperations->handleRPCMethodForm($key, $this->getConfigParams(), $postVals);
 			$url = $this->get('request')->headers->get('referer');
 			return new RedirectResponse($url);
 		}
@@ -757,10 +516,12 @@ class DefaultController extends BaseController
 	}
 
 	/**
+	 * Action for empty module creation.
+	 *
 	 * @Route("/sections/create-empty-module/{key}/", name="createEmptyModule")
 	 * @Template("FITNetopeerBundle:Default:createEmptyModule.html.twig")
 	 *
-	 * @param $key
+	 * @param $key    Identifier of connection (connected device ID)
 	 *
 	 * @return array|Response
 	 */
@@ -793,405 +554,6 @@ class DefaultController extends BaseController
 		$this->assign('emptyModuleTitle', 'Create empty module');
 
 		return $this->getTwigArr();
-	}
-
-	/**
-	 * prepares form for empty module (root element) insertion
-	 *
-	 * @param $key
-	 */
-	private function setEmptyModuleForm($key) {
-		$dataClass = $this->get("DataModel");
-		$tmpArr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
-		$tmpArr = $dataClass->getRootNamesForModuleIdentifiers($key, $tmpArr);
-
-		// use small hack when appending space at the end of key, which will fire all options in typeahead
-		$nsArr = array();
-		if (!empty($tmpArr)) {
-			foreach ($tmpArr as $key => $item) {
-				if ($item['rootElem'] != "") {
-					$modulesArr[$item['rootElem']] = (array)$key;
-					$nsArr[] = $key;
-				}
-			}
-		}
-
-		$form = $this->createFormBuilder()
-				->add('name', 'text', array(
-								'label' => "Module name",
-				        'attr' => array(
-					        'class' => 'typeaheadName percent-width w-50',
-				          'autocomplete' => false
-				        )
-						))
-				->add('namespace', 'text', array(
-								'label' => "Namespace",
-								'attr' => array(
-										'class' => 'typeaheadNS percent-width w-50',
-								    'autocomplete' => false
-								)
-						))
-				->getForm();
-
-		$this->assign('rootName2NS', json_encode($modulesArr));
-		$this->assign('rootNames', json_encode(array_keys($modulesArr)));
-		$this->assign('NS', json_encode($nsArr));
-		$this->assign('emptyModuleForm', $form->createView());
-	}
-
-	/**
-	 * Set values of state array
-	 *
-	 * @param mixed $key   key of associative array
-	 * @param mixed $value value of associative array
-	 */
-	private function setStateParams($key, $value) {
-		$this->paramsState[$key] = $value;
-	}
-
-	public function getStateParams() {
-		return $this->paramsState;
-	}
-
-	/**
-	 * Set values of config array
-	 *
-	 * @param mixed $key   key of associative array
-	 * @param mixed $value value of associative array
-	 */
-	private function setConfigParams($key, $value) {
-		$this->paramsConfig[$key] = $value;
-	}
-
-	public function getConfigParams() {
-		return $this->paramsConfig;
-	}
-
-	/**
-	 * Set default values to config and state arrays
-	 *
-	 * @param int     $key          key of connected server
-	 * @param string  $filterState  state filter
-	 * @param string  $filterConfig config filter
-	 * @param string  $sourceConfig source param of config
-	 */
-	private function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = "") {
-		/**
-		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
-		 */
-		$dataClass = $this->get('DataModel');
-		$conn = $dataClass->getConnFromKey($key);
-
-		if ($conn) {
-			if ($sourceConfig !== "") {
-				$conn->setCurrentDatastore($sourceConfig);
-			}
-			$this->setConfigParams('source', $conn->getCurrentDatastore());
-		}
-
-		$this->setStateParams('key', $key);
-		$this->setStateParams('filter', $filterState);
-
-		$this->setConfigParams('key', $key);
-		$this->setConfigParams('filter', $filterConfig);
-	}
-
-	/**
-	 * prepares filter forms for both sections
-	 *
-	 * @param int     $key          key of connected server
-	 */
-	private function setSectionFilterForms($key) {
-		/* prepareGlobalTwigVariables is needed to init nc_feature
-		array with available datastores... */
-		$this->prepareGlobalTwigVariables();
-		// state part
-		$this->filterForms['state'] = $this->createFormBuilder()
-			->add('formType', 'hidden', array(
-				'data' => 'formState',
-			))
-			->add('filter', 'text', array(
-				'label' => "Filter",
-				'required' => false
-			))
-			->getForm();
-
-		// config part
-		$datastores = array('running' => 'Running');
-		$twigarr = $this->getAssignedVariablesArr();
-		$ncFeatures = $twigarr["ncFeatures"];
-		if (isset($ncFeatures["nc_feature_startup"])) {
-				$datastores['startup'] = 'Start-up';
-		}
-		if (isset($ncFeatures["nc_feature_candidate"])) {
-				$datastores['candidate'] = 'Candidate';
-		}
-		$this->filterForms['config'] = $this->createFormBuilder()
-			->add('formType', 'hidden', array(
-				'data' => 'formConfig',
-			))
-//			->add('filter', 'text', array(
-//				'label' => "Filter",
-//				'required' => false
-//			))
-			->add('source', 'choice', array(
-				'label' => "Source:",
-				'choices' => $datastores,
-				'data' => $this->getCurrentDatastoreForKey($key)
-			))
-			->getForm();
-
-		$targets = $datastores;
-		$current_source = $this->getCurrentDatastoreForKey($key);
-		if ($current_source !== null && $current_source !== "") {
-			unset($targets[$current_source]);
-		} else {
-			unset($targets["running"]);
-		}
-		$this->filterForms['copyConfig'] = $this->createFormBuilder()
-			->add('formType', 'hidden', array(
-				'data' => 'formCopyConfig',
-			))
-			->add('target', 'choice', array(
-				'label' => "copy to:",
-				'choices' => $targets,
-			))
-			->getForm();
-
-		$this->assign("dataStore", $this->getCurrentDatastoreForKey($key));
-		$this->assign('formState', $this->filterForms['state']->createView());
-		$this->assign('formConfig', $this->filterForms['config']->createView());
-		$this->assign('formCopyConfig', $this->filterForms['copyConfig']->createView());
-	}
-
-	/**
-	 * process all kinds of form in section, module or subsection
-	 *
-	 * @param  int    $key                key of connected server
-	 * @param  string $module = null      module name
-	 * @param  string $subsection = null  subsection name
-	 * @return RedirectResponse           redirect to page, which was this method called from
-	 */
-	private function processSectionForms($key, $module = null, $subsection = null) {
-		$dataClass = $this->get('DataModel');
-		$post_vals = $this->getRequest()->get("form");
-
-		if ( !isset($this->filterForms['state']) || !isset($this->filterForms['config']) ) {
-			$this->setSectionFilterForms($key);
-		}
-
-		// processing filter on state part
-		if ( isset($post_vals['formType']) && $post_vals['formType'] == "formState") {
-			$res = $this->handleFilterState($key);
-			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
-
-		// processing filter on config part
-		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formConfig" ) {
-			$res = $this->handleFilterConfig($key);
-			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
-
-		// processing form on config - edit Config
-		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formCopyConfig" ) {
-			$res = $this->handleCopyConfig($key);
-
-		// processing form on config - edit Config
-		} elseif ( is_array($this->getRequest()->get('configDataForm')) ) {
-			$res = $this->get('XMLoperations')->handleEditConfigForm($key, $this->getConfigParams());
-
-		// processing duplicate node form
-		} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleDuplicateNodeForm($key, $this->getConfigParams());
-
-		// processing generate node form
-		} elseif ( is_array($this->getRequest()->get('generateNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleGenerateNodeForm($key, $this->getConfigParams(), $module, $subsection);
-
-		// processing new node form
-		} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleNewNodeForm($key, $this->getConfigParams());
-
-		// processing remove node form
-		} elseif ( is_array($this->getRequest()->get('removeNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleRemoveNodeForm($key, $this->getConfigParams());
-		}
-
-		// we will redirect page after completion, because we want to load edited get and get-config
-		// and what's more, flash message lives exactly one redirect, so without redirect flash message
-		// would stay on the next page, what we do not want...
-		$retArr['key'] = $key;
-		$routeName = 'section';
-		if ( $module ) {
-			$retArr['module'] = $module;
-			$routeName = 'module';
-		}
-		if ( $subsection ) {
-			$retArr['subsection'] = $subsection;
-			$routeName = 'subsection';
-		}
-
-		if ($this->getRequest()->isXmlHttpRequest()) {
-			$this->getRequest()->getSession()->set('isAjax', true);
-		}
-		return $this->redirect($this->generateUrl($routeName, $retArr));
-	}
-
-	/**
-	 * sets new filter for state part
-	 *
-	 * @param  int $key   session key for current server
-	 * @return int 1 on error, 0 on success
-	 */
-	private function handleFilterState(&$key) {
-
-		$this->filterForms['state']->bind($this->getRequest());
-
-		if ( $this->filterForms['state']->isValid() ) {
-			$this->setStateParams("key", $key);
-			$this->setStateParams("filter", $post_vals["filter"]);
-			return 0;
-		} else {
-			$this->getRequest()->getSession()->getFlashBag()->add('error', 'State filter - you have not filled up form correctly.');
-			return 1;
-		}
-	}
-
-	/**
-	 * sets new filter for config part
-	 *
-	 * @param  int $key     session key for current server
-	 * @return int 1 on error, 0 on success
-	 */
-	private function handleFilterConfig(&$key) {
-
-		$this->filterForms['config']->bind($this->getRequest());
-
-		if ( $this->filterForms['config']->isValid() ) {
-			$post_vals = $this->getRequest()->get("form");
-			$this->setConfigParams("key", $key);
-//			$this->setConfigParams("filter", $post_vals["filter"]);
-
-			/**
-			 * @var $dataClass \FIT\NetopeerBundle\Models\Data
-			 */
-			$dataClass = $this->get('DataModel');
-			$conn = $dataClass->getConnFromKey($key);
-			$conn->setCurrentDatastore($post_vals['source']);
-			$dataClass->persistConnectionForKey($key, $conn);
-
-			$this->setConfigParams("source", $post_vals['source']);
-
-			if ($post_vals['source'] !== 'running') {
-				$this->setOnlyConfigSection();
-			}
-			return 0;
-		} else {
-			$this->getRequest()->getSession()->getFlashBag()->add('error', 'Config filter - you have not filled up form correctly.');
-			return  1;
-		}
-	}
-
-	/**
-	 * Execute copy-config
-	 *
-	 * @param  int $key     session key for current server
-	 * @return int 1 on error, 0 on success
-	 */
-	private function handleCopyConfig(&$key) {
-		$dataClass = $this->get('DataModel');
-
-		$this->filterForms['copyConfig']->bind($this->getRequest());
-
-		if ( $this->filterForms['copyConfig']->isValid() ) {
-			$post_vals = $this->getRequest()->get("form");
-			$this->setConfigParams("key", $key);
-			$source = $this->getCurrentDatastoreForKey($key);
-			if ($source === null) {
-				$source = 'running';
-			}
-			$target = $post_vals['target'];
-			$params = array('key' => $key, 'source' => $source, 'target' => $target);
-			$dataClass->handle('copyconfig', $params, false);
-			return 0;
-		} else {
-			$this->getRequest()->getSession()->getFlashBag()->add('error', 'Copy config - you have not filled up form correctly.');
-			return  1;
-		}
-	}
-
-	/**
-	 * sets all necessary steps for display config part in single column mode
-	 */
-	private function setOnlyConfigSection() {
-		$this->get('session')->set('singleColumnLayout', false);
-		$this->assign('singleColumnLayout', false);
-		$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'state');
-		$this->assign('hideColumnControl', true);
-		$this->assign('showConfigFilter', true);
-
-		$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:section.html.twig');
-		$html = $template->renderBlock('config', $this->getAssignedVariablesArr());
-		$this->assign('configSingleContent', $html);
-
-		$this->get('session')->set('singleColumnLayout', true);
-		$this->assign('singleColumnLayout', true);
-	}
-
-	/**
-	 * loads array of config values
-	 */
-	private function loadConfigArr($addConfigSection = true, $merge = true) {
-		try {
-			$dataClass = $this->get('dataModel');
-			if ($addConfigSection) {
-				$this->addAjaxBlock('FITNetopeerBundle:Default:section.html.twig', 'config');
-			}
-
-			// getcofig part
-			if ( ($xml = $dataClass->handle('getconfig', $this->getConfigParams(), $merge)) != 1 ) {
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-
-				// we have only root module
-				if ($xml->count() == 0 && $xml->getName() == 'root') {
-					$this->setEmptyModuleForm($this->getRequest()->get('key'));
-					$this->assign('key', $this->getRequest()->get('key'));
-					$this->assign('additionalTitle', 'Create empty root element');
-					$this->assign('redirectUrl', $this->getRequest()->getRequestUri());
-
-					$this->assign('isEmptyModule', false);
-					$this->assign('showRootElem', false);
-					$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:createEmptyModule.html.twig');
-					$html = $template->renderBlock('singleContent', $this->getAssignedVariablesArr());
-
-					$this->assign('additionalForm', $html);
-				} elseif ($xml->count() == 0) {
-					$this->assign('isEmptyModule', true);
-					$this->assign('showRootElem', false);
-				} else {
-					$this->assign('isEmptyModule', false);
-					$this->assign('showRootElem', true);
-				}
-
-				$this->assign("configArr", $xml);
-			}
-		} catch (\ErrorException $e) {
-			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
-			$this->getRequest()->getSession()->getFlashBag()->add('config error', "Could not parse XML file correctly. ");
-		}
-	}
-
-	private function getCurrentDatastoreForKey($key) {
-		/**
-		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
-		 */
-		$dataClass = $this->get('DataModel');
-		$conn = $dataClass->getConnFromKey($key);
-
-		if ($conn) {
-			return $conn->getCurrentDatastore();
-		} else {
-			return false;
-		}
-
 	}
 }
 

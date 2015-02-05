@@ -1,7 +1,7 @@
 {#
 @author David Alexa <alexa.david@me.com>
 
-Copyright (C) 2012-2013 CESNET
+Copyright (C) 2012-2015 CESNET
 
 LICENSE TERMS
 
@@ -160,7 +160,7 @@ if advised of the possibility of such damage.
 					$("#history-and-profiles").append(newBox);
 				}
 
-				$.nette.success(data);
+				$.netopeergui.processResponseData(data);
 				delegateAnchorActions($("#"+selector));
 			}
 		}
@@ -200,7 +200,7 @@ if advised of the possibility of such damage.
 {% endblock singleContentClass %}
 
 {% block leftColumn %}
-	<div id="history-and-profiles">
+	<div id="history-and-profiles" class="nav-left">
 		<script type="text/javascript">
 //			setIndexActions();
 		</script>
@@ -208,7 +208,7 @@ if advised of the possibility of such damage.
 {% endblock leftColumn %}
 
 {% block state %}
-	<form action="{{ path('connections') }}" method="post" {{ form_enctype(form) }} class="login">
+	<form action="{{ path('connections') }}" method="post" {{ form_enctype(form) }} class="form login">
 		<legend>Connect to server</legend>
 	    {{ form_widget(form) }}
 	    <input type="submit" value="Connect" />

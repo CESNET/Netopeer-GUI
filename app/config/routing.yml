@@ -3,9 +3,15 @@ FITNetopeerBundle:
     type:     annotation
     prefix:   /
 
-login:
+fit_module_default:
+    resource: "@FITModuleDefaultBundle/Controller/"
+    type:     annotation
+    prefix:   /
+
+_login:
     pattern:   /login
-    defaults:  { _controller: NetopeerBundle:Security:login }
+    defaults:  { _controller: FITNetopeerBundle:Security:login }
+
 login_check:
     pattern:   /login_check
 

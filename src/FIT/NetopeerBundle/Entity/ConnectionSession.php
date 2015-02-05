@@ -7,7 +7,7 @@
  *
  * @author David Alexa <alexa.david@me.com>
  *
- * Copyright (C) 2012-2013 CESNET
+ * Copyright (C) 2012-2015 CESNET
  *
  * LICENSE TERMS
  *
@@ -88,6 +88,11 @@ class ConnectionSession {
 	public $sessionStatus = "";
 
 	/**
+	 * @var array  collection of active controller for namespace of module, used for loading correct controller action in module
+	 */
+	private $activeControllers;
+
+	/**
 	 * Creates new instance and fill in all class variables except of sessionStatus.
 	 *
 	 * @param string $session_hash  identification key of connection
@@ -104,6 +109,7 @@ class ConnectionSession {
 		$newtime = new \DateTime();
 		$this->time = $newtime->format("d.m.Y H:i:s");
 		$this->locked = array();
+		$this->activeControllers = array();
 		$this->setCurrentDatastore("running");
 	}
 
@@ -150,5 +156,24 @@ class ConnectionSession {
 	 */
 	public function getCurrentDatastore() {
 		return $this->currentDatastore;
+	}
+
+	/**
+	 * @param string $controllerAction   target controller action (used in ModuleController DB)
+	 * @param string $namespace          target module namespace
+	 */
+	public function setActiveController($namespace, $controllerAction)
+	{
+		$this->activeControllers[$namespace] = $controllerAction;
+	}
+
+	/**
+	 * @param string $namespace          target module namespace
+	 *
+	 * @return array
+	 */
+	public function getActiveControllersForNS($namespace)
+	{
+		return isset($this->activeControllers[$namespace]) ? $this->activeControllers[$namespace] : false;
 	}
 }

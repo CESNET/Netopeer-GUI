@@ -1,7 +1,7 @@
 {#
 @author David Alexa <alexa.david@me.com>
 
-Copyright (C) 2012-2013 CESNET
+Copyright (C) 2012-2015 CESNET
 
 LICENSE TERMS
 
@@ -38,6 +38,6 @@ if advised of the possibility of such damage.
 
 {% set iterator = 1 %}
 {% for key, element in xmlArr %}
-	{% include 'FITNetopeerBundle:Config:parent.html.twig' with {'element': element, 'level': level, 'xpath': '/*', 'iterator': iterator, 'hideEditBar': true} %}
+	{% include 'FITModuleDefaultBundle:Config:parent.html.twig' with {'element': element, 'level': level, 'xpath': '/*', 'iterator': iterator, 'hideEditBar': true} %}
 	{% set iterator = iterator + 1 %}
 {% endfor %}

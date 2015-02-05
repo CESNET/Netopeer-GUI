@@ -1,7 +1,7 @@
 {#
 @author David Alexa <alexa.david@me.com>
 
-Copyright (C) 2012-2013 CESNET
+Copyright (C) 2012-2015 CESNET
 
 LICENSE TERMS
 
@@ -48,7 +48,7 @@ if advised of the possibility of such damage.
 	{% if additionalTitle is defined %}
 		<h2>{{ additionalTitle }}</h2>
 	{% endif %}
-	<form action="{{ path('createEmptyModule', {'key': key}) }}" method="post" {{ form_enctype(emptyModuleForm) }} class="create-empty-module" name="formCreateEmptyModule">
+	<form action="{{ path('createEmptyModule', {'key': key}) }}" method="post" {{ form_enctype(emptyModuleForm) }} class="form create-empty-module" name="formCreateEmptyModule">
 		{{ form_widget(emptyModuleForm) }}
 		{% if redirectUrl is defined %}
 			<input type="hidden" name="form[redirectUrl]" value="{{ redirectUrl }}" />
