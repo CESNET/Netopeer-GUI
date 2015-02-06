@@ -206,6 +206,7 @@ section { float: left; width: 49.93%; min-height: 100%; padding: $content-paddin
 			&:first-child { border-top: 0px none; }
 			&:last-child { border-bottom: 0px none; }
 			&::selection, &::-moz-selection { background: $color-primary; }
+			&.popup { position: relative; background: $grey-darkest; }
 
 			&.error {
 				.circle { background: $color-danger; }

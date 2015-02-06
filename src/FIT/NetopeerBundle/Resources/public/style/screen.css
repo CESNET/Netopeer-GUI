@@ -681,6 +681,9 @@ section#block--alerts .message:last-child {
   border-bottom: 0px none; }
 section#block--alerts .message::selection, section#block--alerts .message::-moz-selection {
   background: #004f80; }
+section#block--alerts .message.popup {
+  position: relative;
+  background: #333; }
 section#block--alerts .message.error .circle {
   background: #820101; }
 section#block--alerts .message.success .circle {

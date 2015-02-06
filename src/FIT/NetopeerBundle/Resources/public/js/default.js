@@ -251,7 +251,7 @@ function prepareAlerts() {
 								$(e).removeClass('popup').addClass('no-popup').show();
 							});
 						}
-					}, 1500);
+					}, 2000);
 				});
 
 			} else if ($alertsBlock.find('.success').length) {
@@ -269,9 +269,11 @@ function prepareAlerts() {
 		$(this).parents('.message').stop(true,true).fadeOut('fast', function() {
 			$(this).remove();
 		});
+		return false;
 	}).on('click', '.message.popup', function(e) {
 		$(e).stop(true,true).removeClass('popup').addClass('no-popup');
 		$("#alerts-icon .header-icon").click();
+		return false;
 	});
 }
 
