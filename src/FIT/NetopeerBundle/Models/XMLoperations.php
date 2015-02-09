@@ -81,7 +81,7 @@ class XMLoperations {
 	 * divides string into the array (name, value) (according to the XML tree node => value)
 	 *
 	 * @param  string $postKey post value
-	 * @return array           modified array
+	 * @return array           in format ('name', 'value')
 	 */
 	public function divideInputName($postKey)
 	{
@@ -90,6 +90,12 @@ class XMLoperations {
 		if ($cnt > 2) {
 			$last = $values[$cnt-1];
 			$values = array(implode("_", array_slice($values, 0, $cnt-1)), $last);
+		} elseif ($cnt == 2) {
+
+		} elseif ($cnt == 1) {
+			$values = array('name', $values[0]);
+		} else {
+			$values = array('name', 'value');
 		}
 		return $values;
 	}
@@ -97,7 +103,7 @@ class XMLoperations {
 	/**
 	 * decodes XPath value (custom coding from JS)
 	 *
-	 * @param  string $value encoded XPath string
+	 * @param  string $value encoded XPath string from JS form
 	 * @return string        decoded XPath string
 	 */
 	public function decodeXPath($value) {
@@ -109,16 +115,20 @@ class XMLoperations {
 	}
 
 	/**
-	 * Completes request tree (XML) with necessary nodes (parent nodes).
-	 * Tree must be valid for edit-config action
+	 * Completes request tree (XML) with necessary parent nodes.
+	 * Tree must be valid for edit-config action.
 	 *
-	 * @param \SimpleXMLElement  $tmpConfigXml
-	 * @param string            $config_string
+	 * @param \SimpleXMLElement $parent current parent of new content to be completed (add all his parents)
+	 * @param string            $newConfigString
+	 * @param null              $wrappedPath
+	 *
 	 * @return \SimpleXMLElement
 	 */
-	public function completeRequestTree(&$tmpConfigXml, $config_string) {
-
-		$subroot = simplexml_load_file($this->dataModel->getPathToModels() . 'wrapped.wyin');
+	public function completeRequestTree(&$parent, $newConfigString, $wrappedPath = null) {
+		if (is_null($wrappedPath)) {
+			$wrappedPath = $this->dataModel->getPathToModels() . 'wrapped.wyin';
+		}
+		$subroot = simplexml_load_file($wrappedPath);
 		$xmlNameSpaces = $subroot->getNamespaces();
 
 		if ( isset($xmlNameSpaces[""]) ) {
@@ -130,12 +140,12 @@ class XMLoperations {
 			$namespace = $ns[0]->attributes()->uri;
 		}
 
-		$parent = $tmpConfigXml->xpath("parent::*");
+		$parent = $parent->xpath("parent::*");
 		while ($parent) {
 			$pos_subroot[] = $parent[0];
 			$parent = $parent[0]->xpath("parent::*");
 		}
-		$config = $config_string;
+		$config = $newConfigString;
 
 		if (isset($pos_subroot)) {
 			for ($i = 0; $i < sizeof($pos_subroot); $i++) {
