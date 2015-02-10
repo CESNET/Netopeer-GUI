@@ -43,6 +43,7 @@
  */
 namespace FIT\NetopeerBundle\Models;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use FIT\NetopeerBundle\Models\Data as Data;
@@ -172,14 +173,14 @@ class XMLoperations {
 	/**
 	 * updates (modifies) value of XML node
 	 *
-	 * @param  string $configXml   xml file
+	 * @param  \SimpleXMLElement $configXml   xml file
 	 * @param  string $elementName name of the element
-	 * @param  string $xpath       XPath to the element
+	 * @param  string $xpath       XPath to the element (without trailing '/', which is added automatically)
 	 * @param  string $val         new value
 	 * @param  string $xPathPrefix
 	 * @param  int    $newIndex    new index of elem in parent cover (selectable plugin)
 	 *
-	 * @return \SimpleXMLElement   modified node
+	 * @return \SimpleXMLElement|array   modified node, empty array if element was not found
 	 */
 	public function elementValReplace(&$configXml, $elementName, $xpath, $val, $xPathPrefix = "xmlns:", $newIndex = -1)
 	{

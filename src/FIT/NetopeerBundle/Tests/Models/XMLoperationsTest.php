@@ -119,9 +119,65 @@ class XMLoperationsTest extends WebTestCase {
 
 	public function testElementValReplace()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+		$testXML = '<?xml version="1.0"?>
+<turing-machine xmlns="http://example.net/turing-machine">
+<transition-function>
+<delta>
+	<label>test</label>
+	<output>
+		<state>2</state>
+		<symbol myatt="8">3</symbol>
+		<head-move>right</head-move>
+	</output>
+</delta>
+</transition-function>
+</turing-machine>';
+		$testXMLObject = simplexml_load_string($testXML);
+		$testXMLObject->registerXPathNamespace("xmlns", "http://example.net/turing-machine");
+
+		// set head-move to left, new index to 10
+		$xpath = '*/*/*[1]/*[2]/*[3]';
+		$res = $xmlOp->elementValReplace($testXMLObject, 'head-move', $xpath, 'left', 'xmlns:', 10);
+		$expected = '<head-move index="10">left</head-move>';
+		$this->assertEquals($expected, $res->asXML(), 'element val replace 1');
+
+		// set label to new_test
+		$xpath = '*/*/*[1]/*[1]';
+		$res = $xmlOp->elementValReplace($testXMLObject, 'label', $xpath, 'new_test');
+		$expected = '<label>new_test</label>';
+		$this->assertEquals($expected, $res->asXML(), 'element val replace 2');
+
+		// set myatt of symbol to value 10
+		$xpath = '*/*/*[1]/*[2]/*[2]';
+		$res = $xmlOp->elementValReplace($testXMLObject, 'at-myatt', $xpath, '10');
+		$expected = '<symbol myatt="10">3</symbol>';
+		$this->assertEquals($expected, $res->asXML(), 'element val replace with attributes 3');
+
+		// expected false on not existing xpath
+		$xpath = '*/*/*[50]/*[78]';
+		$res = $xmlOp->elementValReplace($testXMLObject, 'xxx', $xpath, '84');
+		$this->assertEquals(array(), $res, 'element val replace 4 - unexisting namespace');
+	}
+
+	/**
+	 * @expectedExceptionMessage Undefined namespace prefix
+	 * @expectedException PHPUnit_Framework_Error
+	 */
+	public function testElementValReplaceException()
+	{
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+		$testXML = '<?xml version="1.0"?>
+<turing-machine xmlns="http://example.net/turing-machine">
+<transition-function>
+</transition-function>
+</turing-machine>';
+		$testXMLObject = simplexml_load_string($testXML);
+		$testXMLObject->registerXPathNamespace("xmlns", "http://example.net/turing-machine");
+
+		// expected false on not existing namespace
+		$xpath = '*/*/*[50]/*[78]';
+		$res = $xmlOp->elementValReplace($testXMLObject, 'xxx', $xpath, '84', 'xxx:');
 	}
 
 	public function testHandleEditConfigForm()
