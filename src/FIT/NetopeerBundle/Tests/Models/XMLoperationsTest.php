@@ -209,13 +209,6 @@ class XMLoperationsTest extends WebTestCase {
 		);
 	}
 
-	public function testHandleGenerateNodeForm()
-	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
-	}
-
 	public function testHandleNewNodeForm()
 	{
 		$this->markTestIncomplete(
@@ -258,11 +251,30 @@ class XMLoperationsTest extends WebTestCase {
 		);
 	}
 
+	public function testRemoveXmlHeader()
+	{
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+
+		$headers = array(
+			'<?xml version="1.0"?>',
+		  '<?xml version="1.0" encoding="UTF-8"?>',
+		  '<?xml version="1.0" encoding="UTF-16" standalone="yes"?>'
+		);
+		$xml = '<turing-machine xmlns="http://example.net/turing-machine"><transition-function><delta><label>test</label></delta><delta><label>test2</label></delta></transition-function></turing-machine>';
+
+		$i = 1;
+		foreach ($headers as $header) {
+			$text = $header . $xml;
+			$this->assertEquals($xml, $xmlOp->removeXmlHeader($text), 'remove XML header '.$i++);
+		}
+	}
+
 	public function testLoadModel()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+		$res = $xmlOp->loadModel();
+
+		$this->assertTrue($res instanceof \SimpleXMLElement, 'model found and loaded correctly');
 	}
 
 	public function testMergeXMLWithModel()
@@ -274,16 +286,76 @@ class XMLoperationsTest extends WebTestCase {
 
 	public function testIsResponseValidXML()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+
+		$validXml = array(
+			'<test></test>',
+			'<turing-machine xmlns="http://example.net/turing-machine"><transition-function><delta><label>test</label></delta><delta><label>test2</label></delta></transition-function></turing-machine>',
+			'<turing-machine xmlns="http://example.net/turing-machine"><transition-function><delta><label>test</label></delta><delta><label>test2</label></delta></transition-function></turing-machine><turing-machine xmlns="http://example.net/turing-machine"><transition-function><delta><label>test</label></delta><delta><label>test2</label></delta></transition-function></turing-machine>',
 		);
+
+		$invalidXml = array(
+			'<test></test_false>',
+			'<turing-machine xmlns="http://example.net/turing-machine"><transition-functionx><delta><label>test</label></delta><delta><label>test2</label></delta></transition-function></turing-machine>',
+			'<turing-machine xmlns="http://example.net/turing-machine"><transition-function><delta><label>test</label></delta><delta><label>test2</delta></transition-function></turing-machine>',
+		);
+
+		$i = 1;
+		foreach ($validXml as $xml) {
+			$this->assertTrue($xmlOp->isResponseValidXML($xml), 'xml is valid '.$i++);
+		}
+
+		$i = 1;
+		foreach ($invalidXml as $xml) {
+			$this->assertFalse($xmlOp->isResponseValidXML($xml), 'xml is invalid '.$i++);
+		}
 	}
 
 	public function testGetElementParent()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+
+		$testXMLString = '<?xml version="1.0"?>
+<turing-machine xmlns="http://example.net/turing-machine">
+<transition-function>
+<delta>
+	<label>test</label>
+</delta>
+<delta>
+	<label>test2</label>
+</delta>
+<connection-type eltype="container">
+	<connection-type eltype="choice">
+		<persistent-connection eltype="case">
+			<persistent>true</persistent>
+		</persistent-connection>
+		<periodic-connection eltype="case">
+			<timeout-mins eltype="leaf">10</timeout-mins>
+			<linger-secs eltype="leaf">20</linger-secs>
+		</periodic-connection>
+	</connection-type>
+</connection-type>
+<connection-type></connection-type>
+</transition-function>
+</turing-machine>';
+		$testXML = simplexml_load_string($testXMLString);
+		$testXML->registerXPathNamespace('xmlns', 'http://example.net/turing-machine');
+
+		$element = $testXML->xpath('/*/xmlns:transition-function');
+		$expected = $testXML->xpath('/xmlns:turing-machine');
+		$this->assertEquals($expected[0]->asXml(), $xmlOp->getElementParent($element[0])->asXML(), 'get element parent 1');
+
+		$element = $testXML->xpath('//xmlns:label[text()="test2"]');
+		$expected = $testXML->xpath('/*/*/xmlns:delta[2]');
+		$this->assertEquals($expected[0]->asXml(), $xmlOp->getElementParent($element[0])->asXML(), 'get element parent 2');
+
+		$element = $testXML->xpath('//xmlns:timeout-mins');
+		$expected = $testXML->xpath('/*/*/*[3]');
+		$this->assertEquals($expected[0]->asXml(), $xmlOp->getElementParent($element[0])->asXML(), 'get element parent 3');
+
+		$element = $testXML->xpath('//xmlns:persistent');
+		$expected = $testXML->xpath('/*/*/*[3]');
+		$this->assertEquals($expected[0]->asXml(), $xmlOp->getElementParent($element[0])->asXML(), 'get element parent 4');
 	}
 
 	public function testCheckElemMatch()

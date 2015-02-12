@@ -45,6 +45,7 @@
 namespace FIT\NetopeerBundle\Controller;
 
 
+use FIT\NetopeerBundle\Models\XMLoperations;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -350,10 +351,6 @@ class ModuleController extends BaseController {
 		} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
 			$res = $this->get('XMLoperations')->handleDuplicateNodeForm($key, $this->getConfigParams());
 
-			// processing generate node form
-		} elseif ( is_array($this->getRequest()->get('generateNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleGenerateNodeForm($key, $this->getConfigParams(), $module, $subsection);
-
 			// processing new node form
 		} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
 			$res = $this->get('XMLoperations')->handleNewNodeForm($key, $this->getConfigParams());
@@ -466,7 +463,7 @@ class ModuleController extends BaseController {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 
 				// we have only root module
-				if ($xml->count() == 0 && $xml->getName() == 'root') {
+				if ($xml->count() == 0 && $xml->getName() == XMLoperations::$customRootElement) {
 					$this->setEmptyModuleForm($this->getRequest()->get('key'));
 					$this->assign('key', $this->getRequest()->get('key'));
 					$this->assign('additionalTitle', 'Create empty root element');

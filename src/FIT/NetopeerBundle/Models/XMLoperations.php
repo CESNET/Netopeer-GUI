@@ -63,6 +63,8 @@ class XMLoperations {
 	 */
 	public $dataModel;
 
+	public static $customRootElement = 'netopeer-root';
+
 	/**
 	 * Constructor with DependencyInjection params.
 	 *
@@ -563,29 +565,6 @@ class XMLoperations {
 	}
 
 	/**
-	 * create new node in config - according to the values in XML model
-	 *
-	 * could be changed by user
-	 *
-	 * @param  int      $key 				  session key of current connection
-	 * @param  string   $module 		  module name
-	 * @param  string   $subsection  	subsection name
-	 * @return int                    result code
-	 */
-	public function handleGenerateNodeForm(&$key, &$module, &$subsection)	{
-		$post_vals = $this->container->get('request')->get('generatedNodeForm');
-		$res = 0;
-
-		// TODO: load XML file - https://sauvignon.liberouter.org/symfony/generate/2/-%252A-%252A%253F1%2521-%252A%253F2%2521-%252A%253F1%2521/0/hanic-probe/exporters/model.xml
-		// this URL should be generated from route (path = generateFromModel, params: '2' = level (whatever, not used in this case); 'xPath' = url_encode($xPath), 'key' = $key, 'module' = $module, 'subsection' = subsection, '_format' = 'xml')
-		//
-		// change values to $_POST ones if XML file has been loaded correctly
-		// generate (completeTree) output XML for edit-config
-
-		return $res;
-	}
-
-	/**
 	 * create new node
 	 *
 	 * @param  int      $key 				  session key of current connection
@@ -933,14 +912,17 @@ class XMLoperations {
 	 *                        or null if an error occurred.
 	 */
 	public function removeXmlHeader(&$text) {
-		return preg_replace("/<\?xml .*\?".">/i", "n", $text);
+		return preg_replace("/<\?xml .*\?".">/i", "", $text);
 	}
 
+	/**
+	 * @return \SimpleXMLElement|false
+	 */
 	public function loadModel() {
 		$notEditedPath = $this->dataModel->getModelsDir();
 		$path = $this->dataModel->getPathToModels();
 		$modelFile = $path . 'wrapped.wyin';
-		$res = 1;
+		$res = false;
 
 		$this->logger->info("Trying to find model in ", array('pathToFile' => $modelFile));
 		if ( file_exists($modelFile) ) {
@@ -953,8 +935,7 @@ class XMLoperations {
 				}
 			}
 		} else {
-			// TODO: if is not set module direcotory, we have to set model to merge with
-			// problem: we have to load all models (for example combo, comet-tester...)
+			// TODO: if is not set module direcotory, we have to set model to merge with, maybe custom model?
 			$this->logger->warn("Could not find model in ", array('pathToFile' => $modelFile));
 		}
 		return $res;
@@ -964,14 +945,14 @@ class XMLoperations {
 	 * Merge given XML with data model
 	 *
 	 * @param $xml
-	 * @return int|array 1 on error, merged array on success
+	 * @return array|false    false on error, merged array on success
 	 */
 	public function mergeXMLWithModel(&$xml) {
 		// load model
 		$model = $this->loadModel();
-		$res = 1;
+		$res = false;
 
-		if ($model != 1) {
+		if ($model !== false) {
 			try {
 				$res = $this->mergeWithModel($model, $xml);
 			} catch (\ErrorException $e) {
@@ -987,7 +968,7 @@ class XMLoperations {
  * Check, if XML response is valid.
  *
  * @param string            &$xmlString       xml response
- * @return int  1 on success, 0 on error
+ * @return bool
  */
 public function isResponseValidXML(&$xmlString) {
 	$e = false;
@@ -999,14 +980,17 @@ public function isResponseValidXML(&$xmlString) {
 	if ( (isset($simpleXMLRes) && $simpleXMLRes === false) || $e !== false) {
 		// sometimes is exactly one root node missing
 		// we will check, if is not XML valid with root node
-		$xmlString = "<root>".$xmlString."</root>";
+		$xmlString = "<".self::$customRootElement.">".$xmlString."</".self::$customRootElement.">";
 		try {
 			@$simpleXMLRes = simplexml_load_string($xmlString);
+			if (!($simpleXMLRes instanceof \SimpleXMLElement)) {
+				return false;
+			}
 		} catch (\ErrorException $e) {
-			return 0;
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
 /**
@@ -1212,7 +1196,7 @@ public function mergeRecursive(&$model, $root_el) {
 		$labelsArr = array();
 		$attributesArr = array();
 		$elemsArr= array();
-		if ($xml != 1) {
+		if ($xml !== false) {
 			$dom = new \DOMDocument();
 			$dom->loadXML($xml);
 

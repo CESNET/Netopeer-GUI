@@ -3,6 +3,7 @@
 namespace FIT\Bundle\ModuleDefaultBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\ModuleControllerInterface;
+use FIT\NetopeerBundle\Models\XMLoperations;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -76,7 +77,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	private function checkEmptyRootModule($key, $xml) {
 		if ($xml instanceof \SimpleXMLIterator && $xml->count() == 0) {
 			$isEmptyModule = true;
-			if ($xml->getName() == 'root') {
+			if ($xml->getName() == XMLoperations::$customRootElement) {
 				$this->setEmptyModuleForm($this->getRequest()->get('key'));
 				$isEmptyModule = false;
 				$this->assign('forceShowFormConfig', true);

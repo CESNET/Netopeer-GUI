@@ -735,8 +735,8 @@ class Data {
 		/* syntax highlighting problem if XML def. is in one string */
 		$replaceWhatArr = array(
 			"<?xml version=\"1.0\"?>",
-			"<root>",
-			"</root>"
+			"<".XMLoperations::$customRootElement.">",
+			"</".XMLoperations::$customRootElement.">"
 		);
 		$replaceWithArr = array(
 			"",
