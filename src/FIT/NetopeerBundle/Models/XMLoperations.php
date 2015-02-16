@@ -609,7 +609,7 @@ class XMLoperations {
 
 					// we have to delete all children from parent node (because of xpath selector for new nodes), except from key nodes
 					$domNode = dom_import_simplexml($parentNode[0]);
-					$keyElemsCnt = $this->removeChildren($domNode, $domNode->childNodes);
+					$keyElemsCnt = $this->removeChildrenExceptOfKeyElements($domNode, $domNode->childNodes);
 
 				} else {
 					throw new \ErrorException("Could not set parent node for new elements.");
@@ -712,13 +712,15 @@ class XMLoperations {
 	}
 
 	/**
+	 * removes all children of element except of key elements, which has to remain
+	 *
 	 * @param      \DOMElement $domNode
 	 * @param      \DOMNodeList $domNodeChildren
 	 * @param bool $leaveKey
 	 *
-	 * @return int  number of key elements
+	 * @return int  number of key elements, that remains
 	 */
-	public function removeChildren($domNode, $domNodeChildren, $leaveKey = false)
+	public function removeChildrenExceptOfKeyElements($domNode, $domNodeChildren, $leaveKey = false)
 	{
 		$keyElemIndex = $keyElemsCnt = 0;
 		while ($domNodeChildren->length > $keyElemIndex) {
@@ -752,7 +754,7 @@ class XMLoperations {
 			if (!$isKey || $leaveKey == false) {
 				try {
 //			if (count($domNodeChildren->item($keyElemIndex)->childNodes)) {
-//				 $this->removeChildren($domNodeChildren->item($keyElemIndex), $domNodeChildren->item($keyElemIndex)->childNodes, $leaveKey);
+//				 $this->removeChildrenExceptOfKeyElements($domNodeChildren->item($keyElemIndex), $domNodeChildren->item($keyElemIndex)->childNodes, $leaveKey);
 //			}
 					// TODO: make somehow recursive
 					$domNode->removeChild($child);
@@ -780,7 +782,7 @@ class XMLoperations {
 	 * inserts new element into given XML tree
 	 *
 	 * @param  \SimpleXMLElement $configXml xml file
-	 * @param  string            $xpath     XPath to the element
+	 * @param  string            $xpath     XPath to the element (without initial /)
 	 * @param  string            $label     label value
 	 * @param  string            $value     new value
 	 * @param  string            $xPathPrefix
@@ -1016,8 +1018,8 @@ public function getElementParent($element) {
 /**
  * Check if two elements match.
  *
- * @param $model_el
- * @param $possible_el
+ * @param $model_el       element from model
+ * @param $possible_el    element to match the model
  * @return bool
  */
 public function checkElemMatch($model_el, $possible_el) {

@@ -223,7 +223,7 @@ class XMLoperationsTest extends WebTestCase {
 		);
 	}
 
-	public function testRemoveChildren()
+	public function testRemoveChildrenExceptOfKeyElements()
 	{
 		$this->markTestIncomplete(
 			'This test has not been implemented yet.'
@@ -232,9 +232,47 @@ class XMLoperationsTest extends WebTestCase {
 
 	public function testInsertNewElemIntoXMLTree()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+		$testXML = '<?xml version="1.0"?>
+<turing-machine xmlns="http://example.net/turing-machine">
+<transition-function>
+<delta>
+	<label>test</label>
+</delta>
+</transition-function>
+</turing-machine>';
+		$testXMLObject = simplexml_load_string($testXML);
+		$testXMLObject->registerXPathNamespace("xmlns", "http://example.net/turing-machine");
+
+		// insert output element
+		$xpath = '*/*/*[1]';
+		$res = $xmlOp->insertNewElemIntoXMLTree($testXMLObject, $xpath, 'output', '');
+		$expected = '<output xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="create"/>';
+		$this->assertEquals($expected, $res->asXML(), 'insert new elem 1');
+
+		// insert state element with value
+		$xpath = '*/*/*[1]/*[2]';
+		$res = $xmlOp->insertNewElemIntoXMLTree($testXMLObject, $xpath, 'state', '2');
+		$expected = '<state xc:operation="create">2</state>';
+		$this->assertEquals($expected, $res->asXML(), 'insert new elem 2');
+
+		// insert symbol element with value
+		$xpath = '*/*/*[1]/*[2]';
+		$res = $xmlOp->insertNewElemIntoXMLTree($testXMLObject, $xpath, 'symbol', '3');
+		$expected = '<symbol xc:operation="create">3</symbol>';
+		$this->assertEquals($expected, $res->asXML(), 'insert new elem 3');
+
+		// check if whole XML matches
+		$expectedResString = '<?xml version="1.0"?>
+<turing-machine xmlns="http://example.net/turing-machine">
+<transition-function>
+<delta>
+	<label>test</label>
+<output xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="create"><state xc:operation="create">2</state><symbol xc:operation="create">3</symbol></output></delta>
+</transition-function>
+</turing-machine>
+';
+		$this->assertEquals($expectedResString, $testXMLObject->asXML(), 'insert new elem DOM matches');
 	}
 
 	public function testHandleRemoveNodeForm()
@@ -360,16 +398,71 @@ class XMLoperationsTest extends WebTestCase {
 
 	public function testCheckElemMatch()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+
+		$testXMLString = '<?xml version="1.0"?>
+<turing-machine xmlns="http://example.net/turing-machine">
+<transition-function eltype="not" description="test">
+<connection-type eltype="container" description="text" attr="xxx" cokoliv="fijao"/>
+	<connection-type />
+</transition-function>
+<transition-function>
+	<connection-type />
+</transition-function>
+</turing-machine>';
+		$testXML = simplexml_load_string($testXMLString);
+		$testXML->registerXPathNamespace('xmlns', 'http://example.net/turing-machine');
+
+		// elements should match
+		$sourceXpath = "/xmlns:*/*[1]/*[1]";
+		$targetXpath = "/xmlns:*/*[2]/*[1]";
+		$source = $testXML->xpath($sourceXpath);
+		$target = $testXML->xpath($targetXpath);
+		$this->assertTrue($xmlOp->checkElemMatch($source[0], $target[0]), 'check element match 1');
+
+		// elements should not match
+		$sourceXpath = "/xmlns:*/*[1]/*[1]";
+		$targetXpath = "/xmlns:*/*[1]";
+		$source = $testXML->xpath($sourceXpath);
+		$target = $testXML->xpath($targetXpath);
+		$this->assertFalse($xmlOp->checkElemMatch($source[0], $target[0]), 'check element match 2');
 	}
 
 	public function testCompleteAttributes()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+
+		$testXMLString = '<?xml version="1.0"?>
+<turing-machine xmlns="http://example.net/turing-machine">
+<transition-function eltype="not" description="test">
+<connection-type eltype="container" description="text" attr="xxx" cokoliv="fijao"/>
+<connection-type />
+</transition-function>
+<transition-function>
+	<connection-type />
+</transition-function>
+</turing-machine>';
+		$testXML = simplexml_load_string($testXMLString);
+		$testXML->registerXPathNamespace('xmlns', 'http://example.net/turing-machine');
+
+		// copy all attributes
+		$sourceXpath = "/xmlns:*/*[1]/*[1]";
+		$targetXpath = "/xmlns:*/*[1]/*[2]";
+		$source = $testXML->xpath($sourceXpath);
+		$target = $testXML->xpath($targetXpath);
+		$xmlOp->completeAttributes($source[0], $target[0]);
+		$this->assertEquals($source[0]->asXml(), $target[0]->asXml(), 'complete attributes 1');
+
+		// here is not enabled eltype, so no attributes should be copied
+		$sourceXpath = "/xmlns:*/*[1]";
+		$targetXpath = "/xmlns:*/*[2]";
+		$source = $testXML->xpath($sourceXpath);
+		$target = $testXML->xpath($targetXpath);
+		$xmlOp->completeAttributes($source[0], $target[0]);
+		$expectedString = '<transition-function>
+	<connection-type/>
+</transition-function>';
+		$this->assertEquals($expectedString, $target[0]->asXml(), 'complete attributes 2');
 	}
 
 	public function testFindAndComplete()
