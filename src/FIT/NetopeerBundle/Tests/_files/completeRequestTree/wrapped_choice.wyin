@@ -1,0 +1,875 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="ietf-netconf-server"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:ncserver="urn:ietf:params:xml:ns:yang:ietf-netconf-server"
+        xmlns:yang="urn:ietf:params:xml:ns:yang:ietf-yang-types"
+        xmlns:x509c2n="urn:ietf:params:xml:ns:yang:ietf-x509-cert-to-name"
+        xmlns:inet="urn:ietf:params:xml:ns:yang:ietf-inet-types"
+        xmlns:nacm="urn:ietf:params:xml:ns:yang:ietf-netconf-acm">
+ <namespace uri="urn:ietf:params:xml:ns:yang:ietf-netconf-server"/>
+ <prefix value="ncserver"/>
+ <import module="ietf-yang-types" iskey="false">
+  <prefix value="yang"/>
+ </import>
+ <import module="ietf-inet-types" iskey="false">
+  <prefix value="inet"/>
+ </import>
+ <import module="ietf-x509-cert-to-name" iskey="false">
+  <prefix value="x509c2n"/>
+ </import>
+ <import module="ietf-netconf-acm" iskey="false">
+  <prefix value="nacm"/>
+ </import>
+ <organization>
+  <text>IETF NETCONF (Network Configuration) Working Group</text>
+ </organization>
+ <contact>
+  <text>WG Web:   &lt;http://tools.ietf.org/wg/netconf/&gt;
+WG List:  &lt;mailto:netconf@ietf.org&gt;
+
+WG Chair: Mehmet Ersue
+          &lt;mailto:mehmet.ersue@nsn.com&gt;
+
+WG Chair: Bert Wijnen
+          &lt;mailto:bertietf@bwijnen.net&gt;
+
+Editor:   Juergen Schoenwaelder
+          &lt;mailto:j.schoenwaelder@jacobs-university.de&gt;
+
+          Kent Watsen
+          &lt;mailto:kwatsen@juniper.net&gt;</text>
+ </contact>
+ <description>
+  <text>This module contains a collection of YANG definitions for
+configuring NETCONF servers.
+
+Copyright (c) 2014 IETF Trust and the persons identified as
+authors of the code. All rights reserved.
+
+Redistribution and use in source and binary forms, with or
+without modification, is permitted pursuant to, and subject
+to the license terms contained in, the Simplified BSD
+License set forth in Section 4.c of the IETF Trust's
+Legal Provisions Relating to IETF Documents
+(http://trustee.ietf.org/license-info).
+
+This version of this YANG module is part of RFC XXXX; see
+the RFC itself for full legal notices.</text>
+ </description>
+ <revision date="2014-01-24" description="Initial version" iskey="false">
+  <reference>
+   <text>RFC XXXX: A YANG Data Model for NETCONF Server Configuration</text>
+  </reference>
+ </revision>
+ <ssh eltype="feature" description="A server implements this feature if it supports NETCONF
+over Secure Shell (SSH)." iskey="false">
+  <reference>
+   <text>RFC 6242: Using the NETCONF Protocol over Secure Shell (SSH)</text>
+  </reference>
+ </ssh> <inbound-ssh eltype="feature" description="The inbound-ssh feature indicates that the server can
+open a port to listen for incoming client connections." iskey="false"/>
+ <outbound-ssh eltype="feature" description="The outbound-ssh feature indicates that the server can
+connect to a client." iskey="false">
+  <reference>
+   <text>RFC XXXX: Reverse Secure Shell (Reverse SSH)</text>
+  </reference>
+ </outbound-ssh> <tls eltype="feature" description="A server implements this feature if it supports NETCONF
+over Transport Layer Security (TLS)." iskey="false">
+  <reference>
+   <text>RFC XXXX: NETCONF over Transport Layer Security (TLS)</text>
+  </reference>
+ </tls> <inbound-tls eltype="feature" description="The inbound-tls feature indicates that the server can
+open a port to listen for incoming client connections." iskey="false"/>
+ <outbound-tls eltype="feature" description="The outbound-tls feature indicates that the server can
+connect to a client." iskey="false"/>
+ <tls-map-certificates eltype="feature" description="The tls-map-certificates feature indicates that the
+server implements mapping X.509 certificates to NETCONF
+usernames." iskey="false"/>
+ <tls-map-pre-shared-keys eltype="feature" description="The tls-map-pre-shared-keys feature indicates that the
+server implements mapping TLS pre-shared keys to NETCONF
+usernames." iskey="false"/>
+ <listen-config eltype="grouping" config="true" iskey="false">
+  <one-or-many eltype="choice" config="true" default="one-port" iskey="false">
+   <one-port eltype="case" config="true" iskey="false">
+    <port eltype="leaf" config="true" type="inet:port-number" description="The port number the server listens on on all
+interfaces." iskey="false"/>
+   </one-port>   <many-ports eltype="case" config="true" iskey="false">
+    <interface eltype="list" config="true" key="address" iskey="false">
+     <address eltype="leaf" config="true" type="inet:ip-address" mandatory="true" description="The local IP address of the interface to listen
+on." iskey="true"/>
+     <port eltype="leaf" config="true" type="inet:port-number" description="The local port number on this interface the
+server listens on." iskey="false"/>
+    </interface>   </many-ports>  </one-or-many> </listen-config> <call-home-config eltype="grouping" config="true" iskey="false">
+  <applications eltype="container" config="true" description="A list of applications the device iniates connections
+to. The configuration for each application specifies
+its details, including its servers, the type of
+connection to maintain, and the reconnection strategy
+to use." iskey="false">
+   <application eltype="list" config="true" key="name" iskey="false">
+    <name eltype="leaf" config="true" type="string" mandatory="true" description="An arbitrary name for the application the device
+is connecting to." iskey="true"/>
+    <description eltype="leaf" config="true" type="string" description="An optional description for the application." iskey="false"/>
+    <servers eltype="container" config="true" description="An ordered listing of the application&apos;s servers
+that the device should attempt connecting to." iskey="false">
+     <server eltype="list" config="true" key="address" iskey="false">
+      <min-elements value="1"/>
+      <ordered-by value="user"/>
+      <address eltype="leaf" config="true" type="inet:host" mandatory="true" description="The address or domain-name of the server." iskey="true"/>
+      <port eltype="leaf" config="true" type="inet:port-number" description="The IP port for this server. The device will use
+the IANA-assigned well-known port if not specified." iskey="false"/>
+     </server>    </servers>    <connection-type eltype="container" config="true" description="Indicates the application&apos;s preference for how the
+device&apos;s connection is maintained." iskey="false">
+     <connection-type eltype="choice" config="true" default="persistent-connection" iskey="false">
+      <persistent-connection eltype="case" config="true" iskey="false">
+       <persistent eltype="container" config="true" description="Maintain a persistent connection to the
+application. If the connection goes down,
+immediately start trying to reconnect to it,
+using the reconnection strategy.
+
+This connection type minimizes any
+application-to-server data-transfer delay,
+albeit at the expense of holding resources
+longer." iskey="false">
+        <keep-alives eltype="container" config="true" iskey="false">
+         <interval-secs eltype="leaf" config="true" type="uint8" default="15" description="Sets a timeout interval in seconds after which
+if no data has been received from the
+application, a message will be sent to request
+a response from the application.  A value of
+&apos;0&apos; indicates that no keep-alive messages
+should be sent." iskey="false">
+          <units name="seconds"/>
+         </interval-secs>         <count-max eltype="leaf" config="true" type="uint8" default="3" description="Sets the number of keep-alive messages that may
+be sent without receiving any data from the
+application before assuming the application is
+no longer alive.  If this threshold is reached,
+the transport-level connection will be
+disconnected (thus triggering the reconnection
+strategy).  The interval timer is reset after
+each transmission, thus an unresponsive
+application will be disconnected after
+approximately count-max * interval-secs
+seconds." iskey="false"/>
+        </keep-alives>       </persistent>      </persistent-connection>      <periodic-connection eltype="case" config="true" iskey="false">
+       <periodic eltype="container" config="true" description="Periodically connect to application, using the
+reconnection strategy, so it can flush any pending
+data it may be holding. This connection type
+minimizes resources held open, albeit at the
+expense of longer application-to-server
+data-transfer delay.  Note that for
+server-to-application data, the data should be
+sent immediately, connecting to application first
+if not already." iskey="false">
+        <timeout-mins eltype="leaf" config="true" type="uint8" default="5" description="The maximum amount of unconnected time the
+device will wait until establishing a
+connection to the application again. The
+device may establish a connection before this
+time if it has data it needs to send to the
+application. Note: this value differs from
+the reconnection strategy&apos;s interval-secs
+value." iskey="false">
+         <units name="minutes"/>
+        </timeout-mins>        <linger-secs eltype="leaf" config="true" type="uint8" default="30" description="The amount of time the device should wait after
+last receiving data from or sending data to the
+application before closing its connection to it.
+This is an optimization to prevent unnecessary
+connections." iskey="false">
+         <units name="seconds"/>
+        </linger-secs>       </periodic>      </periodic-connection>     </connection-type>    </connection-type>    <reconnect-strategy eltype="container" config="true" description="The reconnection strategy guides how a device reconnects
+to an application, after losing a connection to it, even
+if due to a reboot.  The device starts with the specified
+server, tries to connect to it count-max times, waiting
+interval-secs between each connection attempt, before
+trying the next server in the list (round robin)." iskey="false">
+     <start-with eltype="leaf" config="true" type="enumeration" enumval="first-listed|last-connected" default="first-listed" description="Specifies which of the application&apos;s servers the
+device should start with when trying to connect to
+the application. In the case of newly configured
+application, the first server listed shall be
+considered last-connected." iskey="false"/>
+     <interval-secs eltype="leaf" config="true" type="uint8" default="5" description="Specifies the time delay between connection attempts
+to the same server.  Note: this value differs from the
+periodic-connection&apos;s timeout-mins value." iskey="false">
+      <units name="seconds"/>
+     </interval-secs>     <count-max eltype="leaf" config="true" type="uint8" default="3" description="Specifies the number times the device tries to
+connect to a specific server before moving on to
+the next server in the list (round robin)." iskey="false"/>
+    </reconnect-strategy>   </application>  </applications> </call-home-config> <ssh-config eltype="grouping" config="true" iskey="false">
+  <listen eltype="container" config="true" description="Provides the configuration of the NETCONF server to
+open one or more ports to listen for incoming client
+connections." iskey="false">
+   <if-feature name="inbound-ssh"/>
+   <one-or-many eltype="choice" config="true" default="one-port" iskey="false">
+    <one-port eltype="case" config="true" iskey="false">
+     <port eltype="leaf" config="true" type="inet:port-number" description="The port number the server listens on on all
+interfaces." iskey="false"/>
+    </one-port>    <many-ports eltype="case" config="true" iskey="false">
+     <interface eltype="list" config="true" key="address" iskey="false">
+      <address eltype="leaf" config="true" type="inet:ip-address" mandatory="true" description="The local IP address of the interface to listen
+on." iskey="true"/>
+      <port eltype="leaf" config="true" type="inet:port-number" description="The local port number on this interface the
+server listens on." iskey="false"/>
+     </interface>    </many-ports>   </one-or-many>   <refine target-node="one-or-many/one-port/port" config="true" default="830" iskey="false"/>
+   <refine target-node="one-or-many/many-ports/interface/port" config="true" default="830" iskey="false"/>
+  </listen>  <call-home eltype="container" config="true" description="Provides the configuration of the NETCONF call-home
+clients to connect to, the overall call-home policy,
+and the reconnect strategy." iskey="false">
+   <if-feature name="outbound-ssh"/>
+   <applications eltype="container" config="true" description="A list of applications the device iniates connections
+to. The configuration for each application specifies
+its details, including its servers, the type of
+connection to maintain, and the reconnection strategy
+to use." iskey="false">
+    <application eltype="list" config="true" key="name" iskey="false">
+     <name eltype="leaf" config="true" type="string" mandatory="true" description="An arbitrary name for the application the device
+is connecting to." iskey="true"/>
+     <description eltype="leaf" config="true" type="string" description="An optional description for the application." iskey="false"/>
+     <servers eltype="container" config="true" description="An ordered listing of the application&apos;s servers
+that the device should attempt connecting to." iskey="false">
+      <server eltype="list" config="true" key="address" iskey="false">
+       <min-elements value="1"/>
+       <ordered-by value="user"/>
+       <address eltype="leaf" config="true" type="inet:host" mandatory="true" description="The address or domain-name of the server." iskey="true"/>
+       <port eltype="leaf" config="true" type="inet:port-number" description="The IP port for this server. The device will use
+the IANA-assigned well-known port if not specified." iskey="false"/>
+      </server>     </servers>     <connection-type eltype="container" config="true" description="Indicates the application&apos;s preference for how the
+device&apos;s connection is maintained." iskey="false">
+      <connection-type eltype="choice" config="true" default="persistent-connection" iskey="false">
+       <persistent-connection eltype="case" config="true" iskey="false">
+        <persistent eltype="container" config="true" description="Maintain a persistent connection to the
+application. If the connection goes down,
+immediately start trying to reconnect to it,
+using the reconnection strategy.
+
+This connection type minimizes any
+application-to-server data-transfer delay,
+albeit at the expense of holding resources
+longer." iskey="false">
+         <keep-alives eltype="container" config="true" iskey="false">
+          <interval-secs eltype="leaf" config="true" type="uint8" default="15" description="Sets a timeout interval in seconds after which
+if no data has been received from the
+application, a message will be sent to request
+a response from the application.  A value of
+&apos;0&apos; indicates that no keep-alive messages
+should be sent." iskey="false">
+           <units name="seconds"/>
+          </interval-secs>          <count-max eltype="leaf" config="true" type="uint8" default="3" description="Sets the number of keep-alive messages that may
+be sent without receiving any data from the
+application before assuming the application is
+no longer alive.  If this threshold is reached,
+the transport-level connection will be
+disconnected (thus triggering the reconnection
+strategy).  The interval timer is reset after
+each transmission, thus an unresponsive
+application will be disconnected after
+approximately count-max * interval-secs
+seconds." iskey="false"/>
+         </keep-alives>        </persistent>       </persistent-connection>       <periodic-connection eltype="case" config="true" iskey="false">
+        <periodic eltype="container" config="true" description="Periodically connect to application, using the
+reconnection strategy, so it can flush any pending
+data it may be holding. This connection type
+minimizes resources held open, albeit at the
+expense of longer application-to-server
+data-transfer delay.  Note that for
+server-to-application data, the data should be
+sent immediately, connecting to application first
+if not already." iskey="false">
+         <timeout-mins eltype="leaf" config="true" type="uint8" default="5" description="The maximum amount of unconnected time the
+device will wait until establishing a
+connection to the application again. The
+device may establish a connection before this
+time if it has data it needs to send to the
+application. Note: this value differs from
+the reconnection strategy&apos;s interval-secs
+value." iskey="false">
+          <units name="minutes"/>
+         </timeout-mins>         <linger-secs eltype="leaf" config="true" type="uint8" default="30" description="The amount of time the device should wait after
+last receiving data from or sending data to the
+application before closing its connection to it.
+This is an optimization to prevent unnecessary
+connections." iskey="false">
+          <units name="seconds"/>
+         </linger-secs>        </periodic>       </periodic-connection>      </connection-type>     </connection-type>     <reconnect-strategy eltype="container" config="true" description="The reconnection strategy guides how a device reconnects
+to an application, after losing a connection to it, even
+if due to a reboot.  The device starts with the specified
+server, tries to connect to it count-max times, waiting
+interval-secs between each connection attempt, before
+trying the next server in the list (round robin)." iskey="false">
+      <start-with eltype="leaf" config="true" type="enumeration" enumval="first-listed|last-connected" default="first-listed" description="Specifies which of the application&apos;s servers the
+device should start with when trying to connect to
+the application. In the case of newly configured
+application, the first server listed shall be
+considered last-connected." iskey="false"/>
+      <interval-secs eltype="leaf" config="true" type="uint8" default="5" description="Specifies the time delay between connection attempts
+to the same server.  Note: this value differs from the
+periodic-connection&apos;s timeout-mins value." iskey="false">
+       <units name="seconds"/>
+      </interval-secs>      <count-max eltype="leaf" config="true" type="uint8" default="3" description="Specifies the number times the device tries to
+connect to a specific server before moving on to
+the next server in the list (round robin)." iskey="false"/>
+     </reconnect-strategy>    </application>   </applications>   <augment target-node="applications/application" config="true" iskey="false">
+    <host-keys eltype="container" config="true" description="An ordered listing of the SSH host keys the
+device should advertise to the application." iskey="false">
+     <host-key eltype="list" config="true" key="name" iskey="false">
+      <min-elements value="1"/>
+      <ordered-by value="user"/>
+      <name eltype="leaf" config="true" type="string" mandatory="true" description="The name of a host key the device should
+advertise during the SSH key exchange." iskey="true"/>
+     </host-key>    </host-keys>   </augment>
+  </call-home> </ssh-config> <tls-config eltype="grouping" config="true" iskey="false">
+  <listen eltype="container" config="true" description="Provides the configuration of the NETCONF server to
+open one or more ports to listen for incoming client
+connections." iskey="false">
+   <if-feature name="inbound-tls"/>
+   <one-or-many eltype="choice" config="true" default="one-port" iskey="false">
+    <one-port eltype="case" config="true" iskey="false">
+     <port eltype="leaf" config="true" type="inet:port-number" description="The port number the server listens on on all
+interfaces." iskey="false"/>
+    </one-port>    <many-ports eltype="case" config="true" iskey="false">
+     <interface eltype="list" config="true" key="address" iskey="false">
+      <address eltype="leaf" config="true" type="inet:ip-address" mandatory="true" description="The local IP address of the interface to listen
+on." iskey="true"/>
+      <port eltype="leaf" config="true" type="inet:port-number" description="The local port number on this interface the
+server listens on." iskey="false"/>
+     </interface>    </many-ports>   </one-or-many>   <refine target-node="one-or-many/one-port/port" config="true" default="6513" iskey="false"/>
+   <refine target-node="one-or-many/many-ports/interface/port" config="true" default="6513" iskey="false"/>
+  </listen>  <call-home eltype="container" config="true" description="Provides the configuration of the NETCONF call-home
+clients to connect to, the overall call-home policy,
+and the reconnect strategy." iskey="false">
+   <if-feature name="outbound-tls"/>
+   <applications eltype="container" config="true" description="A list of applications the device iniates connections
+to. The configuration for each application specifies
+its details, including its servers, the type of
+connection to maintain, and the reconnection strategy
+to use." iskey="false">
+    <application eltype="list" config="true" key="name" iskey="false">
+     <name eltype="leaf" config="true" type="string" mandatory="true" description="An arbitrary name for the application the device
+is connecting to." iskey="true"/>
+     <description eltype="leaf" config="true" type="string" description="An optional description for the application." iskey="false"/>
+     <servers eltype="container" config="true" description="An ordered listing of the application&apos;s servers
+that the device should attempt connecting to." iskey="false">
+      <server eltype="list" config="true" key="address" iskey="false">
+       <min-elements value="1"/>
+       <ordered-by value="user"/>
+       <address eltype="leaf" config="true" type="inet:host" mandatory="true" description="The address or domain-name of the server." iskey="true"/>
+       <port eltype="leaf" config="true" type="inet:port-number" description="The IP port for this server. The device will use
+the IANA-assigned well-known port if not specified." iskey="false"/>
+      </server>     </servers>     <connection-type eltype="container" config="true" description="Indicates the application&apos;s preference for how the
+device&apos;s connection is maintained." iskey="false">
+      <connection-type eltype="choice" config="true" default="persistent-connection" iskey="false">
+       <persistent-connection eltype="case" config="true" iskey="false">
+        <persistent eltype="container" config="true" description="Maintain a persistent connection to the
+application. If the connection goes down,
+immediately start trying to reconnect to it,
+using the reconnection strategy.
+
+This connection type minimizes any
+application-to-server data-transfer delay,
+albeit at the expense of holding resources
+longer." iskey="false">
+         <keep-alives eltype="container" config="true" iskey="false">
+          <interval-secs eltype="leaf" config="true" type="uint8" default="15" description="Sets a timeout interval in seconds after which
+if no data has been received from the
+application, a message will be sent to request
+a response from the application.  A value of
+&apos;0&apos; indicates that no keep-alive messages
+should be sent." iskey="false">
+           <units name="seconds"/>
+          </interval-secs>          <count-max eltype="leaf" config="true" type="uint8" default="3" description="Sets the number of keep-alive messages that may
+be sent without receiving any data from the
+application before assuming the application is
+no longer alive.  If this threshold is reached,
+the transport-level connection will be
+disconnected (thus triggering the reconnection
+strategy).  The interval timer is reset after
+each transmission, thus an unresponsive
+application will be disconnected after
+approximately count-max * interval-secs
+seconds." iskey="false"/>
+         </keep-alives>        </persistent>       </persistent-connection>       <periodic-connection eltype="case" config="true" iskey="false">
+        <periodic eltype="container" config="true" description="Periodically connect to application, using the
+reconnection strategy, so it can flush any pending
+data it may be holding. This connection type
+minimizes resources held open, albeit at the
+expense of longer application-to-server
+data-transfer delay.  Note that for
+server-to-application data, the data should be
+sent immediately, connecting to application first
+if not already." iskey="false">
+         <timeout-mins eltype="leaf" config="true" type="uint8" default="5" description="The maximum amount of unconnected time the
+device will wait until establishing a
+connection to the application again. The
+device may establish a connection before this
+time if it has data it needs to send to the
+application. Note: this value differs from
+the reconnection strategy&apos;s interval-secs
+value." iskey="false">
+          <units name="minutes"/>
+         </timeout-mins>         <linger-secs eltype="leaf" config="true" type="uint8" default="30" description="The amount of time the device should wait after
+last receiving data from or sending data to the
+application before closing its connection to it.
+This is an optimization to prevent unnecessary
+connections." iskey="false">
+          <units name="seconds"/>
+         </linger-secs>        </periodic>       </periodic-connection>      </connection-type>     </connection-type>     <reconnect-strategy eltype="container" config="true" description="The reconnection strategy guides how a device reconnects
+to an application, after losing a connection to it, even
+if due to a reboot.  The device starts with the specified
+server, tries to connect to it count-max times, waiting
+interval-secs between each connection attempt, before
+trying the next server in the list (round robin)." iskey="false">
+      <start-with eltype="leaf" config="true" type="enumeration" enumval="first-listed|last-connected" default="first-listed" description="Specifies which of the application&apos;s servers the
+device should start with when trying to connect to
+the application. In the case of newly configured
+application, the first server listed shall be
+considered last-connected." iskey="false"/>
+      <interval-secs eltype="leaf" config="true" type="uint8" default="5" description="Specifies the time delay between connection attempts
+to the same server.  Note: this value differs from the
+periodic-connection&apos;s timeout-mins value." iskey="false">
+       <units name="seconds"/>
+      </interval-secs>      <count-max eltype="leaf" config="true" type="uint8" default="3" description="Specifies the number times the device tries to
+connect to a specific server before moving on to
+the next server in the list (round robin)." iskey="false"/>
+     </reconnect-strategy>    </application>   </applications>  </call-home>  <cert-maps eltype="container" config="true" description="The cert-maps container is used by a NETCONF server to
+map the NETCONF client&apos;s presented X.509 certificate to
+a NETCONF username.
+
+If no matching and valid cert-to-name list entry can be
+found, then the NETCONF server MUST close the connection,
+and MUST NOT accept NETCONF messages over it." iskey="false">
+   <if-feature name="tls-map-certificates"/>
+   <cert-to-name eltype="list" config="true" key="id" description="This list defines how certificates are mapped to names.
+The name is derived by considering each cert-to-name
+list entry in order. The cert-to-name entry&apos;s fingerprint
+determines whether the list entry is a match:
+
+1) If the cert-to-name list entry&apos;s fingerprint value
+   matches that of the presented certificate, then consider
+   the list entry as a successful match.
+
+2) If the cert-to-name list entry&apos;s fingerprint value
+   matches that of a locally held copy of a trusted CA
+   certificate, and that CA certificate was part of the CA
+   certificate chain to the presented certificate, then
+   consider the list entry as a successful match.
+
+Once a matching cert-to-name list entry has been found, the
+map-type is used to determine how the name associated with
+the certificate should be determined.  See the map-type
+leaf&apos;s description for details on determining the name value.
+If it is impossible to determine a name from the cert-to-name
+list entry&apos;s data combined with the data presented in the
+certificate, then additional cert-to-name list entries MUST
+be searched looking for another potential match.
+
+Security administrators are encouraged to make use of
+certificates with subjectAltName fields that can be mapped to
+names so that a single root CA certificate can allow all
+child certificate&apos;s subjectAltName to map directly to a name
+via a 1:1 transformation." iskey="false">
+    <reference>
+     <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNEntry</text>
+    </reference>
+    <id eltype="leaf" config="true" type="uint32" description="The id specifies the order in which the entries in the
+cert-to-name list are searched.  Entries with lower
+numbers are searched first." iskey="true">
+     <reference>
+      <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNID</text>
+     </reference>
+    </id>    <fingerprint eltype="leaf" config="true" type="x509c2n:tls-fingerprint" mandatory="true" description="Specifies a value with which the fingerprint of the
+certificate presented by the peer is compared.  If the
+fingerprint of the certificate presented by the peer does
+not match the fingerprint configured, then the entry is
+skipped and the search for a match continues." iskey="false">
+     <reference>
+      <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNFingerprint</text>
+     </reference>
+    </fingerprint>    <map-type eltype="leaf" config="true" type="identityref" mandatory="true" description="Specifies the algorithm used to map the certificate
+presented by the peer to a name.
+
+Mappings that need additional configuration objects should
+use the &apos;when&apos; statement to make them conditional based on
+the &apos;map-type&apos;." iskey="false">
+     <reference>
+      <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNMapType</text>
+     </reference>
+    </map-type>    <name eltype="leaf" config="true" type="string" mandatory="true" description="Directly specifies the NETCONF username when the
+&apos;map-type&apos; is &apos;specified&apos;." iskey="false">
+     <reference>
+      <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNData</text>
+     </reference>
+    </name>   </cert-to-name>  </cert-maps>  <psk-maps eltype="container" config="true" description="During the TLS Handshake, the client indicates which
+key to use by including a PSK identity in the TLS
+ClientKeyExchange message. On the server side, this
+PSK identity is used to look up an entry in the psk-map
+list. If such an entry is found, and the pre-shared keys
+match, then the client is authenticated. The server uses
+the value from the user-name leaf in the psk-map list as
+the NETCONF username.  If the server cannot find an entry
+in the psk-map list, or if the pre-shared keys do not
+match, then the server terminates the connection." iskey="false">
+   <if-feature name="tls-map-pre-shared-keys"/>
+   <reference>
+    <text>RFC 4279: Pre-Shared Key Ciphersuites for Transport Layer
+          Security (TLS)</text>
+   </reference>
+   <psk-map eltype="list" config="true" key="psk-identity" iskey="false">
+    <psk-identity eltype="leaf" config="true" type="string" description="The PSK identity encoded as a UTF-8 string. For
+details how certain common PSK identity formats can
+be encoded in UTF-8, see section 5.1. of RFC 4279." iskey="true">
+     <reference>
+      <text>RFC 4279: Pre-Shared Key Ciphersuites for Transport
+          Layer Security (TLS)</text>
+     </reference>
+    </psk-identity>    <user-name eltype="leaf" config="true" type="nacm:user-name-type" mandatory="true" description="The NETCONF username associated with this PSK
+identity." iskey="false"/>
+    <not-valid-before eltype="leaf" config="true" type="yang:date-and-time" description="This PSK identity is not valid before the given date
+and time." iskey="false"/>
+    <not-valid-after eltype="leaf" config="true" type="yang:date-and-time" description="This PSK identity is not valid after the given date
+and time." iskey="false"/>
+    <key eltype="leaf" config="true" type="yang:hex-string" mandatory="true" description="The key associated with the PSK identity" iskey="false">
+     <nacm:default-deny-all/>
+     <reference>
+      <text>RFC 4279: Pre-Shared Key Ciphersuites for Transport
+Layer Security (TLS)</text>
+     </reference>
+    </key>   </psk-map>  </psk-maps> </tls-config> <x509c2n:cert-to-name eltype="grouping" config="true" iskey="false">
+  <cert-to-name eltype="list" config="true" key="id" description="This list defines how certificates are mapped to names.
+The name is derived by considering each cert-to-name
+list entry in order. The cert-to-name entry&apos;s fingerprint
+determines whether the list entry is a match:
+
+1) If the cert-to-name list entry&apos;s fingerprint value
+   matches that of the presented certificate, then consider
+   the list entry as a successful match.
+
+2) If the cert-to-name list entry&apos;s fingerprint value
+   matches that of a locally held copy of a trusted CA
+   certificate, and that CA certificate was part of the CA
+   certificate chain to the presented certificate, then
+   consider the list entry as a successful match.
+
+Once a matching cert-to-name list entry has been found, the
+map-type is used to determine how the name associated with
+the certificate should be determined.  See the map-type
+leaf&apos;s description for details on determining the name value.
+If it is impossible to determine a name from the cert-to-name
+list entry&apos;s data combined with the data presented in the
+certificate, then additional cert-to-name list entries MUST
+be searched looking for another potential match.
+
+Security administrators are encouraged to make use of
+certificates with subjectAltName fields that can be mapped to
+names so that a single root CA certificate can allow all
+child certificate&apos;s subjectAltName to map directly to a name
+via a 1:1 transformation." iskey="false">
+   <reference>
+    <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNEntry</text>
+   </reference>
+   <id eltype="leaf" config="true" type="uint32" description="The id specifies the order in which the entries in the
+cert-to-name list are searched.  Entries with lower
+numbers are searched first." iskey="true">
+    <reference>
+     <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNID</text>
+    </reference>
+   </id>   <fingerprint eltype="leaf" config="true" type="x509c2n:tls-fingerprint" mandatory="true" description="Specifies a value with which the fingerprint of the
+certificate presented by the peer is compared.  If the
+fingerprint of the certificate presented by the peer does
+not match the fingerprint configured, then the entry is
+skipped and the search for a match continues." iskey="false">
+    <reference>
+     <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNFingerprint</text>
+    </reference>
+   </fingerprint>   <map-type eltype="leaf" config="true" type="identityref" mandatory="true" description="Specifies the algorithm used to map the certificate
+presented by the peer to a name.
+
+Mappings that need additional configuration objects should
+use the &apos;when&apos; statement to make them conditional based on
+the &apos;map-type&apos;." iskey="false">
+    <reference>
+     <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNMapType</text>
+    </reference>
+   </map-type>   <name eltype="leaf" config="true" type="string" mandatory="true" description="Directly specifies the NETCONF username when the
+&apos;map-type&apos; is &apos;specified&apos;." iskey="false">
+    <reference>
+     <text>SNMP-TLS-TM-MIB.snmpTlstmCertToTSNData</text>
+    </reference>
+   </name>  </cert-to-name> </x509c2n:cert-to-name><netconf eltype="container" config="true" description="Top-level container for NETCONF server related
+configuration objects." iskey="false"><ssh eltype="container" config="true" iskey="false"><listen eltype="container" config="true" description="Provides the configuration of the NETCONF server to
+open one or more ports to listen for incoming client
+connections." iskey="false"><one-or-many eltype="choice" config="true" iskey="false"><one-port eltype="case" config="true" iskey="false"><port eltype="leaf" config="true" type="uint16" description="The port number the server listens on on all
+interfaces." iskey="false"/>
+</one-port>
+<many-ports eltype="case" config="true" iskey="false"><interface eltype="list" config="true" key="address" iskey="false"><address eltype="leaf" config="true" type="union" description="The local IP address of the interface to listen
+on." mandatory="true" iskey="true"/>
+<port eltype="leaf" config="true" type="uint16" description="The local port number on this interface the
+server listens on." iskey="false"/>
+</interface>
+</many-ports>
+</one-or-many>
+</listen>
+<call-home eltype="container" config="true" description="Provides the configuration of the NETCONF call-home
+clients to connect to, the overall call-home policy,
+and the reconnect strategy." iskey="false"><applications eltype="container" config="true" description="A list of applications the device iniates connections
+to. The configuration for each application specifies
+its details, including its servers, the type of
+connection to maintain, and the reconnection strategy
+to use." iskey="false"><application eltype="list" config="true" key="name" iskey="false"><name eltype="leaf" config="true" type="string" description="An arbitrary name for the application the device
+is connecting to." mandatory="true" iskey="true"/>
+<description eltype="leaf" config="true" type="string" description="An optional description for the application." iskey="false"/>
+<servers eltype="container" config="true" description="An ordered listing of the application&apos;s servers
+that the device should attempt connecting to." iskey="false"><server eltype="list" config="true" key="address" iskey="false" orderedBy="user"><address eltype="leaf" config="true" type="union" description="The address or domain-name of the server." mandatory="true" iskey="true"/>
+<port eltype="leaf" config="true" type="uint16" description="The IP port for this server. The device will use
+the IANA-assigned well-known port if not specified." iskey="false"/>
+</server>
+</servers>
+<connection-type eltype="container" config="true" description="Indicates the application&apos;s preference for how the
+device&apos;s connection is maintained." iskey="false"><connection-type eltype="choice" config="true" iskey="false"><persistent-connection eltype="case" config="true" iskey="false"><persistent eltype="container" config="true" description="Maintain a persistent connection to the
+application. If the connection goes down,
+immediately start trying to reconnect to it,
+using the reconnection strategy.
+
+This connection type minimizes any
+application-to-server data-transfer delay,
+albeit at the expense of holding resources
+longer." iskey="false"><keep-alives eltype="container" config="true" iskey="false"><interval-secs eltype="leaf" config="true" type="uint8" description="Sets a timeout interval in seconds after which
+if no data has been received from the
+application, a message will be sent to request
+a response from the application.  A value of
+&apos;0&apos; indicates that no keep-alive messages
+should be sent." default="15" iskey="false"/>
+<count-max eltype="leaf" config="true" type="uint8" description="Sets the number of keep-alive messages that may
+be sent without receiving any data from the
+application before assuming the application is
+no longer alive.  If this threshold is reached,
+the transport-level connection will be
+disconnected (thus triggering the reconnection
+strategy).  The interval timer is reset after
+each transmission, thus an unresponsive
+application will be disconnected after
+approximately count-max * interval-secs
+seconds." default="3" iskey="false"/>
+</keep-alives>
+</persistent>
+</persistent-connection>
+<periodic-connection eltype="case" config="true" iskey="false"><periodic eltype="container" config="true" description="Periodically connect to application, using the
+reconnection strategy, so it can flush any pending
+data it may be holding. This connection type
+minimizes resources held open, albeit at the
+expense of longer application-to-server
+data-transfer delay.  Note that for
+server-to-application data, the data should be
+sent immediately, connecting to application first
+if not already." iskey="false"><timeout-mins eltype="leaf" config="true" type="uint8" description="The maximum amount of unconnected time the
+device will wait until establishing a
+connection to the application again. The
+device may establish a connection before this
+time if it has data it needs to send to the
+application. Note: this value differs from
+the reconnection strategy&apos;s interval-secs
+value." default="5" iskey="false"/>
+<linger-secs eltype="leaf" config="true" type="uint8" description="The amount of time the device should wait after
+last receiving data from or sending data to the
+application before closing its connection to it.
+This is an optimization to prevent unnecessary
+connections." default="30" iskey="false"/>
+</periodic>
+</periodic-connection>
+</connection-type>
+</connection-type>
+<reconnect-strategy eltype="container" config="true" description="The reconnection strategy guides how a device reconnects
+to an application, after losing a connection to it, even
+if due to a reboot.  The device starts with the specified
+server, tries to connect to it count-max times, waiting
+interval-secs between each connection attempt, before
+trying the next server in the list (round robin)." iskey="false"><start-with eltype="leaf" config="true" type="enumeration" enumval="first-listed|last-connected" description="Specifies which of the application&apos;s servers the
+device should start with when trying to connect to
+the application. In the case of newly configured
+application, the first server listed shall be
+considered last-connected." default="first-listed" iskey="false"/>
+<interval-secs eltype="leaf" config="true" type="uint8" description="Specifies the time delay between connection attempts
+to the same server.  Note: this value differs from the
+periodic-connection&apos;s timeout-mins value." default="5" iskey="false"/>
+<count-max eltype="leaf" config="true" type="uint8" description="Specifies the number times the device tries to
+connect to a specific server before moving on to
+the next server in the list (round robin)." default="3" iskey="false"/>
+</reconnect-strategy>
+</application>
+</applications>
+</call-home>
+</ssh>
+<tls eltype="container" config="true" iskey="false"><listen eltype="container" config="true" description="Provides the configuration of the NETCONF server to
+open one or more ports to listen for incoming client
+connections." iskey="false"><one-or-many eltype="choice" config="true" iskey="false"><one-port eltype="case" config="true" iskey="false"><port eltype="leaf" config="true" type="uint16" description="The port number the server listens on on all
+interfaces." iskey="false"/>
+</one-port>
+<many-ports eltype="case" config="true" iskey="false"><interface eltype="list" config="true" key="address" iskey="false"><address eltype="leaf" config="true" type="union" description="The local IP address of the interface to listen
+on." mandatory="true" iskey="true"/>
+<port eltype="leaf" config="true" type="uint16" description="The local port number on this interface the
+server listens on." iskey="false"/>
+</interface>
+</many-ports>
+</one-or-many>
+</listen>
+<call-home eltype="container" config="true" description="Provides the configuration of the NETCONF call-home
+clients to connect to, the overall call-home policy,
+and the reconnect strategy." iskey="false"><applications eltype="container" config="true" description="A list of applications the device iniates connections
+to. The configuration for each application specifies
+its details, including its servers, the type of
+connection to maintain, and the reconnection strategy
+to use." iskey="false"><application eltype="list" config="true" key="name" iskey="false"><name eltype="leaf" config="true" type="string" description="An arbitrary name for the application the device
+is connecting to." mandatory="true" iskey="true"/>
+<description eltype="leaf" config="true" type="string" description="An optional description for the application." iskey="false"/>
+<servers eltype="container" config="true" description="An ordered listing of the application&apos;s servers
+that the device should attempt connecting to." iskey="false"><server eltype="list" config="true" key="address" iskey="false" orderedBy="user"><address eltype="leaf" config="true" type="union" description="The address or domain-name of the server." mandatory="true" iskey="true"/>
+<port eltype="leaf" config="true" type="uint16" description="The IP port for this server. The device will use
+the IANA-assigned well-known port if not specified." iskey="false"/>
+</server>
+</servers>
+<connection-type eltype="container" config="true" description="Indicates the application&apos;s preference for how the
+device&apos;s connection is maintained." iskey="false"><connection-type eltype="choice" config="true" iskey="false"><persistent-connection eltype="case" config="true" iskey="false"><persistent eltype="container" config="true" description="Maintain a persistent connection to the
+application. If the connection goes down,
+immediately start trying to reconnect to it,
+using the reconnection strategy.
+
+This connection type minimizes any
+application-to-server data-transfer delay,
+albeit at the expense of holding resources
+longer." iskey="false"><keep-alives eltype="container" config="true" iskey="false"><interval-secs eltype="leaf" config="true" type="uint8" description="Sets a timeout interval in seconds after which
+if no data has been received from the
+application, a message will be sent to request
+a response from the application.  A value of
+&apos;0&apos; indicates that no keep-alive messages
+should be sent." default="15" iskey="false"/>
+<count-max eltype="leaf" config="true" type="uint8" description="Sets the number of keep-alive messages that may
+be sent without receiving any data from the
+application before assuming the application is
+no longer alive.  If this threshold is reached,
+the transport-level connection will be
+disconnected (thus triggering the reconnection
+strategy).  The interval timer is reset after
+each transmission, thus an unresponsive
+application will be disconnected after
+approximately count-max * interval-secs
+seconds." default="3" iskey="false"/>
+</keep-alives>
+</persistent>
+</persistent-connection>
+<periodic-connection eltype="case" config="true" iskey="false"><periodic eltype="container" config="true" description="Periodically connect to application, using the
+reconnection strategy, so it can flush any pending
+data it may be holding. This connection type
+minimizes resources held open, albeit at the
+expense of longer application-to-server
+data-transfer delay.  Note that for
+server-to-application data, the data should be
+sent immediately, connecting to application first
+if not already." iskey="false"><timeout-mins eltype="leaf" config="true" type="uint8" description="The maximum amount of unconnected time the
+device will wait until establishing a
+connection to the application again. The
+device may establish a connection before this
+time if it has data it needs to send to the
+application. Note: this value differs from
+the reconnection strategy&apos;s interval-secs
+value." default="5" iskey="false"/>
+<linger-secs eltype="leaf" config="true" type="uint8" description="The amount of time the device should wait after
+last receiving data from or sending data to the
+application before closing its connection to it.
+This is an optimization to prevent unnecessary
+connections." default="30" iskey="false"/>
+</periodic>
+</periodic-connection>
+</connection-type>
+</connection-type>
+<reconnect-strategy eltype="container" config="true" description="The reconnection strategy guides how a device reconnects
+to an application, after losing a connection to it, even
+if due to a reboot.  The device starts with the specified
+server, tries to connect to it count-max times, waiting
+interval-secs between each connection attempt, before
+trying the next server in the list (round robin)." iskey="false"><start-with eltype="leaf" config="true" type="enumeration" enumval="first-listed|last-connected" description="Specifies which of the application&apos;s servers the
+device should start with when trying to connect to
+the application. In the case of newly configured
+application, the first server listed shall be
+considered last-connected." default="first-listed" iskey="false"/>
+<interval-secs eltype="leaf" config="true" type="uint8" description="Specifies the time delay between connection attempts
+to the same server.  Note: this value differs from the
+periodic-connection&apos;s timeout-mins value." default="5" iskey="false"/>
+<count-max eltype="leaf" config="true" type="uint8" description="Specifies the number times the device tries to
+connect to a specific server before moving on to
+the next server in the list (round robin)." default="3" iskey="false"/>
+</reconnect-strategy>
+</application>
+</applications>
+</call-home>
+<cert-maps eltype="container" config="true" description="The cert-maps container is used by a NETCONF server to
+map the NETCONF client&apos;s presented X.509 certificate to
+a NETCONF username.
+
+If no matching and valid cert-to-name list entry can be
+found, then the NETCONF server MUST close the connection,
+and MUST NOT accept NETCONF messages over it." iskey="false"><cert-to-name eltype="list" config="true" description="This list defines how certificates are mapped to names.
+The name is derived by considering each cert-to-name
+list entry in order. The cert-to-name entry&apos;s fingerprint
+determines whether the list entry is a match:
+
+1) If the cert-to-name list entry&apos;s fingerprint value
+   matches that of the presented certificate, then consider
+   the list entry as a successful match.
+
+2) If the cert-to-name list entry&apos;s fingerprint value
+   matches that of a locally held copy of a trusted CA
+   certificate, and that CA certificate was part of the CA
+   certificate chain to the presented certificate, then
+   consider the list entry as a successful match.
+
+Once a matching cert-to-name list entry has been found, the
+map-type is used to determine how the name associated with
+the certificate should be determined.  See the map-type
+leaf&apos;s description for details on determining the name value.
+If it is impossible to determine a name from the cert-to-name
+list entry&apos;s data combined with the data presented in the
+certificate, then additional cert-to-name list entries MUST
+be searched looking for another potential match.
+
+Security administrators are encouraged to make use of
+certificates with subjectAltName fields that can be mapped to
+names so that a single root CA certificate can allow all
+child certificate&apos;s subjectAltName to map directly to a name
+via a 1:1 transformation." key="id" iskey="false"><id eltype="leaf" config="true" type="uint32" description="The id specifies the order in which the entries in the
+cert-to-name list are searched.  Entries with lower
+numbers are searched first." iskey="true"/>
+<fingerprint eltype="leaf" config="true" type="yang:hex-string" description="Specifies a value with which the fingerprint of the
+certificate presented by the peer is compared.  If the
+fingerprint of the certificate presented by the peer does
+not match the fingerprint configured, then the entry is
+skipped and the search for a match continues." mandatory="true" iskey="false"/>
+<map-type eltype="leaf" config="true" type="identityref" description="Specifies the algorithm used to map the certificate
+presented by the peer to a name.
+
+Mappings that need additional configuration objects should
+use the &apos;when&apos; statement to make them conditional based on
+the &apos;map-type&apos;." mandatory="true" iskey="false"/>
+<name eltype="leaf" config="true" type="string" description="Directly specifies the NETCONF username when the
+&apos;map-type&apos; is &apos;specified&apos;." mandatory="true" iskey="false"/>
+</cert-to-name>
+</cert-maps>
+<psk-maps eltype="container" config="true" description="During the TLS Handshake, the client indicates which
+key to use by including a PSK identity in the TLS
+ClientKeyExchange message. On the server side, this
+PSK identity is used to look up an entry in the psk-map
+list. If such an entry is found, and the pre-shared keys
+match, then the client is authenticated. The server uses
+the value from the user-name leaf in the psk-map list as
+the NETCONF username.  If the server cannot find an entry
+in the psk-map list, or if the pre-shared keys do not
+match, then the server terminates the connection." iskey="false"><psk-map eltype="list" config="true" key="psk-identity" iskey="false"><psk-identity eltype="leaf" config="true" type="string" description="The PSK identity encoded as a UTF-8 string. For
+details how certain common PSK identity formats can
+be encoded in UTF-8, see section 5.1. of RFC 4279." iskey="true"/>
+<user-name eltype="leaf" config="true" type="string" description="The NETCONF username associated with this PSK
+identity." mandatory="true" iskey="false"/>
+<not-valid-before eltype="leaf" config="true" type="string" description="This PSK identity is not valid before the given date
+and time." iskey="false"/>
+<not-valid-after eltype="leaf" config="true" type="string" description="This PSK identity is not valid after the given date
+and time." iskey="false"/>
+<key eltype="leaf" config="true" type="string" description="The key associated with the PSK identity" mandatory="true" iskey="false"/>
+</psk-map>
+</psk-maps>
+</tls>
+</netconf>
+</module>

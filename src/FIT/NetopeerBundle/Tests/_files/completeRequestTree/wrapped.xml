@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module name="turing-machine"
+        xmlns="urn:ietf:params:xml:ns:yang:yin:1"
+        xmlns:tm="http://example.net/turing-machine">
+	<namespace uri="http://example.net/turing-machine"/>
+	<prefix value="tm"/>
+	<description>
+		<text>Data model for the Turing Machine.</text>
+	</description>
+	<revision date="2013-12-27" description="Initial revision." iskey="false"/>
+	<tape-symbol eltype="typedef" type="string" description="Type of symbols appearing in tape cells.
+
+A blank is represented as an empty string where necessary." iskey="false"/>
+	<cell-index eltype="typedef" type="int64" description="Type for indexing tape cells." iskey="false"/>
+	<state-index eltype="typedef" type="uint16" description="Type for indexing states of the control unit."
+	             iskey="false"/>
+	<head-dir eltype="typedef" type="enumeration" enumval="left|right" default="right" description="Possible directions for moving the read/write head, one cell
+to the left or right (default)." iskey="false"/>
+	<tape-cells eltype="grouping" config="true" description="The tape of the Turing Machine is represented as a sparse
+array." iskey="false">
+		<cell eltype="list" config="true" key="coord" description="List of non-blank cells." iskey="false">
+			<coord eltype="leaf" config="true" type="cell-index" description="Coordinate (index) of the tape cell."
+			       iskey="true"/>
+			<symbol eltype="leaf" config="true" type="tape-symbol" description="Symbol appearing in the tape cell.
+
+Blank (empty string) is not allowed here because the
+&apos;cell&apos; list only contains non-blank cells." iskey="false"/>
+		</cell>
+	</tape-cells>
+	<turing-machine eltype="container" config="true" description="State data and configuration of a Turing Machine."
+	                iskey="false">
+		<state eltype="leaf" config="false" type="uint16" description="Current state of the control unit.
+
+The initial state is 0." mandatory="true" iskey="false"/>
+		<head-position eltype="leaf" config="false" type="int64" description="Position of tape read/write head."
+		               mandatory="true" iskey="false"/>
+		<tape eltype="container" config="false" description="The contents of the tape." iskey="false">
+			<cell eltype="list" config="false" description="List of non-blank cells." key="coord" iskey="false">
+				<coord eltype="leaf" config="false" type="int64" description="Coordinate (index) of the tape cell."
+				       iskey="true"/>
+				<symbol eltype="leaf" config="false" type="string" description="Symbol appearing in the tape cell.
+
+Blank (empty string) is not allowed here because the
+&apos;cell&apos; list only contains non-blank cells." iskey="false"/>
+			</cell>
+		</tape>
+		<transition-function eltype="container" config="true" description="The Turing Machine is configured by specifying the
+transition function." iskey="false">
+			<delta eltype="list" config="true" description="The list of transition rules." key="label" iskey="false">
+				<label eltype="leaf" config="true" type="string" description="An arbitrary label of the transition rule."
+				       iskey="true"/>
+				<input eltype="container" config="true" description="Input parameters (arguments) of the transition rule."
+				       iskey="false">
+					<state eltype="leaf" config="true" type="uint16" description="Current state of the control unit."
+					       mandatory="true" iskey="false"/>
+					<symbol eltype="leaf" config="true" type="string" description="Symbol read from the tape cell."
+					        mandatory="true" iskey="false"/>
+				</input>
+				<output eltype="container" config="true" description="Output values of the transition rule." iskey="false">
+					<state eltype="leaf" config="true" type="uint16" description="New state of the control unit. If this leaf is not
+present, the state doesn&apos;t change." iskey="false"/>
+					<symbol eltype="leaf" config="true" type="string" description="Symbol to be written to the tape cell. If this leaf is
+not present, the symbol doesn&apos;t change." iskey="false"/>
+					<head-move eltype="leaf" config="true" type="enumeration" enumval="left|right"
+					           description="Move the head one cell to the left or right" iskey="false"/>
+				</output>
+			</delta>
+		</transition-function>
+	</turing-machine>
+</module>

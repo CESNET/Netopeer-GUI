@@ -44,6 +44,7 @@ namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
 use FIT\NetopeerBundle\Models\AjaxSharedData;
+use FIT\NetopeerBundle\Models\XMLoperations;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -256,9 +257,14 @@ class AjaxController extends BaseController
 	{
 		$this->setActiveSectionKey($key);
 		$this->get('DataModel')->buildMenuStructure($key);
+
+		/**
+		 * @var XMLoperations $xmlOp
+		 */
+		$xmlOp = $this->get('XMLoperations');
 		$formParams = $this->get('DataModel')->loadFilters($module, $subsection);
 
-		$res = $this->get('XMLoperations')->getAvailableLabelValuesForXPath($formId, $xPath);
+		$res = $xmlOp->getAvailableLabelValuesForXPath($formId, $xPath);
 
 		// path for creating node typeahead
 		$typeaheadParams = array(
@@ -294,13 +300,13 @@ class AjaxController extends BaseController
 						$twigArr['element'] = $res['elems'][$_GET['label']];
 						$twigArr['useHiddenInput'] = true;
 
-						$html = $this->get('XMLoperations')->removeMultipleWhitespaces($template->renderBlock('configInputElem', $twigArr));
+						$html = $xmlOp->removeMultipleWhitespaces($template->renderBlock('configInputElem', $twigArr));
 						$retArr['valueElem'] = $html;
 
-						$html = $this->get('XMLoperations')->removeMultipleWhitespaces($template->renderBlock('editBar', $twigArr));
+						$html = $xmlOp->removeMultipleWhitespaces($template->renderBlock('editBar', $twigArr));
 						$retArr['editBar'] = $html;
 
-						$children = $this->get('XMLoperations')->getChildrenValues($twigArr['element'], $template, $formId, $xPath);
+						$children = $xmlOp->getChildrenValues($twigArr['element'], $template, $formId, $xPath);
 						$retArr['children'] = $children;
 					}
 

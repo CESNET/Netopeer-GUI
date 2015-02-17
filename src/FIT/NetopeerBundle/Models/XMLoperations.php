@@ -1134,7 +1134,7 @@ public function mergeRecursive(&$model, $root_el) {
 	 * For now, only two validation step are set up - RelaxNG (*.rng) and Schema (*.xsd)
 	 *
 	 * @param string $xml   xml string to validate with RelaxNG and Schema, if available
-	 * @return int          0 on success, 1 on error
+	 * @return bool
 	 */
 	public function validateXml($xml) {
 		$finder = new Finder();
@@ -1152,24 +1152,30 @@ public function mergeRecursive(&$model, $root_el) {
 				$path = $file->getRealPath();
 				if (strpos($path, "rng")) {
 					try {
-						@$domDoc->relaxNGValidate($path);
+						if (!@$domDoc->relaxNGValidate($path)) {
+							return false;
+						}
 					} catch (\ContextErrorException $e) {
 						$this->logger->addWarning($e->getMessage());
+						return false;
 					}
 				} else if (strpos($path, "xsd")) {
 					try {
-						@$domDoc->schemaValidate($path);
+						if (!@$domDoc->schemaValidate($path)) {
+							return false;
+						}
 					} catch (\ContextErrorException $e) {
 						$this->logger->addWarning($e->getMessage());
+						return false;
 					}
 				}
 			}
 		} catch (\ErrorException $e) {
-			$this->logger->warn("XML is not valid.", array('error' => $e->getMessage(), 'xml' => $xml, 'RNGfile' => $path));
-			return 1;
+			$this->logger->addWarning("XML is not valid.", array('error' => $e->getMessage(), 'xml' => $xml, 'RNGfile' => $path));
+			return false;
 		}
 
-		return 0;
+		return true;
 
 	}
 

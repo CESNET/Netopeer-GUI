@@ -73,6 +73,7 @@ class XMLoperationsTest extends WebTestCase {
 			array('--*--*?@contains(xxx)!', '/*/*[@contains(xxx)]'),
 			array('--*--*?position()<3!', '/*/*[position()<3]'),
 			array('--*--*?1!', '/*/*[1]'),
+		  array('/*/*[1]/*[1]/*[2]/*[1]', '/*/*[1]/*[1]/*[2]/*[1]'),
 		);
 
 		foreach ($configuration as $conf) {
@@ -488,20 +489,101 @@ class XMLoperationsTest extends WebTestCase {
 
 	public function testValidateXml()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
-		);
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+
+		$validXml = array('<turing-machine xmlns="http://example.net/turing-machine"><state>2</state><head-position>2</head-position><tape/></turing-machine>', '
+<turing-machine xmlns="http://example.net/turing-machine">
+<state>2</state>
+<head-position>2</head-position>
+<transition-function>
+<!--
+<delta>
+	<label>test</label>
+	<output>
+		<state>2</state>
+		<symbol>3</symbol>
+		<head-move>right</head-move>
+	</output>
+</delta>
+TODO: this should pass
+-->
+</transition-function>
+</turing-machine>');
+		$invalidXml = array('<turing-machine xmlns="http://example.net/turing-machine">
+<transition-function>
+<delta>
+	<label>test</label>
+	<output>
+		<state>2</state>
+		<whatever>3</whatever>
+		<head-move>right</head-move>
+	</output>
+</delta>
+</transition-function>
+</turing-machine>', '<turing-machine xmlns="http://example.net/turing-machinexxx" eltype="container" config="true" description="State data and configuration of a Turing Machine." iskey="false"/>', '<turing-machine xmlns2="http://example.net/turing-machine" eltype="container" config="true" xdescription="State data and configuration of a Turing Machine." iskey="false"/>');
+
+		$i = 1;
+		foreach ($validXml as $xml) {
+			$this->assertTrue($xmlOp->validateXml($xml), 'xml should be valid '.$i++);
+		}
+
+		$i = 1;
+		foreach ($invalidXml as $xml) {
+			$this->assertFalse($xmlOp->validateXml($xml), 'xml should not be valid '.$i++);
+		}
 	}
 
 	public function testGetAvailableLabelValuesForXPath()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+		$formId = 'test_get_children';
+
+		$configuration = array(
+			'--turing-machine' => array('transition-function'), // check ignoring state children
+			'--*--transition-function' => array('delta'),
+			'--*--*?1!--delta' => array('label', 'input', 'output'),
+			'--*--*?1!--*?1!--output' => array('state', 'symbol', 'head-move'),
 		);
+
+		$i = 1;
+		foreach ($configuration as $xpath => $expected) {
+			$res = $xmlOp->getAvailableLabelValuesForXPath($formId, $xpath);
+			$this->assertArrayHasKey('labels', $res, 'array has key labels '.$i);
+			$this->assertArrayHasKey('labelsAttributes', $res, 'array has key labelsAttributes '.$i);
+			$this->assertArrayHasKey('elems', $res, 'array has key elems '.$i);
+			$this->assertNotEmpty($res['elems'], 'array elems is not empty '.$i);
+			$this->assertEquals($expected, $res['labels'], 'getting available label values '.$i++);
+		}
+
+
+		// mocking class method loadModel to return model with choices
+		$formId = 'test_get_children_stub';
+		$stub = $this->getMockWithModel('wrapped_choice.wyin');
+
+		$configuration = array(
+			'--*--*?1!--listen' => array('one-port', 'many-ports'), // check choice elements
+		  '--*--*?1!--*?1!--*?1!--connection-type' => array('persistent-connection', 'periodic-connection'),
+		);
+
+		foreach ($configuration as $xpath => $expected) {
+			$res = $stub->getAvailableLabelValuesForXPath($formId, $xpath);
+			$this->assertArrayHasKey('labels', $res, 'array has key labels '.$i);
+			$this->assertArrayHasKey('labelsAttributes', $res, 'array has key labelsAttributes '.$i);
+			$this->assertArrayHasKey('elems', $res, 'array has key elems '.$i);
+			$this->assertNotEmpty($res['elems'], 'array elems is not empty '.$i);
+			$this->assertEquals($expected, $res['labels'], 'getting available label values '.$i++);
+		}
 	}
 
 	public function testGetChildrenValues()
 	{
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+
+		$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Config:leaf.html.twig');
+		$element = '';
+		$formId = 'test_get_children';
+		$xPath = '';
+
 		$this->markTestIncomplete(
 			'This test has not been implemented yet.'
 		);
@@ -509,9 +591,29 @@ class XMLoperationsTest extends WebTestCase {
 
 	public function testRemoveMultipleWhitespaces()
 	{
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+
+		$configuration = array(
+			array('    xxx  ', ' xxx '),
+			array("\n\n\n\r\n  aa\n\n", ' aa '),
+			array("Lorem ipsum\nnebo tak neco    nebo  co   .", "Lorem ipsum nebo tak neco nebo co ."),
 		);
+
+		foreach ($configuration as $conf) {
+			$this->assertEquals($conf[1], $xmlOp->removeMultipleWhitespaces($conf[0]), 'remove multiple whitespaces for input: \"'.$conf[0].'\"');
+		}
+	}
+
+	// mocking XMLoperations to load custom data model
+	private function getMockWithModel($model) {
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+		$stub = $this->getMockBuilder('FIT\NetopeerBundle\Models\XMLoperations')
+			->setConstructorArgs(array($this->container, $this->logger, $this->dataModel))
+			->setMethods(array('loadModel'))
+			->getMock();
+		$modelXml = simplexml_load_file($xmlOp->dataModel->getPathToModels() . $model);
+		$stub->method('loadModel')->willReturn($modelXml);
+		return $stub;
 	}
 
 
