@@ -404,6 +404,11 @@ def handleTypes(ctx, typename, typeelem):
             attrs += "\""
         else:
             print "no basename %s" % basename
+    elif typename == "leafref":
+        # find path and add leafref-path attribute
+        leafref = typeelem.search_one("path")
+        if leafref:
+            attrs += " leafref-path=\"%s\"" % leafref.arg.__str__()
     elif typename == "enumeration":
         attrs += handleEnumeration(ctx, typeelem)
     return attrs
