@@ -118,6 +118,44 @@ class XMLoperationsTest extends WebTestCase {
 		$this->assertEquals($expectedResString, trim($res->asXML()), 'complete request 3 failed');
 	}
 
+	// check adding some required parents key elements
+	public function testCompleteRequestTree2()
+	{
+		// mocking class method loadModel to return model with choices
+		$stub = $this->getMockWithModel('wrapped_ofconfig.wyin');
+
+		// add resources port into switch. It is important do add all necessary key elements of all parents (here ID in switch)
+		$emptyRootModule = '<?xml version="1.0"?><capable-switch xmlns="urn:onf:config:yang">
+    <id>openvswitch</id>
+    <resources/>
+    <logical-switches>
+      <switch>
+        <id>ofc-bridge</id>
+        <datapath-id>00:01:02:03:04:05:06:07</datapath-id>
+        <lost-connection-behavior>failSecureMode</lost-connection-behavior>
+        <resources/>
+      </switch>
+    </logical-switches>
+  </capable-switch>';
+		$createString = '<resources><port xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="create">ofc-server</port></resources>';
+		$expectedString = '<?xml version="1.0"?>
+<capable-switch xmlns="urn:onf:config:yang" xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+<logical-switches>
+<switch>
+<id>ofc-bridge</id><resources><port xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="create">ofc-server</port></resources></switch>
+</logical-switches>
+</capable-switch>
+';
+
+		$emptyRootModule = $stub->mergeXMLWithModel($emptyRootModule);
+		$node = simplexml_load_string($emptyRootModule);
+		$node->registerXPathNamespace("xmlns", "urn:onf:config:yang");
+		$parent = $node->xpath('/xmlns:*/*[3]/*[1]/*[4]');
+		$res = $stub->completeRequestTree($parent[0], $createString, $this->dataModel->getPathToModels().'wrapped_ofconfig.wyin');
+
+		$this->assertEquals($expectedString, $res->asXML(), 'complete request2 1 failed');
+	}
+
 	public function testElementValReplace()
 	{
 		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
@@ -604,7 +642,13 @@ TODO: this should pass
 		}
 	}
 
-	// mocking XMLoperations to load custom data model
+	/**
+	 * mocking XMLoperations to load custom data model
+	 *
+	 * @param $model
+	 *
+	 * @return XMLoperations
+	 */
 	private function getMockWithModel($model) {
 		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
 		$stub = $this->getMockBuilder('FIT\NetopeerBundle\Models\XMLoperations')

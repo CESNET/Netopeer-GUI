@@ -47,6 +47,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Debug\Exception\ContextErrorException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use FIT\NetopeerBundle\Models\Data as Data;
+use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\Finder\Finder;
 
 class XMLoperations {
@@ -152,17 +153,38 @@ class XMLoperations {
 
 		if (isset($pos_subroot)) {
 			for ($i = 0; $i < sizeof($pos_subroot); $i++) {
-				$tmp = $pos_subroot[$i]->getName();
-				$config .= "</".$pos_subroot[$i]->getName().">\n";
+				/**
+				 * @var SimpleXMLElement $subroot
+				 */
+				$subroot = $pos_subroot[$i];
+				$domNode = dom_import_simplexml($subroot);
+
+
+				// key elements must be added into config XML
+				$newdoc = new \DOMDocument;
+				$node = $newdoc->importNode($domNode, true);
+				$newdoc->appendChild($node);
+				$keyElems = $this->removeChildrenExceptOfKeyElements($node, $node->childNodes, true);
+
+				$childrenConfig = "";
+				if ($keyElems > 0) {
+					$simpleSubRoot = simplexml_import_dom($node);
+					foreach ($simpleSubRoot->children() as $child) {
+						$childrenConfig .= $child->asXml();
+					}
+				}
+
+				$tmp = $subroot->getName();
+				$config .= "</".$subroot->getName().">\n";
 
 				if ($i == sizeof($pos_subroot) - 1) {
-					$config = "<".$pos_subroot[$i]->getName().
+					$config = "<".$subroot->getName().
 							($namespace!==""?" xmlns=\"$namespace\"":"").
 							" xmlns:xc=\"urn:ietf:params:xml:ns:netconf:base:1.0\"".
-							">\n".$config;
+							">\n".$childrenConfig.$config;
 				} else {
-					$config = "<".$pos_subroot[$i]->getName().
-							">\n".$config;
+					$config = "<".$subroot->getName().
+							">\n".$childrenConfig.$config;
 				}
 			}
 		}
@@ -946,7 +968,7 @@ class XMLoperations {
 	/**
 	 * Merge given XML with data model
 	 *
-	 * @param $xml
+	 * @param $xml            XML string
 	 * @return array|false    false on error, merged array on success
 	 */
 	public function mergeXMLWithModel(&$xml) {
