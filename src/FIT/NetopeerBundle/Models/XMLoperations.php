@@ -608,8 +608,10 @@ class XMLoperations {
 				// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
 				$xmlNameSpaces = $configXml->getNamespaces();
 				if ( isset($xmlNameSpaces[""]) ) {
+					$namespace = $xmlNameSpaces[""];
 					$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 				} elseif (sizeof($xmlNameSpaces) == 0) {
+					$namespace = 'urn:ietf:params:xml:ns:yang:yin:1';
 					$configXml->registerXPathNamespace("xmlns", 'urn:ietf:params:xml:ns:yang:yin:1');
 				}
 			}
@@ -638,6 +640,7 @@ class XMLoperations {
 				}
 
 				// we will go through all post values
+				$speciallyAddedNodes = array();
 				foreach ( $post_vals as $labelKey => $labelVal ) {
 					if (in_array($labelKey, $skipArray)) continue;
 					$label = $this->divideInputName($labelKey);
@@ -661,8 +664,13 @@ class XMLoperations {
 						$xpath = $this->decodeXPath($label[1]);
 						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
 
-						$node = $this->insertNewElemIntoXMLTree($configXml, $xpath, $labelVal, $value);
-
+						$addedNodes = $this->insertNewElemIntoXMLTree($configXml, $xpath, $labelVal, $value);
+						// we have created some other element
+						if (sizeof($addedNodes) >= 2) {
+							for ($i = 1; $i < sizeof($addedNodes); $i++) {
+								array_push($speciallyAddedNodes, $addedNodes[$i]);
+							}
+						}
 					}
 				}
 
@@ -673,8 +681,51 @@ class XMLoperations {
 
 				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
 				$createTree = $this->completeRequestTree($parentNode[0], $createString);
+				$createTreeXML = $createTree->asXML();
 
-				$res = $this->executeEditConfig($key, $createTree->asXml(), $configParams['source']);
+				// add all "specially added nodes" - mainly leafrefs and so
+				if (sizeof($speciallyAddedNodes)) {
+					$domNode = dom_import_simplexml($createTree);
+					$domdoc = new \DOMDocument;
+					$node = $domdoc->importNode($domNode, true);
+					$domdoc->appendChild($node);
+					$xpath = new \DOMXPath($domdoc);
+
+					$createTreeXML = $domdoc->saveXML();
+
+					// first remove all existing children and save them for later addition (we can only append child)
+					$originalChildNodes = array();
+					$rootNode = $domdoc->documentElement;
+					foreach ($rootNode->childNodes as $childNode) {
+						array_push($originalChildNodes, $childNode);
+					}
+
+					// must be in separate foreach (because original childNodesList is destroyed)
+					foreach ($originalChildNodes as $childNode) {
+						$rootNode->removeChild($childNode);
+					}
+
+					// append special nodes into empty root element
+					foreach ($speciallyAddedNodes as $node) {
+						$nodeCreateString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node[0]->asXml());
+						$nodeCreateTree = $this->completeRequestTree($node[0], $nodeCreateString);
+
+						foreach ($nodeCreateTree->children() as $child) {
+							$node = $domdoc->importNode(dom_import_simplexml($child), true);
+							$rootNode->appendChild($node);
+						}
+					}
+
+					// return original child nodes back (append them)
+					foreach ($originalChildNodes as $node) {
+						$node = $domdoc->importNode($node, true);
+						$rootNode->appendChild($node);
+					}
+
+					$createTreeXML = $domdoc->saveXML();
+				}
+
+				$res = $this->executeEditConfig($key, $createTreeXML, $configParams['source']);
 
 				if ($res == 0) {
 					$this->container->get('request')->getSession()->getFlashBag()->add('success', "Record has been added.");
@@ -736,24 +787,29 @@ class XMLoperations {
 	/**
 	 * removes all children of element except of key elements, which has to remain
 	 *
-	 * @param      \DOMElement $domNode
+	 * @param      \DOMElement  $domNode
 	 * @param      \DOMNodeList $domNodeChildren
-	 * @param bool $leaveKey
+	 * @param bool              $leaveKey
+	 * @param bool              $recursive
 	 *
 	 * @return int  number of key elements, that remains
 	 */
-	public function removeChildrenExceptOfKeyElements($domNode, $domNodeChildren, $leaveKey = false)
+	public function removeChildrenExceptOfKeyElements($domNode, $domNodeChildren, $leaveKey = false, $recursive = false)
 	{
 		$keyElemIndex = $keyElemsCnt = 0;
+
 		while ($domNodeChildren->length > $keyElemIndex) {
-			$isKey = false;
+			$isKey = $isCreated = false;
 			$child = $domNodeChildren->item($keyElemIndex);
+
 			if ($child->hasAttributes()) {
 				foreach ($child->attributes as $attr) {
 					if ($attr->nodeName == "iskey" && $attr->nodeValue == "true") {
 						if ($child->hasAttributes()) {
 							foreach ($child->attributes as $attr) {
-								$attributesArr[] = $attr->nodeName;
+								if ($attr->nodeName !== 'xc:operation') {
+									$attributesArr[] = $attr->nodeName;
+								}
 							}
 							// remove must be in new foreach, previous deletes only first one
 							foreach ($attributesArr as $attrName) {
@@ -769,17 +825,32 @@ class XMLoperations {
 							$domNode->setAttribute("GUIcustom:".$nodeName, $nodeValue);
 						}
 						$keyElemsCnt++;
-						break;
+					} elseif ($attr->nodeName == "xc:operation" && $attr->nodeValue == "create") {
+						$keyElemIndex++;
+						$isCreated = true;
 					}
 				}
 			}
-			if (!$isKey || $leaveKey == false) {
+
+			if ((!$isKey && !$isCreated) || $leaveKey == false) {
 				try {
-//			if (count($domNodeChildren->item($keyElemIndex)->childNodes)) {
-//				 $this->removeChildrenExceptOfKeyElements($domNodeChildren->item($keyElemIndex), $domNodeChildren->item($keyElemIndex)->childNodes, $leaveKey);
-//			}
-					// TODO: make somehow recursive
-					$domNode->removeChild($child);
+					$childrenRemains = 0;
+
+					// recursively check all children for their key elements
+					if (sizeof($child->childNodes) && $recursive) {
+						foreach ($child->childNodes as $chnode) {
+							if (sizeof($chnode->childNodes)) {
+								$childrenRemains += $this->removeChildrenExceptOfKeyElements($chnode, $chnode->childNodes, $leaveKey, $recursive);
+							}
+						}
+					}
+
+					if ($childrenRemains == 0) {
+						$domNode->removeChild($child);
+					} else {
+						$keyElemIndex++;
+					}
+
 				} catch (\DOMException $e) {
 
 				}
@@ -810,26 +881,131 @@ class XMLoperations {
 	 * @param  string            $xPathPrefix
 	 * @param bool               $addCreateNS
 	 *
-	 * @return \SimpleXMLElement   modified node
+	 * @return array             array of \SimpleXMLElement modified node, which is always first response
 	 */
 	public function insertNewElemIntoXMLTree(&$configXml, $xpath, $label, $value, $xPathPrefix = "xmlns:", $addCreateNS = true)
 	{
 		/**
 		 * get node according to xPath query
 		 * @var \SimpleXMLElement $node
+		 * @var \SimpleXMLElement $elem
+		 * @var \SimpleXMLElement $elemModel
 		 */
 		$node = $configXml->xpath('/'.$xPathPrefix.$xpath);
+		$retArr = array();
+
 		if ($value === "" || $value === false) {
 			$elem = $node[0]->addChild($label);
 		} else {
 			$elem = $node[0]->addChild($label, $value);
 		}
+		$elemIndex = sizeof($node[0]->children());
 
 		if ($addCreateNS) {
 			$elem->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
 		}
 
-		return $elem;
+		array_push($retArr, $elem);
+
+		// we have to check new insterted element model (load model to XML)
+		$xml = $configXml->asXML();
+		$xml = $this->mergeXMLWithModel($xml);
+		$tmpXml = simplexml_load_string($xml);
+		$tmpXml->registerXPathNamespace('xmlns', $configXml->getNamespaces()[""]);
+		$elemWithModel = $tmpXml->xpath('/'.$xPathPrefix.$xpath.'/*['.$elemIndex.']');
+
+		if ($elemWithModel[0]) {
+			$elemModel = $elemWithModel[0];
+			$leafRefPath = "";
+			$isLeafRef = false;
+			foreach ($elemModel->attributes() as $key => $val) {
+				if ($key == 'type' && $val[0] == 'leafref') {
+					$isLeafRef = true;
+				} elseif ($key == 'leafref-path') {
+					$leafRefPath = $val[0];
+				}
+
+				if ($isLeafRef && $leafRefPath != "") {
+					$refElem = $this->addElementRefOnXPath($configXml, (string)$elem[0], $leafRefPath, $xPathPrefix);
+					if ($refElem instanceof \SimpleXMLElement) {
+						array_push($retArr, $refElem);
+					}
+					break;
+				}
+			}
+		}
+
+		return $retArr;
+	}
+
+	/**
+	 * @param \SimpleXMLElement       $configXml
+	 * @param        $refValue      value to add
+	 * @param        $leafRefPath   xpath to target ref
+	 * @param string $xPathPrefix
+	 * @param bool   $addCreateNS
+	 *
+	 * @return \SimpleXMLElement|false     first added element (root of possible subtree)
+	 */
+	public function addElementRefOnXPath(&$configXml, $refValue, $leafRefPath, $xPathPrefix = "xmlns:", $addCreateNS = true) {
+		$pathLevels = explode('/', $leafRefPath);
+		$xpath = "";
+
+		$currentRoot = $configXml->xpath("/xmlns:*");
+
+
+		for ($i = 0; $i < sizeof($pathLevels); $i++) {
+			$path = $pathLevels[$i];
+			if ($path == '') continue;
+
+			$xpath .= "/".$xPathPrefix.$path;
+			$elem = $configXml->xpath($xpath);
+
+			// remove all children from root element
+			$isLastElement = ($i == sizeof($pathLevels) - 1);
+			if (sizeof($elem) && ($i == sizeof($pathLevels) - 2)) {
+				$domNode = dom_import_simplexml($elem[0]);
+				$newdoc = new \DOMDocument;
+				$node = $newdoc->importNode($domNode, true);
+				$newdoc->appendChild($node);
+				$this->removeChildrenExceptOfKeyElements($node, $node->childNodes, $leaveKey = false);
+
+				$newConfigXml = simplexml_import_dom($node);
+				$newConfigXml->registerXPathNamespace(str_replace(":", "", $xPathPrefix), $configXml->getNamespaces()[""]);
+				$configXml = $newConfigXml;
+				$elem = $configXml->xpath($xpath);
+			}
+
+			if (!sizeof($elem)) {
+
+				// last elem does not exists, create new one
+				$elem = $currentRoot[0]->addChild($path);
+
+				if ($addCreateNS) {
+					$elem->addAttribute("xc:operation", "create", "urn:ietf:params:xml:ns:netconf:base:1.0");
+				}
+
+				if (!isset($firstAddedElement)) {
+					$firstAddedElement = $elem;
+				}
+
+				$currentRoot = $elem;
+			}
+
+			// set correct ref value to last element
+			if ($isLastElement) {
+				$elem[0] = $refValue;
+			}
+
+			$currentRoot = $elem;
+
+		}
+
+		if (!isset($firstAddedElement)) {
+			$firstAddedElement = $currentRoot;
+		}
+
+		return ($firstAddedElement[0] instanceof \SimpleXMLElement) ? $firstAddedElement[0] : $firstAddedElement;
 	}
 
 	/**

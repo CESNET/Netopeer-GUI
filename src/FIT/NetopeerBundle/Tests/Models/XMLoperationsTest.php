@@ -150,9 +150,15 @@ class XMLoperationsTest extends WebTestCase {
 		$emptyRootModule = $stub->mergeXMLWithModel($emptyRootModule);
 		$node = simplexml_load_string($emptyRootModule);
 		$node->registerXPathNamespace("xmlns", "urn:onf:config:yang");
+
+
 		$parent = $node->xpath('/xmlns:*/*[3]/*[1]/*[4]');
 		$res = $stub->completeRequestTree($parent[0], $createString, $this->dataModel->getPathToModels().'wrapped_ofconfig.wyin');
+		$this->assertEquals($expectedString, $res->asXML(), 'complete request2 1 failed');
 
+
+		$parent = $node->xpath('/xmlns:*/*[3]/*[1]/*[4]');
+		$res = $stub->completeRequestTree($parent[0], $createString, $this->dataModel->getPathToModels().'wrapped_ofconfig.wyin');
 		$this->assertEquals($expectedString, $res->asXML(), 'complete request2 1 failed');
 	}
 
@@ -287,19 +293,19 @@ class XMLoperationsTest extends WebTestCase {
 		$xpath = '*/*/*[1]';
 		$res = $xmlOp->insertNewElemIntoXMLTree($testXMLObject, $xpath, 'output', '');
 		$expected = '<output xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0" xc:operation="create"/>';
-		$this->assertEquals($expected, $res->asXML(), 'insert new elem 1');
+		$this->assertEquals($expected, $res[0]->asXML(), 'insert new elem 1');
 
 		// insert state element with value
 		$xpath = '*/*/*[1]/*[2]';
 		$res = $xmlOp->insertNewElemIntoXMLTree($testXMLObject, $xpath, 'state', '2');
 		$expected = '<state xc:operation="create">2</state>';
-		$this->assertEquals($expected, $res->asXML(), 'insert new elem 2');
+		$this->assertEquals($expected, $res[0]->asXML(), 'insert new elem 2');
 
 		// insert symbol element with value
 		$xpath = '*/*/*[1]/*[2]';
 		$res = $xmlOp->insertNewElemIntoXMLTree($testXMLObject, $xpath, 'symbol', '3');
 		$expected = '<symbol xc:operation="create">3</symbol>';
-		$this->assertEquals($expected, $res->asXML(), 'insert new elem 3');
+		$this->assertEquals($expected, $res[0]->asXML(), 'insert new elem 3');
 
 		// check if whole XML matches
 		$expectedResString = '<?xml version="1.0"?>
@@ -617,7 +623,7 @@ TODO: this should pass
 	{
 		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
 
-		$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Config:leaf.html.twig');
+//		$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Config:leaf.html.twig');
 		$element = '';
 		$formId = 'test_get_children';
 		$xPath = '';
