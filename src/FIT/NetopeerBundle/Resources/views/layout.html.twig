@@ -1,7 +1,7 @@
 {#
 @author David Alexa <alexa.david@me.com>
 
-Copyright (C) 2012-2013 CESNET
+Copyright (C) 2012-2015 CESNET
 
 LICENSE TERMS
 
@@ -48,7 +48,6 @@ if advised of the possibility of such damage.
 
 	{% stylesheets
 		'bundles/fitnetopeer/style/ui-lightness/jquery-ui-1.10.3.custom.css'
-		'bundles/fitnetopeer/style/pie.css'
 		'bundles/fitnetopeer/js/bootstrap/css/bootstrap.css'
 		'bundles/fitnetopeer/style/screen.css'
 		filter='cssrewrite'
@@ -61,7 +60,6 @@ if advised of the possibility of such damage.
 	{% javascripts
 		'@FITNetopeerBundle/Resources/public/js/jquery-1.11.1.min.js'
 		'@FITNetopeerBundle/Resources/public/js/jquery-migrate-1.2.1.min.js'
-		'@FITNetopeerBundle/Resources/public/js/tooltip/gips.js'
 		'@FITNetopeerBundle/Resources/public/js/*'
 		'@FITNetopeerBundle/Resources/public/js/bootstrap/js/bootstrap.min.js'
 		'@FITNetopeerBundle/Resources/public/js/bootstrap/Bootstrap-3-Typeahead/bootstrap3-typeahead.min.js'
@@ -74,6 +72,10 @@ if advised of the possibility of such damage.
 </head>
 <body>
 	<div id="block--javascripts">{% block javascripts %}{% endblock javascripts %}</div>
+	<div id="block--moduleJavascripts">{% block moduleJavascripts %}{% endblock moduleJavascripts %}</div>
+	<div id="block--moduleStylesheet">
+		{% block moduleStylesheet %}{% endblock moduleStylesheet %}
+	</div>
 
 	{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 		<nav id="block--topMenu">
@@ -107,7 +109,7 @@ if advised of the possibility of such damage.
 
 				{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and
 				not isSingleInstance %}
-					<a href='{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="ajaxLink static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
+					<a href='{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
 				{% endif %}
 
 				<div id="userpane" class="static dropdown">
@@ -132,31 +134,97 @@ if advised of the possibility of such damage.
 		<div class="cover-wo-alerts">
 		{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
 		{# if submenu is defined and submenu #}
-		<nav id="block--leftColumn">
+		<nav id="block--leftColumn" class="scrollable-cover" data-add-scrollable="true">
 			{% block leftColumn %}
-				{% if sectionName is defined %}<h3>{{ sectionName }}</h3>{% endif %}
+				{% if sectionName is defined %}<h3>
+					{% if isModule is defined and isModule %}
+					<a href="{{ path("module", {"key":app.request.get('key'),"module":app.request.get('module')} ) }}" class="ajaxLink">
+						{{ sectionName }}
+					</a>
+					{% else %}
+						{{ sectionName }}
+					{% endif %}
+					</h3>{% endif %}
+				<div class="nav-left">
 				{% for subsection in submenu %}
 					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="ajaxLink {% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 				{% endfor %}
-				{% block leftColumnAdditional %}
+				</div>
+
+				{% block rpcMethods %}
 					{% if rpcMethods is defined and rpcMethods|length > 0 %}
-					<h4>RPC methods defined in model:</h4>
-					{% for rpc in rpcMethods %}
-						<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc.name}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc.name }}</a>
-					{% endfor %} {% endif %}
+						<h4>RPC methods defined in model:</h4>
+						<div class="nav-left">
+						{% for rpc in rpcMethods %}
+							<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc.name}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc.name }}</a>
+						{% endfor %}
+						</div>
+					{% endif %}
+				{% endblock rpcMethods%}
+
+				<div id="block--copyConfig">
+					{% block copyConfig %}
+					{% if stateArr is defined
+					and formConfig is defined
+					and (
+					not(stateArr is empty)
+					or (isEmptyModule is defined and isEmptyModule == true)
+					or (forceShowFormConfig is defined and forceShowFormConfig == true)
+					) %}
+						<h4>Change datastore</h4>
+						<div class="left-column-base">
+						{% if formConfig is defined %}
+							{% block filterConfig %}
+								<form action="" method="post" {{ form_enctype(formConfig) }} class="filter-form" name="formConfig" data-disable-active-link="true">
+									{{ form_widget(formConfig) }}
+								</form>
+							{% endblock filterConfig %}
+
+							<div id="block--sourceValidation">
+								{% block sourceValidation %}
+									{# duplicated in config form filter !#}
+									<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink button grey small left" data-disable-history="true">Validate this datastore</a>
+									{% if isSourceValid is defined %}
+										<span class="source-validation bubble {{ (isSourceValid) ? 'green' : 'red' }}">{{ (isSourceValid) ? 'valid' : 'invalid' }}</span>
+									{% endif %}
+								{% endblock %}
+							</div>
+						{% endif %}
+						{% if formCopyConfig is defined %}
+							<hr class="cleaner" />
+							<h5>Copy active datastore to:</h5>
+							<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter-form" name="formCopyConfig">
+								{{ form_widget(formCopyConfig) }}
+								<input type="submit" value="Copy active datastore" class="button small grey left" />
+							</form>
+						{% endif %}
+						</div>
+					{% endif %}
+					{% endblock %}
+				</div>
+
+				<div id="block--moduleOutputStyleChange">
+				{% block moduleOutputStyleChange %}
+					{% if moduleStylesForm is defined %}
+					<h3>Change output style</h3>
+						<div class="left-column-base">
+						<form action="" method="post" {{ form_enctype(moduleStylesForm) }} class="filter-form" name="outputStyle">
+							{{ form_widget(moduleStylesForm.controllerAction) }}
+						</form>
+						</div>
+					{% endif %}
+				{% endblock moduleOutputStyleChange %}
+				</div>
+
+				<div id="block--leftColumnAdditional">
+				{% block leftColumnAdditional %}
 				{% endblock leftColumnAdditional %}
+				</div>
+
 			{% endblock leftColumn %}
 		</nav>
 		{% set addToColumnClass = ' left-nav-defined' %}
 		{# endif #}
-
-		<div id="block--topPart">
-			{% block topPart %}
-			{% endblock topPart %}
-		</div>
-
-		{#<div class="alert-cover">#}
-		{#</div>#}
 
 		{% if singleColumnLayout == false %}
 			<section id="block--state" class="column{{addToColumnClass}} scrollable-cover" data-add-scrollable="true">

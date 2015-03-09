@@ -1,8 +1,7 @@
 #!/bin/bash
 #
-# netconfwebgui-postinstall.sh: Configuration and initialization of DB
 # Copyright (C) 2013
-# Author(s): Tomas Cejka  <cejkato2@fit.cvut.cz>
+# Author(s): David Alexa  <alexadav@fit.cvut.cz>
 #
 # LICENSE TERMS
 #
@@ -31,6 +30,10 @@
 # otherwise) arising in any way out of the use of this software, even
 # if advised of the possibility of such damage.
 #
+# ==========================
+#
+# This file is executed during composer install.
+# Set correct file mod for necessary files and folders.
 
 chown -R apache:apache ./*
 chmod 700 -R app/{cache,logs}

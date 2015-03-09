@@ -1,6 +1,6 @@
 _home:
     pattern:  /
-    defaults: { _controller: NetopeerBundle:Default:index }
+    defaults: { _controller: FITNetopeerBundle:Default:index }
 
 _wdt:
     resource: "@WebProfilerBundle/Resources/config/routing/wdt.xml"

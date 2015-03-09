@@ -1,6 +1,6 @@
 # @author David Alexa <alexa.david@me.com>
 #
-# Copyright (C) 2012-2013 CESNET
+# Copyright (C) 2012-2015 CESNET
 #
 # LICENSE TERMS
 #
@@ -73,6 +73,12 @@ services:
         class: FIT\NetopeerBundle\Twig\NetopeerTwigExtension
         tags:
             - { name: twig.extension }
+
+    moduleListener:
+        class: FIT\NetopeerBundle\EventListener\ModuleListener
+        arguments: [@DataModel, @doctrine.orm.entity_manager, @data_logger]
+        tags:
+            - { name: kernel.event_listener, event: kernel.request, method: onKernelController }
 
     winzou_cache:
         factory_service: winzou_cache.factory

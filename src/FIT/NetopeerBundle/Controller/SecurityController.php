@@ -4,7 +4,7 @@
  *
  * @author David Alexa <alexa.david@me.com>
  *
- * Copyright (C) 2012-2013 CESNET
+ * Copyright (C) 2012-2015 CESNET
  *
  * LICENSE TERMS
  *
@@ -78,7 +78,7 @@ class SecurityController extends BaseController
 	/**
 	 * Login page action.
 	 *
-	 * @Route("/login/", name="_login")
+	 * @Route("/login", name="_login")
 	 * @Template()
 	 */
 	public function loginAction()

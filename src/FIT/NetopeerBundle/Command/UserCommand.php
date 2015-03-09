@@ -2,7 +2,7 @@
 /**
  * @author David Alexa <alexa.david@me.com>
  *
- * Copyright (C) 2012-2013 CESNET
+ * Copyright (C) 2012-2015 CESNET
  *
  * LICENSE TERMS
  *
@@ -88,8 +88,10 @@ class UserCommand extends ContainerAwareCommand
 	/**
 	 * Executes adding, removing or editing user in DB
 	 *
-	 * @param InputInterface $intput
-	 * @param OutputInterface $output
+	 * @param \Symfony\Component\Console\Input\InputInterface $input
+	 * @param OutputInterface                                 $output
+	 *
+	 * @internal param \Symfony\Component\Console\Input\InputInterface $intput
 	 * @return int|null|void
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
@@ -108,7 +110,7 @@ class UserCommand extends ContainerAwareCommand
 			return;
 		}
 
-		$em = $this->getContainer()->get('doctrine')->getEntityManager();
+		$em = $this->getContainer()->get('doctrine')->getManager();
 
 		if ($command == "add") {
 			if ($password) {

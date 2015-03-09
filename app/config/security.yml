@@ -33,7 +33,7 @@ security:
             anonymous:  ~
             form_login:
                 check_path: /login_check
-                login_path: /login/
+                login_path: /login
             logout:
                 path:   /logout/
                 target: /
@@ -92,7 +92,7 @@ security:
             context: commont_context
 
     access_control:
-        - { path: ^/login/, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY}
         - { path: ^/saml/sp/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/saml/sp/acs$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(login_check|connections|section|ajax), roles: ROLE_USER}

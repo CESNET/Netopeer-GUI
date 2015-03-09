@@ -2,7 +2,7 @@
 /**
  * @author David Alexa <alexa.david@me.com>
  *
- * Copyright (C) 2012-2013 CESNET
+ * Copyright (C) 2012-2015 CESNET
  *
  * LICENSE TERMS
  *
@@ -70,8 +70,11 @@ class ProjectInitCommand extends ContainerAwareCommand
 	/**
 	 * Executes post install SH script
 	 *
-	 * @param InputInterface $intput
-	 * @param OutputInterface $output
+	 * @param \Symfony\Component\Console\Input\InputInterface $input
+	 * @param OutputInterface                                 $output
+	 *
+	 * @internal param \Symfony\Component\Console\Input\InputInterface $intput
+	 * @return int|null|void
 	 */
 	protected function execute(InputInterface $input, OutputInterface $output) {
 		$command = $input->getOption("post");
@@ -80,6 +83,7 @@ class ProjectInitCommand extends ContainerAwareCommand
 		$output->writeln("========================");
 		$output->writeln('Executing post '. $command. ' script.');
 		$output->writeln("========================");
+		// TODO: openssl req -new -x509 -sha256 -days 365 -nodes -out /tmp/server.crt -keyout /tmp/server.key
 
 		$process = new Process("/bin/bash ./src/FIT/NetopeerBundle/bin/netconfwebgui-postinstall.sh");
 		$process->run();

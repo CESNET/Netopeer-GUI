@@ -1,0 +1,180 @@
+{#
+@author David Alexa <alexa.david@me.com>
+
+Copyright (C) 2012-2015 CESNET
+
+LICENSE TERMS
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+1. Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in
+  the documentation and/or other materials provided with the
+  distribution.
+3. Neither the name of the Company nor the names of its contributors
+  may be used to endorse or promote products derived from this
+  software without specific prior written permission.
+
+ALTERNATIVELY, provided that this notice is retained in full, this
+product may be distributed under the terms of the GNU General Public
+License (GPL) version 2 or later, in which case the provisions
+of the GPL apply INSTEAD OF those given above.
+
+This software is provided ``as is'', and any express or implied
+warranties, including, but not limited to, the implied warranties of
+merchantability and fitness for a particular purpose are disclaimed.
+In no event shall the company or contributors be liable for any
+direct, indirect, incidental, special, exemplary, or consequential
+damages (including, but not limited to, procurement of substitute
+goods or services; loss of use, data, or profits; or business
+interruption) however caused and on any theory of liability, whether
+in contract, strict liability, or tort (including negligence or
+otherwise) arising in any way out of the use of this software, even
+if advised of the possibility of such damage.
+#}
+
+{% extends 'FITModuleDefaultBundle::layout.html.twig' %}
+{% block title %}Section {% if sectionName is defined and not(sectionName is empty) %}- {{sectionName}}{% endif %}{% endblock title %}
+
+{% block leftColumnAdditional %}
+	{% if (hideColumnControl is not defined) or (hideColumnControl is defined and hideColumnControl != true) %}
+		<div class="change-columns-layout nav-left">
+			<h5 class="left-column-base">Show as:</h5>
+			<a href="{{ path('changeColumnLayout', {"newValue": "true"}) }}" class="item ajaxLink" data-disable-history="true" title="Merged state & config">
+				<span class="bullet"></span>
+				Merged
+			</a>
+			<a href="{{ path('changeColumnLayout', {"newValue": "false"}) }}" class="item ajaxLink" data-disable-history="true" title="State & config separately">
+				<span class="bullet"></span>
+				Separate
+			</a>
+		</div>
+	{% endif %}
+{% endblock leftColumnAdditional %}
+
+{% set stateDefined = 'false' %}
+
+{% block state %}
+{% block singleContent %}
+	{#<div class="edit-bar">#}
+		{#<span class="create-child"#}
+		{#rel="--*" data-typeahead-path="/symfony/app_dev.php/ajax/get-values-for-label/FORMID/0/nacm/XPATH/">new node</span>#}
+	{#</div>#}
+
+	{% set stateDefined = 'true' %}
+	{% if configSingleContent is defined %}
+		{{ configSingleContent|raw }}
+	{% else %}
+		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
+		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
+			<hr class="cleaner" />
+			<form action="" method="post" name="formConfigData" data-disable-history="true" class="form">
+				<div class="root">
+					{# new item insertion#}
+					{% if isEmptyModule is defined and isEmptyModule == true %}
+
+						{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
+					{% elseif showRootElem is defined and showRootElem == true %}
+						{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
+					{% endif %}
+
+					{% set iterator = 1 %}
+					{% for key, element in stateArr %}
+						{% include 'FITModuleDefaultBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
+						{% set iterator = iterator + 1 %}
+					{% endfor %}
+
+					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
+						{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
+							<input type="submit" value="Save config" />
+						{% endif %}
+					{% endif %}
+				</div>
+			</form>
+			{% if modelTreeDump is defined %}
+			<div id="hiddenModelTreeDump">
+<pre>
+{{ modelTreeDump|raw }}
+</pre>
+			</div>
+			{% endif %}
+		{% else %}
+			<div class="alert info">
+				No results found.
+			</div>
+			{% if additionalForm is defined %}
+				{{ additionalForm|raw }}
+			{% endif %}
+		{% endif %}
+	{% endif %}
+{% endblock singleContent %}
+{% endblock state %}
+
+{% block config %}
+	<h1 class="left">{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
+
+	<hr class="cleaner" />
+	{% if (configArr is defined and not(configArr is empty)) or (isEmptyModule is defined and isEmptyModule == true) %}
+		<form action="" method="post" name="formConfigData" data-disable-history="true" class="form">
+			<div class="root">
+				{% if isEmptyModule is defined and isEmptyModule == true %}
+					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
+
+				{% elseif showRootElem is defined and showRootElem == true %}
+					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
+				{% endif %}
+
+				{% set iterator = 1 %}
+				{% for key, element in configArr %}
+					{% include 'FITModuleDefaultBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
+					{% set iterator = iterator + 1 %}
+				{% endfor %}
+				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
+					{# if (hideConfigSubmitButton is not defined) or hideConfigSubmitButton != true #}
+						<input type="submit" value="Save config" />
+					{# endif #}
+				{% endif %}
+			</div>
+		</form>
+	{% else %}
+		<div class="alert info">
+			No results found.
+		</div>
+		{% if additionalForm is defined %}
+			{{ additionalForm|raw }}
+		{% endif %}
+	{% endif %}
+
+	{% if modelTreeDump is defined %}
+		<div id="hiddenModelTreeDump">
+<pre>
+{{ modelTreeDump|raw }}
+</pre>
+		</div>
+	{% endif %}
+{% endblock config %}
+
+{% block notifications %}
+	{% if ncFeatures is defined and ncFeatures["nc_feature_notification"] is defined %}
+		{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
+			<script type="text/javascript">
+				var lookupIpUrl = '{{ path('lookupIp', {"ip": "REPLACE_IP"}) }}';
+				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");
+				if ($(notifOutput).hasClass('hidden')) {
+					$(notifOutput).removeClass('hidden');
+					notifResizable();
+				}
+			</script>
+		{% endif %}
+		<div class="notif-cover">
+			<div class="notif-history-cover"></div>
+			{#<a href="{{ path("notificationsHistoryTo", {"connectedDeviceId": app.request.get('key'), "from": '-10', 'to': '0'} ) }}" data-key="{{ app.request.get('key') }}" class="button grey right" id="js-get-notif-history" title="Get notifications from history">Load history</a>#}
+			{# TODO: show, when notifications history wont cause deadlock #}
+		</div>
+	{% endif %}
+
+{% endblock notifications %}
+
