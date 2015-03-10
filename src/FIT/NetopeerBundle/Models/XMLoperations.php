@@ -945,15 +945,29 @@ class XMLoperations {
 	 * @param string $xPathPrefix
 	 * @param bool   $addCreateNS
 	 *
-	 * @return \SimpleXMLElement|false     first added element (root of possible subtree)
+	 * @return \SimpleXMLElement|bool     first added element (root of possible subtree)
 	 */
 	public function addElementRefOnXPath(&$configXml, $refValue, $leafRefPath, $xPathPrefix = "xmlns:", $addCreateNS = true) {
+
+		// check if target leaf ref does not exists already (we don't have to add add)
+		$xpath = str_replace("/", "/xmlns:", $leafRefPath);
+		$targets = $configXml->xpath($xpath);
+		if (sizeof($targets)) {
+			foreach ($targets as $target) {
+				$val = (string)$target;
+				if ($val == $refValue) {
+					return true;
+				}
+			}
+		}
+
+		// start with first part of xpath
 		$pathLevels = explode('/', $leafRefPath);
 		$xpath = "";
 
 		$currentRoot = $configXml->xpath("/xmlns:*");
 
-
+		// go throug all xpath parts and check, if element already exists
 		for ($i = 0; $i < sizeof($pathLevels); $i++) {
 			$path = $pathLevels[$i];
 			if ($path == '') continue;
@@ -976,6 +990,7 @@ class XMLoperations {
 				$elem = $configXml->xpath($xpath);
 			}
 
+			// if element does not exists, create one
 			if (!sizeof($elem)) {
 
 				// last elem does not exists, create new one
