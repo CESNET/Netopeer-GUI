@@ -20,7 +20,7 @@ After tha, **run** the following commands:
     # cd netopeergui
     # git submodule update --init --recursive 
     
-    cd netopeergui
+    cd netopeer-gui
     
     cd install
     ./bootstrap.sh
