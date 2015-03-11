@@ -755,8 +755,8 @@ class XMLoperations {
 
 		if ($domNode->hasAttributes()) {
 			foreach ($domNode->attributes as $attr) {
-				if (strpos($attr->nodeName, "GUIcustom:") === 0) {
-					$elemName = str_replace("GUIcustom:", "", $attr->nodeName);
+				if (strpos($attr->nodeName, "GUIcustom_") === 0) {
+					$elemName = str_replace("GUIcustom_", "", $attr->nodeName);
 					$elemValue = $attr->nodeValue;
 
 					if ($domNode->hasChildNodes()) {
@@ -822,7 +822,7 @@ class XMLoperations {
 						} else if (isset($child)) {
 							$nodeName = $child->nodeName;
 							$nodeValue = $child->nodeValue;
-							$domNode->setAttribute("GUIcustom:".$nodeName, $nodeValue);
+							$domNode->setAttribute("GUIcustom_".$nodeName, $nodeValue);
 						}
 						$keyElemsCnt++;
 					} elseif ($attr->nodeName == "xc:operation" && $attr->nodeValue == "create") {
@@ -859,7 +859,7 @@ class XMLoperations {
 
 		if ($domNode->hasAttributes()) {
 			foreach ($domNode->attributes as $attr) {
-				if (strpos($attr->nodeName, "GUIcustom:") !== 0) {
+				if (strpos($attr->nodeName, "GUIcustom_") !== 0) {
 					$attributesArr[] = $attr->nodeName;
 				}
 			}
@@ -911,7 +911,9 @@ class XMLoperations {
 		$xml = $configXml->asXML();
 		$xml = $this->mergeXMLWithModel($xml);
 		$tmpXml = simplexml_load_string($xml);
-		$tmpXml->registerXPathNamespace('xmlns', $configXml->getNamespaces()[""]);
+		if (isset($configXml->getNamespaces()[""])) {
+			$tmpXml->registerXPathNamespace(str_replace(":", "", $xPathPrefix), $configXml->getNamespaces()[""]);
+		}
 		$elemWithModel = $tmpXml->xpath('/'.$xPathPrefix.$xpath.'/*['.$elemIndex.']');
 
 		if ($elemWithModel[0]) {
