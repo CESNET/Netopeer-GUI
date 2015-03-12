@@ -72,7 +72,8 @@
 .sortable-placeholder { height: 40px; width: 100%; display: block; min-height: 40px; float: left; clear: left; }
 .ui-sortable-helper { background: #fff; }
 .leaf-line { padding: 6px 0.5% 5px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
-	&.hover { background-color: #dadada; border-color: #aaa; }
+	&.hover { background-color: #dadada !important; border-color: #aaa; }
+	&.modified { background-color: $color-bg-info !important; }
 	&.is-root-elem { border-left: 0px none !important; border-right: 0px none !important;  margin-bottom: 15px !important;
 		.dots, .dash { display: none; }
 		.edit-bar .sibling { display: none; }
@@ -160,7 +161,7 @@ form.generatedForm, form.addedForm {
 }
 
 form.addedForm {
-	> div { background: $color-bg-success; }
+	.leaf-line { background: $color-bg-success !important; }
 }
 
 /* tooltip */

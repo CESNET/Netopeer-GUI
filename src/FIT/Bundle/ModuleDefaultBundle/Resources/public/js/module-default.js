@@ -44,6 +44,10 @@ function initModuleDefaultJS() {
 		});
 	});
 
+	$("body").on('change', 'input.value', function() {
+		$(this).parent('.leaf-line').addClass('modified');
+	});
+
 	showIconsOnLeafLine();
 }
 

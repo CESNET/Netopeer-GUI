@@ -299,8 +299,10 @@
   width: 100%;
   position: relative; }
 .leaf-line.hover {
-  background-color: #dadada;
+  background-color: #dadada !important;
   border-color: #aaa; }
+.leaf-line.modified {
+  background-color: #d4e5ef !important; }
 .leaf-line.is-root-elem {
   border-left: 0px none !important;
   border-right: 0px none !important;
@@ -515,8 +517,8 @@ form.generatedForm .leaf-line input.label, form.generatedForm .leaf-line input.v
   height: 22px;
   line-height: 22px; }
 
-form.addedForm > div {
-  background: #dbfadf; }
+form.addedForm .leaf-line {
+  background: #d6f1d9 !important; }
 
 /* tooltip */
 .tooltip-cover {
