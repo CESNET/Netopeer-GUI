@@ -71,7 +71,7 @@ if advised of the possibility of such damage.
 		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
 		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
 			<hr class="cleaner" />
-			<form action="" method="post" name="formConfigData" data-disable-history="true" class="form">
+			<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
 				<div class="root">
 					{# new item insertion#}
 					{% if isEmptyModule is defined and isEmptyModule == true %}
@@ -89,7 +89,7 @@ if advised of the possibility of such damage.
 
 					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
 						{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
-							<input type="submit" value="Save config" />
+							<input type="submit" value="Commit all changes" />
 						{% endif %}
 					{% endif %}
 				</div>
@@ -118,7 +118,7 @@ if advised of the possibility of such damage.
 
 	<hr class="cleaner" />
 	{% if (configArr is defined and not(configArr is empty)) or (isEmptyModule is defined and isEmptyModule == true) %}
-		<form action="" method="post" name="formConfigData" data-disable-history="true" class="form">
+		<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
 			<div class="root">
 				{% if isEmptyModule is defined and isEmptyModule == true %}
 					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
@@ -134,7 +134,7 @@ if advised of the possibility of such damage.
 				{% endfor %}
 				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
 					{# if (hideConfigSubmitButton is not defined) or hideConfigSubmitButton != true #}
-						<input type="submit" value="Save config" />
+						<input type="submit" value="Commit all changes" />
 					{# endif #}
 				{% endif %}
 			</div>

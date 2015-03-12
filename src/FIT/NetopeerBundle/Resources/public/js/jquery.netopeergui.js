@@ -293,7 +293,15 @@ jQuery(function($) {
 		if (formAction == "") {
 			formAction = window.location.href;
 		}
-		$.netopeergui.loadAjaxLink(e, $(this), formAction, 'POST', $(this).serialize());
+
+		var serializedData = $(this).serialize();
+		if ($(this).data('serializeChildren') == true) {
+			$(this).find('form').each(function(i,e) {
+				serializedData += "&" + $(e).serialize();
+			});
+		}
+
+		$.netopeergui.loadAjaxLink(e, $(this), formAction, 'POST', serializedData);
 	});
 
 	$("body").on('submit', '.modal form', function(e) {

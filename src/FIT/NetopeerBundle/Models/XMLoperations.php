@@ -49,6 +49,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use FIT\NetopeerBundle\Models\Data as Data;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\Finder\Finder;
+use FIT\NetopeerBundle\Models\MergeXML;
 
 class XMLoperations {
 	/**
@@ -195,6 +196,43 @@ class XMLoperations {
 	}
 
 	/**
+	 * @param string $sourceXml
+	 * @param string $newXml
+	 * @param array  $params    parametrs for MergeXML constructor
+	 * @param int    $output    kind of output of MergeXML
+	 *
+	 * @return \DOMDocument|false
+	 */
+	public function mergeXml ($sourceXml, $newXml, $params = array(), $output = 0) {
+		$defaultParams = array(
+			'join' => false, // common root name if any source has different root name (default is *root*, specifying *false* denies different names)
+		  'updn' => true, // traverse the nodes by name sequence (*true*, default) or overall sequence (*false*),
+		  'stay' => 'all', // use the *stay* attribute value to deny overwriting of specific node (default is *all*, can be array of values, string or empty)
+		  'clone' => '', // use the *clone* attribute value to clone specific nodes if they already exists (empty by default, can be array of values, string or empty)
+		);
+		$params = array_merge($defaultParams, $params);
+
+		$sourceDoc = new \DOMDocument();
+		$sourceDoc->loadXML($sourceXml);
+
+		$newDoc = new \DOMDocument();
+		$newDoc->loadXML($newXml);
+
+		try {
+			$mergeXml = new MergeXML();
+			@$mergeXml->AddSource($sourceXml);
+			@$mergeXml->AddSource($newDoc);
+
+			if (@$mergeXml->error->code != "") {
+				return false;
+			}
+		} catch (Exception $e) {
+			return false;
+		}
+		return $mergeXml->Get($output);
+	}
+
+	/**
 	 * updates (modifies) value of XML node
 	 *
 	 * @param  \SimpleXMLElement $configXml   xml file
@@ -272,8 +310,9 @@ class XMLoperations {
 
 		try {
 
-			if ( ($configXml = $this->dataModel->handle('getconfig', $configParams, false)) != 1 ) {
-				$configXml = simplexml_load_string($configXml, 'SimpleXMLIterator');
+			if ( ($originalXml = $this->dataModel->handle('getconfig', $configParams, false)) != 1 ) {
+
+				$configXml = simplexml_load_string($originalXml, 'SimpleXMLIterator');
 
 				// save to temp file - for debugging
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
@@ -372,6 +411,34 @@ class XMLoperations {
 				// for debugging, edited configXml will be saved into temp file
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
 					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/edited.yin', $configXml->asXml());
+				}
+
+				// check, if newNodeForm was send too
+				$toAdd = "";
+				if (sizeof($this->container->get('request')->get('newNodeForm'))) {
+					$newNodeForms = $this->container->get('request')->get('newNodeForm');
+					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/testing.yin', var_export($newNodeForms, true));
+					foreach ($newNodeForms as $newNodeFormVals) {
+						$originalConfigXml = simplexml_load_string($originalXml, 'SimpleXMLIterator');
+
+						// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
+						$xmlNameSpaces = $originalConfigXml->getNamespaces();
+
+						if ( isset($xmlNameSpaces[""]) ) {
+							$originalConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+							$xPathPrefix = "xmlns:";
+						} else {
+							// we will use this xmlns as backup for XPath request
+							$originalConfigXml->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
+							$xPathPrefix = "";
+						}
+						$toAdd .= $this->processNewNodeForm($originalConfigXml, $newNodeFormVals);
+
+						// finally merge the request
+						if (($out = $this->mergeXml($configXml->asXML(), $originalConfigXml->asXML())) !== false) {
+							$configXml = simplexml_load_string($out->saveXML());
+						}
+					}
 				}
 
 				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source']);
@@ -596,8 +663,6 @@ class XMLoperations {
 	public function handleNewNodeForm(&$key, $configParams)	{
 		$post_vals = $this->container->get('request')->get('newNodeForm');
 		$res = 0;
-		$keyElemsCnt = 0;
-		$dom = new \DOMDocument();
 
 		try {
 			// load original (not modified) getconfig
@@ -617,113 +682,8 @@ class XMLoperations {
 			}
 
 			// if we have XML configuration
-			$skipArray = array();
 			if (isset($configXml)) {
-
-				// load parent value
-				if (array_key_exists('parent', $post_vals)) {
-					$parentPath = $post_vals['parent'];
-
-					$xpath = $this->decodeXPath($parentPath);
-					// get node according to xPath query
-					/** @var \SimpleXMLElement $tmpParentNode */
-					$parentNode = $configXml->xpath($xpath);
-
-					array_push($skipArray, 'parent');
-
-					// we have to delete all children from parent node (because of xpath selector for new nodes), except from key nodes
-					$domNode = dom_import_simplexml($parentNode[0]);
-					$keyElemsCnt = $this->removeChildrenExceptOfKeyElements($domNode, $domNode->childNodes);
-
-				} else {
-					throw new \ErrorException("Could not set parent node for new elements.");
-				}
-
-				// we will go through all post values
-				$speciallyAddedNodes = array();
-				foreach ( $post_vals as $labelKey => $labelVal ) {
-					if (in_array($labelKey, $skipArray)) continue;
-					$label = $this->divideInputName($labelKey);
-					// values[0] - label
-					// values[1] - encoded xPath
-
-					// load parent node
-
-
-					if ( count($label) != 2 ) {
-						$this->logger->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $label, 'postKey' => $labelKey));
-						throw new \ErrorException("Could not proccess all form fields.");
-
-					} else {
-						$valueKey = str_replace('label', 'value', $labelKey);
-						$value = $post_vals[$valueKey];
-
-						array_push($skipArray, $labelKey);
-						array_push($skipArray, $valueKey);
-
-						$xpath = $this->decodeXPath($label[1]);
-						$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
-
-						$addedNodes = $this->insertNewElemIntoXMLTree($configXml, $xpath, $labelVal, $value);
-						// we have created some other element
-						if (sizeof($addedNodes) >= 2) {
-							for ($i = 1; $i < sizeof($addedNodes); $i++) {
-								array_push($speciallyAddedNodes, $addedNodes[$i]);
-							}
-						}
-					}
-				}
-
-				if ($keyElemsCnt > 0 && isset($domNode)) {
-					$dom->importNode($domNode, true);
-					$this->moveCustomKeyAttributesIntoElements($dom, $domNode, $keyElemsCnt);
-				}
-
-				$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
-				$createTree = $this->completeRequestTree($parentNode[0], $createString);
-				$createTreeXML = $createTree->asXML();
-
-				// add all "specially added nodes" - mainly leafrefs and so
-				if (sizeof($speciallyAddedNodes)) {
-					$domNode = dom_import_simplexml($createTree);
-					$domdoc = new \DOMDocument;
-					$node = $domdoc->importNode($domNode, true);
-					$domdoc->appendChild($node);
-					$xpath = new \DOMXPath($domdoc);
-
-					$createTreeXML = $domdoc->saveXML();
-
-					// first remove all existing children and save them for later addition (we can only append child)
-					$originalChildNodes = array();
-					$rootNode = $domdoc->documentElement;
-					foreach ($rootNode->childNodes as $childNode) {
-						array_push($originalChildNodes, $childNode);
-					}
-
-					// must be in separate foreach (because original childNodesList is destroyed)
-					foreach ($originalChildNodes as $childNode) {
-						$rootNode->removeChild($childNode);
-					}
-
-					// append special nodes into empty root element
-					foreach ($speciallyAddedNodes as $node) {
-						$nodeCreateString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node[0]->asXml());
-						$nodeCreateTree = $this->completeRequestTree($node[0], $nodeCreateString);
-
-						foreach ($nodeCreateTree->children() as $child) {
-							$node = $domdoc->importNode(dom_import_simplexml($child), true);
-							$rootNode->appendChild($node);
-						}
-					}
-
-					// return original child nodes back (append them)
-					foreach ($originalChildNodes as $node) {
-						$node = $domdoc->importNode($node, true);
-						$rootNode->appendChild($node);
-					}
-
-					$createTreeXML = $domdoc->saveXML();
-				}
+				$createTreeXML = $this->processNewNodeForm($configXml, $post_vals);
 
 				$res = $this->executeEditConfig($key, $createTreeXML, $configParams['source']);
 
@@ -740,6 +700,100 @@ class XMLoperations {
 		}
 
 		return $res;
+	}
+
+	/**
+	 * @param \SimpleXMLElement $configXml
+	 * @param array             $post_vals
+	 *
+	 * @return mixed|string
+	 * @throws \ErrorException
+	 */
+	private function processNewNodeForm(&$configXml, $post_vals) {
+		$keyElemsCnt = 0;
+		$dom = new \DOMDocument();
+		$skipArray = array();
+
+		// load parent value
+		if (array_key_exists('parent', $post_vals)) {
+			$parentPath = $post_vals['parent'];
+
+			$xpath = $this->decodeXPath($parentPath);
+			// get node according to xPath query
+			/** @var \SimpleXMLElement $tmpParentNode */
+			$parentNode = $configXml->xpath($xpath);
+
+			array_push($skipArray, 'parent');
+
+			// we have to delete all children from parent node (because of xpath selector for new nodes), except from key nodes
+			$domNode = dom_import_simplexml($parentNode[0]);
+			$keyElemsCnt = $this->removeChildrenExceptOfKeyElements($domNode, $domNode->childNodes);
+
+		} else {
+			throw new \ErrorException("Could not set parent node for new elements.");
+		}
+
+		// we will go through all post values
+		$speciallyAddedNodes = array();
+		foreach ( $post_vals as $labelKey => $labelVal ) {
+			if (in_array($labelKey, $skipArray)) continue;
+			$label = $this->divideInputName($labelKey);
+			// values[0] - label
+			// values[1] - encoded xPath
+
+			// load parent node
+
+
+			if ( count($label) != 2 ) {
+				$this->logger->err('newNodeForm must contain exactly 2 params, example container_-*-*?1!-*?2!-*?1!', array('values' => $label, 'postKey' => $labelKey));
+				throw new \ErrorException("Could not proccess all form fields.");
+
+			} else {
+				$valueKey = str_replace('label', 'value', $labelKey);
+				$value = $post_vals[$valueKey];
+
+				array_push($skipArray, $labelKey);
+				array_push($skipArray, $valueKey);
+
+				$xpath = $this->decodeXPath($label[1]);
+				$xpath = substr($xpath, 1, strripos($xpath, "/") - 1);
+
+				$addedNodes = $this->insertNewElemIntoXMLTree($configXml, $xpath, $labelVal, $value);
+				// we have created some other element
+				if (sizeof($addedNodes) >= 2) {
+					for ($i = 1; $i < sizeof($addedNodes); $i++) {
+						array_push($speciallyAddedNodes, $addedNodes[$i]);
+					}
+				}
+			}
+		}
+
+		if ($keyElemsCnt > 0 && isset($domNode)) {
+			$dom->importNode($domNode, true);
+			$this->moveCustomKeyAttributesIntoElements($dom, $domNode, $keyElemsCnt);
+		}
+
+		$createString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $parentNode[0]->asXml());
+		$createTree = $this->completeRequestTree($parentNode[0], $createString);
+		$createTreeXML = $createTree->asXML();
+
+		// add all "specially added nodes" - mainly leafrefs and so
+		if (sizeof($speciallyAddedNodes)) {
+			// append special nodes into empty root element
+			foreach ($speciallyAddedNodes as $node) {
+				$nodeCreateString = "\n".str_replace('<?xml version="1.0"?'.'>', '', $node[0]->asXml());
+				$nodeCreateTree = $this->completeRequestTree($node[0], $nodeCreateString);
+
+				// finally merge the request
+				if (($out = $this->mergeXml($createTreeXML, $nodeCreateTree->asXML())) !== false) {
+					$createTree = simplexml_load_string($out->saveXML());
+				}
+			}
+
+			$createTreeXML = $createTree->asXML();
+		}
+
+		return $createTreeXML;
 	}
 
 	/**

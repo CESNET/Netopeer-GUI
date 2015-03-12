@@ -35,6 +35,44 @@
 * otherwise) arising in any way out of the use of this software, even
 * if advised of the possibility of such damage.
 */
+/**
+* @author David Alexa <alexa.david@me.com>
+*
+* Copyright (C) 2012-2015 CESNET
+*
+* LICENSE TERMS
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+* 1. Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in
+*    the documentation and/or other materials provided with the
+*    distribution.
+* 3. Neither the name of the Company nor the names of its contributors
+*    may be used to endorse or promote products derived from this
+*    software without specific prior written permission.
+*
+* ALTERNATIVELY, provided that this notice is retained in full, this
+* product may be distributed under the terms of the GNU General Public
+* License (GPL) version 2 or later, in which case the provisions
+* of the GPL apply INSTEAD OF those given above.
+*
+* This software is provided ``as is'', and any express or implied
+* warranties, including, but not limited to, the implied warranties of
+* merchantability and fitness for a particular purpose are disclaimed.
+* In no event shall the company or contributors be liable for any
+* direct, indirect, incidental, special, exemplary, or consequential
+* damages (including, but not limited to, procurement of substitute
+* goods or services; loss of use, data, or profits; or business
+* interruption) however caused and on any theory of liability, whether
+* in contract, strict liability, or tort (including negligence or
+* otherwise) arising in any way out of the use of this software, even
+* if advised of the possibility of such damage.
+*/
+/** enable overriding this file **/
 /*
 * @author David Alexa <alexa.david@me.com>
 *
@@ -93,7 +131,7 @@
   width: 0px; }
 .level-0 .label {
   padding-left: 6px; }
-.level-0 input.label {
+.generatedForm .level-0 input.label {
   margin-left: 6px;
   padding-left: 0px; }
 
@@ -101,7 +139,7 @@
   width: 8px; }
 .level-1 .label {
   padding-left: 14px; }
-.level-1 input.label {
+.generatedForm .level-1 input.label {
   margin-left: 14px;
   padding-left: 0px; }
 
@@ -109,7 +147,7 @@
   width: 16px; }
 .level-2 .label {
   padding-left: 22px; }
-.level-2 input.label {
+.generatedForm .level-2 input.label {
   margin-left: 22px;
   padding-left: 0px; }
 
@@ -117,7 +155,7 @@
   width: 24px; }
 .level-3 .label {
   padding-left: 30px; }
-.level-3 input.label {
+.generatedForm .level-3 input.label {
   margin-left: 30px;
   padding-left: 0px; }
 
@@ -125,7 +163,7 @@
   width: 32px; }
 .level-4 .label {
   padding-left: 38px; }
-.level-4 input.label {
+.generatedForm .level-4 input.label {
   margin-left: 38px;
   padding-left: 0px; }
 
@@ -133,7 +171,7 @@
   width: 40px; }
 .level-5 .label {
   padding-left: 46px; }
-.level-5 input.label {
+.generatedForm .level-5 input.label {
   margin-left: 46px;
   padding-left: 0px; }
 
@@ -141,7 +179,7 @@
   width: 48px; }
 .level-6 .label {
   padding-left: 54px; }
-.level-6 input.label {
+.generatedForm .level-6 input.label {
   margin-left: 54px;
   padding-left: 0px; }
 
@@ -149,7 +187,7 @@
   width: 56px; }
 .level-7 .label {
   padding-left: 62px; }
-.level-7 input.label {
+.generatedForm .level-7 input.label {
   margin-left: 62px;
   padding-left: 0px; }
 
@@ -157,7 +195,7 @@
   width: 64px; }
 .level-8 .label {
   padding-left: 70px; }
-.level-8 input.label {
+.generatedForm .level-8 input.label {
   margin-left: 70px;
   padding-left: 0px; }
 
@@ -165,7 +203,7 @@
   width: 72px; }
 .level-9 .label {
   padding-left: 78px; }
-.level-9 input.label {
+.generatedForm .level-9 input.label {
   margin-left: 78px;
   padding-left: 0px; }
 
@@ -173,7 +211,7 @@
   width: 80px; }
 .level-10 .label {
   padding-left: 86px; }
-.level-10 input.label {
+.generatedForm .level-10 input.label {
   margin-left: 86px;
   padding-left: 0px; }
 
@@ -181,7 +219,7 @@
   width: 88px; }
 .level-11 .label {
   padding-left: 94px; }
-.level-11 input.label {
+.generatedForm .level-11 input.label {
   margin-left: 94px;
   padding-left: 0px; }
 
@@ -189,7 +227,7 @@
   width: 96px; }
 .level-12 .label {
   padding-left: 102px; }
-.level-12 input.label {
+.generatedForm .level-12 input.label {
   margin-left: 102px;
   padding-left: 0px; }
 
@@ -197,7 +235,7 @@
   width: 104px; }
 .level-13 .label {
   padding-left: 110px; }
-.level-13 input.label {
+.generatedForm .level-13 input.label {
   margin-left: 110px;
   padding-left: 0px; }
 
@@ -205,7 +243,7 @@
   width: 112px; }
 .level-14 .label {
   padding-left: 118px; }
-.level-14 input.label {
+.generatedForm .level-14 input.label {
   margin-left: 118px;
   padding-left: 0px; }
 
@@ -213,7 +251,7 @@
   width: 120px; }
 .level-15 .label {
   padding-left: 126px; }
-.level-15 input.label {
+.generatedForm .level-15 input.label {
   margin-left: 126px;
   padding-left: 0px; }
 
@@ -412,31 +450,6 @@
   float: right;
   margin: 0px 0px 0px 4px; }
 
-.top-part {
-  position: absolute;
-  right: 30px;
-  top: 55px;
-  font-size: 1.2em;
-  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70);
-  opacity: 0.7;
-  z-index: 10; }
-.top-part:hover {
-  filter: progid:DXImageTransform.Microsoft.Alpha(enabled=false);
-  opacity: 1; }
-
-.configure .loading {
-  background: url("../images/loading-bar.gif") repeat-x;
-  display: block;
-  height: 20px;
-  line-height: 20px;
-  color: #fff;
-  padding: 0px 3%;
-  width: 94%;
-  border: 1px solid #00304d;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: 5px;
-  border-radius: 5px; }
-
 #hiddenModelTreeDump {
   display: none; }
 
@@ -465,33 +478,6 @@ pre {
 form.form .radio-cover {
   margin-top: 0px; }
 
-form.filter {
-  margin-top: 20px; }
-form.filter > div {
-  float: left;
-  margin-left: 30px; }
-form.filter label {
-  display: inline-block;
-  vertical-align: middle;
-  *vertical-align: auto;
-  *zoom: 1;
-  *display: inline;
-  margin: 0px 10px 0px 0px;
-  width: auto;
-  height: auto;
-  line-height: 1em; }
-form.filter label.required:after {
-  content: " "; }
-form.filter select {
-  margin-top: 5px;
-  width: 100px; }
-form.filter input[type="submit"] {
-  margin: 1px 10px; }
-form.filter .note {
-  font-size: 0.8em;
-  font-style: italic;
-  margin-top: 7px; }
-
 form.generatedForm {
   position: relative;
   z-index: 25;
@@ -502,10 +488,6 @@ form.generatedForm {
   -moz-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.7);
   -webkit-box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.7);
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.7); }
-form.generatedForm .leaf-line input.label, form.generatedForm .leaf-line input.value {
-  margin-top: 0px;
-  height: 22px;
-  line-height: 22px; }
 form.generatedForm input[type="submit"] {
   float: right;
   margin-right: 15px; }
@@ -524,6 +506,17 @@ form.generatedForm .model-tree-opener {
   float: right;
   margin: 25px 25px 0px 0px;
   cursor: pointer; }
+form.generatedForm .append-changes {
+  margin: 15px 10px 0px 0px;
+  cursor: pointer; }
+
+form.generatedForm .leaf-line input.label, form.generatedForm .leaf-line input.value, form.addedForm .leaf-line input.label, form.addedForm .leaf-line input.value {
+  margin-top: 0px;
+  height: 22px;
+  line-height: 22px; }
+
+form.addedForm > div {
+  background: #dbfadf; }
 
 /* tooltip */
 .tooltip-cover {
@@ -577,7 +570,7 @@ form.generatedForm .model-tree-opener {
   -webkit-border-radius: 4px;
   border-radius: 4px; }
 .gips-body.blue {
-  background-color: #004F80; }
+  background-color: #004f80; }
 
 .gips-icon {
   width: 0;
@@ -586,5 +579,5 @@ form.generatedForm .model-tree-opener {
   border-width: 6px;
   position: absolute;
   bottom: -6px;
-  border-color: #004F80 transparent transparent transparent;
+  border-color: #004f80 transparent transparent transparent;
   margin-left: 20px; }
