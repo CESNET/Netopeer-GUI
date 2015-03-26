@@ -245,14 +245,14 @@ class BaseController extends Controller
 								'label' => "Module name",
 								'attr' => array(
 										'class' => 'typeaheadName percent-width w-50',
-										'autocomplete' => false
+										'autocomplete' => 'off'
 								)
 						))
 				->add('namespace', 'text', array(
 								'label' => "Namespace",
 								'attr' => array(
 										'class' => 'typeaheadNS percent-width w-50',
-										'autocomplete' => false
+										'autocomplete' => 'off'
 								)
 						))
 				->getForm();

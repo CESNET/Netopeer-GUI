@@ -702,7 +702,8 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 			'data-unique-id': uniqueId,
 			'data-original-xPath': xPath,
 			'data-parrent-xPath': encodeURIComponent(parentXPath),
-			value: labelValue
+			value: labelValue,
+			'autocomplete': 'off'
 		}).typeahead({
 			minLength: 0,
 			items: 9999,
