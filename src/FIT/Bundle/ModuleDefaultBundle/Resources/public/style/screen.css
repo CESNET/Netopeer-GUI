@@ -509,7 +509,7 @@ form.generatedForm .model-tree-opener {
   margin: 25px 25px 0px 0px;
   cursor: pointer; }
 form.generatedForm .append-changes {
-  margin: 15px 10px 0px 0px;
+  margin: 15px 10px 15px 0px;
   cursor: pointer; }
 
 form.generatedForm .leaf-line input.label, form.generatedForm .leaf-line input.value, form.addedForm .leaf-line input.label, form.addedForm .leaf-line input.value {

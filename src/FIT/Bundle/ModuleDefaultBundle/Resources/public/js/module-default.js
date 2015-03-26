@@ -393,12 +393,15 @@ function createSubmitButton($form, inputValue) {
 	if ( $form.children("input[type=submit]").length ) {
 		$form.children("input[type=submit]").remove();
 	}
-	var $elementSubmit = $("<input>")
-		.attr({
-			type: 'submit',
-			value: inputValue
-		});
-	$form.append($elementSubmit);
+	// show submit button only when no form was appended
+	if (newNodeFormCnt < 1) {
+		var $elementSubmit = $("<input>")
+			.attr({
+				type: 'submit',
+				value: inputValue
+			});
+		$form.append($elementSubmit);
+	}
 }
 
 function createAppendButton($cover, $form) {
@@ -459,6 +462,7 @@ function appendChanges($cover, $form) {
 	});
 
 	$cover.find('.active').removeClass('active');
+	formInputChanged = true;
 }
 
 function createCloseButton($cover, $form) {

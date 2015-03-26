@@ -149,7 +149,7 @@ form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 
 
 	#modelTreeDump { display: none; width: 94%; overflow: hidden; clear: both; padding: 15px 3%; background: #f0f0f0; border-top: 1px solid #ccc; }
 	.model-tree-opener { float: right; margin: 25px 25px 0px 0px; cursor: pointer; }
-	.append-changes { margin: 15px 10px 0px 0px; cursor: pointer; }
+	.append-changes { margin: 15px 10px 15px 0px; cursor: pointer; }
 }
 
 form.generatedForm, form.addedForm {
