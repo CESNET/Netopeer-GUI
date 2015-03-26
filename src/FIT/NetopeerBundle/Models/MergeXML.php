@@ -173,7 +173,7 @@ class MergeXML {
       if (!$this->join) {
         $rlt = $this->Error('dif');
       } else if (is_string($this->join)) {
-        $doc = new DOMDocument();
+        $doc = new \DOMDocument();
         $doc->encoding = $this->dom->encoding;
         $doc->preserveWhiteSpace = false;
         $doc->formatOutput = true;

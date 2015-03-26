@@ -30,6 +30,18 @@ function initModuleDefaultJS() {
 
 	prepareTooltipActions();
 
+	$("form[name=formConfigData]").on("change", "input, select", function(event){
+		formInputChanged = true;
+	});
+
+	$("form[name=formConfigData] input[type=submit], form[name=newNodeForm].addedForm  input[type=submit]").on("click", function(event){
+		formInputChanged = false;
+	});
+
+	$("form").on("change", ".js-auto-submit-on-change", function() {
+		$(this).parents('form').submit();
+	});
+
 	/* when range input type, add number of current value before input */
 	$("input[type='range']").each(function(i, e) {
 		var tmp = $("<input>").attr({
@@ -45,7 +57,9 @@ function initModuleDefaultJS() {
 	});
 
 	$("body").on('change', 'input.value', function() {
-		$(this).parent('.leaf-line').addClass('modified');
+		if (!$(this).parent().hasClass('generated')) {
+			$(this).parent('.leaf-line').addClass('modified');
+		}
 	});
 
 	showIconsOnLeafLine();
@@ -394,7 +408,7 @@ function createSubmitButton($form, inputValue) {
 		$form.children("input[type=submit]").remove();
 	}
 	// show submit button only when no form was appended
-	if (newNodeFormCnt < 1) {
+	if (newNodeFormCnt < 1 || inputValue == "Delete record") {
 		var $elementSubmit = $("<input>")
 			.attr({
 				type: 'submit',

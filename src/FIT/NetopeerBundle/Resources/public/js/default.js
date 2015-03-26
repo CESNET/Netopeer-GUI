@@ -68,16 +68,6 @@ function initJS() {
 	collapseTopNav();
 	prepareAlerts();
 	changeSectionHeight();
-
-	$("form[name=formConfigData]").on("change", "input, select", function(event){
-		formInputChanged = true;
-	}).on("submit", function(event){
-		formInputChanged = false;
-	});
-
-	$("form").on("change", ".js-auto-submit-on-change", function() {
-		$(this).parents('form').submit();
-	});
 }
 
 function initPopupMenu($cover) {
