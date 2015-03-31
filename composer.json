@@ -21,7 +21,8 @@
         "sensio/generator-bundle": "2.3.*",
         "incenteev/composer-parameter-handler": "~2.0",
         "winzou/cache-bundle": "dev-master",
-        "aerialship/saml-sp-bundle": "dev-master"
+        "aerialship/saml-sp-bundle": "dev-master",
+        "codeception/codeception": "*"
     },
     "scripts": {
         "post-install-cmd": [
