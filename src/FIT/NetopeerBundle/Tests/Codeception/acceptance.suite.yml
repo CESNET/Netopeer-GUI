@@ -11,8 +11,9 @@
 class_name: WebGuy
 modules:
     enabled:
-        - PhpBrowser
+        - WebDriver
         - WebHelper
     config:
-        PhpBrowser:
+        WebDriver:
             url: 'http://netopeer/netopeer-gui/app_dev.php/'
+            browser: chrome
