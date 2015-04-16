@@ -414,28 +414,27 @@ class XMLoperations {
 				}
 
 				// check, if newNodeForm was send too
-				$toAdd = "";
 				if (sizeof($this->container->get('request')->get('newNodeForm'))) {
 					$newNodeForms = $this->container->get('request')->get('newNodeForm');
 					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/testing.yin', var_export($newNodeForms, true));
 					foreach ($newNodeForms as $newNodeFormVals) {
-						$originalConfigXml = simplexml_load_string($originalXml, 'SimpleXMLIterator');
+						$newNodeConfigXML = simplexml_load_string($originalXml, 'SimpleXMLIterator');
 
 						// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
-						$xmlNameSpaces = $originalConfigXml->getNamespaces();
+						$xmlNameSpaces = $newNodeConfigXML->getNamespaces();
 
 						if ( isset($xmlNameSpaces[""]) ) {
-							$originalConfigXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+							$newNodeConfigXML->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 							$xPathPrefix = "xmlns:";
 						} else {
 							// we will use this xmlns as backup for XPath request
-							$originalConfigXml->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
+							$newNodeConfigXML->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
 							$xPathPrefix = "";
 						}
-						$toAdd .= $this->processNewNodeForm($originalConfigXml, $newNodeFormVals);
+						$toAdd = $this->processNewNodeForm($newNodeConfigXML, $newNodeFormVals);
 
 						// finally merge the request
-						if (($out = $this->mergeXml($configXml->asXML(), $originalConfigXml->asXML())) !== false) {
+						if (($out = $this->mergeXml($configXml->asXML(), $toAdd)) !== false) {
 							$configXml = simplexml_load_string($out->saveXML());
 						}
 					}
@@ -970,6 +969,7 @@ class XMLoperations {
 		}
 		$elemWithModel = $tmpXml->xpath('/'.$xPathPrefix.$xpath.'/*['.$elemIndex.']');
 
+		/* We don't want to auto generate leaf-ref now
 		if ($elemWithModel[0]) {
 			$elemModel = $elemWithModel[0];
 			$leafRefPath = "";
@@ -990,6 +990,7 @@ class XMLoperations {
 				}
 			}
 		}
+		*/
 
 		return $retArr;
 	}
@@ -1092,7 +1093,7 @@ class XMLoperations {
 		$res = 0;
 
 		try {
-			if ( ($originalXml = $this->dataModel->handle('getconfig', $configParams, false)) != 1 ) {
+			if ( ($originalXml = $this->dataModel->handle('getconfig', $configParams, true)) != 1 ) {
 				$tmpConfigXml = simplexml_load_string($originalXml);
 
 				// save to temp file - for debugging
@@ -1122,7 +1123,7 @@ class XMLoperations {
 				if ($this->container->getParameter('kernel.environment') == 'dev') {
 					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/removeNode.yin', $tmpConfigXml->asXml());
 				}
-				$res = $this->executeEditConfig($key, $tmpConfigXml->asXml(), $configParams['source']);
+				$res = $this->executeEditConfig($key, $deleteTree->asXml(), $configParams['source']);
 				if ($res == 0) {
 					$this->container->get('request')->getSession()->getFlashBag()->add('success', "Record has been removed.");
 				}

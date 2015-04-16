@@ -469,7 +469,7 @@ function appendChanges($cover, $form) {
 	// we have to modify xpath and rel attributes for generated icons and inputs
 	modifyAllInputsXPath($parentsForm.find('.leaf-line'), true);
 
-	$parentsForm.find('input').each(function(i,e) {
+	$parentsForm.find('input, select').each(function(i,e) {
 		var name = $(e).attr('name');
 		var modifiedName = name.replace(/newNodeForm(\[[\d+]\])?/, 'newNodeForm['+$parentsForm.data('formIndex')+']');
 		$(e).attr('name', modifiedName);
