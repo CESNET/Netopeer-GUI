@@ -324,10 +324,12 @@ class XMLoperations {
 
 				if ( isset($xmlNameSpaces[""]) ) {
 					$configXml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
+					$xmlNamespace = $xmlNameSpaces[""];
 					$xPathPrefix = "xmlns:";
 				} else {
 					// we will use this xmlns as backup for XPath request
 					$configXml->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
+					$xmlNamespace = "urn:cesnet:tmc:hanicprobe:1.0";
 					$xPathPrefix = "";
 				}
 
@@ -417,6 +419,11 @@ class XMLoperations {
 				if (sizeof($this->container->get('request')->get('newNodeForm'))) {
 					$newNodeForms = $this->container->get('request')->get('newNodeForm');
 					@file_put_contents($this->container->get('kernel')->getRootDir().'/logs/tmp-files/testing.yin', var_export($newNodeForms, true));
+
+					// create empty simpleXmlObject for adding all newNodeForms
+					$currentRoot = $configXml->xpath("/xmlns:*");
+					$newNodesXML = new SimpleXMLElement("<".$currentRoot[0]->getName()." xmlns='".$xmlNamespace."'></".$currentRoot[0]->getName().">");
+
 					foreach ($newNodeForms as $newNodeFormVals) {
 						$newNodeConfigXML = simplexml_load_string($originalXml, 'SimpleXMLIterator');
 
@@ -425,18 +432,23 @@ class XMLoperations {
 
 						if ( isset($xmlNameSpaces[""]) ) {
 							$newNodeConfigXML->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-							$xPathPrefix = "xmlns:";
+							$newNodesXML->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
 						} else {
 							// we will use this xmlns as backup for XPath request
 							$newNodeConfigXML->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
-							$xPathPrefix = "";
+							$newNodesXML->registerXPathNamespace("xmlns", "urn:cesnet:tmc:hanicprobe:1.0");
 						}
 						$toAdd = $this->processNewNodeForm($newNodeConfigXML, $newNodeFormVals);
 
-						// finally merge the request
-						if (($out = $this->mergeXml($configXml->asXML(), $toAdd)) !== false) {
-							$configXml = simplexml_load_string($out->saveXML());
+						// merge new node XML with previous one
+						if (($out = $this->mergeXml($newNodesXML->asXML(), $toAdd)) !== false) {
+							$newNodesXML = simplexml_load_string($out->saveXML());
 						}
+					}
+
+					// finally merge the request with edited values
+					if (($out = $this->mergeXml($configXml->asXML(), $newNodesXML->asXML())) !== false) {
+						$configXml = simplexml_load_string($out->saveXML());
 					}
 				}
 
