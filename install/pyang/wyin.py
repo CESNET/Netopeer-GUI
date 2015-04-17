@@ -337,8 +337,10 @@ def fmt_text(indent, data):
 
 
 def print_children(ctx, i_children, module, fd):
+    child_index = 1
     for ch in i_children:
-        print_node(ctx, ch, module, fd)
+        print_node(ctx, ch, module, fd, child_index)
+        child_index += 1
 
 def handleEnumeration(ctx, typeelem):
     attrs = ""
@@ -456,21 +458,21 @@ def getAttrs(ctx, s):
     return attrs
 
 
-def print_node(ctx, s, module, fd):
+def print_node(ctx, s, module, fd, child_idx = 1):
     if type(s) == list:
         for m in s:
-            print_node(ctx,m, module, fd)
+            print_node(ctx,m, module, fd, child_idx)
         return
     if s.i_module.i_modulename == module.i_modulename:
         name = s.arg
     else:
         name = s.i_module.i_prefix + ':' + s.arg
     if hasattr(s, 'i_children') and s.i_children:
-        fd.write("<%s%s>" % (name, getAttrs(ctx, s)))
+        fd.write("<%s%s model-level-index=\"%d\">" % (name, getAttrs(ctx, s), child_idx))
         print_children(ctx, s.i_children, module, fd)
         fd.write("</%s>\n" % (name))
     else:
-        fd.write("<%s%s/>\n" % (name, getAttrs(ctx, s)))
+        fd.write("<%s%s model-level-index=\"%d\"/>\n" % (name, getAttrs(ctx, s), child_idx))
     return
 
 def get_typename(s):
