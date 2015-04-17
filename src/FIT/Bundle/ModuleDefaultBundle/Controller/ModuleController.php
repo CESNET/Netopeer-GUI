@@ -69,31 +69,4 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 
 		return $this->getTwigArr();
 	}
-
-	/**
-	 * @param int    $key
-	 * @param string $xml    result of prepareDataForModuleAction()
-	 */
-	private function checkEmptyRootModule($key, $xml) {
-		if ($xml instanceof \SimpleXMLIterator && $xml->count() == 0) {
-			$isEmptyModule = true;
-			if ($xml->getName() == XMLoperations::$customRootElement) {
-				$this->setEmptyModuleForm($this->getRequest()->get('key'));
-				$isEmptyModule = false;
-				$this->assign('forceShowFormConfig', true);
-			}
-			$this->assign('isEmptyModule', $isEmptyModule);
-			$this->assign('key', $this->getRequest()->get('key'));
-			$this->assign('additionalTitle', 'Create empty root element');
-			$this->assign('redirectUrl', $this->getRequest()->getRequestUri());
-			$this->setEmptyModuleForm($key);
-			$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Module:createEmptyModule.html.twig');
-			$html = $template->renderBlock('singleContent', $this->getAssignedVariablesArr());
-
-			$this->assign('additionalForm', $html);
-		} else {
-			$this->assign('showRootElem', true);
-		}
-	}
-
 }
