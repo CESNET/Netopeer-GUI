@@ -268,6 +268,125 @@ class XMLoperationsTest extends WebTestCase {
 		);
 	}
 
+	public function testSortXMLByModelLevelIndex()
+	{
+		$xmlOp = new XMLoperations($this->container, $this->logger, $this->dataModel);
+		$testXML = '<?xml version="1.0"?>
+<nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm" xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+<enable-nacm model-level-index="9">false</enable-nacm>
+<groups model-level-index="1">
+	<group model-level-index="1">
+		<name model-level-index="1">first</name>
+	</group>
+	<group xc:operation="create" model-level-index="4">
+		<name xc:operation="create" model-level-index="1">third</name>
+	</group>
+	<group model-level-index="2">
+		<name model-level-index="1">second</name>
+	</group>
+</groups>
+</nacm>';
+
+		$expected = '<?xml version="1.0"?>
+<nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm" xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+<groups model-level-index="1">
+	<group model-level-index="1">
+		<name model-level-index="1">first</name>
+	</group>
+	<group model-level-index="2">
+		<name model-level-index="1">second</name>
+	</group>
+	<group xc:operation="create" model-level-index="4">
+		<name xc:operation="create" model-level-index="1">third</name>
+	</group>
+</groups>
+<enable-nacm model-level-index="9">false</enable-nacm>
+</nacm>';
+		$res = $xmlOp->sortXMLByModelLevelIndex($testXML, false);
+		$this->assertEquals(preg_replace('/\s+/', '', $expected), preg_replace('/\s+/', '', $res), 'sort xml by model level 1');
+
+		$expected = '<?xml version="1.0"?>
+<nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm" xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+<groups>
+	<group>
+		<name>first</name>
+	</group>
+	<group>
+		<name>second</name>
+	</group>
+	<group xc:operation="create">
+		<name xc:operation="create">third</name>
+	</group>
+</groups>
+<enable-nacm>false</enable-nacm>
+</nacm>';
+		$res = $xmlOp->sortXMLByModelLevelIndex($testXML, true);
+		$this->assertEquals(preg_replace('/\s+/', '', $expected), preg_replace('/\s+/', '', $res), 'sort xml by model level 2');
+
+		$testXML = '<?xml version="1.0"?>
+<nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm" xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+<enable-nacm model-level-index="9">false</enable-nacm>
+<enable-nacm model-level-index="1">xxxx</enable-nacm>
+<groups model-level-index="4">
+	<group model-level-index="1">
+		<name model-level-index="1">first</name>
+	</group>
+	<group xc:operation="create" model-level-index="4">
+		<name xc:operation="create" model-level-index="1">third</name>
+	</group>
+	<group model-level-index="2">
+		<name model-level-index="1">second</name>
+	</group>
+	<group model-level-index="2">
+		<name model-level-index="1">second</name>
+	</group>
+	<group model-level-index="2">
+		<name model-level-index="1">second</name>
+	</group>
+</groups>
+</nacm>';
+
+		$expected = '<?xml version="1.0"?>
+<nacm xmlns="urn:ietf:params:xml:ns:yang:ietf-netconf-acm" xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+<enable-nacm model-level-index="1">xxxx</enable-nacm>
+<groups model-level-index="4">
+	<group model-level-index="1">
+		<name model-level-index="1">first</name>
+	</group>
+	<group model-level-index="2">
+		<name model-level-index="1">second</name>
+	</group>
+	<group model-level-index="2">
+		<name model-level-index="1">second</name>
+	</group>
+	<group model-level-index="2">
+		<name model-level-index="1">second</name>
+	</group>
+	<group xc:operation="create" model-level-index="4">
+		<name xc:operation="create" model-level-index="1">third</name>
+	</group>
+</groups>
+<enable-nacm model-level-index="9">false</enable-nacm>
+</nacm>';
+		$res = $xmlOp->sortXMLByModelLevelIndex($testXML, false);
+		$this->assertEquals(preg_replace('/\s+/', '', $expected), preg_replace('/\s+/', '', $res), 'sort xml by model level 3');
+
+
+		$testXML = '<?xml version="1.0"?> <capable-switch xmlns="urn:onf:config:yang" xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+<id model-level-index="1">openvswitch</id>
+<logical-switches model-level-index="4"><switch model-level-index="1"><id model-level-index="1">ofc-bridge</id><datapath-id model-level-index="3">00:01:02:03:04:05:06:07</datapath-id><lost-connection-behavior model-level-index="4">failSecureMode</lost-connection-behavior><resources xc:operation="create" model-level-index="6"><port xc:operation="create" model-level-index="1">eth0</port></resources></switch>  </logical-switches>
+<resources xc:operation="create" model-level-index="3"><port xc:operation="create" model-level-index="1"><name xc:operation="create" model-level-index="1">eth0</name></port></resources>
+</capable-switch>';
+
+		$expected = '<?xml version="1.0"?> <capable-switch xmlns="urn:onf:config:yang" xmlns:xc="urn:ietf:params:xml:ns:netconf:base:1.0">
+<id model-level-index="1">openvswitch</id>
+<resources xc:operation="create" model-level-index="3"><port xc:operation="create" model-level-index="1"><name xc:operation="create" model-level-index="1">eth0</name></port></resources>
+<logical-switches model-level-index="4"><switch model-level-index="1"><id model-level-index="1">ofc-bridge</id><datapath-id model-level-index="3">00:01:02:03:04:05:06:07</datapath-id><lost-connection-behavior model-level-index="4">failSecureMode</lost-connection-behavior><resources xc:operation="create" model-level-index="6"><port xc:operation="create" model-level-index="1">eth0</port></resources></switch>  </logical-switches>
+</capable-switch>';
+		$res = $xmlOp->sortXMLByModelLevelIndex($testXML, false);
+		$this->assertEquals(preg_replace('/\s+/', '', $expected), preg_replace('/\s+/', '', $res), 'sort xml by model level 4');
+	}
+
 	public function testRemoveChildrenExceptOfKeyElements()
 	{
 		$this->markTestIncomplete(

@@ -452,7 +452,13 @@ class XMLoperations {
 					}
 				}
 
-				$res = $this->executeEditConfig($key, $configXml->asXml(), $configParams['source']);
+				// sort final config xml
+				$params['attributesWhiteList'] = array('model-level-index');
+				$xmlString = $configXml->asXML();
+				$xmlString = $this->mergeXMLWithModel($xmlString, $params);
+				$sortedXml = $this->sortXMLByModelLevelIndex($xmlString, true);
+
+				$res = $this->executeEditConfig($key, $sortedXml, $configParams['source']);
 				if ($res !== 1) {
 					$this->container->get('session')->getFlashBag()->add('success', "Config has been edited successfully.");
 				}
@@ -850,6 +856,47 @@ class XMLoperations {
 	}
 
 	/**
+	 * Sorts given XML file by attribute model-level-number recursively
+	 *
+	 * @param      $xml
+	 * @param bool $removeIndexAttr
+	 *
+	 * @return string
+	 */
+	public function sortXMLByModelLevelIndex($xml, $removeIndexAttr = true) {
+		$xslt = '
+		<xsl:stylesheet version="1.0"
+		    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+		    <xsl:output method="xml" indent="yes"/>
+		    <xsl:template match="@* | node()">
+		        <xsl:copy>
+		            <xsl:apply-templates select="@* | node()">
+		                <xsl:sort select="@model-level-index" data-type="number"/>
+		            </xsl:apply-templates>
+		        </xsl:copy>
+		    </xsl:template>
+		</xsl:stylesheet>';
+
+		$xsldoc = new \DOMDocument();
+		$xsldoc->loadXML($xslt);
+
+		$xmldoc = new \DOMDocument();
+		$xmldoc->loadXML($xml);
+
+		$xsl = new \XSLTProcessor();
+		$xsl->importStyleSheet($xsldoc);
+
+		$res = $xsl->transformToXML($xmldoc);
+
+		// remove attribute model-level-index
+		if ($removeIndexAttr) {
+			$res = preg_replace('/ model-level-index="\d+"/', '', $res);
+		}
+
+		return $res;
+	}
+
+	/**
 	 * removes all children of element except of key elements, which has to remain
 	 *
 	 * @param      \DOMElement  $domNode
@@ -1228,17 +1275,18 @@ class XMLoperations {
 	/**
 	 * Merge given XML with data model
 	 *
-	 * @param $xml            XML string
+	 * @param string $xml            XML string
 	 * @return array|false    false on error, merged array on success
+	 * @param array             $params   modification parameters for merge
 	 */
-	public function mergeXMLWithModel(&$xml) {
+	public function mergeXMLWithModel(&$xml, $params = array()) {
 		// load model
 		$model = $this->loadModel();
 		$res = false;
 
 		if ($model !== false) {
 			try {
-				$res = $this->mergeWithModel($model, $xml);
+				$res = $this->mergeWithModel($model, $xml, $params);
 			} catch (\ErrorException $e) {
 				// TODO
 				$this->logger->err("Could not merge with model:", array('error' => $e->getMessage()));
@@ -1322,18 +1370,29 @@ public function checkElemMatch($model_el, $possible_el) {
 	}
 }
 
-/**
- * Completes tree structure for target element.
- *
- * @param \SimpleXMLElement $source
- * @param \SimpleXMLElement $target
- */
-public function completeAttributes(&$source, &$target) {
+	/**
+	 * Completes tree structure for target element.
+	 *
+	 * $params['attributesWhiteList'] = set array of white listed attributes to add
+	 *                                  default empty array() - add all
+	 *
+	 * @param \SimpleXMLElement $source
+	 * @param \SimpleXMLElement $target
+	 * @param array             $params   modification parameters for merge
+	 */
+public function completeAttributes(&$source, &$target, $params = array()) {
+	if (isset($params['attributesWhiteList']) && sizeof($params['attributesWhiteList'])) {
+		$filterAttributes = $params['attributesWhiteList'];
+	}
 	if ($source->attributes()) {
 		$attrs = $source->attributes();
 //		var_dump($source->getName());
 		if (in_array($attrs["eltype"], array("leaf","list","leaf-list", "container", "choice", "case"))) {
 			foreach ($source->attributes() as $key => $val) {
+
+				// skip attributes which are not in whitelist
+				if (isset($filterAttributes) && !in_array($key, $filterAttributes)) continue;
+
 				try {
 					@$target->addAttribute($key, $val);
 				} catch (\ErrorException $e) {
@@ -1350,19 +1409,20 @@ public function completeAttributes(&$source, &$target) {
  *
  * @param  \SimpleXMLElement &$model with data model
  * @param  \SimpleXMLElement $el     with element of response
+ * @param array              $params   modification parameters for merge
  */
-public function findAndComplete(&$model, $el) {
+public function findAndComplete(&$model, $el, $params = array()) {
 	$modelns = $model->getNamespaces();
 	$model->registerXPathNamespace("c", $modelns[""]);
 	$found = $model->xpath("//c:". $el->getName());
 
 	if (sizeof($found) == 1) {
-		$this->completeAttributes($found[0], $el);
+		$this->completeAttributes($found[0], $el, $params);
 	} else {
 //		echo "Not found unique<br>";
 		foreach ($found as $found_el) {
 			if ($this->checkElemMatch($found_el, $el)) {
-				$this->completeAttributes($found_el, $el);
+				$this->completeAttributes($found_el, $el, $params);
 				break;
 			}
 		}
@@ -1374,21 +1434,22 @@ public function findAndComplete(&$model, $el) {
  *
  * @param  \SimpleXMLElement &$model  with data model
  * @param  \SimpleXMLElement $root_el with element of response
+ * @param array              $params   modification parameters for merge
  */
-public function mergeRecursive(&$model, $root_el) {
+public function mergeRecursive(&$model, $root_el, $params = array()) {
 		if ($root_el->count() == 0) {
-			$this->findAndComplete($model, $root_el);
+			$this->findAndComplete($model, $root_el, $params);
 			// TODO: repair merge with root element (no parents)
 		}
 
 		foreach ($root_el as $ch) {
-			$this->findAndComplete($model, $ch);
-			$this->mergeRecursive($model, $ch);
+			$this->findAndComplete($model, $ch, $params);
+			$this->mergeRecursive($model, $ch, $params);
 		}
 
 		foreach ($root_el->children as $ch) {
-			$this->findAndComplete($model, $ch);
-			$this->mergeRecursive($model, $ch);
+			$this->findAndComplete($model, $ch, $params);
+			$this->mergeRecursive($model, $ch, $params);
 		}
 	}
 
@@ -1398,12 +1459,13 @@ public function mergeRecursive(&$model, $root_el) {
 	 * @param  \SimpleXMLElement  $model 	data configuration model
 	 * @param  string             $result data from netconf server
 	 * @return string								      the result of merge
+	 * @param array               $params   modification parameters for merge
 	 */
-	public function mergeWithModel($model, $result) {
+	public function mergeWithModel($model, $result, $params = array()) {
 		if ($result) {
 			$resxml = simplexml_load_string($result);
 
-			$this->mergeRecursive($model, $resxml);
+			$this->mergeRecursive($model, $resxml, $params);
 
 			return $resxml->asXML();
 		} else {
