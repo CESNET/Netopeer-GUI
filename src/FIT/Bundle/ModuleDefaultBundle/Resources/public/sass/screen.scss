@@ -49,7 +49,9 @@
 	.level-#{$i} {
 		.dots { width: 8px * $i; }
 		.label { padding-left: 6px + (8px * $i); }
-		input.label { margin-left: 6px + (8px * $i); padding-left: 0px; }
+		.generatedForm & {
+			input.label { margin-left: 6px + (8px * $i); padding-left: 0px; }
+		}
 	}
 }
 
@@ -70,7 +72,8 @@
 .sortable-placeholder { height: 40px; width: 100%; display: block; min-height: 40px; float: left; clear: left; }
 .ui-sortable-helper { background: #fff; }
 .leaf-line { padding: 6px 0.5% 5px 0px; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; margin-top: -1px; @include box-sizing(border-box); float: left; width: 100%; position: relative;
-	&.hover { background-color: #dadada; border-color: #aaa; }
+	&.hover { background-color: #dadada !important; border-color: #aaa; }
+	&.modified { background-color: $color-bg-info !important; }
 	&.is-root-elem { border-left: 0px none !important; border-right: 0px none !important;  margin-bottom: 15px !important;
 		.dots, .dash { display: none; }
 		.edit-bar .sibling { display: none; }
@@ -141,16 +144,24 @@ form.form {
 
 form.generatedForm { position: relative; z-index: 25; background: #fff; margin: 0px 0px 15px 0px; float: left; width: 100%; @include single-box-shadow(0px, 0px, 10px, 0px, rgba(0,0,0,0.7));
 
-	.leaf-line {
-		input {
-			&.label, &.value { margin-top: 0px; height: 22px; line-height: 22px; }
-		}
-	}
 	input[type="submit"] { float: right; margin-right: 15px; }
 	.close { float: left; margin-left: 15px; }
 
 	#modelTreeDump { display: none; width: 94%; overflow: hidden; clear: both; padding: 15px 3%; background: #f0f0f0; border-top: 1px solid #ccc; }
 	.model-tree-opener { float: right; margin: 25px 25px 0px 0px; cursor: pointer; }
+	.append-changes { margin: 15px 10px 15px 0px; cursor: pointer; }
+}
+
+form.generatedForm, form.addedForm {
+	.leaf-line {
+		input {
+			&.label, &.value { margin-top: 0px; height: 22px; line-height: 22px; }
+		}
+	}
+}
+
+form.addedForm {
+	.leaf-line { background: $color-bg-success !important; }
 }
 
 /* tooltip */

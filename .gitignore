@@ -8,6 +8,10 @@
 /bin/doctrine
 /bin/doctrine.php
 /bin/lightsaml
+/bin/phpunit
+/bin/codecept
+/bin/webunit
+/src/FIT/NetopeerBundle/Tests/Codeception/_log/
 /src/FIT/NetopeerBundle/Resources/public/.sass-cache/
 /src/FIT/NetopeerBundle/Data/models/*
 /src/winzou/*

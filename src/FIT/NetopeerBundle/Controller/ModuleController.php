@@ -45,6 +45,7 @@
 namespace FIT\NetopeerBundle\Controller;
 
 
+use FIT\NetopeerBundle\Models\XMLoperations;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -350,10 +351,6 @@ class ModuleController extends BaseController {
 		} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
 			$res = $this->get('XMLoperations')->handleDuplicateNodeForm($key, $this->getConfigParams());
 
-			// processing generate node form
-		} elseif ( is_array($this->getRequest()->get('generateNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleGenerateNodeForm($key, $this->getConfigParams(), $module, $subsection);
-
 			// processing new node form
 		} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
 			$res = $this->get('XMLoperations')->handleNewNodeForm($key, $this->getConfigParams());
@@ -466,7 +463,7 @@ class ModuleController extends BaseController {
 				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
 
 				// we have only root module
-				if ($xml->count() == 0 && $xml->getName() == 'root') {
+				if ($xml->count() == 0 && $xml->getName() == XMLoperations::$customRootElement) {
 					$this->setEmptyModuleForm($this->getRequest()->get('key'));
 					$this->assign('key', $this->getRequest()->get('key'));
 					$this->assign('additionalTitle', 'Create empty root element');
@@ -491,6 +488,34 @@ class ModuleController extends BaseController {
 		} catch (\ErrorException $e) {
 			$this->get('data_logger')->err("Config: Could not parse XML file correctly.", array("message" => $e->getMessage()));
 			$this->getRequest()->getSession()->getFlashBag()->add('config error', "Could not parse XML file correctly. ");
+		}
+	}
+
+	/**
+	 * Checks if we have empty module in XML
+	 *
+	 * @param int    $key
+	 * @param string $xml    result of prepareDataForModuleAction()
+	 */
+	protected  function checkEmptyRootModule($key, $xml) {
+		if ($xml instanceof \SimpleXMLIterator && $xml->count() == 0) {
+			$isEmptyModule = true;
+			if ($xml->getName() == XMLoperations::$customRootElement) {
+				$this->setEmptyModuleForm($this->getRequest()->get('key'));
+				$isEmptyModule = false;
+				$this->assign('forceShowFormConfig', true);
+			}
+			$this->assign('isEmptyModule', $isEmptyModule);
+			$this->assign('key', $this->getRequest()->get('key'));
+			$this->assign('additionalTitle', 'Create empty root element');
+			$this->assign('redirectUrl', $this->getRequest()->getRequestUri());
+			$this->setEmptyModuleForm($key);
+			$template = $this->get('twig')->loadTemplate('FITNetopeerBundle:Default:createEmptyModule.html.twig');
+			$html = $template->renderBlock('singleContent', $this->getAssignedVariablesArr());
+
+			$this->assign('additionalForm', $html);
+		} else {
+			$this->assign('showRootElem', true);
 		}
 	}
 

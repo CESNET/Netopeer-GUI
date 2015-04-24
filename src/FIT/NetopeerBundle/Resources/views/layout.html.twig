@@ -184,9 +184,6 @@ if advised of the possibility of such damage.
 								{% block sourceValidation %}
 									{# duplicated in config form filter !#}
 									<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink button grey small left" data-disable-history="true">Validate this datastore</a>
-									{% if isSourceValid is defined %}
-										<span class="source-validation bubble {{ (isSourceValid) ? 'green' : 'red' }}">{{ (isSourceValid) ? 'valid' : 'invalid' }}</span>
-									{% endif %}
 								{% endblock %}
 							</div>
 						{% endif %}

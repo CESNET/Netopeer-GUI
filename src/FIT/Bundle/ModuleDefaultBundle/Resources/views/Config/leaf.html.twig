@@ -113,7 +113,7 @@ if advised of the possibility of such damage.
 			{% endif %}
 			{% if editBarShouldBeVisible %}
 				<img src="{{ asset('bundles/fitmoduledefault/images/ico/add_child.png')}}" alt="Add child" title="Add child" class="create-child" rel="{{ xpath|replace({'/': '--', '[': '?', ']': '!'}) }}{#_{{ path("generateFromModel", {"level": level, "xPath": xpath|replace({'/': '-', '[': '?', ']': '!'})|url_encode, "key": routeParams.key, "module": routeParams.module, "subsection": routeParams.subsection} ) }}#}" data-typeahead-path="{{ valuesTypeaheadPath }}"/>
-				<img src="{{ asset('bundles/fitmoduledefault/images/ico/add_sibling.png')}}" alt="Duplicate node" title="Duplicate node" rel="{{ xpath|replace({'/': '--', '[': '?', ']': '!'}) }}" class="sibling" />
+				{#<img src="{{ asset('bundles/fitmoduledefault/images/ico/add_sibling.png')}}" alt="Duplicate node" title="Duplicate node" rel="{{ xpath|replace({'/': '--', '[': '?', ']': '!'}) }}" class="sibling" />#}
 			{% endif %}
 			<img src="{{ asset('bundles/fitmoduledefault/images/ico/remove_child.png')}}" alt="Remove child" title="Remove child" class="remove-child" rel="{{ xpath|replace({'/': '--', '[': '?', ']': '!'}) }}" />
 		</span>

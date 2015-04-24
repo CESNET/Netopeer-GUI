@@ -1,9 +1,12 @@
+var newNodeFormCnt;
+
 $(document).ready(function() {
 	initModuleDefaultJS();
 });
 
 function initModuleDefaultJS() {
-
+	newNodeFormCnt = 0;
+	
 	// zobrazime jinak skryte ikonky pro pridavani potomku (novych listu XML)
 	$(".type-list .edit-bar .sibling, .type-list .edit-bar .remove-child, .type-list .edit-bar .child").show();
 
@@ -27,6 +30,18 @@ function initModuleDefaultJS() {
 
 	prepareTooltipActions();
 
+	$("form[name=formConfigData]").on("change", "input, select", function(event){
+		formInputChanged = true;
+	});
+
+	$("form[name=formConfigData] input[type=submit], form[name=newNodeForm].addedForm  input[type=submit]").on("click", function(event){
+		formInputChanged = false;
+	});
+
+	$("form").on("change", ".js-auto-submit-on-change", function() {
+		$(this).parents('form').submit();
+	});
+
 	/* when range input type, add number of current value before input */
 	$("input[type='range']").each(function(i, e) {
 		var tmp = $("<input>").attr({
@@ -39,6 +54,12 @@ function initModuleDefaultJS() {
 		$(e).bind('change', function() {
 			$(e).next('.range-cover-number').val(e.value);
 		});
+	});
+
+	$("body").on('change', 'input.value', function() {
+		if (!$(this).parent().hasClass('generated')) {
+			$(this).parent('.leaf-line').addClass('modified');
+		}
 	});
 
 	showIconsOnLeafLine();
@@ -386,12 +407,76 @@ function createSubmitButton($form, inputValue) {
 	if ( $form.children("input[type=submit]").length ) {
 		$form.children("input[type=submit]").remove();
 	}
-	var $elementSubmit = $("<input>")
+	// show submit button only when no form was appended
+	if (newNodeFormCnt < 1 || inputValue == "Delete record") {
+		var $elementSubmit = $("<input>")
+			.attr({
+				type: 'submit',
+				value: inputValue
+			});
+		$form.append($elementSubmit);
+	}
+}
+
+function createAppendButton($cover, $form) {
+	// create commit button (if already exists, delete it)
+	if ( $form.find('a.append-changes').length ) {
+		$form.find('a.append-changes').remove();
+	}
+
+	var $elementAppend = $("<a>")
 		.attr({
-			type: 'submit',
-			value: inputValue
-		});
-	$form.append($elementSubmit);
+			class: 'append-changes button grey right'
+		})
+		.text('Append changes');
+	$form.append($elementAppend);
+
+	$elementAppend.bind('click', function() {
+		appendChanges($cover, $form);
+	});
+}
+
+// put modified form back into parent tree
+function appendChanges($cover, $form) {
+	// wrap back root form
+	var $originalForm = $(".old-form").removeClass('old-form');
+	var $parentsForm = $form;
+	$cover.find('.root').wrap($originalForm);
+	$originalForm.remove();
+
+	// remove underlay
+	$('.form-underlay').remove();
+	$('.form-cover').remove();
+
+	// remove unwanted elements from form
+	$form.children('a, input[type=submit], #modelTreeDump').remove();
+	$form.find('.generated').removeClass('generated');
+	$form.removeClass('generatedForm').addClass('addedForm');
+
+	// unbind changes (typeahead callbacks)
+	$form.find('input.label').unbind('click').unbind('change').unbind('focus');
+
+	// if we add form to newAddedForm, don't append form, only children
+	if ($form.parents('form[name*=newNodeForm]').length) {
+		$parentsForm = $form.parents('form[name*=newNodeForm]');
+
+		$form.children('input[type=hidden]').remove();
+		$form.children().unwrap();
+	} else {
+		$form.data('formIndex', newNodeFormCnt++);
+	}
+
+	// we have to modify xpath and rel attributes for generated icons and inputs
+	modifyAllInputsXPath($parentsForm.find('.leaf-line'), true);
+
+	$parentsForm.find('input, select').each(function(i,e) {
+		var name = $(e).attr('name');
+		var modifiedName = name.replace(/newNodeForm(\[[\d+]\])?/, 'newNodeForm['+$parentsForm.data('formIndex')+']');
+		$(e).attr('name', modifiedName);
+	});
+
+	$cover.find('.active').removeClass('active');
+	formInputChanged = true;
 }
 
 function createCloseButton($cover, $form) {
@@ -440,10 +525,11 @@ function wrapCoverForm($cover, $form) {
 function unwrapCoverForm($currentParentLevel, $cover) {
 	if ($(".old-form").length) return;
 
-	var $oldForm = $currentParentLevel.parents('form').clone().addClass('old-form');
+	var $form = $currentParentLevel.parents('section').find('form').first();
+	var $oldForm = $form.clone().addClass('old-form');
 	$oldForm.html('');
 	$cover.prepend($oldForm);
-	$currentParentLevel.parents('form').children('.root').unwrap();
+	$form.children('.root').unwrap();
 
 	recountFormUnderlayDimensions($cover);
 }
@@ -461,6 +547,7 @@ function createNode($elem) {
 
 	// create submit and close button
 	createSubmitButton($form, "Create new node");
+	createAppendButton($cover, $form);
 	createCloseButton($cover, $form);
 
 	// reload content of model dump tree
@@ -633,7 +720,8 @@ function createNodeElements($elem, $coverDiv, $form, childName, childData) {
 			'data-unique-id': uniqueId,
 			'data-original-xPath': xPath,
 			'data-parrent-xPath': encodeURIComponent(parentXPath),
-			value: labelValue
+			value: labelValue,
+			'autocomplete': 'off'
 		}).typeahead({
 			minLength: 0,
 			items: 9999,
@@ -791,7 +879,7 @@ function bindEditBarModification($editBar, $form) {
 		var confirmBox = confirm("Are you sure you want to delete this element and all his children? This can not be undone!");
 		if (confirmBox) {
 			// remove all children and itself
-			$(this).parents(".leaf-line").next("div[class*='level-']").remove();
+			$(this).parents(".leaf-line").nextAll("div[class*='level-']").remove();
 			$(this).parents(".leaf-line").remove();
 		} else {
 			return false;
@@ -816,7 +904,7 @@ function modifyAllInputsXPath($leafLines, forceRewriteOriginalXpath) {
 		var newIndex = getNewIndex($(this));
 
 		if (forceRewriteOriginalXpath != undefined && forceRewriteOriginalXpath == true) {
-			var $childrenLeafs = $(this).next("div[class*='level-']").children('.leaf-line');
+			var $childrenLeafs = $(this).nextAll("div[class*='level-']").children('.leaf-line');
 			rewriteOriginalXPath($childrenLeafs.find('input.label'), $labelInput.data('originalXpath'), newIndex);
 			modifyAllInputsXPath($childrenLeafs);
 		}

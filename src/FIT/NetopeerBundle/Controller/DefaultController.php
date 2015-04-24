@@ -134,7 +134,7 @@ class DefaultController extends BaseController
 			->add('host', 'text', array('attr' => array('value' => $host)))
 			->add('port', 'number', array('attr' => array('value' => $port)))
 			->add('user', 'text', array('attr' => array('value' => $userName)))
-			->add('password', 'password')
+			->add('password', 'password', array('required' => false))
 			->getForm();
 		$this->assign('form', $form->createView());
 

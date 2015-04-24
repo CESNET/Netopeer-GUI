@@ -34,10 +34,6 @@
 # otherwise) arising in any way out of the use of this software, even
 # if advised of the possibility of such damage.
  
-parameters:
-    netopeer.data.class: FIT\NetopeerBundle\Models\Data
-
-
 services:
     data_logger:
         class: Symfony\Bridge\Monolog\Logger

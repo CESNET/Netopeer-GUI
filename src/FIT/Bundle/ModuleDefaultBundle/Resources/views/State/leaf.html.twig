@@ -51,7 +51,7 @@ if advised of the possibility of such damage.
 	<span class="label">
 		<span class="dots"></span>
 		{% if element.attributes.description is defined %}
-			<span class="tooltip help">
+			<span class="tooltip-cover help">
 				<span class="icon-help">?</span>
 				<span class="tooltip-description">{{element.attributes.description}}</span>
 			</span>
@@ -67,7 +67,7 @@ if advised of the possibility of such damage.
 				{{element.name}}
 			{% endif %}
 			{% if element.attributes.mandatory is defined and element.attributes.config is defined and element.attributes.config == "true" %}
-				<span class="mandatory tooltip">
+				<span class="mandatory tooltip-cover">
 				<span class="icon-help">*</span>
 				<span class="tooltip-description">Mandatory item</span>
 				</span>
