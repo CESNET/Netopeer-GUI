@@ -15,5 +15,5 @@ modules:
         - WebHelper
     config:
         WebDriver:
-            url: 'http://netopeer/netopeer-gui/app_dev.php/'
+            url: 'http://netopeer/netopeer-gui/'
             browser: chrome

@@ -8,4 +8,7 @@
 
 class_name: TestGuy
 modules:
-    enabled: [Filesystem, TestHelper]
+    enabled: [Symfony2, Doctrine2, Filesystem]
+    config:
+          Symfony2:
+             environment: 'test'
