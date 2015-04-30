@@ -38,7 +38,7 @@ class CommonScenarios {
 		$I->fillField('Password', CommonScenarios::$devicePass);
 		$I->click('Connect');
 		$I->waitForText('Loading...', 10);
-		$I->waitForText('Configure device', 30);
+		$I->waitForText('Configure device', 50);
 		$I->waitForText('History of connected devices', 10);
 		$I->waitForText('localhost:830', 2);
 		$I->seeNumberOfElements('.message.success', 3);

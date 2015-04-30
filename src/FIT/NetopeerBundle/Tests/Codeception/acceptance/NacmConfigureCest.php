@@ -2,7 +2,7 @@
 
 use FIT\NetopeerBundle\Tests\Codeception\_support\CommonScenarios;
 
-class ConfigureCest
+class NacmConfigureCest
 {
 
 	public function _before(WebGuy $I)
@@ -12,6 +12,9 @@ class ConfigureCest
 		$I->click('Configure device');
 		$I->waitForText('Config & State data', 10);
 		$I->canSeeInCurrentUrl('sections/0/interfaces/');
+		$I->click('Nacm');
+		$I->waitForText('enable-nacm');
+		$I->canSeeInCurrentUrl('sections/0/nacm/');
 	}
 
 	public function _after(WebGuy $I)
@@ -19,23 +22,28 @@ class ConfigureCest
 		$I->amOnPage('/logout');
 	}
 
-	public function _turingAddTransition(WebGuy $I) {
-		$I->amOnPage('/sections/0/turing-machine/');
-		$I->waitForText('turing-machine', 10);
-		$I->click('.create-child');
-		$I->waitForText('transition-function');
-		$I->click('transition-function');
+	public function _addGroups(WebGuy $I) {
+		$I->click('.create-child[rel="--*?1!"]');
+		$I->waitForElement('.typeahead');
+		$I->wait(3);
+		$I->click('groups');
+		$I->wait(3);
 		$I->click('.create-child', '.generatedForm');
-		$I->waitForText('delta');
-		$I->click('delta');
-		$I->waitForText('label');
-		$I->fillField('input[name="newNodeForm[value2_--*?1!--*?1!--*?1!--*?1!]"]', 'test');
+		$I->waitForElement('.typeahead');
+		$I->wait(3);
+		$I->click('.create-child[rel="--*?1!--*?1!--*?1!"]');
+		$I->waitForElement('input.value[name*="--*?1!--*?1!--*?1!--*?1!"]');
+		$inputValue = 'test-name'.time();
+		$I->fillField('input.value[name*="--*?1!--*?1!--*?1!--*?1!"]', $inputValue);
+
+		$I->waitForText($inputValue);
+		$I->seeNumberOfElements('.message.success', 1);
 	}
 
 	public function testEditConfig(WebGuy $I) {
-		$I->wantTo('create new transition function using submit button');
+		$I->wantTo('create new interface using submit button');
 
-		$this->_turingAddTransition($I);
+		$this->_addGroups($I);
 		$I->click('Create new node');
 
 		// see result
@@ -44,10 +52,10 @@ class ConfigureCest
 		$I->waitForText('test');
 	}
 
-	public function testEditConfigWithCommit(WebGuy $I) {
-		$I->wantTo('create new transition function using commit all');
+	public function _testEditConfigWithCommit(WebGuy $I) {
+		$I->wantTo('create new interface using commit all');
 
-		$this->_turingAddTransition($I);
+		$this->_addGroups($I);
 		$I->click('Append changes');
 
 		$I->seeNumberOfElements('form.addedForm', 1);

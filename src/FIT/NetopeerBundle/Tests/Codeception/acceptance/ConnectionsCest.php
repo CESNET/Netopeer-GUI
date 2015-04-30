@@ -15,7 +15,7 @@ class UserCest
 		$I->amOnPage('/logout');
 	}
 
-	public function connectToLocalhostDevice(WebGuy $I)
+	public function _connectToLocalhostDevice(WebGuy $I)
 	{
 		CommonScenarios::connectToLocalhostDevice($I);
 	}
@@ -26,19 +26,20 @@ class UserCest
 
 		$I->wantTo('connect to second localhost device');
 		$I->amOnPage('/connections/');
+
+		$I->expectTo('connect to localhost device');
 		$I->waitForText('localhost:830', 10);
 		$I->click('#block--historyOfConnectedDevices a.device-item');
 		$I->fillField('Password', CommonScenarios::$devicePass);
 		$I->click('Connect');
 		$I->waitForText('Loading...', 10);
-		$I->waitForText('Configure device', 30);
+		$I->waitForText('Configure device', 50);
 		$I->seeNumberOfElements('.message.success', 2);
 		$I->seeNumberOfElements('tr', 2);
 
-		$I->wantTo('disconnect from second device');
-		$I->amOnPage('/');
+		$I->expectTo('disconnect from second device');
 		$I->click('Disconnect', '#row-1');
-		$I->amOnPage('/');
+		$I->wait(3);
 		$I->seeNumberOfElements('.message.success', 1);
 		$I->see('Successfully disconnected.');
 		$I->seeNumberOfElements('tr', 1);

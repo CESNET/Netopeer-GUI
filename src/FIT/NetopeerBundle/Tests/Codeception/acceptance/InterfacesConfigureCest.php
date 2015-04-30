@@ -2,7 +2,7 @@
 
 use FIT\NetopeerBundle\Tests\Codeception\_support\CommonScenarios;
 
-class ConfigureCest
+class InterfaceConfigureCest
 {
 
 	public function _before(WebGuy $I)
@@ -19,23 +19,27 @@ class ConfigureCest
 		$I->amOnPage('/logout');
 	}
 
-	public function _turingAddTransition(WebGuy $I) {
-		$I->amOnPage('/sections/0/turing-machine/');
-		$I->waitForText('turing-machine', 10);
-		$I->click('.create-child');
-		$I->waitForText('transition-function');
-		$I->click('transition-function');
+	public function _addInterface(WebGuy $I) {
+		$I->waitForText('interfaces', 10);
+		$I->click('.create-child[rel="--*?1!"]');
+		$I->waitForElement('.typeahead');
+		$I->wait(1);
+		$I->click('interface');
+		$I->wait(1);
+		$I->fillField('input.value[name*="--*?1!--*?1!--*?1!"]', 'test-name'.time());
+
 		$I->click('.create-child', '.generatedForm');
-		$I->waitForText('delta');
-		$I->click('delta');
-		$I->waitForText('label');
-		$I->fillField('input[name="newNodeForm[value2_--*?1!--*?1!--*?1!--*?1!]"]', 'test');
+		$I->waitForElement('.typeahead');
+		$I->wait(1);
+		$I->click('description');
+		$I->wait(1);
+		$I->fillField('input.value[name*="--*?1!--*?1!--*?3!"]', 'loopback interface');
 	}
 
 	public function testEditConfig(WebGuy $I) {
-		$I->wantTo('create new transition function using submit button');
+		$I->wantTo('create new interface using submit button');
 
-		$this->_turingAddTransition($I);
+		$this->_addInterface($I);
 		$I->click('Create new node');
 
 		// see result
@@ -44,10 +48,10 @@ class ConfigureCest
 		$I->waitForText('test');
 	}
 
-	public function testEditConfigWithCommit(WebGuy $I) {
-		$I->wantTo('create new transition function using commit all');
+	public function _testEditConfigWithCommit(WebGuy $I) {
+		$I->wantTo('create new interface using commit all');
 
-		$this->_turingAddTransition($I);
+		$this->_addInterface($I);
 		$I->click('Append changes');
 
 		$I->seeNumberOfElements('form.addedForm', 1);
