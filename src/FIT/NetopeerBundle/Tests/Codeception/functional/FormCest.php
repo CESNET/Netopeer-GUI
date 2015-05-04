@@ -6,7 +6,7 @@ class CreateFormCest
 {
 	public function _before(TestGuy $I)
 	{
-		$I->amOnPage('/login');
+		$I->amOnPage('/logout');
 		$I->submitForm('#login-form', array('_username' => 'admin', '_password' => 'pass'));
 		$I->fillField('Host', 'localhost');
 		$I->fillField('Port', '830');
@@ -24,9 +24,9 @@ class CreateFormCest
 	public function submitCreateForm(TestGuy $I)
 	{
 		$I->wantTo('submit create form test');
-		$I->amOnPage('/sections/0/');
+		$I->amOnPage('/sections/0/nacm/');
 
-//	    $I->seeCurrentUrlEquals('/sections/0/nacm/');
+		$I->canSeeInCurrentUrl('/sections/0/nacm/');
 
 		$data['newNodeForm'] = array(
 				'parent'                          => '--*?1!',
@@ -42,21 +42,7 @@ class CreateFormCest
 		// check what is in answer
 		$I->see('block--state');
 		$I->see('bestsupertestever');
-	}
-
-	public function submitRemoveForm(TestGuy $I)
-	{
-		$I->wantTo('submit delete form test');
-		$I->amOnPage('/sections/0/nacm/');
-
-		$data['removeNodeForm'] = array(
-				'parent' => '-*--*%3F2!',
-		);
-		$I->sendAjaxPostRequest('/sections/0/nacm/', $data);
-
-		// check what is in answer
-		$I->see('block--state');
-		$I->dontSee('write-default');
+		$I->dontSee('500 Internal Server Error');
 	}
 
 	public function submitEditConfigForm(TestGuy $I)
@@ -73,9 +59,26 @@ class CreateFormCest
 		// check what is in answer
 		$I->see('block--state');
 		$I->dontSee('permit');
+		$I->dontSee('500 Internal Server Error');
 	}
 
-	public function submitEmptyModuleForm(TestGuy $I)
+	public function submitRemoveForm(TestGuy $I)
+	{
+		$I->wantTo('submit delete form test');
+		$I->amOnPage('/sections/0/nacm/');
+
+		$data['removeNodeForm'] = array(
+				'parent' => '--*--*?2!',
+		);
+		$I->sendAjaxPostRequest('/sections/0/nacm/', $data);
+
+		// check what is in answer
+		$I->see('block--state');
+		$I->dontSee('write-default', '.form');
+		$I->dontSee('500 Internal Server Error');
+	}
+
+	public function _submitEmptyModuleForm(TestGuy $I)
 	{
 		$I->wantTo('submit empty module form test');
 		$I->amOnPage('/sections/create-empty-module/0/');
@@ -85,9 +88,11 @@ class CreateFormCest
 				'name' => 'notification',
 		    'namespace' => 'urn:ietf:params:xml:ns:netconf:notification:1.0',
 		);
-		$I->submitForm('form[name=formCreateEmptyModule]', $data);
+
+		$I->submitForm('form.create-empty-module', $data);
 
 		// check what is in answer
 		$I->see('block--state');
+		$I->dontSee('500 Internal Server Error');
 	}
 }
