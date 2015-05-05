@@ -33,15 +33,20 @@ class UserCest
 		$I->fillField('Password', CommonScenarios::$devicePass);
 		$I->click('Connect');
 		$I->waitForText('Loading...', 10);
-		$I->waitForText('Configure device', 50);
-		$I->seeNumberOfElements('.message.success', 2);
+		$I->waitForText('Configure device', 50, '#row-1');
+		$I->seeNumberOfElements('.message.success', 3);
 		$I->seeNumberOfElements('tr', 2);
+
+		$I->waitForElementNotVisible('#ajax-spinner');
 
 		$I->expectTo('disconnect from second device');
 		$I->click('Disconnect', '#row-1');
-		$I->wait(3);
+
+		$I->waitForElementNotVisible('#row-1');
+
+		$I->click('.ico-alerts');
+		$I->canSee('Successfully disconnected.');
 		$I->seeNumberOfElements('.message.success', 1);
-		$I->see('Successfully disconnected.');
 		$I->seeNumberOfElements('tr', 1);
 	}
 }

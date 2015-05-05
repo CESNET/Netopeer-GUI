@@ -28,8 +28,8 @@ class ConfigureCest
 		$I->click('.create-child', '.generatedForm');
 		$I->waitForText('delta');
 		$I->click('delta');
-		$I->waitForText('label');
-		$I->fillField('input[name="newNodeForm[value2_--*?1!--*?1!--*?1!--*?1!]"]', 'test');
+		$I->wait(3);
+		$I->fillField('.generatedForm input.value[name*="--*?1!--*?1!--*?1!--*?1!"]', 'test');
 	}
 
 	public function testEditConfig(WebGuy $I) {
@@ -37,6 +37,7 @@ class ConfigureCest
 
 		$this->_turingAddTransition($I);
 		$I->click('Create new node');
+		$I->waitForElementNotVisible('#ajax-spinner');
 
 		// see result
 		$I->seeNumberOfElements('.message.success', 1);
@@ -52,6 +53,7 @@ class ConfigureCest
 
 		$I->seeNumberOfElements('form.addedForm', 1);
 		$I->click('Commit all changes');
+		$I->waitForElementNotVisible('#ajax-spinner');
 
 		// see result
 		$I->seeNumberOfElements('.message.success', 1);
