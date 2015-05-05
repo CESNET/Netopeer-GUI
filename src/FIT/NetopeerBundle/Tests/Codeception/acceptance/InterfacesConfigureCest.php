@@ -43,9 +43,7 @@ class InterfaceConfigureCest
 		$I->click('Create new node');
 
 		// see result
-		$I->seeNumberOfElements('.message.success', 1);
-		$I->waitForText('delta');
-		$I->waitForText('test');
+		CommonScenarios::checkNumberOfFlashes($I, 1);
 	}
 
 	public function _testEditConfigWithCommit(WebGuy $I) {
@@ -58,8 +56,6 @@ class InterfaceConfigureCest
 		$I->click('Commit all changes');
 
 		// see result
-		$I->seeNumberOfElements('.message.success', 1);
-		$I->waitForText('delta');
-		$I->waitForText('test');
+		CommonScenarios::checkNumberOfFlashes($I, 1);
 	}
 }

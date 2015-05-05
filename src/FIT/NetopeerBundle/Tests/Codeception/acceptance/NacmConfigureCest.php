@@ -25,30 +25,11 @@ class NacmConfigureCest
 
 	public function _addGroups(WebGuy $I, $inputValue) {
 		$I->click('.create-child[rel="--*?1!"]');
-		$I->waitForElement('.typeahead');
-		$I->wait(3);
-		$I->click('groups');
-		$I->wait(3);
+		CommonScenarios::waitAndClickInTypeahead($I, 'groups');
 		$I->click('.create-child', '.generatedForm');
-		$I->waitForElement('.typeahead');
-		$I->wait(3);
-		$I->click('group');
+		CommonScenarios::waitAndClickInTypeahead($I, 'group');
 		$I->waitForElement('input.value[name*="--*?1!--*?1!--*?1!--*?1!"]');
 		$I->fillField('input.value[name*="--*?1!--*?1!--*?1!--*?1!"]', $inputValue);
-	}
-
-	public function _testEditConfig(WebGuy $I) {
-		$I->wantTo('create new interface using submit button');
-		$inputValue = 'test-name'.time();
-
-		$this->_addGroups($I, $inputValue);
-		$I->click('Create new node');
-		$I->waitForElementNotVisible('#ajax-spinner');
-
-		$I->wait(2);
-
-//		$I->canSee($inputValue);
-		$I->canSeeNumberOfElements('.message.success', 1);
 	}
 
 	public function testEditConfigWithCommit(WebGuy $I) {
@@ -67,6 +48,26 @@ class NacmConfigureCest
 
 		// see result
 //		$I->canSee($inputValue);
-		$I->canSeeNumberOfElements('.message.success', 1);
+		CommonScenarios::checkNumberOfFlashes($I, 1);
+		$I->canSee('group');
+	}
+
+	public function testEditConfig(WebGuy $I) {
+		$I->wantTo('create new interface using submit button');
+		$inputValue = 'test-name'.time();
+
+		$I->click('.create-child[rel="--*--*?3!"]');
+		CommonScenarios::waitAndClickInTypeahead($I, 'group');
+		$I->waitForElement('input.value[name*="--*--*?3!--*?1!--*?1!"]');
+		$I->fillField('input.value[name*="--*--*?3!--*?1!--*?1!"]', $inputValue);
+
+		$I->click('Create new node');
+		$I->waitForElementNotVisible('#ajax-spinner');
+
+		$I->wait(2);
+
+//		$I->canSee($inputValue);
+		CommonScenarios::checkNumberOfFlashes($I, 1);
+		$I->canSee('group');
 	}
 }

@@ -50,12 +50,12 @@ class DatastoreConfigureCest
 		$I->wantTo('test candidate datastore');
 
 		// check if module is empty
-		if (1) {
+		if (0) {
 			$I->click('.remove-child');
 			$I->click('Delete record');
 			$I->waitForElementNotVisible('#ajax-spinner');
 			$I->waitForText('Create empty root element');
-			$I->seeNumberOfElements('.message.success', 1);
+			CommonScenarios::checkNumberOfFlashes($I, 1);
 		}
 
 		$this->_createEmptyModule($I);

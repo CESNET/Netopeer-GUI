@@ -44,9 +44,7 @@ class UserCest
 
 		$I->waitForElementNotVisible('#row-1');
 
-		$I->click('.ico-alerts');
-		$I->canSee('Successfully disconnected.');
-		$I->seeNumberOfElements('.message.success', 1);
+		CommonScenarios::checkNumberOfFlashes($I, 1, 'success', 'Successfully disconnected.');
 		$I->seeNumberOfElements('tr', 1);
 	}
 }

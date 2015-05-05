@@ -41,6 +41,34 @@ class CommonScenarios {
 		$I->waitForText('Configure device', 50);
 		$I->waitForText('History of connected devices', 10);
 		$I->waitForText('localhost:830', 2);
-		$I->seeNumberOfElements('.message.success', 3);
+		self::checkNumberOfFlashes($I, 3);
+	}
+
+	public static function checkNumberOfFlashes($I, $number, $kind = 'success', $message = null) {
+		/**
+		 * @var WebGuy $I
+		 */
+		$I->expectTo('see '.$number.' of '.$kind.' flashes');
+		$I->wait(1);
+		$I->click('.ico-alerts');
+		$I->wait(2);
+		$I->waitForElementVisible('#block--alerts');
+		$I->seeNumberOfElements('.message.'.$kind, $number);
+		if (!is_null($message)) {
+			$I->canSee($message);
+		}
+		$I->click('.ico-alerts');
+		$I->wait(3);
+//		$I->waitForElementNotVisible('#block--alerts');
+	}
+
+	public static function waitAndClickInTypeahead($I, $link) {
+		/**
+		 * @var WebGuy $I
+		 */
+		$I->waitForElement('.typeahead');
+		$I->waitForText($link, 5, '.typeahead');
+		$I->click($link, '.typeahead');
+		$I->wait(3);
 	}
 } 
