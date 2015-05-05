@@ -89,6 +89,7 @@ if advised of the possibility of such damage.
 
 					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
 						{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
+							<input type="hidden" name="configDataForm[commit_all_button]" value="true" />
 							<input type="submit" value="Commit all changes" />
 						{% endif %}
 					{% endif %}

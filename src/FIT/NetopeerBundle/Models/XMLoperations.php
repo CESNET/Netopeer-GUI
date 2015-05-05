@@ -337,6 +337,8 @@ class XMLoperations {
 				$parentNodesForSorting = array();
 				$processSorting = false;
 				foreach ( $post_vals as $postKey => $val ) {
+					if ($postKey == 'commit_all_button') continue;
+
 					$index = -1;
 
 					// divide string, if index is set
