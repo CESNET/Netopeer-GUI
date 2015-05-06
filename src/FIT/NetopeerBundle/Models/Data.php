@@ -1874,6 +1874,8 @@ class Data {
 			sem_release($lock);
 
 
+			$res = @system(__DIR__."/../bin/find-identities.sh '".$this->getModelsDir()."/tmp/'");
+			ob_clean();
 			/* non-critical - only models, that I downloaded will be processed, others already exist */
 			foreach ($list as $schema) {
 				$this->processSchema($schema);
