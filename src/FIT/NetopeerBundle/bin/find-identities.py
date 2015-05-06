@@ -131,6 +131,10 @@ for f in files:
                     basename = base.attrib["name"]
             else:
                 basename = ""
+            status = child.find('{urn:ietf:params:xml:ns:yang:yin:1}status')
+            if status is not None:
+                if status.attrib["value"] in ["deprecated", "obsolete"]:
+                    continue
             newIdentity = IdentityRefTree(child.attrib["name"], currentPrefix, currentNS, basename)
             ex = findExistingIdentity(basename)
             if ex is not None:
