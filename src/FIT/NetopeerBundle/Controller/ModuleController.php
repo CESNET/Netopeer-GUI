@@ -45,6 +45,7 @@
 namespace FIT\NetopeerBundle\Controller;
 
 
+use FIT\NetopeerBundle\Models\Data;
 use FIT\NetopeerBundle\Models\XMLoperations;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -75,6 +76,9 @@ class ModuleController extends BaseController {
 	 */
 	protected function prepareDataForModuleAction($bundleName, $key, $module = null, $subsection = null)
 	{
+		/**
+		 * @var Data $dataClass
+		 */
 		$dataClass = $this->get('DataModel');
 		$this->bundleName = $bundleName;
 
@@ -138,6 +142,12 @@ class ModuleController extends BaseController {
 		$modelTree = $dataClass->getModelTreeDump($module);
 		if ($modelTree) {
 			$this->assign('modelTreeDump', $modelTree);
+		}
+
+		// load identity refs array
+		$identities = $dataClass->loadIdentityRefsForModule($key, $module);
+		if ($identities) {
+			$this->assign('moduleIdentityRefs', $identities);
 		}
 
 		// loading state part = get Action
