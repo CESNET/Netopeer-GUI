@@ -103,7 +103,7 @@ def findExistingIdentity(name):
 files = [f for f in os.listdir(os.curdir) if os.path.isfile(f) and f.endswith(".yin")]
 for f in files:
     with open(f, "r") as fd:
-        root = ET.fromstringlist("\n".join(fd.readlines()))
+        root = ET.fromstring("\n".join(fd.readlines()))
 
         currentPrefix = ""
         currentNS = ""
