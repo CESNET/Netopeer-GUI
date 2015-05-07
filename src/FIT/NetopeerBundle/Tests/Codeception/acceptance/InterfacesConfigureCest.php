@@ -22,17 +22,12 @@ class InterfaceConfigureCest
 	public function _addInterface(WebGuy $I) {
 		$I->waitForText('interfaces', 10);
 		$I->click('.create-child[rel="--*?1!"]');
-		$I->waitForElement('.typeahead');
-		$I->wait(1);
-		$I->click('interface');
-		$I->wait(1);
-		$I->fillField('input.value[name*="--*?1!--*?1!--*?1!"]', 'test-name'.time());
+		CommonScenarios::waitAndClickInTypeahead($I, 'interface');
+		$I->fillField('.generatedForm input.value[name*="--*?1!--*?1!--*?1!"]', 'test-name'.time());
+		$I->selectOption('.generatedForm select[name*="--*?1!--*?1!--*?2!"]', 'ianaift:other');
 
 		$I->click('.create-child', '.generatedForm');
-		$I->waitForElement('.typeahead');
-		$I->wait(1);
-		$I->click('description');
-		$I->wait(1);
+		CommonScenarios::waitAndClickInTypeahead($I, 'description');
 		$I->fillField('input.value[name*="--*?1!--*?1!--*?3!"]', 'loopback interface');
 	}
 
@@ -44,9 +39,10 @@ class InterfaceConfigureCest
 
 		// see result
 		CommonScenarios::checkNumberOfFlashes($I, 1);
+		$I->seeNumberOfElements('.level-0.interface', 2);
 	}
 
-	public function _testEditConfigWithCommit(WebGuy $I) {
+	public function testEditConfigWithCommit(WebGuy $I) {
 		$I->wantTo('create new interface using commit all');
 
 		$this->_addInterface($I);
@@ -57,5 +53,6 @@ class InterfaceConfigureCest
 
 		// see result
 		CommonScenarios::checkNumberOfFlashes($I, 1);
+		$I->seeNumberOfElements('.level-0.interface', 3);
 	}
 }

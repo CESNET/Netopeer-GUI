@@ -61,10 +61,9 @@ class DatastoreConfigureCest
 		$this->_createEmptyModule($I);
 	}
 
-	// TODO: not working now (segfault in netopeer-server)
 	public function _copyToRunning(WebGuy $I) {
 		$this->_login($I);
-		$this->_changeTo($I);
+		$this->_changeTo($I, 'Start-up');
 		$I->selectOption("#form_target", 'Running');
 		$I->click('Copy active datastore');
 		$I->waitForElementNotVisible('#ajax-spinner');
