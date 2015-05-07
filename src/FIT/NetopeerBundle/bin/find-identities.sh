@@ -49,6 +49,6 @@ modelpath="$1"
   
   # run preprocessor to gain identities
   binary="$0"
-  ${binary%%.*}.py > "$modelpath/identities.json"
+  ${binary%%.sh}.py > "$modelpath/identities.json"
 )
 
