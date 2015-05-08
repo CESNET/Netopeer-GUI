@@ -165,12 +165,8 @@ if advised of the possibility of such damage.
 				<div id="block--copyConfig">
 					{% block copyConfig %}
 					{% if stateArr is defined
-					and formConfig is defined
-					and (
-					not(stateArr is empty)
-					or (isEmptyModule is defined and isEmptyModule == true)
-					or (forceShowFormConfig is defined and forceShowFormConfig == true)
-					) %}
+						and formConfig is defined
+					%}
 						<h4>Change datastore</h4>
 						<div class="left-column-base">
 						{% if formConfig is defined %}

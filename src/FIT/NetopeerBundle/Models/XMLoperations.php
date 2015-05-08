@@ -1657,10 +1657,11 @@ public function mergeRecursive(&$model, $root_el, $params = array()) {
 	 * @param string             $formId
 	 * @param string             $xPath
 	 * @param string             $requiredChildren
+	 * @param array              $identityRefs
 	 *
 	 * @return array|bool
 	 */
-	public function getChildrenValues($element, $template, $formId, $xPath = "", $requiredChildren = "") {
+	public function getChildrenValues($element, $template, $formId, $xPath = "", $requiredChildren = "", $identityRefs = array()) {
 		$retArr = array();
 		$targetAttributes = array('key', 'iskey', 'mandatory');
 
@@ -1698,6 +1699,7 @@ public function mergeRecursive(&$model, $root_el, $params = array()) {
 			$twigArr['xpath'] = "";
 			$twigArr['element'] = $el;
 			$twigArr['useHiddenInput'] = true;
+			$twigArr['moduleIdentityRefs'] = $identityRefs;
 
 			$newXPath = $xPath . "/*";
 			$res = $this->getAvailableLabelValuesForXPath($formId, $newXPath);

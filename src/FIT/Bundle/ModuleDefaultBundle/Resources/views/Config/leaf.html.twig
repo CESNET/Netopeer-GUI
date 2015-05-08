@@ -151,7 +151,15 @@ if advised of the possibility of such damage.
 			{% elseif element.attributes.type is defined and (element.attributes.type == 'enumeration' or element.attributes.type == 'identityref') %}
 				<span class="config-value-cover">
 					<select name="{{currentInputName}}">
-						{% for val in explode('|', element.attributes.enumval) %}
+						{% if element.attributes.type == 'identityref'
+							and element.attributes.enumval == ''
+							and (moduleIdentityRefs is defined and element.attributes.identitybasename is defined) %}
+							{% set identityKey = ''~element.attributes.identitybasename~'' %}
+							{% set values = (moduleIdentityRefs[identityKey] is defined) ? moduleIdentityRefs[identityKey] : [] %}
+						{% else %}
+							{% set values = explode('|', element.attributes.enumval) %}
+						{% endif %}
+						{% for val in values %}
 							<option value="{{val}}" {% if element.0 == val %}selected="selected"{% endif %}>{{val}}</option>
 						{% endfor %}
 					</select>

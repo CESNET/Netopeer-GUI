@@ -1774,6 +1774,54 @@ class Data {
 	}
 
 	/**
+	 * Loads file with identities for identity refs and loads content of this file with json_decode
+	 *
+	 * @return array|int      0 on error, json decoded array on success
+	 */
+	public function loadIdentityRefs() {
+		$path = $this->getModelsDir();
+
+		// identites.json is located in tmp dir
+		$path .= 'tmp/identities.json';
+
+		if ($content = file_get_contents($path)) {
+			return json_decode($content, true);
+		}
+
+		return 0;
+	}
+
+	/**
+	 * Loads only identity refs for given module
+	 *
+	 * @param $key
+	 * @param $module
+	 *
+	 * @return array|int
+	 */
+	public function loadIdentityRefsForModule($key, $module) {
+		$idrefs = $this->loadIdentityRefs();
+		$identities = array();
+
+		if ($idrefs) {
+			$ns = $this->getNamespaceForModule($key, $module);
+			$prefix = array_search($ns, $idrefs['prefixes']);
+			if ($prefix) {
+				foreach ($idrefs['identities'] as $key => $values) {
+					if (strpos($key, $prefix.":") === 0) {
+						asort($values);
+						$identities[str_replace($prefix.":", '', $key)] = $values;
+					}
+				}
+			}
+
+			return $identities;
+		}
+
+		return 0;
+	}
+
+	/**
 	 * Get one model and process it.
 	 *
 	 * @param array &$schparams  key, identifier, version, format for get-schema

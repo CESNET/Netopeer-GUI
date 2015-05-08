@@ -300,13 +300,19 @@ class AjaxController extends BaseController
 						$twigArr['element'] = $res['elems'][$_GET['label']];
 						$twigArr['useHiddenInput'] = true;
 
+						// load identity refs array
+						$identities = $this->get('DataModel')->loadIdentityRefsForModule($key, $module);
+						if ($identities) {
+							$twigArr['moduleIdentityRefs'] = $identities;
+						}
+
 						$html = $xmlOp->removeMultipleWhitespaces($template->renderBlock('configInputElem', $twigArr));
 						$retArr['valueElem'] = $html;
 
 						$html = $xmlOp->removeMultipleWhitespaces($template->renderBlock('editBar', $twigArr));
 						$retArr['editBar'] = $html;
 
-						$children = $xmlOp->getChildrenValues($twigArr['element'], $template, $formId, $xPath);
+						$children = $xmlOp->getChildrenValues($twigArr['element'], $template, $formId, $xPath, "", $identities);
 						$retArr['children'] = $children;
 					}
 
