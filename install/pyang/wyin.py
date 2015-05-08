@@ -105,7 +105,6 @@ def emit_wyin(ctx, module, fd):
 
     wyin_init_prefix(ctx, module)
 
-    print wyin_nsprefixes
     if wyin_nsprefixes:
         for p,ns in wyin_nsprefixes.iteritems():
             namespace = module.search_one('namespace')
@@ -125,7 +124,6 @@ def emit_wyin(ctx, module, fd):
     print_node(ctx, chs, module, fd)
     fd.write('</%s>\n' % module.keyword)
     #end of document
-    print identityrefs, wyin_namespace
 
 def wyin_init_prefix(ctx, module):
     global wyin_prefix, wyin_namespace, wyin_nsprefixes
@@ -195,7 +193,6 @@ def emit_stmt(ctx, module, stmt, fd, indent, indentstep, keys = []):
     else:
         (argname, argiselem) = syntax.yin_map[stmt.raw_keyword]
         tag = stmt.raw_keyword
-
     if argiselem == False or argname is None:
         if argname is None:
             attr = ''
@@ -241,7 +238,6 @@ def emit_stmt(ctx, module, stmt, fd, indent, indentstep, keys = []):
                         setattr(s, "i_config", s.arg)
                     else:
                         fd.write(' %s="%s"' % (s.raw_keyword, escape2xml(s.arg)))
-
                     if s.raw_keyword == "type":
                         if s.arg == "enumeration":
                             fd.write(' enumval="')
@@ -404,6 +400,7 @@ def handleTypes(ctx, typename, typeelem):
                     sep = True
                 attrs += i
             attrs += "\""
+            attrs += " identitybasename=\"" + basename + "\""
         else:
             print "no basename %s" % basename
     elif typename == "leafref":
