@@ -426,8 +426,10 @@ class XMLoperations {
 					$currentRoot = $configXml->xpath("/xmlns:*");
 					$newNodesXML = new SimpleXMLElement("<".$currentRoot[0]->getName()." xmlns='".$xmlNamespace."'></".$currentRoot[0]->getName().">");
 
+					$modelXml = $this->mergeXMLWithModel($originalXml);
 					foreach ($newNodeForms as $newNodeFormVals) {
-						$newNodeConfigXML = simplexml_load_string($originalXml, 'SimpleXMLIterator');
+						$newNodeConfigXML = simplexml_load_string($modelXml, 'SimpleXMLIterator');
+
 
 						// we will get namespaces from original getconfig and set them to simpleXml object, 'cause we need it for XPath queries
 						$xmlNameSpaces = $newNodeConfigXML->getNamespaces();
