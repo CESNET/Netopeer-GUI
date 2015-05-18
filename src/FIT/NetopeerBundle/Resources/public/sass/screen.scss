@@ -55,6 +55,7 @@ a { @include link-colors($link-color, $link-color-hover);
 strong, b { font-weight: bold; }
 .left { float: left; }
 .right { float: right; }
+.display-none { display: none; }
 hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: transparent; background: transparent; visibility: hidden; clear: both; }
 .red { color: $color-danger; }
 .green { color: $color-success; }
@@ -308,7 +309,7 @@ form.form { margin: 15px 0px;
 	input { @include box-sizing(border-box);
 		&[type="text"], &[type="password"], &.text { @include box-sizing(border-box); width: $form-input-width; height: $form-input-height; line-height: $form-input-height; padding: $form-input-padding; border: 1px solid $form-input-border; background: $form-input-background; margin-top: 10px; @include inline-block; @include border-radius($form-input-radius); font-size: $form-input-font-size;
 		}
-		&[disabled="true"] { border-color: $grey-light; background-color: $grey-lighter; }
+		&[disabled="true"], &[disabled="disabled"] { border-color: $grey-light; background-color: $grey-lighter; }
 		&[type="submit"] { @extend .button; }
 		&[type="radio"], &[type="checkbox"] { @include inline-block; margin-top: -2px; margin-right: 4px; }
 		&.percent-width {

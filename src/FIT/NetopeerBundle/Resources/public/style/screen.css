@@ -181,6 +181,9 @@ strong, b {
 .right {
   float: right; }
 
+.display-none {
+  display: none; }
+
 hr.cleaner {
   width: 100%;
   height: 0px;
@@ -937,7 +940,7 @@ form.form input[type="text"], form.form textarea, form.form input[type="password
   -webkit-border-radius: 3px;
   border-radius: 3px;
   font-size: 1em; }
-form.form input[disabled="true"] {
+form.form input[disabled="true"], form.form input[disabled="disabled"] {
   border-color: #ccc;
   background-color: #eaeaea; }
 form.form input[type="radio"], form.form input[type="checkbox"] {

@@ -449,9 +449,11 @@ class XMLoperations {
 					}
 
 					// finally merge the request with edited values
-					if (($out = $this->mergeXml($configXml->asXML(), $newNodesXML->asXML())) !== false) {
-						$configXml = simplexml_load_string($out->saveXML());
-					}
+					// EDIT: do not merge new node form witch edited values (because it causes merge errors)
+					// if (($out = $this->mergeXml($configXml->asXML(), $newNodesXML->asXML())) !== false) {
+					// 	$configXml = simplexml_load_string($out->saveXML());
+					// }
+					$configXml = $newNodesXML;
 				}
 
 				// sort final config xml

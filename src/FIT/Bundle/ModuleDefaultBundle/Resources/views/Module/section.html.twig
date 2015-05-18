@@ -71,6 +71,7 @@ if advised of the possibility of such damage.
 		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
 		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
 			<hr class="cleaner" />
+			<div class="alert info display-none js-only-for-append-mode">You can not change the values of existing configuration while adding new configuration. Commit your changes first.</div>
 			<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
 				<div class="root">
 					{# new item insertion#}
