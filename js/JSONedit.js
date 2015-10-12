@@ -24,7 +24,6 @@ function MainViewCtrl($scope, $filter, $http, $window) {
 
 	$scope.download = function(jsonData) {
 		var result = JXON.jsToString(jsonData);
-		result = result.replace(/xmlns:all/g, 'xmlns');
 		$window.open("data:text/xml;charset=utf-8," + encodeURIComponent(result));
 	};
 }
