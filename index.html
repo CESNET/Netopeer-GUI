@@ -1,7 +1,6 @@
 <!doctype html>
-<html ng-app="JSONedit">
+<html ng-app="NetopeerGUIApp">
 <head>
-	<script src="bower_components/jxon/index.js"></script>
 	<script src="bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
 	<script src="bower_components/angular/angular.min.js"></script>
@@ -16,9 +15,9 @@
 	<link href="css/styles.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
-<div id="mainView" ng-controller="MainViewCtrl">
+<div id="mainView" ng-controller="ConfigurationController">
 	<h2>NetopeerGUI - JXON test</h2>
-	<button ng-click="download(jsonData)">download as xml</button>
+	<button ng-click="download(jsonData)">download as JSON</button>
 
 	<div class="jsonView">
 		<json child="jsonData" default-collapsed="false" type="object"></json>

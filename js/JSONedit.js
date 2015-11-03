@@ -1,13 +1,9 @@
-'use strict';
+var app = angular.module('NetopeerGUIApp', ['JSONedit'])
 
-var app = angular.module('exampleApp', ['JSONedit']);
+.controller('ConfigurationController', function($scope, $filter, $http, $window) {
 
-function MainViewCtrl($scope, $filter, $http, $window) {
-
-	$http.get('data/get2.xml').success(function(data) {
-		var xml = data;
-		// example JSON
-		$scope.jsonData = JXON.stringToJs(xml);
+	$http.get('data/get.json').success(function(data) {
+		$scope.jsonData = data;
 	});
 
 	$scope.$watch('jsonData', function (json) {
@@ -23,9 +19,11 @@ function MainViewCtrl($scope, $filter, $http, $window) {
 	}, true);
 
 	$scope.download = function(jsonData) {
-		var result = JXON.jsToString(jsonData);
-		result = result.replace(/xmlns:all/g, 'xmlns');
-		result = result.replace(/\s[^(xmlns)]\w*=\"[a-zA-Z0-9\s\d\.\(\)\\\/\-,\'\|:]*\"/gim, ''); // remove all attributes
-		$window.open("data:text/xml;charset=utf-8," + encodeURIComponent(result));
+		//var result = JSON.stringify(jsonData);
+		//result = result.replace(/xmlns:all/g, 'xmlns');
+		//result = result.replace(/\s[^(xmlns)]\w*=\"[a-zA-Z0-9\s\d\.\(\)\\\/\-,\'\|:]*\"/gim, ''); // remove all attributes
+		var cleanJson = JSON.stringify(jsonData);
+		$window.open("data:application/json;charset=utf-8," + encodeURIComponent(cleanJson));
 	};
 }
+);

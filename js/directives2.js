@@ -250,15 +250,15 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
             //+ '<span class="jsonItemDesc">'+objectName+'</span>'
             + '<div class="jsonContents" ng-hide="collapsed">'
                 // repeat
-                + '<span class="block" ng-hide="key.indexOf(\'_\') == 0" ng-repeat="(key, val) in child | skipAttributes">'
+                + '<span class="block" ng-repeat="(key, val) in child | skipAttributes">'
                     // object key
                     + '<span class="jsonObjectKey">'
                         + '<input class="keyinput" type="text" ng-model="newkey" ng-init="newkey=key" '
                             + 'ng-blur="moveKey(child, key, newkey)"/>'
                         // delete button
-                        + '<i class="iconButton deleteKeyBtn glyphicon glyphicon-trash" ng-click="deleteKey(child, key)" ng-if="!child[\'@mandatory\']"></i>'
+                        + '<i class="iconButton deleteKeyBtn glyphicon glyphicon-trash" ng-click="deleteKey(child, key)" ng-if="!child[\'$@\'+key][\'mandatory\']"></i>'
                         // info button
-                        + '<i class="iconButton glyphicon glyphicon-info-sign" tooltip-placement="left" uib-tooltip="{{child[\'@description\']}}" ng-if="child[\'@description\']"></i>'
+                        + '<i class="iconButton glyphicon glyphicon-info-sign" tooltip-placement="left" uib-tooltip="{{child[\'$@\'+key][\'description\']}}" ng-if="child[\'$@\'+key][\'description\']"></i>'
                     + '</span>'
                     // object value
                     + '<span class="jsonObjectValue">' + switchTemplate + '</span>'
@@ -275,9 +275,6 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
                 + '<ol class="arrayOl" ui-sortable="sortableOptions" ng-model="child">'
                     // repeat
                     + '<li class="arrayItem" ng-repeat="val in child track by $index">'
-                      // info button
-                  + '<i class="iconButton glyphicon glyphicon-info-sign" tooltip-placement="left" uib-tooltip="{{child[\'@description\']}}" ng-if="child[\'@description\']"></i>'
-                        + '<i class="iconButton moveArrayItemBtn glyphicon glyphicon-align-justify"></i>'
                         + '<span>' + switchTemplate + '</span>'
                     + '</li>'
                     // repeat end
