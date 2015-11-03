@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('JSONedit', ['ui.sortable'])
+angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
 .directive('ngModelOnblur', function() {
     // override the default input to update on blur
     // from http://jsfiddle.net/cn8VF/
@@ -19,7 +19,7 @@ angular.module('JSONedit', ['ui.sortable'])
         }
     };
 })
-.directive('json', ["$compile", function($compile) {
+.directive('json', ["$compile", "$log", function($compile, $log) {
   return {
     restrict: 'E',
     scope: {
@@ -31,9 +31,13 @@ angular.module('JSONedit', ['ui.sortable'])
         var stringName = "Text";
         var objectName = "Object";
         var arrayName = "Array";
+        var numberName = "Number";
+        var urlName = "Url";
         var refName = "Reference";
-        var boolName = "Boolean"
+        var boolName = "Boolean";
+        var literalName = "Literal";
 
+        //scope.valueTypes = [stringName, objectName, arrayName, numberName, urlName, refName, boolName, literalName];
         scope.valueTypes = [stringName, objectName, arrayName, refName, boolName];
         scope.sortableOptions = {
             axis: 'y'
@@ -53,19 +57,35 @@ angular.module('JSONedit', ['ui.sortable'])
         //////
         // Helper functions
         //////
+        var isNumberType = function(type) {
+            return type.indexOf('int') >= 0;
+        };
+
+        var isUrlType = function(type) {
+            return type === "inet:uri";
+        };
 
         var getType = function(obj) {
+            // get custom yang datatype
             var type = Object.prototype.toString.call(obj);
+
             if (type === "[object Object]") {
-                return "Object";
+                return objectName;
             } else if(type === "[object Array]"){
-                return "Array";
-            } else if(type === "[object Boolean]"){
-                return "Boolean";
-            } else if(type === "[object Number]"){
-                return "Number";
+                return arrayName;
+            }
+
+            if (typeof obj['@type'] !== "undefined") {
+                type = obj['@type'];
+            }
+
+            if(type === "Boolean" || type === "[object Boolean]"){
+                return boolName;
+            } else if(isNumberType(type) || type === "[object Number]"){
+                // TODO: check range
+                return numberName;
             } else {
-                return "Literal";
+                return literalName;
             }
         };
         var isNumber = function(n) {
@@ -73,6 +93,18 @@ angular.module('JSONedit', ['ui.sortable'])
         };
         scope.getType = function(obj) {
             return getType(obj);
+        };
+
+        var editBarVisible = function(obj) {
+            if (typeof obj['@type'] !== "undefined") {
+                var type = obj['@type'];
+                return (type == "list" || type == "leaf-list" || type == "container");
+            }
+
+            return false;
+        };
+        scope.editBarVisible = function(obj) {
+            return editBarVisible(obj);
         };
         scope.toggleCollapse = function() {
             if (scope.collapsed) {
@@ -213,17 +245,20 @@ angular.module('JSONedit', ['ui.sortable'])
     
         // start template
         if (scope.type == "object"){
-            var template = '<i ng-click="toggleCollapse()" class="glyphicon" ng-class="chevron"></i>'
-            + '<span class="jsonItemDesc">'+objectName+'</span>'
+            var template = ''
+            + '<i ng-click="toggleCollapse()" class="glyphicon" ng-class="chevron"></i>'
+            //+ '<span class="jsonItemDesc">'+objectName+'</span>'
             + '<div class="jsonContents" ng-hide="collapsed">'
                 // repeat
-                + '<span class="block" ng-hide="key.indexOf(\'_\') == 0" ng-repeat="(key, val) in child">'
+                + '<span class="block" ng-hide="key.indexOf(\'_\') == 0" ng-repeat="(key, val) in child | skipAttributes">'
                     // object key
                     + '<span class="jsonObjectKey">'
                         + '<input class="keyinput" type="text" ng-model="newkey" ng-init="newkey=key" '
                             + 'ng-blur="moveKey(child, key, newkey)"/>'
                         // delete button
-                        + '<i class="deleteKeyBtn glyphicon glyphicon-trash" ng-click="deleteKey(child, key)"></i>'
+                        + '<i class="iconButton deleteKeyBtn glyphicon glyphicon-trash" ng-click="deleteKey(child, key)" ng-if="!child[\'@mandatory\']"></i>'
+                        // info button
+                        + '<i class="iconButton glyphicon glyphicon-info-sign" tooltip-placement="left" uib-tooltip="{{child[\'@description\']}}" ng-if="child[\'@description\']"></i>'
                     + '</span>'
                     // object value
                     + '<span class="jsonObjectValue">' + switchTemplate + '</span>'
@@ -232,16 +267,17 @@ angular.module('JSONedit', ['ui.sortable'])
                 + addItemTemplate
             + '</div>';
         } else if (scope.type == "array") {
-            var template = '<i ng-click="toggleCollapse()" class="glyphicon"'
+            var template = ''
+            +  '<i ng-click="toggleCollapse()" class="glyphicon"'
             + 'ng-class="chevron"></i>'
             + '<span class="jsonItemDesc">'+arrayName+'</span>'
             + '<div class="jsonContents" ng-hide="collapsed">'
                 + '<ol class="arrayOl" ui-sortable="sortableOptions" ng-model="child">'
                     // repeat
                     + '<li class="arrayItem" ng-repeat="val in child track by $index">'
-                        // delete button
-                        + '<i class="deleteKeyBtn glyphicon glyphicon-trash" ng-click="deleteKey(child, $index)"></i>'
-                        + '<i class="moveArrayItemBtn glyphicon glyphicon-align-justify"></i>'
+                      // info button
+                  + '<i class="iconButton glyphicon glyphicon-info-sign" tooltip-placement="left" uib-tooltip="{{child[\'@description\']}}" ng-if="child[\'@description\']"></i>'
+                        + '<i class="iconButton moveArrayItemBtn glyphicon glyphicon-align-justify"></i>'
                         + '<span>' + switchTemplate + '</span>'
                     + '</li>'
                     // repeat end
@@ -257,4 +293,15 @@ angular.module('JSONedit', ['ui.sortable'])
         element.replaceWith ( newElement );
     }
   };
-}]);
+}])
+.filter('skipAttributes', function() {
+    return function(items) {
+        var result = {};
+        angular.forEach(items, function(value, key) {
+            if (key.indexOf('@') !== 0) {
+                result[key] = value;
+            }
+        });
+        return result;
+    };
+});

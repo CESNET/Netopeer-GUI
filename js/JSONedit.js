@@ -4,7 +4,7 @@ var app = angular.module('exampleApp', ['JSONedit']);
 
 function MainViewCtrl($scope, $filter, $http, $window) {
 
-	$http.get('data/get.xml').success(function(data) {
+	$http.get('data/get2.xml').success(function(data) {
 		var xml = data;
 		// example JSON
 		$scope.jsonData = JXON.stringToJs(xml);
@@ -24,6 +24,8 @@ function MainViewCtrl($scope, $filter, $http, $window) {
 
 	$scope.download = function(jsonData) {
 		var result = JXON.jsToString(jsonData);
+		result = result.replace(/xmlns:all/g, 'xmlns');
+		result = result.replace(/\s[^(xmlns)]\w*=\"[a-zA-Z0-9\s\d\.\(\)\\\/\-,\'\|:]*\"/gim, ''); // remove all attributes
 		$window.open("data:text/xml;charset=utf-8," + encodeURIComponent(result));
 	};
 }

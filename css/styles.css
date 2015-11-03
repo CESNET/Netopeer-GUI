@@ -1,6 +1,6 @@
 #mainView {
     margin: 30px auto;
-    width: 700px;
+    width: 95%;
 }
 #jsonTextarea {
     width: 700px;
@@ -32,7 +32,7 @@
     height: 29px;
     padding-left: 5px;
 }
-.jsonView input[type="text"] {
+.jsonView input[type="text"], .jsonView input[type="number"] {
     margin: 0;
     border: 0;
     background: none;
@@ -81,7 +81,7 @@
 .jsonView .addObjectItemBtn i {
     display: block;
 }
-.jsonView .deleteKeyBtn, .jsonView .moveArrayItemBtn {
+.jsonView .iconButton {
     float: right;
     margin-right: 10px;
     position: relative;

@@ -20,9 +20,10 @@
   ],
   "dependencies": {
     "bootstrap": "3.x.x",
-    "angular": "1.2.x",
+    "angular": "~1.4.7",
     "angular-ui-sortable": "0.12.x",
-    "jxon": "~1.5.4"
+    "jxon": "~1.5.4",
+    "angular-bootstrap": "~0.14.1"
   },
   "moduleType": [],
   "private": true
