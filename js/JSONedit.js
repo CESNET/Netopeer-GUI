@@ -7,7 +7,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit'])
 	});
 
 	$scope.$watch('jsonData', function (json) {
-		$scope.jsonString = $filter('json')(json);
+		$scope.jsonString = JSON.stringify(json);
 	}, true);
 	$scope.$watch('jsonString', function (json) {
 		try {
@@ -22,7 +22,8 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit'])
 		//var result = JSON.stringify(jsonData);
 		//result = result.replace(/xmlns:all/g, 'xmlns');
 		//result = result.replace(/\s[^(xmlns)]\w*=\"[a-zA-Z0-9\s\d\.\(\)\\\/\-,\'\|:]*\"/gim, ''); // remove all attributes
-		var cleanJson = JSON.stringify(jsonData);
+		//var cleanJson = JSON.stringify(jsonData);
+		var cleanJson = $filter('json')(jsonData);
 		$window.open("data:application/json;charset=utf-8," + encodeURIComponent(cleanJson));
 	};
 }

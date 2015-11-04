@@ -58,7 +58,7 @@
 }
 
 /* chevrons */
-.jsonView .glyphicon-chevron-right, .jsonView .glyphicon-chevron-down {
+.jsonView .glyphicon-menu-right, .jsonView .glyphicon-menu-down {
     float: left;
     cursor: pointer;
     position: relative;
@@ -66,7 +66,7 @@
     right: 22px;
     margin-right: -15px;
 }
-.jsonView > json > .glyphicon-chevron-down {
+.jsonView > json > .glyphicon-menu-down {
     display: none;
 }
 /* add and delete */
@@ -97,6 +97,7 @@
 .jsonContents {
     margin-left: 25px;
 }
+li .jsonContents { margin-left: 0px; }
 .jsonView .block {
     display: block;
 }
@@ -123,10 +124,14 @@
 /* array numbering */
 .jsonView ol.arrayOl {
     margin: 0;
-    padding-left: 25px;
+    padding-left: 20px;
 }
-.jsonView ol.arrayOl > li > span > span > json > .glyphicon-chevron-down,
-.jsonView ol.arrayOl > li > span > span > json > .glyphicon-chevron-right {
+.jsonView li { clear: both; min-height: 30px; }
+.jsonView ol.arrayOl .glyphicon-menu-down {
+    margin-left: -20px;
+}
+.jsonView ol.arrayOl > li > span > span > json > .glyphicon-menu-down,
+.jsonView ol.arrayOl > li > span > span > json > .glyphicon-menu-right {
     left: -40px;
 }
 .jsonView ol.arrayOl li {

@@ -1,5 +1,9 @@
 'use strict';
 
+var counts = {
+  object: 0
+};
+
 angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
 .directive('ngModelOnblur', function() {
     // override the default input to update on blur
@@ -48,9 +52,9 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
             scope.collapsed = scope.defaultCollapsed;
         }
         if (scope.collapsed) {
-            scope.chevron = "glyphicon-chevron-right";
+            scope.chevron = "glyphicon-menu-right";
         } else {
-            scope.chevron = "glyphicon-chevron-down";
+            scope.chevron = "glyphicon-menu-down";
         }
         
 
@@ -109,10 +113,10 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
         scope.toggleCollapse = function() {
             if (scope.collapsed) {
                 scope.collapsed = false;
-                scope.chevron = "glyphicon-chevron-down";
+                scope.chevron = "glyphicon-menu-down";
             } else {
                 scope.collapsed = true;
-                scope.chevron = "glyphicon-chevron-right";
+                scope.chevron = "glyphicon-menu-right";
             }
         };
         scope.moveKey = function(obj, key, newkey) {
@@ -245,8 +249,11 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
     
         // start template
         if (scope.type == "object"){
-            var template = ''
-            + '<i ng-click="toggleCollapse()" class="glyphicon" ng-class="chevron"></i>'
+            var template = '';
+            if (counts.object++ > 0) {
+                template += '<i ng-click="toggleCollapse()" class="glyphicon" ng-class="chevron"></i>';
+            }
+            template = template
             //+ '<span class="jsonItemDesc">'+objectName+'</span>'
             + '<div class="jsonContents" ng-hide="collapsed">'
                 // repeat
@@ -270,7 +277,7 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
             var template = ''
             +  '<i ng-click="toggleCollapse()" class="glyphicon"'
             + 'ng-class="chevron"></i>'
-            + '<span class="jsonItemDesc">'+arrayName+'</span>'
+            //+ '<span class="jsonItemDesc">'+arrayName+'</span>'
             + '<div class="jsonContents" ng-hide="collapsed">'
                 + '<ol class="arrayOl" ui-sortable="sortableOptions" ng-model="child">'
                     // repeat
