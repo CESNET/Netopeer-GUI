@@ -4,8 +4,9 @@ var counts = {
   object: 0
 };
 
-angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
-.directive('ngModelOnblur', function() {
+var NetopeerGUI = angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap', 'configurationTemplates']);
+
+NetopeerGUI.directive('ngModelOnblur', function() {
     // override the default input to update on blur
     // from http://jsfiddle.net/cn8VF/
     return {
@@ -23,13 +24,22 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
         }
     };
 })
-.directive('json', ["$compile", "$log", function($compile, $log) {
+.directive('json', function($compile, $log) {
   return {
     restrict: 'E',
     scope: {
       child: '=',
       type: '@',
-      defaultCollapsed: '='
+      defaultCollapsed: '=',
+      hideCollapse: '='
+    },
+    controller: function($scope) {
+      $scope.getTemplateUrl = function(type) {
+          if (typeof type === 'undefined') {
+              type = $scope.type;
+          }
+          return 'types/'+type+'.html';
+      };
     },
     link: function(scope, element, attributes) {
         var stringName = "Text";
@@ -99,16 +109,13 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
             return getType(obj);
         };
 
-        var editBarVisible = function(obj) {
+        scope.editBarVisible = function(obj) {
             if (typeof obj['@type'] !== "undefined") {
                 var type = obj['@type'];
                 return (type == "list" || type == "leaf-list" || type == "container");
             }
 
             return false;
-        };
-        scope.editBarVisible = function(obj) {
-            return editBarVisible(obj);
         };
         scope.toggleCollapse = function() {
             if (scope.collapsed) {
@@ -204,100 +211,14 @@ angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap'])
         // Note:
         // sometimes having a different ng-model and then saving it on ng-change
         // into the object or array is necessary for all updates to work
-        
-        // recursion
-        var switchTemplate = 
-            '<span ng-switch on="getType(val)" >'
-                + '<json ng-switch-when="Object" child="val" type="object" default-collapsed="defaultCollapsed"></json>'
-                + '<json ng-switch-when="Array" child="val" type="array" default-collapsed="defaultCollapsed"></json>'
-                + '<span ng-switch-when="Boolean" type="boolean">'
-                    + '<input type="checkbox" ng-model="val" ng-model-onblur ng-change="child[key] = val">'
-                + '</span>'
-                + '<span ng-switch-when="Number" type="number">'
-                    + '<input type="number" ng-model="val" ng-model-onblur ng-change="child[key] = val">'
-                + '</span>'
-                + '<span ng-switch-default class="jsonLiteral"><input type="text" ng-model="val" '
-                    + 'placeholder="Empty" ng-model-onblur ng-change="child[key] = possibleNumber(val)"/>'
-                + '</span>'
-            + '</span>';
-        
-        // display either "plus button" or "key-value inputs"
-        var addItemTemplate = 
-        '<div ng-switch on="showAddKey" class="block" >'
-            + '<span ng-switch-when="true">';
-                if (scope.type == "object"){
-                   // input key
-                    addItemTemplate += '<input placeholder="Name" type="text" ui-keyup="{\'enter\':\'addItem(child)\'}" '
-                        + 'class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" /> ';
-                }
-                addItemTemplate += 
-                // value type dropdown
-                '<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm"'
-                    + 'ng-init="$parent.valueType=\''+stringName+'\'" ui-keydown="{\'enter\':\'addItem(child)\'}"></select>'
-                // input value
-                + '<span ng-show="$parent.valueType == \''+stringName+'\'"> : <input type="text" placeholder="Value" '
-                    + 'class="form-control input-sm addItemValueInput" ng-model="$parent.valueName" ui-keyup="{\'enter\':\'addItem(child)\'}"/></span> '
-                // Add button
-                + '<button class="btn btn-primary btn-sm" ng-click="addItem(child)">Add</button> '
-                + '<button class="btn btn-default btn-sm" ng-click="$parent.showAddKey=false">Cancel</button>'
-            + '</span>'
-            + '<span ng-switch-default>'
-                // plus button
-                + '<button class="addObjectItemBtn" ng-click="$parent.showAddKey = true"><i class="glyphicon glyphicon-plus"></i></button>'
-            + '</span>'
-        + '</div>';
-    
-        // start template
-        if (scope.type == "object"){
-            var template = '';
-            if (counts.object++ > 0) {
-                template += '<i ng-click="toggleCollapse()" class="glyphicon" ng-class="chevron"></i>';
-            }
-            template = template
-            //+ '<span class="jsonItemDesc">'+objectName+'</span>'
-            + '<div class="jsonContents" ng-hide="collapsed">'
-                // repeat
-                + '<span class="block" ng-repeat="(key, val) in child | skipAttributes">'
-                    // object key
-                    + '<span class="jsonObjectKey">'
-                        + '<input class="keyinput" type="text" ng-model="newkey" ng-init="newkey=key" '
-                            + 'ng-blur="moveKey(child, key, newkey)"/>'
-                        // delete button
-                        + '<i class="iconButton deleteKeyBtn glyphicon glyphicon-trash" ng-click="deleteKey(child, key)" ng-if="!child[\'$@\'+key][\'mandatory\']"></i>'
-                        // info button
-                        + '<i class="iconButton glyphicon glyphicon-info-sign" tooltip-placement="left" uib-tooltip="{{child[\'$@\'+key][\'description\']}}" ng-if="child[\'$@\'+key][\'description\']"></i>'
-                    + '</span>'
-                    // object value
-                    + '<span class="jsonObjectValue">' + switchTemplate + '</span>'
-                + '</span>'
-                // repeat end
-                + addItemTemplate
-            + '</div>';
-        } else if (scope.type == "array") {
-            var template = ''
-            +  '<i ng-click="toggleCollapse()" class="glyphicon"'
-            + 'ng-class="chevron"></i>'
-            //+ '<span class="jsonItemDesc">'+arrayName+'</span>'
-            + '<div class="jsonContents" ng-hide="collapsed">'
-                + '<ol class="arrayOl" ui-sortable="sortableOptions" ng-model="child">'
-                    // repeat
-                    + '<li class="arrayItem" ng-repeat="val in child track by $index">'
-                        + '<span>' + switchTemplate + '</span>'
-                    + '</li>'
-                    // repeat end
-                + '</ol>'
-                + addItemTemplate
-            + '</div>';
-        } else {
-            console.error("scope.type was "+ scope.type);
-        }
 
-        var newElement = angular.element(template);
+        var newElement = '<div ng-include="getTemplateUrl()"></div>';
+        newElement = angular.element(newElement);
         $compile(newElement)(scope);
         element.replaceWith ( newElement );
     }
   };
-}])
+})
 .filter('skipAttributes', function() {
     return function(items) {
         var result = {};

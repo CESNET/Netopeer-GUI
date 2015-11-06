@@ -1,0 +1,22 @@
+<div ng-switch on="showAddKey" class="block" >
+	<span ng-switch-when="true">
+		<input placeholder="Name" type="text" ui-keyup="{'enter':'addItem(child)'}"
+		class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" ng-if="scope.type == 'object'"/>
+
+		<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ng-init="$parent.valueType=''+stringName+''" ui-keydown="{'enter':'addItem(child)'}"></select>
+
+		<span ng-show="$parent.valueType == '''+stringName+'''"> : <input type="text" placeholder="Value" class="form-control input-sm addItemValueInput" ng-model="$parent.valueName" ui-keyup="{'enter':'addItem(child)'}"/></span>
+
+		<button class="btn btn-primary btn-sm" ng-click="addItem(child)">
+			Add
+		</button>
+		<button class="btn btn-default btn-sm" ng-click="$parent.showAddKey=false">
+			Cancel
+		</button>
+	</span>
+	<span ng-switch-default>
+		<button class="addObjectItemBtn" ng-click="$parent.showAddKey = true">
+			<i class="glyphicon glyphicon-plus"></i>
+		</button>
+	</span>
+</div>

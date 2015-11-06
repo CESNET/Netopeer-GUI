@@ -9,9 +9,13 @@
 	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 	<link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
 
-
 	<script src="js/directives2.js"></script>
+	<script src="js/directives/addItem.js"></script>
+	<script src="js/directives/switchItem.js"></script>
 	<script src="js/JSONedit.js"></script>
+
+	<script src="public/templates.js"></script>
+
 	<link href="css/styles.css" rel="stylesheet" type="text/css"/>
 </head>
 <body>
@@ -20,7 +24,7 @@
 	<button ng-click="download(jsonData)">download as JSON</button>
 
 	<div class="jsonView">
-		<json child="jsonData" default-collapsed="false" type="object"></json>
+		<json child="jsonData" default-collapsed="false" type="object" hide-collapse="true"></json>
 	</div>
 
 	<hr>
