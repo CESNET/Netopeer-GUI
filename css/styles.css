@@ -88,7 +88,7 @@
 
 /* basic layout */
 .jsonView .jsonObjectKey {
-    font-weight: bold;
+    font-weight: bold; margin-right: 25px;
 }
 .jsonContents {
     margin-left: 25px;
