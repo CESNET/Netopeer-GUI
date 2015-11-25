@@ -15,11 +15,7 @@
 
 /* striped background */
 .jsonView {
-    background-color: #f3f6fa;
-    background-image: linear-gradient(rgba(255, 255, 255, 1) 50%, transparent 50%, transparent);
-    background-size: 60px 60px;
     padding: 30px 0 0 5px;
-    background-attachment: local;
 }
 /* inputs */
 .jsonView select.form-control {
@@ -34,7 +30,7 @@
 }
 .jsonView input[type="text"], .jsonView input[type="number"] {
     margin: 0;
-    border: 0;
+    border: 1px solid #ccc;
     background: none;
 }
 .jsonView input[type="checkbox"] {
@@ -62,7 +58,7 @@
     float: left;
     cursor: pointer;
     position: relative;
-    top: 7px;
+    top: -22px;
     right: 22px;
     margin-right: -15px;
 }
@@ -127,8 +123,14 @@ li .jsonContents { margin-left: 0px; }
     padding-left: 20px;
 }
 .jsonView li { clear: both; min-height: 30px; }
-.jsonView ol.arrayOl .glyphicon-menu-down {
+.jsonView ol.arrayOl .glyphicon-menu-down, .jsonView ol.arrayOl .glyphicon-menu-right {
     margin-left: -20px;
+}
+.jsonView ol.arrayOl .glyphicon-menu-down {
+    top: 7px;
+}
+.jsonView ol.arrayOl .glyphicon-menu-right {
+    top: -16px;
 }
 .jsonView ol.arrayOl > li > span > span > json > .glyphicon-menu-down,
 .jsonView ol.arrayOl > li > span > span > json > .glyphicon-menu-right {
@@ -144,7 +146,7 @@ li .jsonContents { margin-left: 0px; }
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     font-style: normal;
 }
-.jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc) {
+.jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) {
     color: black;
 }
 

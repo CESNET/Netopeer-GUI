@@ -9,6 +9,8 @@
 	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
 	<link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
 
+	<script src="node_modules/rhaboo/rhaboo.min.js"></script>
+
 	<script src="js/directives2.js"></script>
 	<script src="js/directives/addItem.js"></script>
 	<script src="js/directives/switchItem.js"></script>
@@ -22,6 +24,8 @@
 <div id="mainView" ng-controller="ConfigurationController">
 	<h2>NetopeerGUI - JSON test</h2>
 	<button ng-click="download(jsonData)">download as JSON</button>
+	<button ng-click="undo()" ng-disabled="hasUndo()">history undo</button>
+	<button ng-click="redo()" ng-disabled="hasRedo()">history redo</button>
 
 	<div class="jsonView">
 		<json child="jsonData" default-collapsed="false" type="object" hide-collapse="true"></json>

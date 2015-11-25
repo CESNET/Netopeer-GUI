@@ -10,7 +10,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
     // override the default input to update on blur
     // from http://jsfiddle.net/cn8VF/
     return {
-        restrict: 'A',
+        restrict: 'EAC',
         require: 'ngModel',
         link: function(scope, elm, attr, ngModelCtrl) {
             if (attr.type === 'radio' || attr.type === 'checkbox') return;
@@ -38,7 +38,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
           if (typeof type === 'undefined') {
               type = $scope.type;
           }
-          return 'types/'+type+'.html';
+          return 'templates/types/'+type+'.html';
       };
     },
     link: function(scope, element, attributes) {
@@ -79,7 +79,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return type === "inet:uri";
         };
 
-        var getType = function(obj) {
+        var getType = function(key, obj, parent) {
+            var schema = getSchemaFromKey(key, parent);
             // get custom yang datatype
             var type = Object.prototype.toString.call(obj);
 
@@ -89,8 +90,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return arrayName;
             }
 
-            if (typeof obj['@type'] !== "undefined") {
-                type = obj['@type'];
+            if (schema && typeof schema['type'] !== "undefined") {
+                type = schema['type'];
             }
 
             if(type === "Boolean" || type === "[object Boolean]"){
@@ -105,13 +106,26 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var isNumber = function(n) {
           return !isNaN(parseFloat(n)) && isFinite(n);
         };
-        scope.getType = function(obj) {
-            return getType(obj);
+        scope.getType = function(key, obj, parent) {
+            return getType(key, obj, parent);
         };
 
-        scope.editBarVisible = function(obj) {
-            if (typeof obj['@type'] !== "undefined") {
-                var type = obj['@type'];
+        var getSchemaFromKey = function(key, parent) {
+            if (typeof parent['$@'+key] === "undefined") {
+                return false;
+            }
+            return parent['$@'+key];
+        };
+
+        scope.isConfig = function(key, parent) {
+            var schema = getSchemaFromKey(key, parent);
+            return (schema && typeof schema['config'] !== "undefined" && schema['config'] === true);
+        };
+
+        scope.editBarVisible = function(key, parent) {
+            var schema = getSchemaFromKey(key, parent);
+            if (schema && typeof schema['type'] !== "undefined") {
+                var type = schema['type'];
                 return (type == "list" || type == "leaf-list" || type == "container");
             }
 
@@ -146,8 +160,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 console.error("object to delete from was " + obj);
             }
         };
-        scope.addItem = function(obj) {
-            if (getType(obj) == "Object") {
+        scope.addItem = function(key, obj, parent) {
+            var type = getType(key, obj, parent);
+            if (type == "Object") {
                 // check input for key
                 if (scope.keyName == undefined || scope.keyName.length == 0){
                     alert("Please fill in a name");
@@ -180,7 +195,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     scope.valueName = "";
                     scope.showAddKey = false;
                 }
-            } else if (getType(obj) == "Array") {
+            } else if (type == "Array") {
                 // add item to array
                 switch(scope.valueType) {
                     case stringName: obj.push(scope.valueName ? scope.valueName : "");
