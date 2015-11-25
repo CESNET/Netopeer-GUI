@@ -1,0 +1,95 @@
+//@import "compass/reset";
+
+#mainView { margin: 30px auto; width: 95%; }
+
+#jsonTextarea { width: 700px; height: 300px; }
+
+.red { color: red; }
+
+/* JSON VIEW */
+
+/* striped background */
+
+.jsonView { padding: 30px 0 0 5px;
+	select.form-control { margin: 0; padding: 0; width: 100px; display: inline; height: 29px; padding-left: 5px;
+	}
+	input { height: 30px; margin: 0; padding: 0;
+		&.form-control { width: 100px; display: inline; height: 29px; padding-left: 5px; }
+		&[type="text"], &[type="number"] { margin: 0; border: 1px solid #ccc; background: none; }
+		&[type="checkbox"] { position: absolute; }
+		&.keyinput { font-weight: bold; }
+
+		&[type="text"] {
+			&.addItemKeyInput, &.addItemValueInput { border: 1px solid #ccc; background: white; margin-left: 0; }
+		}
+	}
+	.addItemKeyInput { font-weight: bold; }
+	.glyphicon-menu-right, .glyphicon-menu-down { float: left; cursor: pointer; position: relative; top: -22px; right: 22px; margin-right: -15px; }
+	> json > .glyphicon-menu-down { display: none; }
+	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; height: 30px; display: block;
+		i { display: block; }
+	}
+	.iconButton { float: right; margin-right: 10px; position: relative; top: 7px; z-index: 99999999999999; cursor: pointer; }
+	.jsonObjectKey { font-weight: bold; margin-right: 25px; }
+}
+
+/* inputs */
+
+/* chevrons */
+
+/* add and delete */
+
+/* basic layout */
+
+.jsonContents { margin-left: 25px; }
+
+li .jsonContents { margin-left: 0px; }
+
+.jsonView {
+	.block { display: block; }
+	.jsonItemDesc { font-family: Georgia, serif; color: grey; font-style: italic; cursor: default; line-height: 30px; }
+	.objectDesc { cursor: default; }
+	> json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
+	ol.arrayOl { margin: 0; padding-left: 20px; }
+	li {clear: both;min-height: 30px; }
+	ol.arrayOl {
+		.glyphicon-menu-down, .glyphicon-menu-right { margin-left: -20px; }
+		.glyphicon-menu-down { top: 7px; }
+		.glyphicon-menu-right { top: -16px; }
+		> li > span > span > json > {
+			.glyphicon-menu-down, .glyphicon-menu-right { left: -40px; }
+		}
+		li { color: grey; font-style: italic; font-family: Georgia, serif; list-style-type: decimal;
+			input { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-style: normal; }
+		}
+	}
+	li {
+		select, button { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-style: normal;}
+	}
+	ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
+	li li {
+		list-style-type: lower-roman;
+		li {
+			list-style-type: upper-roman;
+			li {
+				list-style-type: lower-latin;
+				li {
+					list-style-type: upper-latin;
+					li {
+						list-style-type: lower-greek;
+						li {
+							list-style-type: decimal;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+/* first brace */
+
+/* array numbering */
+
+.sortable-placeholder { height: 20px; display: block; }
+

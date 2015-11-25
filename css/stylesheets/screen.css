@@ -1,0 +1,228 @@
+/* line 3, ../sass/screen.scss */
+#mainView {
+  margin: 30px auto;
+  width: 95%;
+}
+
+/* line 5, ../sass/screen.scss */
+#jsonTextarea {
+  width: 700px;
+  height: 300px;
+}
+
+/* line 7, ../sass/screen.scss */
+.red {
+  color: red;
+}
+
+/* JSON VIEW */
+/* striped background */
+/* line 13, ../sass/screen.scss */
+.jsonView {
+  padding: 30px 0 0 5px;
+}
+/* line 14, ../sass/screen.scss */
+.jsonView select.form-control {
+  margin: 0;
+  padding: 0;
+  width: 100px;
+  display: inline;
+  height: 29px;
+  padding-left: 5px;
+}
+/* line 16, ../sass/screen.scss */
+.jsonView input {
+  height: 30px;
+  margin: 0;
+  padding: 0;
+}
+/* line 17, ../sass/screen.scss */
+.jsonView input.form-control {
+  width: 100px;
+  display: inline;
+  height: 29px;
+  padding-left: 5px;
+}
+/* line 18, ../sass/screen.scss */
+.jsonView input[type="text"], .jsonView input[type="number"] {
+  margin: 0;
+  border: 1px solid #ccc;
+  background: none;
+}
+/* line 19, ../sass/screen.scss */
+.jsonView input[type="checkbox"] {
+  position: absolute;
+}
+/* line 20, ../sass/screen.scss */
+.jsonView input.keyinput {
+  font-weight: bold;
+}
+/* line 23, ../sass/screen.scss */
+.jsonView input[type="text"].addItemKeyInput, .jsonView input[type="text"].addItemValueInput {
+  border: 1px solid #ccc;
+  background: white;
+  margin-left: 0;
+}
+/* line 26, ../sass/screen.scss */
+.jsonView .addItemKeyInput {
+  font-weight: bold;
+}
+/* line 27, ../sass/screen.scss */
+.jsonView .glyphicon-menu-right, .jsonView .glyphicon-menu-down {
+  float: left;
+  cursor: pointer;
+  position: relative;
+  top: -22px;
+  right: 22px;
+  margin-right: -15px;
+}
+/* line 28, ../sass/screen.scss */
+.jsonView > json > .glyphicon-menu-down {
+  display: none;
+}
+/* line 29, ../sass/screen.scss */
+.jsonView .addObjectItemBtn {
+  background-color: transparent;
+  border-color: transparent;
+  padding: 0;
+  border: 0;
+  height: 30px;
+  display: block;
+}
+/* line 30, ../sass/screen.scss */
+.jsonView .addObjectItemBtn i {
+  display: block;
+}
+/* line 32, ../sass/screen.scss */
+.jsonView .iconButton {
+  float: right;
+  margin-right: 10px;
+  position: relative;
+  top: 7px;
+  z-index: 99999999999999;
+  cursor: pointer;
+}
+/* line 33, ../sass/screen.scss */
+.jsonView .jsonObjectKey {
+  font-weight: bold;
+  margin-right: 25px;
+}
+
+/* inputs */
+/* chevrons */
+/* add and delete */
+/* basic layout */
+/* line 44, ../sass/screen.scss */
+.jsonContents {
+  margin-left: 25px;
+}
+
+/* line 46, ../sass/screen.scss */
+li .jsonContents {
+  margin-left: 0px;
+}
+
+/* line 49, ../sass/screen.scss */
+.jsonView .block {
+  display: block;
+}
+/* line 50, ../sass/screen.scss */
+.jsonView .jsonItemDesc {
+  font-family: Georgia, serif;
+  color: grey;
+  font-style: italic;
+  cursor: default;
+  line-height: 30px;
+}
+/* line 51, ../sass/screen.scss */
+.jsonView .objectDesc {
+  cursor: default;
+}
+/* line 52, ../sass/screen.scss */
+.jsonView > json > .jsonItemDesc {
+  display: block;
+  float: left;
+  position: relative;
+  bottom: 25px;
+  height: 0;
+  width: 0;
+}
+/* line 53, ../sass/screen.scss */
+.jsonView ol.arrayOl {
+  margin: 0;
+  padding-left: 20px;
+}
+/* line 54, ../sass/screen.scss */
+.jsonView li {
+  clear: both;
+  min-height: 30px;
+}
+/* line 56, ../sass/screen.scss */
+.jsonView ol.arrayOl .glyphicon-menu-down, .jsonView ol.arrayOl .glyphicon-menu-right {
+  margin-left: -20px;
+}
+/* line 57, ../sass/screen.scss */
+.jsonView ol.arrayOl .glyphicon-menu-down {
+  top: 7px;
+}
+/* line 58, ../sass/screen.scss */
+.jsonView ol.arrayOl .glyphicon-menu-right {
+  top: -16px;
+}
+/* line 60, ../sass/screen.scss */
+.jsonView ol.arrayOl > li > span > span > json > .glyphicon-menu-down, .jsonView ol.arrayOl > li > span > span > json > .glyphicon-menu-right {
+  left: -40px;
+}
+/* line 62, ../sass/screen.scss */
+.jsonView ol.arrayOl li {
+  color: grey;
+  font-style: italic;
+  font-family: Georgia, serif;
+  list-style-type: decimal;
+}
+/* line 63, ../sass/screen.scss */
+.jsonView ol.arrayOl li input {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-style: normal;
+}
+/* line 67, ../sass/screen.scss */
+.jsonView li select, .jsonView li button {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-style: normal;
+}
+/* line 69, ../sass/screen.scss */
+.jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) {
+  color: black;
+}
+/* line 70, ../sass/screen.scss */
+.jsonView li li {
+  list-style-type: lower-roman;
+}
+/* line 72, ../sass/screen.scss */
+.jsonView li li li {
+  list-style-type: upper-roman;
+}
+/* line 74, ../sass/screen.scss */
+.jsonView li li li li {
+  list-style-type: lower-latin;
+}
+/* line 76, ../sass/screen.scss */
+.jsonView li li li li li {
+  list-style-type: upper-latin;
+}
+/* line 78, ../sass/screen.scss */
+.jsonView li li li li li li {
+  list-style-type: lower-greek;
+}
+/* line 80, ../sass/screen.scss */
+.jsonView li li li li li li li {
+  list-style-type: decimal;
+}
+
+/* first brace */
+/* array numbering */
+/* line 94, ../sass/screen.scss */
+.sortable-placeholder {
+  height: 20px;
+  display: block;
+}
