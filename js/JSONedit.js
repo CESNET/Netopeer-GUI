@@ -50,11 +50,22 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit'])
 		}, true);
 
 		$scope.download = function (jsonData) {
-			//var result = JSON.stringify(jsonData);
-			//result = result.replace(/xmlns:all/g, 'xmlns');
-			//result = result.replace(/\s[^(xmlns)]\w*=\"[a-zA-Z0-9\s\d\.\(\)\\\/\-,\'\|:]*\"/gim, ''); // remove all attributes
-			//var cleanJson = JSON.stringify(jsonData);
 			var cleanJson = $filter('json')(jsonData);
+			var jsonObj = angular.fromJson(cleanJson);
+			var removeSchemaNodes = function(obj) {
+				Object.keys(obj).filter(function (v) {
+					return v.indexOf('$@') !== -1;
+				}).forEach(function (v) {
+					delete obj[v];
+				});
+
+				for (var child in obj) {
+					//removeSchemaNodes(obj[child]);
+					// TODO make recursive
+				}
+			};
+			removeSchemaNodes(jsonObj);
+			cleanJson = $filter('json')(jsonObj);
 			$window.open("data:application/json;charset=utf-8," + encodeURIComponent(cleanJson));
 		};
 
