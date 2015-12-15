@@ -2,9 +2,9 @@ var storage = Rhaboo.perishable("Some unique name");
 var historyIndex = 0,
 		historyUndo = 0;
 
-var app = angular.module('NetopeerGUIApp', ['JSONedit'])
+var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 
-	.controller('ConfigurationController', function ($scope, $filter, $http, $window, $timeout) {
+	.controller('ConfigurationController', function ($scope, $filter, $http, $window, $timeout, traverse) {
 
 		storage.write('revisions', []);
 		storage.erase('revisions');
@@ -53,16 +53,13 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit'])
 			var cleanJson = $filter('json')(jsonData);
 			var jsonObj = angular.fromJson(cleanJson);
 			var removeSchemaNodes = function(obj) {
-				Object.keys(obj).filter(function (v) {
-					return v.indexOf('$@') !== -1;
-				}).forEach(function (v) {
-					delete obj[v];
+				traverse(obj).forEach(function (element, index, array) {
+					if (typeof this.key !== "undefined") {
+						if (this.key.indexOf('$@') !== -1) {
+							this.remove();
+						}
+					}
 				});
-
-				for (var child in obj) {
-					//removeSchemaNodes(obj[child]);
-					// TODO make recursive
-				}
 			};
 			removeSchemaNodes(jsonObj);
 			cleanJson = $filter('json')(jsonObj);
