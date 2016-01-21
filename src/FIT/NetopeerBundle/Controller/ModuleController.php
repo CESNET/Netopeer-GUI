@@ -76,10 +76,8 @@ class ModuleController extends BaseController {
 	 */
 	protected function prepareDataForModuleAction($bundleName, $key, $module = null, $subsection = null)
 	{
-		/**
-		 * @var Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$this->bundleName = $bundleName;
 
 		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
@@ -95,7 +93,7 @@ class ModuleController extends BaseController {
 		$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'alerts');
 		$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'topMenu');
 
-		if ($dataClass->checkLoggedKeys() === 1) {
+		if ($connectionFunc->checkLoggedKeys() === 1) {
 			$url = $this->get('request')->headers->get('referer');
 			if (!strlen($url)) {
 				$url = $this->generateUrl('connections');
@@ -104,7 +102,7 @@ class ModuleController extends BaseController {
 		}
 
 		/* build correct menu structure for this module, generates module structure too */
-		$dataClass->buildMenuStructure($key);
+		$connectionFunc->buildMenuStructure($key);
 
 		/* Show the first module we have */
 		if ( $module == null ) {
@@ -113,7 +111,7 @@ class ModuleController extends BaseController {
 
 		// now, we could set forms params with filter (even if we don't have module or subsection)
 		// filter will be empty
-		$filters = $dataClass->loadFilters($module, $subsection);
+		$filters = $connectionFunc->loadFilters($module, $subsection);
 		$this->setSectionFormsParams($key, $filters['state'], $filters['config']);
 
 		/** prepare necessary data for left column */
@@ -139,15 +137,9 @@ class ModuleController extends BaseController {
 		}
 
 		// load model tree dump
-		$modelTree = $dataClass->getModelTreeDump($module);
+		$modelTree = $connectionFunc->getModelTreeDump($module);
 		if ($modelTree) {
 			$this->assign('modelTreeDump', $modelTree);
-		}
-
-		// load identity refs array
-		$identities = $dataClass->loadIdentityRefsForModule($key, $module);
-		if ($identities) {
-			$this->assign('moduleIdentityRefs', $identities);
 		}
 
 		// loading state part = get Action
@@ -160,10 +152,9 @@ class ModuleController extends BaseController {
 				$merge = true;
 			}
 
-			if ( ($xml = $dataClass->handle('get', $this->getStateParams(), $merge)) != 1 ) {
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
-				$this->assign("stateArr", $xml);
-				return $xml;
+			if ( ($json = $netconfFunc->handle('get', $this->getStateParams(), $merge)) != 1 ) {
+				$this->assign("stateJson", $json);
+				return $json;
 			}
 		} catch (\ErrorException $e) {
 			$this->get('data_logger')->err("State: Could not parse filter correctly.", array("message" => $e->getMessage()));
@@ -180,14 +171,11 @@ class ModuleController extends BaseController {
 	 * @return array
 	 */
 	protected function setModuleOutputStyles($key, $module) {
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		$controllers = array();
 
-		$namespace = $dataClass->getNamespaceForModule($key, $module);
-		$record = $dataClass->getModuleControllers($module, $namespace);
+		$namespace = $connectionFunc->getNamespaceForModule($key, $module);
+		$record = $connectionFunc->getModuleControllers($module, $namespace);
 		if ($record) {
 			$controllers = $record->getControllerActions();
 		}
@@ -206,8 +194,8 @@ class ModuleController extends BaseController {
 		}
 
 		// build form for controller output change
-		$conn = $dataClass->getConnectionSessionForKey($key);
-		$controllerAction = $conn->getActiveControllersForNS($dataClass->getNamespaceForModule($key, $module));
+		$conn = $connectionFunc->getConnectionSessionForKey($key);
+		$controllerAction = $conn->getActiveControllersForNS($connectionFunc->getNamespaceForModule($key, $module));
 
 		$form = $this->createFormBuilder(null, array('csrf_protection' => false))
 				->add('controllerAction', 'choice', array(
@@ -226,7 +214,7 @@ class ModuleController extends BaseController {
 			$postVals = $this->getRequest()->get("form");
 			if ( isset($postVals['controllerAction']) ) {
 				$conn->setActiveController($namespace, $postVals['controllerAction']);
-				$dataClass->persistConnectionSessionForKey($key, $conn);
+				$connectionFunc->persistConnectionSessionForKey($key, $conn);
 			}
 		}
 
@@ -243,14 +231,14 @@ class ModuleController extends BaseController {
 	 * @return null|RedirectResponse
 	 */
 	protected function setModuleOrSectionName($key, $module, $subsection) {
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		// if we have module, we are definitely in module or subsection action, so we could load names
 		if ( $module ) {
 			parent::setSubmenuUrl($module);
-			$this->assign('sectionName', $dataClass->getSectionName($module));
+			$this->assign('sectionName', $connectionFunc->getSectionName($module));
 
 			if ( $subsection ) {
-				$this->assign('subsectionName', $dataClass->getSubsectionName($subsection));
+				$this->assign('subsectionName', $connectionFunc->getSubsectionName($subsection));
 			}
 
 			// we are in section
@@ -281,9 +269,10 @@ class ModuleController extends BaseController {
 		// path for creating node typeahead
 		$typeaheadParams = array(
 				'formId' => "FORMID",
-				'key' => $key,
+				'connIds' => array($key),
 				'xPath' => "XPATH"
 		);
+		return; // TODO
 		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabel', $typeaheadParams);
 		if (!is_null($module)) {
 			$typeaheadParams['module'] = $module;
@@ -305,7 +294,10 @@ class ModuleController extends BaseController {
 	 * @return RedirectResponse
 	 */
 	protected function redirectToFirstModule($key) {
-		$dataClass = $this->get('DataModel');
+		// TODO
+		return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'all')));
+
+//		$dataClass = $this->get('DataModel');
 		$retArr['key'] = $key;
 		$routeName = 'module';
 		$modules = $dataClass->getModels();
@@ -373,7 +365,7 @@ class ModuleController extends BaseController {
 		// we will redirect page after completion, because we want to load edited get and get-config
 		// and what's more, flash message lives exactly one redirect, so without redirect flash message
 		// would stay on the next page, what we do not want...
-		$retArr['key'] = $key;
+		$retArr['connIds'] = array($key);
 		$routeName = 'section';
 		if ( $module ) {
 			$retArr['module'] = $module;
@@ -463,14 +455,17 @@ class ModuleController extends BaseController {
 			$bundleName = $this->bundleName;
 		}
 		try {
-			$dataClass = $this->get('dataModel');
+			$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 			if ($addConfigSection) {
 				$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'config');
 			}
 
 			// getcofig part
-			if ( ($xml = $dataClass->handle('getconfig', $this->getConfigParams(), $merge)) != 1 ) {
-				$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+			if ( ($json = $netconfFunc->handle('getconfig', $this->getConfigParams(), $merge)) != 1 ) {
+
+				$this->assign("configJson", $json);
+				return;
+				// TODO;
 
 				// we have only root module
 				if ($xml->count() == 0 && $xml->getName() == XMLoperations::$customRootElement) {
@@ -542,7 +537,7 @@ class ModuleController extends BaseController {
 		$this->filterForms['state']->bind($this->getRequest());
 
 		if ( $this->filterForms['state']->isValid() ) {
-			$this->setStateParams("key", $key);
+			$this->setStateParams("connIds", array($key));
 			$this->setStateParams("filter", $post_vals["filter"]);
 			return 0;
 		} else {
@@ -563,16 +558,13 @@ class ModuleController extends BaseController {
 
 		if ( $this->filterForms['config']->isValid() ) {
 			$post_vals = $this->getRequest()->get("form");
-			$this->setConfigParams("key", $key);
+			$this->setConfigParams("connIds", array($key));
 //			$this->setConfigParams("filter", $post_vals["filter"]);
 
-			/**
-			 * @var $dataClass \FIT\NetopeerBundle\Models\Data
-			 */
-			$dataClass = $this->get('DataModel');
-			$conn = $dataClass->getConnectionSessionForKey($key);
+			$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+			$conn = $connectionFunc->getConnectionSessionForKey($key);
 			$conn->setCurrentDatastore($post_vals['source']);
-			$dataClass->persistConnectionSessionForKey($key, $conn);
+			$connectionFunc->persistConnectionSessionForKey($key, $conn);
 
 			$this->setConfigParams("source", $post_vals['source']);
 
@@ -593,20 +585,20 @@ class ModuleController extends BaseController {
 	 * @return int 1 on error, 0 on success
 	 */
 	private function handleCopyConfig(&$key) {
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 
 		$this->filterForms['copyConfig']->bind($this->getRequest());
 
 		if ( $this->filterForms['copyConfig']->isValid() ) {
 			$post_vals = $this->getRequest()->get("form");
-			$this->setConfigParams("key", $key);
+			$this->setConfigParams("connIds", array($key));
 			$source = $this->getCurrentDatastoreForKey($key);
 			if ($source === null) {
 				$source = 'running';
 			}
 			$target = $post_vals['target'];
-			$params = array('key' => $key, 'source' => $source, 'target' => $target);
-			$dataClass->handle('copyconfig', $params, false);
+			$params = array('connIds' => array($key), 'source' => $source, 'target' => $target);
+			$netconfFunc->handle('copyconfig', $params, false);
 			return 0;
 		} else {
 			$this->getRequest()->getSession()->getFlashBag()->add('error', 'Copy config - you have not filled up form correctly.');

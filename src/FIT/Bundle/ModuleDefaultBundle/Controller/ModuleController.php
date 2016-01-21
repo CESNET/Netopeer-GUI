@@ -22,10 +22,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	 */
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		$res = $this->prepareDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 
 		/* parent module did not prepares data, but returns redirect response,
@@ -59,7 +56,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			$this->assign('singleColumnLayout', true);
 			$this->setOnlyConfigSection();
 		} else {
-			$conn = $dataClass->getConnectionSessionForKey($key);
+			$conn = $connectionFunc->getConnectionSessionForKey($key);
 			if ($conn->getCurrentDatastore() !== "running") {
 				$this->loadConfigArr(false, $merge);
 				$this->setOnlyConfigSection();

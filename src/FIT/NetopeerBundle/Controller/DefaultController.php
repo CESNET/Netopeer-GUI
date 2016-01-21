@@ -47,6 +47,7 @@ namespace FIT\NetopeerBundle\Controller;
 use FIT\NetopeerBundle\Models\Array2XML;
 
 // these import the "@Route" and "@Template" annotations
+use FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -92,11 +93,11 @@ class DefaultController extends BaseController
 		 */
 		$session = $this->getRequest()->getSession();
 		$singleInstance = $this->container->getParameter('fit_netopeer.single_instance');
-		// DependencyInjection (DI) - defined in Resources/config/services.yml
+
 		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 * @var NetconfFunctionality
 		 */
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'title');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'additionalTitle');
@@ -166,7 +167,7 @@ class DefaultController extends BaseController
 
 				// state flash = state -> left column in the layout
 				$result = "";
-				$res = $dataClass->handle("connect", $params, false, $result);
+				$res = $netconfFunc->handle("connect", $params, false, $result);
 
 				// if connection is broken (Could not connect)
 				if ($res == 0) {
@@ -190,7 +191,7 @@ class DefaultController extends BaseController
 						$baseConn->saveConnectionIntoDB($post_vals['host'], $post_vals['port'], $post_vals['user']);
 					} else {
 						// update models
-						$dataClass->updateLocalModels($result);
+						$netconfFunc->updateLocalModels($result);
 						setcookie("singleInstanceLoginFailed", false);
 						return $this->redirect($this->generateUrl('handleConnection', array('command' => 'get', 'key' => $result)));
 					}
@@ -256,18 +257,15 @@ class DefaultController extends BaseController
 	 */
 	public function reloadDeviceAction($key)
 	{
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 
 		/* reload hello message */
 		$params = array('key' => $key);
-		if (($res = $dataClass->handle("reloadhello", $params) == 0)) {
+		if (($res = $netconfFunc->handle("reloadhello", $params) == 0)) {
 		}
 
-		$dataClass->updateLocalModels($key);
-		$dataClass->invalidateAndRebuildMenuStructureForKey($key);
+		$connectionFunc->invalidateAndRebuildMenuStructureForKey($key);
 
 		//reconstructs a routing path and gets a routing array called $route_params
 		if ($this->getRequest()->isXmlHttpRequest()) {
@@ -298,9 +296,9 @@ class DefaultController extends BaseController
 	 */
 	public function handleConnectionAction($command, $key, $identifier = "")
 	{
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$params = array(
-			'key' => $key,
+			'connIds' => array($key),
 			'filter' => '',
 		);
 
@@ -319,8 +317,7 @@ class DefaultController extends BaseController
 			$params['target'] = $this->getCurrentDatastoreForKey($key);
 			$this->getRequest()->getSession()->set('isLocking', true);
 		}
-
-		$res = $dataClass->handle($command, $params, false);
+		$res = $netconfFunc->handle($command, $params, false);
 
 		if ( $res != 1 && !in_array($command, array("connect", "disconnect"))) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
@@ -345,19 +342,20 @@ class DefaultController extends BaseController
 	 */
 	public function handleBackupAction($key)
 	{
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		$params = array(
 			'key' => $key,
 			'filter' => '',
 		);
 
-		$res = $dataClass->handle('backup', $params, false);
+		$res = $netconfFunc->handle('backup', $params, false);
 		$resp = new Response();
 		$resp->setStatusCode(200);
 		$resp->headers->set('Cache-Control', 'private');
 		$resp->headers->set('Content-Length', strlen($res));
 		$resp->headers->set('Content-Type', 'application/force-download');
-		$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.xml"', date("Y-m-d"), $dataClass->getHostFromKey($key)));
+		$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.xml"', date("Y-m-d"), $connectionFunc->getHostFromKey($key)));
 		$resp->sendHeaders();
 		$resp->setContent($res);
 		$resp->sendContent();
@@ -376,12 +374,10 @@ class DefaultController extends BaseController
 	 */
 	public function sessionInfoAction($key, $action)
 	{
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		parent::setActiveSectionKey($key);
-		$dataClass->buildMenuStructure($key);
+		$connectionFunc->buildMenuStructure($key);
 
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleStylesheet');
@@ -428,7 +424,7 @@ class DefaultController extends BaseController
 						}
 					}
 
-					$connVarsArr['connection-'.$connKey][$connKey]['nc_features'] = $dataClass->getCapabilitiesArrForKey($connKey);
+					$connVarsArr['connection-'.$connKey][$connKey]['nc_features'] = $connectionFunc->getCapabilitiesArrForKey($connKey);
 				}
 				$sessionArr['session-connections'] = $connVarsArr;
 			}
@@ -443,7 +439,7 @@ class DefaultController extends BaseController
 			$this->assign('hideStateSubmitButton', true);
 		} else if ($action == "reload") {
 			$params = array('key' => $key);
-			$dataClass->handle("reloadhello", $params);
+			$netconfFunc->handle("reloadhello", $params);
 		}
 
 		$this->assign('singleColumnLayout', true);

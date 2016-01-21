@@ -159,23 +159,20 @@ class BaseController extends Controller
 		);
 		$this->assign('app', $app);
 
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		if (!in_array($this->getRequest()->get('_route'), array('connections', '_login')) &&
 				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
 			if (!in_array($this->getRequest()->get('_route'), array('createEmptyModule'))) {
-				$dataClass->buildMenuStructure($this->activeSectionKey);
+				$connectionFunc->buildMenuStructure($this->activeSectionKey);
 			}
-			$this->assign('topmenu', $dataClass->getModels());
-			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
+			$this->assign('topmenu', $connectionFunc->getModels());
+			$this->assign('submenu', $connectionFunc->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
 		}
 
 		try {
 			$key = $this->getRequest()->get('key');
 			if ($key != "") {
-				$conn = $dataClass->getConnectionSessionForKey($key);
+				$conn = $connectionFunc->getConnectionSessionForKey($key);
 				if ($conn !== false) {
 					$this->assign('lockedConn', $conn->getLockForDatastore());
 					$this->assign('sessionStatus', $conn->sessionStatus);
@@ -187,7 +184,7 @@ class BaseController extends Controller
 			$session->getFlashBag()->add('error', "Trying to use unknown connection. Please, connect to the device.");
 		}
 
-		$this->assign("ncFeatures", $dataClass->getCapabilitiesArrForKey($key));
+		$this->assign("ncFeatures", $connectionFunc->getCapabilitiesArrForKey($key));
 	}
 
 	/**
@@ -199,11 +196,8 @@ class BaseController extends Controller
 	 * @param string  $sourceConfig source param of config
 	 */
 	protected function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = "") {
-		/**
-		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
-		 */
-		$dataClass = $this->get('DataModel');
-		$conn = $dataClass->getConnectionSessionForKey($key);
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$conn = $connectionFunc->getConnectionSessionForKey($key);
 
 		if ($conn) {
 			if ($sourceConfig !== "") {
@@ -212,10 +206,10 @@ class BaseController extends Controller
 			$this->setConfigParams('source', $conn->getCurrentDatastore());
 		}
 
-		$this->setStateParams('key', $key);
+		$this->setStateParams('connIds', array($key));
 		$this->setStateParams('filter', $filterState);
 
-		$this->setConfigParams('key', $key);
+		$this->setConfigParams('connIds', array($key));
 		$this->setConfigParams('filter', $filterConfig);
 	}
 
@@ -225,9 +219,9 @@ class BaseController extends Controller
 	 * @param $key    Identifier of connection (connected device ID)
 	 */
 	protected function setEmptyModuleForm($key) {
-		$dataClass = $this->get("DataModel");
-		$tmpArr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
-		$tmpArr = $dataClass->getRootNamesForModuleIdentifiers($key, $tmpArr);
+		$connectionFunc = $this->get("fitnetopeerbundle.service.connection.functionality");
+		$tmpArr = $connectionFunc->getModuleIdentifiersForCurrentDevice($key);
+		$tmpArr = $connectionFunc->getRootNamesForModuleIdentifiers($key, $tmpArr);
 
 		// use small hack when appending space at the end of key, which will fire all options in typeahead
 		$nsArr = array();
@@ -291,6 +285,8 @@ class BaseController extends Controller
 	 */
 	protected function createRPCListFromModel($module, $subsection = "")
 	{
+		// TODO;
+		return;
 		if (!empty($this::$rpcs)) return $this::$rpcs;
 		/**
 		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
@@ -347,11 +343,8 @@ class BaseController extends Controller
 	 * @return bool|string
 	 */
 	protected function getCurrentDatastoreForKey($key) {
-		/**
-		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
-		 */
-		$dataClass = $this->get('DataModel');
-		$conn = $dataClass->getConnectionSessionForKey($key);
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$conn = $connectionFunc->getConnectionSessionForKey($key);
 
 		if ($conn) {
 			return $conn->getCurrentDatastore();

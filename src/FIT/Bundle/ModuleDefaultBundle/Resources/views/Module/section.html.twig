@@ -69,6 +69,7 @@ if advised of the possibility of such damage.
 		{{ configSingleContent|raw }}
 	{% else %}
 		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
+		{{ stateJson }}
 		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
 			<hr class="cleaner" />
 			<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
@@ -118,6 +119,7 @@ if advised of the possibility of such damage.
 	<h1 class="left">{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
 
 	<hr class="cleaner" />
+	{{ configJson }}
 	{% if (configArr is defined and not(configArr is empty)) or (isEmptyModule is defined and isEmptyModule == true) %}
 		<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
 			<div class="root">
