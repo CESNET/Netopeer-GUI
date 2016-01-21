@@ -203,16 +203,32 @@ class Data {
 	/**
 	 * Get hash for current connection
 	 *
-	 * @param  int $key      session key
-	 * @return string
+	 * @todo: presunout do separatni sluzby
+	 *
+	 * @param  int|array $keys      array of session keys
+	 * @param  bool $associative    return array with connId as key
+	 * @return array
 	 */
-	private function getHashFromKey($key) {
-		$conn = $this->getConnectionSessionForKey($key);
-
-		if (isset($conn->hash)) {
-			return $conn->hash;
+	private function getHashFromKeys($keys, $associative = false) {
+		if (is_int($keys)) {
+			$keys = array($keys);
 		}
-		//throw new \ErrorException("No identification key was found.");
+
+		$res = array();
+		foreach ($keys as $key) {
+			$conn = $this->getConnectionSessionForKey($key);
+
+			if (isset($conn->hash)) {
+				if ($associative) {
+					$res[$key] = $conn->hash;
+				} else {
+					$res[] = $conn->hash;
+				}
+			}
+		}
+
+		if (!empty($res)) return $res;
+
 		return "NOHASH";
 	}
 
@@ -342,6 +358,8 @@ class Data {
 	/**
 	 * Find instance of SessionConnection.class for key.
 	 *
+	 * @todo: presunout do separatni sluzby
+	 *
 	 * @param  int $key      session key
 	 * @return bool|ConnectionSession
 	 */
@@ -468,18 +486,25 @@ class Data {
 	/**
 	 * Updates array of SessionConnections.
 	 *
-	 * @param  int $key      session key
+	 * @todo: presunout do connection functionality
+	 *
+	 * @param  int|array $keys      session connection keys
 	 * @param  string $targetDataStore    target datastore identifier
 	 */
-	private function updateConnLock($key, $targetDataStore) {
-		$conn = $this->getConnectionSessionForKey($key);
-
-		if ($conn == false) {
-			return;
+	private function updateConnLock($keys, $targetDataStore) {
+		if (is_int($keys)) {
+			$keys = array($keys);
 		}
+		foreach ($keys as $key) {
+			$conn = $this->getConnectionSessionForKey($key);
 
-		$conn->toggleLockOfDatastore($targetDataStore);
-		$this->persistConnectionSessionForKey($key, $conn);
+			if ($conn == false) {
+				continue;
+			}
+
+			$conn->toggleLockOfDatastore($targetDataStore);
+			$this->persistConnectionSessionForKey($key, $conn);
+		}
 	}
 
 	/**
@@ -614,7 +639,34 @@ class Data {
 	}
 
 	/**
-	 * Handles connection to the socket
+	 * Adds params from sourceArr to targetArr if is defined in optionalParams
+	 *
+	 * @param array $targetArr
+	 * @param array $sourceArr
+	 * @param array $params
+	 *
+	 * @return mixed
+	 */
+	private function addOptionalParams(array $targetArr, array $sourceArr, array $optionalParams) {
+		foreach ($optionalParams as $param) {
+			if (isset($sourceArr[$param])) {
+				$targetArr[$param] = $sourceArr[$param];
+			}
+		}
+
+		return $targetArr;
+	}
+
+	/**
+	 * Request to create NETCONF session (connect)
+	 * key: type (int), value: 4
+	 * key: user (string)
+	 *
+	 * Optional:
+	 * key: host (string), "localhost" if not specified
+	 * key: port (string), "830" if not specified
+	 * key: pass (string), value: plain text password, mandatory if “privatekey” is not set
+	 * key: privatekey (string), value: filesystem path to the private key, if set, “pass” parameter is optional and changes into the pass for this private key
 	 *
 	 * @param  resource &$sock     socket descriptor
 	 * @param  array    &$params  connection params for mod_netconf
@@ -624,22 +676,29 @@ class Data {
 	private function handle_connect(&$sock, &$params, &$result = null) {
 		$session = $this->container->get('request')->getSession();
 
-		$connect = json_encode(array(
-					"type" => self::MSG_CONNECT,
-					"host" => $params["host"],
-					"port" => $params["port"],
-					"user" => $params["user"],
-					"pass" => $params["pass"],
-					"capabilities" => $params["capabilities"],
-					));
+		$connectParams = array(
+			"type" => self::MSG_CONNECT,
+			"host" => $params["host"],
+			"port" => $params["port"],
+			"user" => $params["user"],
+			"pass" => $params["pass"],
+			"capabilities" => $params["capabilities"],
+		);
+		$connectParams = $this->addOptionalParams($connectParams, $params, array('host', 'port', 'user', 'pass', 'privatekey'));
+
+		$connect = json_encode($connectParams);
 		$this->write2socket($sock, $connect);
 		$response = $this->readnetconf($sock);
 		$decoded = json_decode($response, true);
 
-		if ($decoded && ($decoded["type"] == self::REPLY_OK)) {
-			$param = array( "session" => $decoded["session"] );
+		if ($decoded) {
+			$newConnection = reset($decoded);
+		}
+
+		if (isset($newConnection["type"]) && ($newConnection["type"] == self::REPLY_OK)) {
+			$param = array( "sessions" => array($newConnection['session']));
 			$status = $this->handle_info($sock, $param);
-			$newconnection = new ConnectionSession($decoded["session"], $params["host"], $params["port"], $params["user"]);
+			$newconnection = new ConnectionSession($newConnection['session'], $params["host"], $params["port"], $params["user"]);
 			$newconnection->sessionStatus = json_encode($status);
 			$newconnection = serialize($newconnection);
 
@@ -655,9 +714,9 @@ class Data {
 
 			return 0;
 		} else {
-			$this->logger->addError("Could not connect.", array("error" => (isset($decoded["errors"])?" Error: ".var_export($decoded["errors"], true) : var_export($this->getJsonError(), true))));
-			if (isset($decoded['errors'])) {
-				foreach ($decoded['errors'] as $error) {
+			$this->logger->addError("Could not connect.", array("error" => (isset($newConnection["errors"])?" Error: ".var_export($newConnection["errors"], true) : var_export($this->getJsonError(), true))));
+			if (isset($newConnection['errors'])) {
+				foreach ($newConnection['errors'] as $error) {
 					$session->getFlashBag()->add('error', $error);
 				}
 			} else {
@@ -668,142 +727,9 @@ class Data {
 	}
 
 	/**
-	 * handle get action
-	 *
-	 * @param  resource &$sock   	socket descriptor
-	 * @param  array    &$params 	array of values for mod_netconf (type, params...)
-	 * @return mixed		          decoded data on success
-	 */
-	public function handle_get(&$sock, &$params) {
-		if ( $this->checkLoggedKeys() != 0) {
-			return 1;
-		}
-
-		$sessionKey = $this->getHashFromKey($params['key']);
-
-		$get_params = array(
-			"type" 		=> self::MSG_GET,
-			"session" 	=> $sessionKey,
-			"source" 	=> "running",
-		);
-		if ($params['filter'] !== "") {
-			$get_params["filter"] = $params['filter'];
-		}
-
-		$decoded = $this->execute_operation($sock, $get_params);
-
-		return $this->checkDecodedData($decoded);
-	}
-
-	/**
-	 * handle get config action
-	 *
-	 * @param  resource &$sock   	socket descriptor
-	 * @param  array    &$params   array of values for mod_netconf (type, params...)
-	 * @return mixed          		decoded data on success, 1 on error
-	 */
-	public function handle_getconfig(&$sock, &$params)	{
-		if ( $this->checkLoggedKeys() != 0) {
-			return 1;
-		}
-		$sessionKey = $this->getHashFromKey($params['key']);
-
-		$getconfigparams = array(
-			"type" 		=> self::MSG_GETCONFIG,
-			"session" 	=> $sessionKey,
-			"source" 	=> $params['source'],
-		);
-		if(isset($params['filter']) && $params['filter'] !== "") {
-			$getconfigparams["filter"] = $params['filter'];
-		}
-		$decoded = $this->execute_operation($sock, $getconfigparams);
-		return $this->checkDecodedData($decoded);
-	}
-
-	/**
-	 * handle edit config action
-	 *
-	 * @param  resource &$sock   	socket descriptor
-	 * @param  array    &$params   array of values for mod_netconf (type, params...)
-	 * @return mixed          		decoded data on success, 1 on error
-	 */
-	private function handle_editconfig(&$sock, &$params) {
-		if ( $this->checkLoggedKeys() != 0) {
-			return 1;
-		}
-		$sessionKey = $this->getHashFromKey($params['key']);
-		/* syntax highlighting problem if XML def. is in one string */
-		$replaceWhatArr = array(
-			"<?xml version=\"1.0\"?>",
-			"<".XMLoperations::$customRootElement.">",
-			"</".XMLoperations::$customRootElement.">"
-		);
-		$replaceWithArr = array(
-			"",
-			"",
-			""
-		);
-		$params['config'] = str_replace($replaceWhatArr, $replaceWithArr, $params['config']);
-
-		/* edit-config to store new values */
-		$editparams = array(
-			"type" => self::MSG_EDITCONFIG,
-			"session" => $sessionKey,
-			"target" => $params['target'],
-		);
-		if (isset($params['source']) && ($params['source'] === "url")) {
-			/* required 'uri-source' when 'source' is 'url' */
-			$editparams['source'] = 'url';
-			$editparams['uri-source'] = $params['uri-source'];
-		} else {
-			/* source can be set to "config" or "url" */
-			$editparams['source'] = 'config';
-			$editparams['config'] = $params['config'];
-		}
-		if (isset($params['default-operation']) && ($params['default-operation'] !== "")) {
-			$editparams['default-operation'] = $params['default-operation'];
-		}
-		if (isset($params['type']) && ($params['type'] !== "")) {
-			$editparams['type'] = $params['type'];
-		}
-		if (isset($params['test-option']) && ($params['test-option'] !== "")) {
-			$editparams['test-option'] = $params['test-option'];
-		}
-		$decoded = $this->execute_operation($sock, $editparams);
-		return $this->checkDecodedData($decoded);
-	}
-
-	/**
-	 * handle copy config action
-	 *
-	 * @param  resource &$sock   	socket descriptor
-	 * @param  array    &$params   array of values for mod_netconf (type, params...)
-	 * @return mixed          		decoded data on success, 1 on error
-	 */
-	private function handle_copyconfig(&$sock, &$params) {
-		if ( $this->checkLoggedKeys() != 0) {
-			return 1;
-		}
-		$sessionKey = $this->getHashFromKey($params['key']);
-		/* copy-config parameters */
-		$newparams = array(
-			"type" => self::MSG_COPYCONFIG,
-			"session" => $sessionKey,
-			"source" => $params['source'],
-			"target" => $params['target'],
-		);
-		if ($params['source'] === "url") {
-			$newparams['uri-source'] = $params['uri-source'];
-		}
-		if ($params['target'] === "url") {
-			$newparams['uri-target'] = $params['uri-target'];
-		}
-		$decoded = $this->execute_operation($sock, $newparams);
-		return $this->checkDecodedData($decoded);
-	}
-
-	/**
-	 * handle get config action
+	 * Request to close NETCONF session (disconnect)
+	 * key: type (int), value: 5
+	 * key: sessions (array of ints), value: array of SIDs
 	 *
 	 * @param  resource &$sock   	socket descriptor
 	 * @param  array    &$params   array of values for mod_netconf (type, params...)
@@ -815,31 +741,200 @@ class Data {
 		}
 		$session = $this->container->get('request')->getSession();
 		$sessionConnections = $session->get('session-connections');
-		$requestKey = $params['key'];
-		$sessionKey = $this->getHashFromKey($params['key']);
+		$sessionKeys = $this->getHashFromKeys($params['connIds'], true);
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_DISCONNECT,
-			"session" 	=> $sessionKey
+			"sessions" 	=> array_keys($sessionKeys)
 		));
 
-		if ($decoded["type"] === self::REPLY_OK) {
-			$session->getFlashBag()->add('success', "Successfully disconnected.");
-		} else {
-			$this->logger->addError("Could not disconnecd.", array("error" => var_export($decoded, true)));
-			$session->getFlashBag()->add('error', "Could not disconnect from server. ");
+		foreach ($decoded as $sid => $response) {
+			if ($response["type"] === self::REPLY_OK) {
+				$session->getFlashBag()->add('success', "Session ".$sid." successfully disconnected.");
+			} else {
+				$this->logger->addError("Could not disconnect.", array("error" => var_export($response, true)));
+				$session->getFlashBag()->add('error', "Could not disconnect session ".$sid." from server. ");
+			}
+
+			$key = array_search($sid, $sessionKeys);
+			if ($key) {
+				unset( $sessionConnections[$key] );
+			}
 		}
 
-		unset( $sessionConnections[ $requestKey] );
 		$session->set("session-connections", $sessionConnections);
 	}
 
 	/**
-	 * handle lock action
+	 * NETCONF <get> (returns merged data)
+	 * key: type (int), value: 6
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: strict (bool), value: whether return error on unknown data
+	 *
+	 * Optional:
+	 * key: filter (string), value: xml subtree filter
+	 *
+	 * @param  resource &$sock   	socket descriptor
+	 * @param  array    &$params 	array of values for mod_netconf (type, params...)
+	 * @return mixed		          decoded data on success
+	 */
+	public function handle_get(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+
+		$getParams = array(
+			"type" 		=> self::MSG_GET,
+			"sessions" 	=> $this->getHashFromKeys($params['connIds']),
+			"source" 	=> "running",
+		);
+		$getParams = $this->addOptionalParams($getParams, $params, array('filters'));
+
+		$decoded = $this->execute_operation($sock, $getParams);
+
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * NETCONF <get-config> (returns array of responses merged with schema)
+	 * key: type (int), value: 7
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: source (string), value: running|startup|candidate
+	 * key: strict (bool), value: whether return error on unknown data
+	 *
+	 * Optional:
+	 * key: filter (string), value: xml subtree filter
+	 *
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params array of values for mod_netconf (type, params...)	 *
+	 * @return mixed                decoded data on success, 1 on error
+	 */
+	public function handle_getconfig(&$sock, &$params)	{
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+
+		$getconfigParams = array(
+			"type" 		=> self::MSG_GETCONFIG,
+			"sessions" 	=> $this->getHashFromKeys($params['connIds']),
+			"source" 	=> $params['source'],
+		);
+		$this->addOptionalParams($getconfigParams, $params, array('filters'));
+
+		$decoded = $this->execute_operation($sock, $getconfigParams);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/** NETCONF <edit-config>
+	 * key: type (int), value: 8
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: target (string), value: running|startup|candidate
+	 * key: configs (array of sJSON, with the same order as sessions), value: array of edit configuration data according to NETCONF RFC for each session
+	 *
+	 * Optional:
+	 * key: source (string), value: config|url, default value: config
+	 * key: default-operation (string), value: merge|replace|none
+	 * key: error-option (string), value: stop-on-error|continue-on-error|rollback-on-error
+	 * key: uri-source (string), required when "source" is "url", value: uri
+	 * key: test-option (string), value: notset|testset|set|test, default value: testset
+	 *
+	 *
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params array of values for mod_netconf (type, params...)
+	 *
+	 * @return mixed                decoded data on success, 1 on error
+	 */
+	private function handle_editconfig(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+
+		/* edit-config to store new values */
+		$editparams = array(
+			"type" => self::MSG_EDITCONFIG,
+			"sessions" => $this->getHashFromKeys($params['connIds']),
+			"target" => $params['target'],
+			"configs" => $params['configs'],
+		);
+		$editparams = $this->addOptionalParams($editparams, $params, array('source', 'default-operation', 'error-option', 'uri-source', 'test-option'));
+
+		$decoded = $this->execute_operation($sock, $editparams);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * NETCONF <copy-config>
+	 * key: type (int), value: 9
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: source (string), value: running|startup|candidate|url|config
+	 * key: target (string), value: running|startup|candidate|url
+	 *
+	 * Optional:
+	 * key: uri-source (string), required when "source" is "url", value: uri
+	 * key: uri-target (string), required when "target" is "url", value: uri
+	 * key: configs (array of sJSON, with the same order as sessions), required when “source” is “config”, value: array of new complete configuration data for each session,
+	 *
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params array of values for mod_netconf (type, params...)
+	 *
+	 * @return mixed                decoded data on success, 1 on error
+	 */
+	private function handle_copyconfig(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+
+		$copyParams = array(
+			"type" => self::MSG_COPYCONFIG,
+			"sessions" => $this->getHashFromKeys($params['connIds']),
+			"source" => $params['source'],
+			"target" => $params['target'],
+		);
+		$copyParams = $this->addOptionalParams($copyParams, $params, array('uri-source', 'uri-target', 'configs'));
+
+		$decoded = $this->execute_operation($sock, $copyParams);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * NETCONF <delete-config>
+	 * key: type (int), value: 10
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: target (string), value: running|startup|candidate|url
+	 * Optional:
+	 * key: url (string), value: target URL
+ *
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params array of values for mod_netconf (type, params...)
+	 *
+	 * @return mixed                decoded data on success, 1 on error
+	 */
+	private function handle_deleteconfig(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+
+		$deleteParams = array(
+			"type" => self::MSG_DELETECONFIG,
+			"sessions" => $this->getHashFromKeys($params['connIds']),
+			"target" => $params['target'],
+		);
+		$deleteParams = $this->addOptionalParams($deleteParams, $params, array('url'));
+
+		$decoded = $this->execute_operation($sock, $deleteParams);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * NETCONF <lock>
+	 * key: type (int), value: 11
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: target (string), value: running|startup|candidate
 	 *
 	 * @param  resource &$sock   	socket descriptor
 	 * @param  array    &$params   array of values for mod_netconf (type, params...)
-	 * @return int       		      0 on success, 1 on error
+	 *
+	 * @return null|int                  1 on error
 	 */
 	private function handle_lock(&$sock, &$params) {
 
@@ -847,110 +942,234 @@ class Data {
 			return 1;
 		}
 		$session = $this->container->get('request')->getSession();
-		$sessionKey = $this->getHashFromKey($params['key']);
+		$sessionKeys = $this->getHashFromKeys($params['connIds'], true);
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_LOCK,
 			"target"	=> $params['target'],
-			"session" 	=> $sessionKey
+			"session" 	=> array_values($sessionKeys)
 		));
 
-		if ($decoded["type"] === self::REPLY_OK) {
-			$session->getFlashBag()->add('success', "Successfully locked.");
-			$this->updateConnLock($params['key'], $params['target']);
-		} else {
-			$this->logger->addError("Could not lock.", array("error" => var_export($decoded, true)));
-			$session->getFlashBag()->add('error', "Could not lock datastore. ");
+		$lockedConnIds = array();
+		foreach ($decoded as $sid => $response) {
+			if ($response["type"] === self::REPLY_OK) {
+				$session->getFlashBag()->add('success', "Session ".$sid." successfully locked.");
+				$lockedConnIds[] = array_search($sid, $sessionKeys);
+			} else {
+				$this->logger->addError("Could not lock.", array("error" => var_export($response, true)));
+				$session->getFlashBag()->add('error', "Could not lock datastore for session " .$sid. ". ");
+			}
 		}
+
+		$this->updateConnLock($lockedConnIds, $params['target']);
 	}
 
 	/**
-	 * handle unlock action
+	 * NETCONF <unlock>
+	 * key: type (int), value: 12
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: target (string), value: running|startup|candidate
 	 *
 	 * @param  resource &$sock   	socket descriptor
-	 * @param  array    &$params   array of values for mod_netconf (type, params...)
-	 * @return int             		0 on success, 1 on error
+	 * @param  array &$params array of values for mod_netconf (type, params...)
+	 *
+	 * @return int                    0 on success, 1 on error
 	 */
 	private function handle_unlock(&$sock, &$params) {
 		if ($this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 		$session = $this->container->get('request')->getSession();
-		$sessionKey = $this->getHashFromKey($params['key']);
+		$sessionKeys = $this->getHashFromKeys($params['connIds'], true);
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_UNLOCK,
 			"target"	=> $params['target'],
-			"session" 	=> $sessionKey
+			"sessions" 	=> array_values($sessionKeys),
 		));
 
-		if ($decoded["type"] === self::REPLY_OK) {
-			$session->getFlashBag()->add('success', "Successfully unlocked.");
-			$this->updateConnLock($params['key'], $params['target']);
-		} else {
-			$this->logger->addError("Could not unlock.", array("error" => var_export($decoded, true)));
-			$session->getFlashBag()->add('error', "Could not unlock datastore. ");
+		$lockedConnIds = array();
+		foreach ($decoded as $sid => $response) {
+			if ($response["type"] === self::REPLY_OK) {
+				$session->getFlashBag()->add('success', "Session ".$sid." successfully unlocked.");
+				$lockedConnIds[] = array_search($sid, $sessionKeys);
+			} else {
+				$this->logger->addError("Could not unlock.", array("error" => var_export($response, true)));
+				$session->getFlashBag()->add('error', "Could not unlock session ".$sid.". ");
+			}
 		}
+
+		$this->updateConnLock($lockedConnIds, $params['target']);
 	}
 
 	/**
-	 * handle User RPC method
+	 * NETCONF <kill-session>
+	 * key: type (int), value: 13
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: session-id (int), value: SID of the session to kill
 	 *
-	 * @param  resource &$sock    socket descriptor
-	 * @param  array    &$params   must contain "identifier" of schema, can contain "version" and "format" of schema
-	 * @param  mixed    &$result  decoded data from response
-	 * @return int             		0 on success, 1 on error
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params must contain "session-id"
+	 * @param  mixed    &$result decoded data from response
+	 *
+	 * @return int                0 on success, 1 on error
 	 */
-	private function handle_userrpc(&$sock, &$params, &$result) {
-
+	private function handle_killsession(&$sock, &$params, &$result) {
 		if ($this->checkLoggedKeys() != 0) {
 			return 1;
 		}
 		$session = $this->container->get('request')->getSession();
-		$sessionKey = $this->getHashFromKey($params['key']);
+		$sessionKeys = $this->getHashFromKeys($params['connIds'], true);
 
-		$decoded = $this->execute_operation($sock,	array(
-			"type" 		=> self::MSG_GENERIC,
-			"content"	=> $params['content'],
-			"session" 	=> $sessionKey
-		));
+		$arguments = array(
+			"type" 		=> self::MSG_KILL,
+			"sessions" 	=> array_values($sessionKeys),
+			"session-id"	=> $params["session-id"],
+		);
 
-		if ($decoded["type"] === self::REPLY_OK) {
-			$session->getFlashBag()->add('success', "Successful call of method.");
-		} else if ($decoded["type"] === self::REPLY_DATA) {
-			$result = $decoded["data"];
-			return 0;
-                } else {
-			$this->logger->addError("User RPC call.", array("error" => var_export($decoded, true)));
-			$session->getFlashBag()->add('error', "RPC error: ".
-				((isset($decoded["errors"]) && sizeof($decoded['errors'])) ? $decoded["errors"][0] : ""));
-                        return 1;
+		$decoded = $this->execute_operation($sock, $arguments);
+
+		foreach ($decoded as $sid => $response) {
+			if ($response["type"] === self::REPLY_OK) {
+				$session->getFlashBag()->add('success', "Session ".$sid." successfully killed.");
+			} else {
+				$this->logger->addError("Could not kill session.", array("error" => var_export($response, true)));
+				$session->getFlashBag()->add('error', "Could not kill session ".$sid.".");
+			}
 		}
 	}
 
 	/**
-	 * handle reload info action
+	 * Provide information about NETCONF session
+	 * key: type (int), value: 14
+	 * key: sessions (array of ints), value: array of SIDs
 	 *
-	 * Result is the same as from handle_info()
-	 * @param  resource &$sock   	socket descriptor
-	 * @param  array    &$params   array of values for mod_netconf (type, params...)
-	 * @return int       		      0 on success, 1 on error
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params array of values for mod_netconf (type, params...)
+	 *
+	 * @return int                  0 on success, 1 on error
 	 */
-	private function handle_reloadhello(&$sock, &$params) {
-		$session = $this->container->get('request')->getSession();
-
-		if (isset($params["session"]) && ($params["session"] !== "")) {
-			$sessionKey = $params['session'];
+	private function handle_info(&$sock, &$params) {
+		if (isset($params["sessions"])) {
+			$sessionKeys = $params['sessions'];
 		} else {
 			if ($this->checkLoggedKeys() != 0) {
 				return 1;
 			}
-			$sessionKey = $this->getHashFromKey($params['key']);
+			$sessionKeys = $this->getHashFromKeys($params['connIds']);
+		}
+
+		$session = $this->container->get('request')->getSession();
+		$decoded = $this->execute_operation($sock,	array(
+			"type" 		=> self::MSG_INFO,
+			"sessions" 	=> $sessionKeys
+		));
+
+		if (!$decoded) {
+			/* error occurred, unexpected response */
+			$this->logger->addError("Could get session info.", array("error" => var_export($decoded, true)));
+			$session->getFlashBag()->add('error', "Could not get session info.");
+		}
+
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * Perform generic operation not included in base NETCONF
+	 * key: type (int), value: 15
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: contents (array of sJSON with same index order as sessions array), value: array of sJSON data as content of the NETCONF's <rpc> envelope
+	 *
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params array of values for mod_netconf (type, params...)
+	 *
+	 * @return int                  0 on success, 1 on error
+	 */
+	private function handle_generic(&$sock, &$params) {
+		if ( $this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+
+		$genericParams = array(
+			"type" => self::MSG_GENERIC,
+			"sessions" => $this->getHashFromKeys($params['connIds']),
+			"contents" => $params['contents'],
+		);
+
+		$decoded = $this->execute_operation($sock, $genericParams);
+
+		foreach ($decoded as $sid => $response) {
+			if ($response["type"] === self::REPLY_OK) {
+				$session->getFlashBag()->add('success', "Successful call of method.");
+			} else {
+				$this->logger->addError("User RPC call.", array("error" => var_export($response, true)));
+				$session->getFlashBag()->add('error', "RPC error: ".
+				                                      ((isset($response["errors"]) && sizeof($response['errors'])) ? $response["errors"][0] : ""));
+			}
+		}
+
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * handle getschema action
+	 * key: type (int), value: 16
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: identifiers (array of strings with same index order as sessions array), value: array of schema identifiers
+	 * Optional:
+	 * key: format (string), value: format of the schema (yin or yang)
+	 *
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params must contain "identifier" of schema, can contain "version" and "format" of schema
+	 * @param  mixed    &$result decoded data from response
+	 *
+	 * @return int                    0 on success, 1 on error
+	 */
+	private function handle_getschema(&$sock, &$params, &$result) {
+		if ($this->checkLoggedKeys() != 0) {
+			return 1;
+		}
+		$session = $this->container->get('request')->getSession();
+		$sessionKeys = $this->getHashFromKeys($params['connIds'], true);
+
+		$arguments = array(
+			"type" 		=> self::MSG_GETSCHEMA,
+			"sessions" 	=> array_values($sessionKeys),
+			"identifiers"	=> $params["identifiers"],
+		);
+		$arguments = $this->addOptionalParams($arguments, $params, array('format', 'version'));
+
+		$decoded = $this->execute_operation($sock, $arguments);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * Update hello message of NETCONF session
+	 * key: type (int), value: 17
+	 * key: sessions (array of ints), value: array of SIDs
+	 *
+	 * Result is the same as from handle_info()
+	 *
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params array of values for mod_netconf (type, params...)
+	 *
+	 * @return int                  0 on success, 1 on error
+	 */
+	private function handle_reloadhello(&$sock, &$params) {
+		$session = $this->container->get('request')->getSession();
+
+		if (isset($params["sessions"]) && ($params["sessions"] !== "")) {
+			$sessionKeys = $params['sessions'];
+		} else {
+			if ($this->checkLoggedKeys() != 0) {
+				return 1;
+			}
+			$sessionKeys = $this->getHashFromKeys($params['connIds']);
 		}
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_RELOADHELLO,
-			"session" 	=> $sessionKey
+			"sessions" 	=> $sessionKeys
 		));
 
 		if (!$decoded) {
@@ -960,27 +1179,32 @@ class Data {
 			return 1;
 		}
 
-		return $decoded;
+		return $this->checkDecodedData($decoded);
 	}
 
 	/**
-	 * handle getting notifications history
+	 * Provide list of notifications from past.
+	 * key: type (int), value: 18
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: from (int64), value: start time in history
+	 * key: to (int64), value: end time
 	 *
-	 * @param  resource &$sock   	socket descriptor
-	 * @param  array    &$params   array of values for mod_netconf (type, params...)
-	 * @return int       		      0 on success, 1 on error
+	 * @param  resource &$sock   socket descriptor
+	 * @param  array    &$params array of values for mod_netconf (type, params...)
+	 *
+	 * @return int                  0 on success, 1 on error
 	 */
-	private function handle_ntf_gethistory(&$sock, &$params) {
-		if (isset($params["session"]) && ($params["session"] !== "")) {
-			$sessionKey = $params['session'];
+	private function handle_notif_history(&$sock, &$params) {
+		if (isset($params["sessions"]) && ($params["sessions"] !== "")) {
+			$sessionKeys = $params['sessions'];
 		} else {
 			$session = $this->container->get('request')->getSession();
-			$sessionKey = $this->getHashFromKey($params['key']);
+			$sessionKeys = $this->getHashFromKeys($params['connIds']);
 		}
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_NTF_GETHISTORY,
-			"session" 	=> $sessionKey,
+			"sessions" 	=> $sessionKeys,
 			"from" => $params['from'],
 			"to" => $params['to']
 		));
@@ -992,117 +1216,17 @@ class Data {
 			return 1;
 		}
 
-		return $decoded;
+		return $this->checkDecodedData($decoded);
 	}
 
-	/**
-	 * handle info action
-	 *
-	 * @param  resource &$sock   	socket descriptor
-	 * @param  array    &$params   array of values for mod_netconf (type, params...)
-	 * @return int       		      0 on success, 1 on error
-	 */
-	private function handle_info(&$sock, &$params) {
-		if (isset($params["session"]) && ($params["session"] !== "")) {
-			$sessionKey = $params['session'];
-		} else {
-			if ($this->checkLoggedKeys() != 0) {
-				return 1;
-			}
-			$session = $this->container->get('request')->getSession();
-			$sessionKey = $this->getHashFromKey($params['key']);
-		}
-
-		$decoded = $this->execute_operation($sock,	array(
-			"type" 		=> self::MSG_INFO,
-			"session" 	=> $sessionKey
-		));
-
-		if (!$decoded) {
-			/* error occurred, unexpected response */
-			$this->logger->addError("Could get session info.", array("error" => var_export($decoded, true)));
-			$session->getFlashBag()->add('error', "Could not get session info.");
-		}
-
-		return $decoded;
-	}
 
 	/**
-	 * handle getschema action
-	 *
-	 * @param  resource &$sock    socket descriptor
-	 * @param  array    &$params   must contain "identifier" of schema, can contain "version" and "format" of schema
-	 * @param  mixed    &$result  decoded data from response
-	 * @return int             		0 on success, 1 on error
-	 */
-	private function handle_getschema(&$sock, &$params, &$result) {
-		if ($this->checkLoggedKeys() != 0) {
-			return 1;
-		}
-		$session = $this->container->get('request')->getSession();
-		$sessionKey = $this->getHashFromKey($params['key']);
-		/* TODO check if: "urn:ietf:params:xml:ns:yang:ietf-netconf-monitoring?module=ietf-netconf-monitoring"
-		is in capabilities */
-
-		$arguments = array(
-			"type" 		=> self::MSG_GETSCHEMA,
-			"session" 	=> $sessionKey,
-			"identifier"	=> $params["identifier"], /* TODO escape string $params["identifier"]? */
-		);
-
-		if (isset($params["format"])) $arguments["format"] = $params["format"];
-		if (isset($params["version"])) $arguments["version"] = $params["version"];
-
-		$decoded = $this->execute_operation($sock, $arguments);
-
-
-		if ($decoded["type"] === self::REPLY_DATA) {
-			$result = $decoded["data"];
-			return 0;
-		} else {
-			$this->logger->addError("Get-schema failed.", array("error" => var_export($decoded, true)));
-			$session->getFlashBag()->add('error', "Get-schema failed."
-				. ((isset($decoded["errors"]) && sizeof($decoded['errors'])) ? " Reason: ".$decoded["errors"][0] : "")
-				. (isset($decoded["bad-element"])?" (".  $decoded["bad-element"]  .")":"")
-			);
-			return 1;
-		}
-	}
-
-	/**
-	 * handle kill-session action
-	 *
-	 * @param  resource &$sock    socket descriptor
-	 * @param  array    &$params   must contain "session-id"
-	 * @param  mixed    &$result  decoded data from response
-	 * @return int          		0 on success, 1 on error
-	 */
-	private function handle_killsession(&$sock, &$params, &$result) {
-		if ($this->checkLoggedKeys() != 0) {
-			return 1;
-		}
-		$session = $this->container->get('request')->getSession();
-		$sessionKey = $this->getHashFromKey($params['key']);
-
-		$arguments = array(
-			"type" 		=> self::MSG_KILL,
-			"session" 	=> $sessionKey,
-			"session-id"	=> $params["session-id"],
-		);
-
-		$decoded = $this->execute_operation($sock, $arguments);
-
-		if ($decoded["type"] === self::REPLY_OK) {
-			$session->getFlashBag()->add('success', "Session successfully killed.");
-			$this->updateConnLock($params['key'], $params['target']);
-		} else {
-			$this->logger->addError("Could not kill session.", array("error" => var_export($decoded, true)));
-			$session->getFlashBag()->add('error', "Could not kill session.");
-		}
-	}
-
-	/**
-	 * validates datastore on server
+	 * Validate datastore or url
+	 * key: type (int), value: 19
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: target (string), value: running|startup|candidate|url
+	 * Required when target is "url":
+	 * key: url (string), value: URL of datastore to validate
 	 *
 	 * @param $sock
 	 * @param $params
@@ -1114,23 +1238,18 @@ class Data {
 			return 1;
 		}
 
-		$sessionKey = $this->getHashFromKey($params['key']);
-
-		$get_params = array(
+		$validateParams = array(
 			"type" 		=> self::MSG_VALIDATE,
-			"session" 	=> $sessionKey,
+			"session" 	=> $this->getHashFromKeys($params['connIds']),
 			"target" 	=> $params['target'],
 		);
-		if (isset($params['url']) && ($params['url'] != NULL) && ($params['target'] == 'url')) {
-			$get_params["url"] = $params['url'];
-		}
-		if ($params['filter'] !== "") {
-			$get_params["filter"] = $params['filter'];
-		}
+		$validateParams = $this->addOptionalParams($validateParams, $params, array('url'));
 
-		$decoded = $this->execute_operation($sock, $get_params);
+		$decoded = $this->execute_operation($sock, $validateParams);
 		return $this->checkDecodedData($decoded);
 	}
+
+
 
 	/**
 	 * checks, if logged keys are valid
@@ -1306,7 +1425,7 @@ class Data {
 //			}
 //		}
 
-                $socket_path = '/var/run/mod_netconf.sock';
+                $socket_path = '/var/run/netopeerguid.sock';
                 if (!file_exists($socket_path)) {
 			$this->logger->addError('Backend is not running or socket file does not exist.', array($socket_path));
 			$this->container->get('request')->getSession()->getFlashBag()->add('error', "Backend is not running or socket file does not exist: ".$socket_path);
@@ -1343,6 +1462,9 @@ class Data {
 			case "connect":
 				$res = $this->handle_connect($sock, $params, $result);
 				break;
+			case "disconnect":
+				$res = $this->handle_disconnect($sock, $params);
+				break;
 			case "get":
 				$res = $this->handle_get($sock, $params);
 				break;
@@ -1357,8 +1479,8 @@ class Data {
 			case "copyconfig":
 				$res = $this->handle_copyconfig($sock, $params);
 				break;
-			case "disconnect":
-				$res = $this->handle_disconnect($sock, $params);
+			case "deleteconfig":
+				$res = $this->handle_deleteconfig($sock, $params);
 				break;
 			case "lock":
 				$res = $this->handle_lock($sock, $params);
@@ -1366,27 +1488,28 @@ class Data {
 			case "unlock":
 				$res = $this->handle_unlock($sock, $params);
 				break;
-			case "reloadhello":
-				$res = $this->handle_reloadhello($sock, $params);
-				break;
-			case "notificationsHistory":
-				// JSON encoded data OR 1 on error, so we can return it now
-				return $this->handle_ntf_gethistory($sock, $params);
+			case "killsession":
+				$res = $this->handle_killsession($sock, $params, $result);
 				break;
 			case "info":
 				$res = $this->handle_info($sock, $params);
 				break;
+			case "userrpc":
+			case "generic":
+				$res = $this->handle_generic($sock, $params, $result);
+				break;
 			case "getschema":
 				$res = $this->handle_getschema($sock, $params, $result);
 				break;
-			case "killsession":
-				$res = $this->handle_killsession($sock, $params, $result);
+			case "reloadhello":
+				$res = $this->handle_reloadhello($sock, $params);
+				break;
+			case "notif_history":
+				// JSON encoded data OR 1 on error, so we can return it now
+				return $this->handle_notif_history($sock, $params);
 				break;
 			case "validate":
 				$res = $this->handle_validate($sock, $params, $result);
-				break;
-			case "userrpc":
-				$res = $this->handle_userrpc($sock, $params, $result);
 				break;
 			case "backup":
 				$params["source"] = "startup";
@@ -1645,7 +1768,7 @@ class Data {
 		if ($key === -1) {
 			$key = $this->container->get('request')->get('key');
 		}
-		$hashedKey = $this->getHashFromKey($key);
+		$hashedKey = $this->getHashFromKeys($key);
 		if ($hashedKey && $cache->contains('menuStructure_'.$hashedKey)) {
 //			$this->logger->addInfo("Cached file for menuStructure found.", array('key' => 'menuStructure_'.$hashedKey));
 			return $cache->fetch('menuStructure_'.$hashedKey);
@@ -1665,7 +1788,7 @@ class Data {
 		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
 		 */
 		$cache = $this->container->get('winzou_cache');
-		$hashedKey = $this->getHashFromKey($key);
+		$hashedKey = $this->getHashFromKeys($key);
 		$this->models = $folders;
 		$cache->save('menuStructure_'.$hashedKey, $folders, $lifetime);
 	}
@@ -1681,7 +1804,7 @@ class Data {
 		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
 		 */
 		$cache = $this->container->get('winzou_cache');
-		$hashedKey = $this->getHashFromKey($key);
+		$hashedKey = $this->getHashFromKeys($key);
 		if ($hashedKey && $cache->contains('modelNamespaces_'.$hashedKey)) {
 //			$this->logger->addInfo("Cached file for modelNamespaces found.", array('key' => 'modelNamespaces_'.$hashedKey));
 			return $cache->fetch('modelNamespaces_'.$hashedKey);
@@ -1718,7 +1841,7 @@ class Data {
 		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
 		 */
 		$cache = $this->container->get('winzou_cache');
-		$hashedKey = $this->getHashFromKey($key);
+		$hashedKey = $this->getHashFromKeys($key);
 		$this->modelNamespaces = $namespaces;
 		$cache->save('modelNamespaces_'.$hashedKey, $namespaces, $lifetime);
 	}
@@ -1743,7 +1866,7 @@ class Data {
 		 * @var \winzou\CacheBundle\Cache\LifetimeFileCache $cache
 		 */
 		$cache = $this->container->get('winzou_cache');
-		$hashedKey = $this->getHashFromKey($key);
+		$hashedKey = $this->getHashFromKeys($key);
 		if ($hashedKey && $cache->contains('modelNamespaces_'.$hashedKey)) {
 			$this->logger->addInfo("Invalidate cached file", array('key' => 'modelNamespaces_'.$hashedKey));
 			$cache->delete('modelNamespaces_'.$hashedKey);
