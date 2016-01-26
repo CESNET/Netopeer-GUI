@@ -36,7 +36,7 @@
  * otherwise) arising in any way out of the use of this software, even
  * if advised of the possibility of such damage.
  */
-namespace FIT\NetopeerBundle\Models;
+namespace FIT\NetopeerBundle\Services\Managers;
 
 use FIT\NetopeerBundle\Entity\SamlUser;
 use Symfony\Component\DependencyInjection\ContainerInterface;

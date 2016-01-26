@@ -61,7 +61,7 @@ services:
         arguments: [@doctrine.orm.entity_manager, @security.context, @data_logger]
 
     SamlToState:
-        class: FIT\NetopeerBundle\Models\SamlToState
+        class: FIT\NetopeerBundle\Services\Managers\SamlToState
         arguments: [@service_container, @data_logger]
 
     netopeer.twig.netopeer_twig_extension:
