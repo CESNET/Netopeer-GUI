@@ -43,8 +43,6 @@
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
-use FIT\NetopeerBundle\Models\AjaxSharedData;
-use FIT\NetopeerBundle\Models\XMLoperations;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -55,59 +53,6 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class AjaxController extends BaseController
 {
-	/**
-	 * Change session value for showing single or double column layout
-	 *
-	 * @Route("/ajax/get-schema/{key}", name="getSchema")
-	 *
-	 * @param  int      $key 				  session key of current connection
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	public function getSchemaAction($key)
-	{
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
-		$schemaData = AjaxSharedData::getInstance();
-		
-		ob_start();
-		$data = $schemaData->getDataForKey($key);
-		if (!(isset($data['isInProgress']) && $data['isInProgress'] === true)) {
-			$dataClass->updateLocalModels($key);
-		}
-		$output = ob_get_clean();
-		$result['output'] = $output;
-
-		return $this->getSchemaStatusAction($key, $result);
-	}
-
-	/**
-	 * Get status of get-schema operation
-	 *
-	 * @Route("/ajax/get-schema-status/{key}", name="getSchemaStatus")
-	 *
-	 * @param  int      $key 				  session key of current connection
-	 * @param  array    $result
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	public function getSchemaStatusAction($key, $result = array())
-	{
-		$schemaData = AjaxSharedData::getInstance();
-		
-		$data = $schemaData->getDataForKey($key);
-		if (isset($data['isInProgress']) && $data['isInProgress'] === true) {
-			$schemaData->setDataForKey($key, 'status', "in progress");
-		}
-
-		$data = $schemaData->getDataForKey($key);
-		$flashes = $this->getRequest()->getSession()->getFlashBag()->all();
-		$result['message'] = $flashes;
-		$result['key'] = $key;
-
-		return new Response(json_encode($result));
-	}
-
 	/**
 	 * Get history of connected devices
 	 *
@@ -239,96 +184,6 @@ class AjaxController extends BaseController
 	}
 
 	/**
-	 * Get available values for label name from model based on xPath selector.
-	 *
-	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{xPath}/", name="getValuesForLabel")
-	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{module}/{xPath}/", name="getValuesForLabelWithModule")
-	 * @Route("/ajax/get-values-for-label/{formId}/{key}/{module}/{subsection}/{xPath}/", name="getValuesForLabelWithSubsection")
-	 * @Template()
-	 *
-	 * @param int $key
-	 * @param string $formId            unique identifier of form
-	 * @param null|string $module       name of the module
-	 * @param null|string $subsection   name of the subsection
-	 * @param string $xPath    encoded xPath selector
-	 * @return Response    $result
-	 */
-	public function getValuesForLabelAction($key, $formId, $xPath = "", $module = null, $subsection = null)
-	{
-		$this->setActiveSectionKey($key);
-		$this->get('DataModel')->buildMenuStructure($key);
-
-		/**
-		 * @var XMLoperations $xmlOp
-		 */
-		$xmlOp = $this->get('XMLoperations');
-		$formParams = $this->get('DataModel')->loadFilters($module, $subsection);
-
-		$res = $xmlOp->getAvailableLabelValuesForXPath($formId, $xPath);
-
-		// path for creating node typeahead
-		$typeaheadParams = array(
-				'formId' => "FORMID",
-				'key' => $key,
-				'xPath' => "XPATH"
-		);
-		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabel', $typeaheadParams);
-		if (!is_null($module)) {
-			$typeaheadParams['module'] = $module;
-			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
-		}
-		if (!is_null($subsection)) {
-			$typeaheadParams['subsection'] = $subsection;
-			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithSubsection', $typeaheadParams);
-		}
-
-		if (is_array($res)) {
-			if (isset($_GET['command']) && isset($_GET['label'])) {
-				if ($_GET['command'] == 'attributesAndValueElem') {
-					$retArr = array();
-					if (isset($res['labelsAttributes'][$_GET['label']])) {
-						$retArr['labelAttributes'] = $res['labelsAttributes'][$_GET['label']];
-					}
-
-					if (isset($res['elems'][$_GET['label']])) {
-						$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Config:leaf.html.twig');
-						$twigArr = array();
-
-						$twigArr['key'] = "";
-						$twigArr['xpath'] = "";
-						$twigArr['valuesTypeaheadPath'] = $valuesTypeaheadPath;
-						$twigArr['element'] = $res['elems'][$_GET['label']];
-						$twigArr['useHiddenInput'] = true;
-
-						// load identity refs array
-						$identities = $this->get('DataModel')->loadIdentityRefsForModule($key, $module);
-						if ($identities) {
-							$twigArr['moduleIdentityRefs'] = $identities;
-						}
-
-						$html = $xmlOp->removeMultipleWhitespaces($template->renderBlock('configInputElem', $twigArr));
-						$retArr['valueElem'] = $html;
-
-						$html = $xmlOp->removeMultipleWhitespaces($template->renderBlock('editBar', $twigArr));
-						$retArr['editBar'] = $html;
-
-						$children = $xmlOp->getChildrenValues($twigArr['element'], $template, $formId, $xPath, "", $identities);
-						$retArr['children'] = $children;
-					}
-
-					return new Response(json_encode($retArr));
-				} else {
-					return new Response(false);
-				}
-			} else {
-				return new Response(json_encode($res['labels']));
-			}
-		} else {
-			return new Response(false);
-		}
-	}
-
-	/**
 	 * Process getting history of notifications
 	 *
 	 * @Route("/ajax/get-notifications-history/{connectedDeviceId}/", name="notificationsHistory")
@@ -345,19 +200,14 @@ class AjaxController extends BaseController
 	 */
 	public function getNotificationsHistoryAction($connectedDeviceId, $from = null, $to = 0, $max = 50)
 	{
-		//return $this->getTwigArr(); // TODO: remove, when will be working fine
-		
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 
 		$params['key'] = $connectedDeviceId;
 		$params['from'] = ($from ? $from : time() - 12 * 60 * 60);
 		$params['to'] = $to;
 		$params['max'] = $max;
 
-		$history = $dataClass->handle("notificationsHistory", $params);
+		$history = $netconfFunc->handle("notificationsHistory", $params);
 
 		// $history is 1 on error (we will show flash message) or array on success
 		if ($history !== 1) {
@@ -379,10 +229,11 @@ class AjaxController extends BaseController
 	 */
 	public function validateSource($key, $target, $module)
 	{
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 
 		$subsection = null;
-		$filters = $dataClass->loadFilters($module, $subsection);
+		$filters = $connectionFunc->loadFilters($module, $subsection);
 
 		$params = array(
 			'key' => $key,
@@ -390,7 +241,7 @@ class AjaxController extends BaseController
 			'target' => $target
 		);
 
-		$res = $dataClass->handle('validate', $params, false);
+		$res = $netconfFunc->handle('validate', $params, false);
 		$this->getRequest()->getSession()->getFlashBag()->add('state '.(!$res ? 'success' : 'error'), 'Datastore '.$target.' is '.($res ? 'in' : '').'valid.');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'alerts');
 		$this->assign('dataStore', $target);

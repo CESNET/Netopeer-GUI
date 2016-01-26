@@ -44,9 +44,6 @@
 namespace FIT\NetopeerBundle\Controller;
 
 
-use FIT\NetopeerBundle\Models\Array2XML;
-
-// these import the "@Route" and "@Template" annotations
 use FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -388,6 +385,8 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'topMenu');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'leftColumn');
 
+		// TODO
+
 		if ( $action == "session" ) {
 			/**
 			 * @var Session $session
@@ -432,8 +431,8 @@ class DefaultController extends BaseController
 			unset($sessionArr['_security_secured_area']);
 			unset($sessionArr['_security_commont_context']);
 
-			$xml = Array2XML::createXML("session", $sessionArr);
-			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
+//			$xml = Array2XML::createXML("session", $sessionArr);
+//			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
 
 			$this->assign("stateArr", $xml);
 			$this->assign('hideStateSubmitButton', true);
