@@ -420,17 +420,24 @@ class NetconfFunctionality {
 			"sessions" 	=> array_keys($sessionKeys)
 		));
 
-		foreach ($decoded as $sid => $response) {
-			if ($response["type"] === self::REPLY_OK) {
-				$session->getFlashBag()->add('success', "Session ".$sid." successfully disconnected.");
-			} else {
-				$this->getLogger()->addError("Could not disconnect.", array("error" => var_export($response, true)));
-				$session->getFlashBag()->add('error', "Could not disconnect session ".$sid." from server. ");
-			}
+		if (sizeof($decoded)) {
+			foreach ( $decoded as $sid => $response ) {
+				if ( $response["type"] === self::REPLY_OK ) {
+					$session->getFlashBag()->add( 'success', "Session " . $sid . " successfully disconnected." );
+				} else {
+					$this->getLogger()->addError( "Could not disconnect.",
+						array( "error" => var_export( $response, true ) ) );
+					$session->getFlashBag()->add( 'error', "Could not disconnect session " . $sid . " from server. " );
+				}
 
-			$key = array_search($sid, $sessionKeys);
-			if ($key) {
-				unset( $sessionConnections[$key] );
+				$key = array_search( $sid, $sessionKeys );
+				if ( $key ) {
+					unset( $sessionConnections[ $key ] );
+				}
+			}
+		} else {
+			foreach ($params['connIds'] as $key) {
+				unset( $sessionConnections[ $key ] );
 			}
 		}
 
@@ -938,6 +945,11 @@ class NetconfFunctionality {
 		if ( $status['errorCode'] ) {
 			$this->getLogger()->addWarning('Checking decoded data:', array('error' => $status['message']));
 			$session->getFlashBag()->add('error', $status['message']);
+			return 1;
+		}
+
+		if (!sizeof($decoded)) {
+			$session->getFlashBag()->add('error', 'Empty response');
 			return 1;
 		}
 

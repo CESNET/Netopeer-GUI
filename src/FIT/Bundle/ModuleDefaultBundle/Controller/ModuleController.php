@@ -7,6 +7,7 @@ use FIT\NetopeerBundle\Models\XMLoperations;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController implements ModuleControllerInterface
@@ -23,13 +24,20 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
-		$res = $this->prepareDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
+		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->get('angular') == "true") { // TODO
+			$res = $this->prepareDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 
-		/* parent module did not prepares data, but returns redirect response,
-		 * so we will follow this redirect
-		 */
-		if ($res instanceof RedirectResponse) {
-			return $res;
+			/* parent module did not prepares data, but returns redirect response,
+			 * so we will follow this redirect
+			 */
+			if ($res instanceof RedirectResponse) {
+				return $res;
+			}
+
+			return new JsonResponse(json_decode($res));
+		} else {
+			$this->assign('singleColumnLayout', true);
+			return $this->getTwigArr();
 		}
 
 		// check if we have only root module

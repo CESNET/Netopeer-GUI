@@ -57,6 +57,8 @@ if advised of the possibility of such damage.
 
 {% set stateDefined = 'false' %}
 
+{% block htmlAdditions %} ng-app="NetopeerGUIApp"{% endblock %}
+
 {% block state %}
 {% block singleContent %}
 	{#<div class="edit-bar">#}
@@ -69,32 +71,26 @@ if advised of the possibility of such damage.
 		{{ configSingleContent|raw }}
 	{% else %}
 		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
-		{{ stateJson }}
-		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
+		{% if 1 or stateJson is defined %}
+			{#and (isEmptyModule is defined and isEmptyModule == true)#}
 			<hr class="cleaner" />
-			<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
-				<div class="root">
-					{# new item insertion#}
-					{% if isEmptyModule is defined and isEmptyModule == true %}
+			<div id="mainView" ng-controller="ConfigurationController">
+				<button ng-click="reload()">reload data</button>
+				<button ng-click="download(jsonData)">download as JSON</button>
+				<button ng-click="undo()" ng-disabled="hasUndo()">history undo</button>
+				<button ng-click="redo()" ng-disabled="hasRedo()">history redo</button>
 
-						{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
-					{% elseif showRootElem is defined and showRootElem == true %}
-						{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
-					{% endif %}
-
-					{% set iterator = 1 %}
-					{% for key, element in stateArr %}
-						{% include 'FITModuleDefaultBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
-						{% set iterator = iterator + 1 %}
-					{% endfor %}
-
-					{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
-						{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
-							<input type="hidden" name="configDataForm[commit_all_button]" value="true" />
-							<input type="submit" value="Commit all changes" />
-						{% endif %}
-					{% endif %}
+				<div class="jsonView">
+					<json child="jsonData" default-collapsed="false" type="object" hide-collapse="true"></json>
 				</div>
+
+				<hr>
+				<div>
+					<textarea id="jsonTextarea" ng-model="jsonString"></textarea>
+					<span class="red" ng-if="!wellFormed">JSON not well-formed!</span>
+				</div>
+			</div>
+			<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
 			</form>
 			{% if modelTreeDump is defined %}
 			<div id="hiddenModelTreeDump">
