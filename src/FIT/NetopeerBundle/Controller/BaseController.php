@@ -163,9 +163,9 @@ class BaseController extends Controller
 		if (!in_array($this->getRequest()->get('_route'), array('connections', '_login')) &&
 				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
 			if (!in_array($this->getRequest()->get('_route'), array('createEmptyModule'))) {
-				$connectionFunc->buildMenuStructure($this->activeSectionKey);
+				$connectionFunc->buildMenuStructure($this->getActiveSectionKey());
 			}
-			$this->assign('topmenu', $connectionFunc->getModels());
+			$this->assign('topmenu', $connectionFunc->getModels($this->getActiveSectionKey()));
 			$this->assign('submenu', $connectionFunc->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
 		}
 
@@ -406,6 +406,10 @@ class BaseController extends Controller
 	 * @return int|null   section key
 	 */
 	public function getActiveSectionKey() {
+		$requestKey = intval($this->getRequest()->get('key'));
+		if (is_null($this->activeSectionKey) && isset($requestKey)) {
+			return $requestKey;
+		}
 		return $this->activeSectionKey;
 	}
 

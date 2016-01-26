@@ -65,19 +65,18 @@ class ModuleController extends BaseController {
 	static protected $defaultModuleAction = "FIT\Bundle\ModuleDefaultBundle\Controller\ModuleController::moduleAction";
 
 	/**
-	 * base method for getting data for module action
+	 * base method for preparing variables for module action
 	 *
 	 * @param      $bundleName
 	 * @param      $key
 	 * @param null $module
 	 * @param null $subsection
 	 *
-	 * @return \SimpleXMLIterator|RedirectResponse|null   SimpleXMLIterator with state XML, redirectResponse when current page is not correct, null on some failure
+	 * * @return RedirectResponse|null   redirectResponse when current page is not correct, null on some failure
 	 */
-	protected function prepareDataForModuleAction($bundleName, $key, $module = null, $subsection = null)
+	protected function prepareVariablesForModuleAction($bundleName, $key, $module = null, $subsection = null)
 	{
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
-		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$this->bundleName = $bundleName;
 
 		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
@@ -142,17 +141,26 @@ class ModuleController extends BaseController {
 			$this->assign('modelTreeDump', $modelTree);
 		}
 
+		return null;
+	}
+
+	/**
+	 * base method for getting data for module action
+	 *
+	 * @param      $bundleName
+	 * @param      $key
+	 * @param null $module
+	 * @param null $subsection
+	 *
+	 * @return json|null   JSON with state data
+	 */
+	protected function loadDataForModuleAction($bundleName, $key, $module = null, $subsection = null) {
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+
 		// loading state part = get Action
 		// we will load it every time, because state column will we show everytime
 		try {
-
-			if ($module === 'all') {
-				$merge = false;
-			} else {
-				$merge = true;
-			}
-
-			if ( ($json = $netconfFunc->handle('get', $this->getStateParams(), $merge)) != 1 ) {
+			if ( ($json = $netconfFunc->handle('get', $this->getStateParams())) != 1 ) {
 				$this->assign("stateJson", $json);
 				return $json;
 			}
@@ -500,7 +508,7 @@ class ModuleController extends BaseController {
 	 * Checks if we have empty module in XML
 	 *
 	 * @param int    $key
-	 * @param string $xml    result of prepareDataForModuleAction()
+	 * @param string $xml    result of prepareVariablesForModuleAction()
 	 */
 	protected  function checkEmptyRootModule($key, $xml) {
 		if ($xml instanceof \SimpleXMLIterator && $xml->count() == 0) {
@@ -605,4 +613,4 @@ class ModuleController extends BaseController {
 			return  1;
 		}
 	}
-} 
+}

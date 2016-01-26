@@ -17,7 +17,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	 */
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
-		$res = $this->prepareDataForModuleAction("FITModuleXmlBundle", $key, $module, $subsection);
+		$res = $this->prepareVariablesForModuleAction("FITModuleXmlBundle", $key, $module, $subsection);
 
 		/* parent module did not prepares data, but returns redirect response,
 		 * so we will follow this redirect

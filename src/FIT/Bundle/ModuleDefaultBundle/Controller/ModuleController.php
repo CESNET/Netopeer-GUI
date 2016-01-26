@@ -24,16 +24,17 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
-		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->get('angular') == "true") { // TODO
-			$res = $this->prepareDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
+		$res = $this->prepareVariablesForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 
-			/* parent module did not prepares data, but returns redirect response,
-			 * so we will follow this redirect
-			 */
-			if ($res instanceof RedirectResponse) {
-				return $res;
-			}
+		/* parent module did not prepares data, but returns redirect response,
+		 * so we will follow this redirect
+		 */
+		if ($res instanceof RedirectResponse) {
+			return $res;
+		}
 
+		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->get('angular') == "true") {
+			$res = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 			return new JsonResponse(json_decode($res));
 		} else {
 			$this->assign('singleColumnLayout', true);

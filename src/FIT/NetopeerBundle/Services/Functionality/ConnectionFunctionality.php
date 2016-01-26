@@ -72,6 +72,7 @@ class ConnectionFunctionality {
 	protected $container;
 
 	protected $modelNamespaces;
+	protected $models;
 
 	/**
 	 * @return \Symfony\Bridge\Monolog\Logger
@@ -143,11 +144,35 @@ class ConnectionFunctionality {
 		$this->container = $container;
 	}
 
-	public function getModels() {
-		// TODO
+	/**
+	 * Get models.
+	 *
+	 * @param  int    $key        session key of current connection
+	 * @return array|null
+	 */
+	public function getModels($key) {
+		$hashedKey = $this->getHashFromKeys($key);
+		$hashedKey = array_pop($hashedKey);
+		if ($hashedKey && $this->getCache()->contains('menuStructure_'.$hashedKey)) {
+//			$this->logger->addInfo("Cached file for menuStructure found.", array('key' => 'menuStructure_'.$hashedKey));
+			return $this->getCache()->fetch('menuStructure_'.$hashedKey);
+		}
+		return $this->models;
 	}
 
-
+	/**
+	 * save model folder structure
+	 *
+	 * @param  int    $key        session key of current connection
+	 * @param  array  $models    array to persist
+	 * @param   int   $lifetime   cache lifetime in seconds
+	 */
+	public function setModels($key, $models, $lifetime = 6000) {
+		$hashedKey = $this->getHashFromKeys($key);
+		$hashedKey = array_pop($hashedKey);
+		$this->models = $models;
+		$this->getCache()->save('menuStructure_'.$hashedKey, $models, $lifetime);
+	}
 
 
 	/**
@@ -194,7 +219,8 @@ class ConnectionFunctionality {
 			return false;
 		}
 		$sessionStatus = json_decode($conn->sessionStatus);
-		$capabilities = $sessionStatus->capabilities;
+		$sid = $this->getHashFromKeys($key)[0];
+		$capabilities = $sessionStatus->$sid->capabilities;
 
 		$arr = array();
 		if (is_array($capabilities) && count($capabilities)) {
@@ -443,94 +469,53 @@ class ConnectionFunctionality {
 	 * @param  string $path
 	 */
 	public function buildMenuStructure($key, $path = "") {
-// TODO
-		return;
+
 		// we will build menu structure only if we have not build it before
-		if ( !$this->getModels($key) || !$this->getModelNamespaces($key) ) {
-			$finder = new Finder();
-
-			$params = array(
-				'key' => $key,
-				'source' => 'running',
-				'filter' => "",
-			);
-
-			$allowedModels = array();
-			$allowedSubmenu = array();
+		if ( 1 || !$this->getModels($key) || !$this->getModelNamespaces($key) ) {
+			$models = array();
 			$namespaces = array();
 
-			try {
-				// load GET XML from server
-				if ( ($xml = $this->handle('get', $params, false)) != 1 ) {
-					$xml = simplexml_load_string($xml, 'SimpleXMLIterator');
+			$netconfFunc = $this->getContainer()->get('fitnetopeerbundle.service.netconf.functionality');
+			$json = json_decode($netconfFunc->handle('get', array('connIds' => array($key))), true);
 
-					$xmlNameSpaces = $xml->getNamespaces();
+			$modifiedJson = array();
+			foreach ($json as $name => $val) {
+				$newKey = substr($name, 0, strpos($name, ':'));
+				$modifiedJson[$newKey] = array($name => $val);
+			}
 
-					if ( isset($xmlNameSpaces[""]) ) {
-						$xml->registerXPathNamespace("xmlns", $xmlNameSpaces[""]);
-						$nodes = $xml->xpath('/xmlns:*');
+			if ($this->getModuleIdentifiersForCurrentDevice($key)) {
+				foreach ( $this->getModuleIdentifiersForCurrentDevice( $key ) as $ns => $values ) {
+
+					$i                         = 0;
+					$moduleName                = $values['moduleName'];
+
+					if (isset($modifiedJson[$moduleName])) {
+						$configuration = $modifiedJson[$moduleName];
 					} else {
-						$nodes = $xml->xpath('/*');
+						$configuration = array();
 					}
 
-					// get first level nodes (so without root) as items for top menu
-					foreach ($nodes as $node) {
-						foreach ($node as $nodeKey => $submenu) {
-							$ns = $submenu->getNameSpaces();
-							$i = 0;
-							if (isset($namespaces[$nodeKey])) {
-								$i = 1;
-								while(isset($namespaces[$nodeKey.$i])) {
-									$i++;
-								}
-								$namespaces[$nodeKey.$i] = $ns[""];
-							} else {
-								$namespaces[$nodeKey] = $ns[""];
-							}
-
-							if (!in_array(array("name" => $nodeKey, 'index' => $i), $allowedModels) ) {
-								$allowedModels[] = array("name" => $nodeKey, 'index' => $i);
-							}
-
-							foreach ($submenu as $subKey => $tmp) {
-								if ( !in_array(array("name" => $subKey, 'index' => 0), $allowedSubmenu) ) {
-									$allowedSubmenu[] = array("name" => $subKey, 'index' => 0);
-								}
-							}
-						}
-					}
+					$models[ $moduleName ]     = array(
+						'path'      => "module",
+						"params"    => array(
+							'key'    => $key,
+							'module' => $moduleName,
+						),
+						"title"     => "detail of " . $this->getSectionName( $moduleName ),
+						"name"      => $this->getSectionName( $moduleName ),
+						"children"  => $this->buildSubmenu( $key, $moduleName, $configuration ),
+						"namespace" => $ns,
+						"version"   => $values['revision'],
+					);
+					$namespaces[ $moduleName ] = $ns;
 				}
-			} catch (\ErrorException $e) {
-				$this->logger->addError("Could not build MenuStructure", array('key' => $key, 'path' => $path, 'error' => $e->getMessage()));
+			} else {
+				$this->getLogger()->addError("Could not build MenuStructure", array('key' => $key));
 				// nothing
 			}
 			$this->setModelNamespaces($key, $namespaces);
-
-
-			// we will check, if nodes from GET are same as models structure
-			// if not, they won't be displayed
-			$folders = array();
-			sort($allowedModels);
-			foreach ($allowedModels as $module) {
-				$moduleWithIndex = $module['name'];
-				if ($module['index'] !== 0) {
-					$moduleWithIndex .= $module['index'];
-				}
-				if ($this->existsModelDirForName($moduleWithIndex)) {
-					$folders[$moduleWithIndex] = array(
-						'path' => "module",
-						"params" => array(
-							'key' => $key,
-							'module' => $moduleWithIndex,
-						),
-						"title" => "detail of ".$this->getSectionName($module['name']),
-						"name" => $this->getSectionName($module['name']),
-						"children" => $this->buildSubmenu($key, $module, $allowedSubmenu),
-						"namespace" => $namespaces[$moduleWithIndex],
-					);
-				}
-			}
-			$this->setModels($key, $folders);
+			$this->setModels($key, $models);
 		}
 	}
 
@@ -539,51 +524,37 @@ class ConnectionFunctionality {
 	 *
 	 * @param  int  $key session key of current connection
 	 * @param array $module       array with indexes: name and index
-	 * @param $allowedSubmenu
 	 * @param string $path
 	 * @return array
 	 */
-	private function buildSubmenu($key, $module, $allowedSubmenu, $path = "") {
-		$finder = new Finder();
+	private function buildSubmenu($key, $module, $configuration) {
+		$submodule = array();
 
-		// TODO
+		if (sizeof($configuration)) {
+			$configuration = array_pop($configuration);
+			foreach ($configuration as $subsection => $val) {
+				if (strpos($subsection, '$@') !== false) continue;
 
-		$moduleWithIndex = $module['name'];
-		if ($module['index'] !== 0) {
-			$moduleWithIndex .= $module['index'];
-		}
-
-		// we will check, if nodes from GET are same as models structure
-		// if not, they won't be displayed
-//		$dir = $this->getPathToModels($moduleWithIndex);
-		if ( !file_exists($dir) ) {
-			$folders = array();
-		} else {
-			$iterator = $finder
-				->directories()
-				->sortByName()
-				->depth(0)
-				->in($dir);
-
-			$folders = array();
-			foreach ($iterator as $folder) {
-				$subsection = $folder->getRelativePathname();
-				if ( in_array(array("name" => $subsection, "index" => 0), $allowedSubmenu) ) {
-					$folders[] = array(
-						'path' => "subsection",
-						"params" => array(
-							'key' => $key,
-							'module' => $moduleWithIndex,
-							'subsection' => $subsection,
-						),
-						"title" => "detail of ".$this->getSubsectionName($subsection),
-						"name" => $this->getSubsectionName($subsection),
-						// "children" => $this->getSubmenu($key, $completePath),
-					);
+				if (isset($configuration['$@'.$subsection])) {
+					$schema = $configuration['$@'.$subsection];
+					if (isset($schema['eltype']) && $schema['eltype'] === "container") {
+						$submodule[] = array(
+							'path' => "subsection",
+							"params" => array(
+								'key' => $key,
+								'module' => $module,
+								'subsection' => $subsection,
+							),
+							"title" => "detail of ".$this->getSubsectionName($subsection),
+							"name" => $this->getSubsectionName($subsection),
+							// "children" => $this->getSubmenu($key, $completePath),
+						);
+					}
 				}
 			}
 		}
-		return $folders;
+
+		return $submodule;
 	}
 
 	/**
@@ -594,13 +565,11 @@ class ConnectionFunctionality {
 	 * @return array              array with config and state filter
 	 */
 	public function loadFilters(&$module, &$subsection) {
-		// if file filter.txt exists in models, we will use it
 		$filterState = $filterConfig = "";
 
-		// TODO
-
 		$namespaces = $this->getModelNamespaces($this->getContainer()->get('request')->get('key'));
-		if (isset($namespaces[$module])) { $namespace = $namespaces[$module];
+		if (isset($namespaces[$module])) {
+			$namespace = $namespaces[$module];
 			$filter = new \SimpleXMLElement("<".$module."></".$module.">");
 			$filter->addAttribute('xmlns', $namespace);
 			if ( $subsection ) {
@@ -646,12 +615,14 @@ class ConnectionFunctionality {
 	 * @return array|null
 	 */
 	public function getModelNamespaces($key) {
-		// TODO
-//		$hashedKey = $this->getHashFromKeys($key);
-//		if ($hashedKey && $this->getCache()->contains('modelNamespaces_'.$hashedKey)) {
-////			$this->logger->addInfo("Cached file for modelNamespaces found.", array('key' => 'modelNamespaces_'.$hashedKey));
-//			return $this->getCache()->fetch('modelNamespaces_'.$hashedKey);
-//		}
+		if (!$this->modelNamespaces) {
+			$hashedKey = $this->getHashFromKeys($key);
+			$hashedKey = array_pop($hashedKey);
+			if ($hashedKey && $this->getCache()->contains('modelNamespaces_'.$hashedKey)) {
+//			$this->getLogger()->addInfo("Cached file for modelNamespaces found.", array('key' => 'modelNamespaces_'.$hashedKey));
+				return $this->getCache()->fetch('modelNamespaces_'.$hashedKey);
+			}
+		}
 		return $this->modelNamespaces;
 	}
 
@@ -681,6 +652,7 @@ class ConnectionFunctionality {
 	 */
 	public function setModelNamespaces($key, $namespaces, $lifetime = 6000) {
 		$hashedKey = $this->getHashFromKeys($key);
+		$hashedKey = array_pop($hashedKey);
 		$this->modelNamespaces = $namespaces;
 		$this->getCache()->save('modelNamespaces_'.$hashedKey, $namespaces, $lifetime);
 	}
@@ -703,11 +675,11 @@ class ConnectionFunctionality {
 	public function invalidateMenuStructureForKey($key) {
 		$hashedKey = $this->getHashFromKeys($key);
 		if ($hashedKey && $this->getCache()->contains('modelNamespaces_'.$hashedKey)) {
-			$this->logger->addInfo("Invalidate cached file", array('key' => 'modelNamespaces_'.$hashedKey));
+			$this->getLogger()->addInfo("Invalidate cached file", array('key' => 'modelNamespaces_'.$hashedKey));
 			$this->getCache()->delete('modelNamespaces_'.$hashedKey);
 		}
 		if ($hashedKey && $this->getCache()->contains('menuStructure_'.$hashedKey)) {
-			$this->logger->addInfo("Invalidate cached file", array('key' => 'menuStructure_'.$hashedKey));
+			$this->getLogger()->addInfo("Invalidate cached file", array('key' => 'menuStructure_'.$hashedKey));
 			$this->getCache()->delete('menuStructure_'.$hashedKey);
 		}
 		$this->getCache()->deleteDeads();

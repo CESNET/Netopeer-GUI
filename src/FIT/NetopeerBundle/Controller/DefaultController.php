@@ -373,7 +373,7 @@ class DefaultController extends BaseController
 	{
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
-		parent::setActiveSectionKey($key);
+		$this->setActiveSectionKey($key);
 		$connectionFunc->buildMenuStructure($key);
 
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
