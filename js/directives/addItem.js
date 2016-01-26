@@ -1,6 +1,6 @@
 NetopeerGUI.directive('addItem', function() {
 	return {
 		restrict: 'E',
-		templateUrl: 'templates/directives/addItem.html'
+		templateUrl: 'directives/addItem.html'
 	};
 })

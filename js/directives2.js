@@ -38,7 +38,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
           if (typeof type === 'undefined') {
               type = $scope.type;
           }
-          return 'templates/types/'+type+'.html';
+          //return baseURL + '/bundles/fitmoduledefault/netopeerangular/templates/types/'+type+'.html';
+          return 'types/'+type+'.html';
       };
     },
     link: function(scope, element, attributes) {

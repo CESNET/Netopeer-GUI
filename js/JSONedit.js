@@ -19,9 +19,13 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 		var isUndo = false,
 				isRedo = false;
 
-		$http.get('data/real.json').success(function (data) {
-			$scope.jsonData = data;
-		});
+		$scope.reload = function() {
+			$http.get(window.location.href + '?angular=true').success(function (data) {
+				$scope.jsonData = data;
+			});
+		}
+
+		$scope.reload();
 
 		$scope.$watch('jsonData', function (newValue, oldValue) {
 			$timeout(function() {
