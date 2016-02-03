@@ -1,4 +1,5 @@
 //@import "compass/reset";
+@import "compass/css3";
 
 .red { color: red; }
 
@@ -20,7 +21,7 @@
 		}
 	}
 	.addItemKeyInput { font-weight: bold; }
-	.glyphicon-menu-right, .glyphicon-menu-down { float: left; cursor: pointer; position: relative; top: -22px; right: 22px; margin-right: -15px; }
+	.glyphicon-menu-right, .glyphicon-menu-down { float: left; cursor: pointer; position: relative; top: -16px; right: 22px; margin-right: -15px; }
 	> json > .glyphicon-menu-down { display: none; }
 	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; height: 30px; display: block;
 		i { display: block; }
@@ -42,7 +43,7 @@
 li .jsonContents { margin-left: 0px; }
 
 .jsonView {
-	.block { display: block; }
+	.block { clear: both; display: block; }
 	.jsonItemDesc { font-family: Georgia, serif; color: grey; font-style: italic; cursor: default; line-height: 30px; }
 	.objectDesc { cursor: default; }
 	> json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }

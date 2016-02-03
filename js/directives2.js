@@ -52,8 +52,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var boolName = "Boolean";
         var literalName = "Literal";
 
-        //scope.valueTypes = [stringName, objectName, arrayName, numberName, urlName, refName, boolName, literalName];
-        scope.valueTypes = [stringName, objectName, arrayName, refName, boolName];
+        scope.valueTypes = [stringName, objectName, arrayName, numberName, urlName, refName, boolName, literalName];
+        scope.stringName = stringName;
+        //scope.valueTypes = [stringName, objectName, arrayName, refName, boolName];
         scope.sortableOptions = {
             axis: 'y'
         };
@@ -148,12 +149,12 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 delete obj[key];
             }
         };
-        scope.deleteKey = function(obj, key) {
-            if (getType(obj) == "Object") {
+        scope.deleteKey = function(key, obj, parent) {
+            if (getType(key, obj, parent) == "Object") {
                 if( confirm('Delete "'+key+'" and all it contains?') ) {
                     delete obj[key];
                 }
-            } else if (getType(obj) == "Array") {
+            } else if (getType(key, obj, parent) == "Array") {
                 if( confirm('Delete "'+obj[key]+'"?') ) {
                     obj.splice(key, 1);
                 }
@@ -165,41 +166,41 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             var type = getType(key, obj, parent);
             if (type == "Object") {
                 // check input for key
-                if (scope.keyName == undefined || scope.keyName.length == 0){
+                if (parent.keyName == undefined || parent.keyName.length == 0){
                     alert("Please fill in a name");
-                } else if (scope.keyName.indexOf("$") == 0){
+                } else if (parent.keyName.indexOf("$") == 0){
                     alert("The name may not start with $ (the dollar sign)");
-                } else if (scope.keyName.indexOf("_") == 0){
+                } else if (parent.keyName.indexOf("_") == 0){
                     alert("The name may not start with _ (the underscore)");
                 } else {
-                    if (obj[scope.keyName]) {
-                        if( !confirm('An item with the name "'+scope.keyName
+                    if (obj[parent.keyName]) {
+                        if( !confirm('An item with the name "'+parent.keyName
                             +'" exists already. Do you really want to replace it?') ) {
                             return;
                         }
                     }
                     // add item to object
-                    switch(scope.valueType) {
-                        case stringName: obj[scope.keyName] = scope.valueName ? scope.possibleNumber(scope.valueName) : "";
+                    switch(parent.valueType) {
+                        case stringName: obj[parent.keyName] = parent.valueName ? parent.possibleNumber(parent.valueName) : "";
                                         break;
-                        case objectName:  obj[scope.keyName] = {};
+                        case objectName:  obj[parent.keyName] = {};
                                         break;
-                        case arrayName:   obj[scope.keyName] = [];
+                        case arrayName:   obj[parent.keyName] = [];
                                         break;
-                        case refName: obj[scope.keyName] = {"Reference!!!!": "todo"};
+                        case refName: obj[parent.keyName] = {"Reference!!!!": "todo"};
                                         break;
-                        case boolName: obj[scope.keyName] = false;
+                        case boolName: obj[parent.keyName] = false;
                                         break;
                     }
                     //clean-up
-                    scope.keyName = "";
-                    scope.valueName = "";
-                    scope.showAddKey = false;
+                    parent.keyName = "";
+                    parent.valueName = "";
+                    parent.showAddKey = false;
                 }
             } else if (type == "Array") {
                 // add item to array
-                switch(scope.valueType) {
-                    case stringName: obj.push(scope.valueName ? scope.valueName : "");
+                switch(parent.valueType) {
+                    case stringName: obj.push(parent.valueName ? parent.valueName : "");
                                     break;
                     case objectName:  obj.push({});
                                     break;
@@ -210,8 +211,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     case refName: obj.push({"Reference!!!!": "todo"});
                                     break;
                 }
-                scope.valueName = "";
-                scope.showAddKey = false;
+                parent.valueName = "";
+                parent.showAddKey = false;
             } else {
                 console.error("object to add to was " + obj);
             }

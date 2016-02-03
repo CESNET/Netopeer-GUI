@@ -11,7 +11,7 @@
 .jsonView input.keyinput { font-weight: bold; }
 .jsonView input[type="text"].addItemKeyInput, .jsonView input[type="text"].addItemValueInput { border: 1px solid #ccc; background: white; margin-left: 0; }
 .jsonView .addItemKeyInput { font-weight: bold; }
-.jsonView .glyphicon-menu-right, .jsonView .glyphicon-menu-down { float: left; cursor: pointer; position: relative; top: -22px; right: 22px; margin-right: -15px; }
+.jsonView .glyphicon-menu-right, .jsonView .glyphicon-menu-down { float: left; cursor: pointer; position: relative; top: -16px; right: 22px; margin-right: -15px; }
 .jsonView > json > .glyphicon-menu-down { display: none; }
 .jsonView .addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; height: 30px; display: block; }
 .jsonView .addObjectItemBtn i { display: block; }
@@ -26,7 +26,7 @@
 
 li .jsonContents { margin-left: 0px; }
 
-.jsonView .block { display: block; }
+.jsonView .block { clear: both; display: block; }
 .jsonView .jsonItemDesc { font-family: Georgia, serif; color: grey; font-style: italic; cursor: default; line-height: 30px; }
 .jsonView .objectDesc { cursor: default; }
 .jsonView > json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }

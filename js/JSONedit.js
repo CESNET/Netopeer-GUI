@@ -1,4 +1,4 @@
-var storage = Rhaboo.perishable("Some unique name");
+var storage = Rhaboo.perishable(window.location.href);
 var historyIndex = 0,
 		historyUndo = 0;
 

@@ -1,11 +1,14 @@
 <div ng-switch on="showAddKey" class="block" >
 	<span ng-switch-when="true">
-		<input placeholder="Name" type="text" ui-keyup="{'enter':'addItem(key, child, $parent)'}"
-		class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" ng-if="scope.type == 'object'"/>
+		<span ng-show="getType(key, child, $parent) == 'Object'">
+			<input placeholder="Name" type="text" ui-keyup="{'enter':'addItem(key, child, $parent)'}"
+						 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" /> :
+		</span>
+
 
 		<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ng-init="$parent.valueType=''+stringName+''" ui-keydown="{'enter':'addItem(key, child, $parent)'}"></select>
 
-		<span ng-show="$parent.valueType == '''+stringName+'''"> : <input type="text" placeholder="Value" class="form-control input-sm addItemValueInput" ng-model="$parent.valueName" ui-keyup="{'enter':'addItem(key, child, $parent)'}"/></span>
+		<input ng-show="$parent.valueType == stringName" type="text" placeholder="Value" class="form-control input-sm addItemValueInput" ng-model="$parent.valueName" ui-keyup="{'enter':'addItem(key, child, $parent)'}"/>
 
 		<button class="btn btn-primary btn-sm" ng-click="addItem(key, child, $parent)">
 			Add
