@@ -471,7 +471,7 @@ class ConnectionFunctionality {
 	public function buildMenuStructure($key, $path = "") {
 
 		// we will build menu structure only if we have not build it before
-		if ( 1 || !$this->getModels($key) || !$this->getModelNamespaces($key) ) {
+		if ( !$this->getModels($key) || !$this->getModelNamespaces($key) ) {
 			$models = array();
 			$namespaces = array();
 

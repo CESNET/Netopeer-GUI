@@ -121,7 +121,8 @@ class ModuleController extends BaseController {
 
 		// if form has been send, we well process it
 		if ($this->getRequest()->getMethod() == 'POST') {
-			return $this->processSectionForms($key, $module, $subsection);
+//			return $this->processSectionForms($key, $module, $subsection); // TODO
+			return;
 		}
 
 		// we will prepare filter form in column

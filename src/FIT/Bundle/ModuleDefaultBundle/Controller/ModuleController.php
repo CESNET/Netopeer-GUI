@@ -33,6 +33,19 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			return $res;
 		}
 
+		if ($this->getRequest()->getMethod() == 'POST') {
+			$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+			$configParams = $this->getConfigParams();
+			$postData = json_decode($this->getRequest()->getContent(), true);
+			$params = array(
+				'connIds' => array($key),
+				'target' => $configParams['source'],
+				'configs' => array($postData['editConfig'])
+			);
+			$res = $netconfFunc->handle('editconfig', $params, true, $result);
+			return new JsonResponse(json_decode($res));
+		}
+
 		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->get('angular') == "true") {
 			$res = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 			return new JsonResponse(json_decode($res));

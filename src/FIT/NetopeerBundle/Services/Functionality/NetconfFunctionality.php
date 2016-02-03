@@ -1064,7 +1064,7 @@ class NetconfFunctionality {
 				$res = $this->handle_getconfig($sock, $params);
 				break;
 			case "editconfig":
-				$this->getLogger()->addInfo("Handle editConfig: ", array('configToSend' => $params['config']));
+				$this->getLogger()->addInfo("Handle editConfig: ", array('configToSend' => var_export($params['configs'], true)));
 				$res = $this->handle_editconfig($sock, $params);
 				break;
 			case "copyconfig":

@@ -77,6 +77,7 @@ if advised of the possibility of such damage.
 			<div id="mainView" ng-controller="ConfigurationController">
 				<button ng-click="reload()">reload data</button>
 				<button ng-click="download(jsonData)">download as JSON</button>
+				<button ng-click="submitConfiguration(jsonData)">Apply changes</button>
 				<button ng-click="undo()" ng-disabled="hasUndo()">history undo</button>
 				<button ng-click="redo()" ng-disabled="hasRedo()">history redo</button>
 
