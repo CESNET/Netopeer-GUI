@@ -52,7 +52,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 			}
 		}, true);
 
-		$scope.download = function (jsonData) {
+		var cleanupJSON = function(jsonData) {
 			var cleanJson = $filter('json')(jsonData);
 			var jsonObj = angular.fromJson(cleanJson);
 			var removeSchemaNodes = function(obj) {
@@ -66,6 +66,11 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 			};
 			removeSchemaNodes(jsonObj);
 			cleanJson = $filter('json')(jsonObj);
+			return cleanJson;
+		}
+
+		$scope.download = function (jsonData) {
+			var cleanJson = cleanupJSON(jsonData);
 			$window.open("data:application/json;charset=utf-8," + encodeURIComponent(cleanJson));
 		};
 
@@ -93,6 +98,22 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 				//$scope.jsonData = JSON.parse(json);
 				historyUndo--;
 			}, 1);
+		};
+
+		$scope.submitConfiguration = function(jsonData) {
+			var cleanJson = cleanupJSON(jsonData);
+			console.log(cleanJson);
+			$http({
+				url: window.location.href,
+				method: 'POST',
+				data: {editConfig: cleanJson}
+			}).then(function successCallback(data) {
+				alert('ok');
+				console.log(data);
+			}, function errorCallback(data) {
+				alert('error');
+				console.log('data');
+			});
 		};
 	}
 );

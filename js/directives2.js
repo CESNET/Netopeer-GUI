@@ -129,7 +129,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         var getSchemaFromKey = function(key, parent) {
-            if (typeof parent['$@'+key] === "undefined") {
+            if (typeof parent === "undefined" || parent['$@'+key] === "undefined") {
                 return false;
             }
             return parent['$@'+key];
@@ -242,10 +242,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             child[key] = val;
             if (typeof child['@'+key] === "undefined") {
                 child['@'+key] = {
-                    'xc-operation': ''
+                    'ietf-netconf:operation"': ''
                 }
             }
-            child['@'+key]['xc-operation'] = 'create';
+            child['@'+key]['ietf-netconf:operation"'] = 'create';
         };
 
         //////
