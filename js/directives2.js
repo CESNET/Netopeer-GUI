@@ -64,9 +64,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             scope.collapsed = scope.defaultCollapsed;
         }
         if (scope.collapsed) {
-            scope.chevron = "glyphicon-menu-right";
+            scope.chevron = "fa-plus-square-o";
         } else {
-            scope.chevron = "glyphicon-menu-down";
+            scope.chevron = "fa-minus-square-o";
         }
         
 
@@ -136,10 +136,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.toggleCollapse = function() {
             if (scope.collapsed) {
                 scope.collapsed = false;
-                scope.chevron = "glyphicon-menu-down";
+                scope.chevron = "fa-minus-square-o";
             } else {
                 scope.collapsed = true;
-                scope.chevron = "glyphicon-menu-right";
+                scope.chevron = "fa-plus-square-o";
             }
         };
         scope.moveKey = function(obj, key, newkey) {

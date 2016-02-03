@@ -19,7 +19,7 @@
     "tests"
   ],
   "dependencies": {
-    "bootstrap": "3.x.x",
+    "font-awesome-sass": "4.x.x",
     "angular": "~1.4.7",
     "angular-ui-sortable": "0.12.x",
     "angular-bootstrap": "~0.14.1",
