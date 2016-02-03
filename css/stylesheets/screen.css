@@ -1297,11 +1297,11 @@
 .jsonView input.keyinput { font-weight: bold; }
 .jsonView input[type="text"].addItemKeyInput, .jsonView input[type="text"].addItemValueInput { border: 1px solid #ccc; background: white; margin-left: 0; }
 .jsonView .addItemKeyInput { font-weight: bold; }
-.jsonView .fa-plus-square-o, .jsonView .fa-minus-square-o { float: left; cursor: pointer; position: relative; top: -16px; right: 22px; margin-right: -15px; }
+.jsonView .fa-plus-square-o, .jsonView .fa-minus-square-o { float: left; cursor: pointer; position: relative; top: -1em; right: 22px; margin-right: -15px; }
 .jsonView > json > .fa-minus-square-o { display: none; }
-.jsonView .addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; height: 30px; display: block; }
+.jsonView .addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; display: block; }
 .jsonView .addObjectItemBtn i { display: block; }
-.jsonView .iconButton { float: right; margin-right: 10px; position: relative; top: 7px; z-index: 99999999999999; cursor: pointer; }
+.jsonView .iconButton { float: right; margin-right: 10px; position: relative; top: -1px; z-index: 99999999999999; cursor: pointer; }
 .jsonView .jsonObjectKey { font-weight: bold; margin-right: 25px; }
 
 /* inputs */
@@ -1312,8 +1312,8 @@
 
 li .jsonContents { margin-left: 0px; }
 
-.jsonView .block { clear: both; display: block; }
-.jsonView .jsonItemDesc { font-family: Georgia, serif; color: grey; font-style: italic; cursor: default; line-height: 30px; }
+.jsonView .block { clear: both; display: block; margin-bottom: 0.5em; }
+.jsonView .jsonItemDesc { color: grey; font-style: italic; cursor: default; line-height: 30px; }
 .jsonView .objectDesc { cursor: default; }
 .jsonView > json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
 .jsonView ol.arrayOl { margin: 0; padding-left: 20px; }
@@ -1322,9 +1322,9 @@ li .jsonContents { margin-left: 0px; }
 .jsonView ol.arrayOl .fa-minus-square-o { top: 7px; }
 .jsonView ol.arrayOl .fa-plus-square-o { top: -16px; }
 .jsonView ol.arrayOl > li > span > span > json > .fa-minus-square-o, .jsonView ol.arrayOl > li > span > span > json > .fa-plus-square-o { left: -40px; }
-.jsonView ol.arrayOl li { color: grey; font-style: italic; font-family: Georgia, serif; list-style-type: decimal; }
-.jsonView ol.arrayOl li input { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-style: normal; }
-.jsonView li select, .jsonView li button { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-style: normal; }
+.jsonView ol.arrayOl li { color: grey; font-style: italic; list-style-type: decimal; }
+.jsonView ol.arrayOl li input { font-style: normal; }
+.jsonView li select, .jsonView li button { font-style: normal; }
 .jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
 .jsonView li li { list-style-type: lower-roman; }
 .jsonView li li li { list-style-type: upper-roman; }

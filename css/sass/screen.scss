@@ -26,12 +26,12 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 		}
 	}
 	.addItemKeyInput { font-weight: bold; }
-	.fa-plus-square-o, .fa-minus-square-o { float: left; cursor: pointer; position: relative; top: -16px; right: 22px; margin-right: -15px; }
+	.fa-plus-square-o, .fa-minus-square-o { float: left; cursor: pointer; position: relative; top: -1em; right: 22px; margin-right: -15px; }
 	> json > .fa-minus-square-o { display: none; }
-	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; height: 30px; display: block;
+	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0;display: block;
 		i { display: block; }
 	}
-	.iconButton { float: right; margin-right: 10px; position: relative; top: 7px; z-index: 99999999999999; cursor: pointer; }
+	.iconButton { float: right; margin-right: 10px; position: relative; top: -1px; z-index: 99999999999999; cursor: pointer; }
 	.jsonObjectKey { font-weight: bold; margin-right: 25px; }
 }
 
@@ -48,8 +48,8 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 li .jsonContents { margin-left: 0px; }
 
 .jsonView {
-	.block { clear: both; display: block; }
-	.jsonItemDesc { font-family: Georgia, serif; color: grey; font-style: italic; cursor: default; line-height: 30px; }
+	.block { clear: both; display: block; margin-bottom: 0.5em; }
+	.jsonItemDesc { color: grey; font-style: italic; cursor: default; line-height: 30px; }
 	.objectDesc { cursor: default; }
 	> json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
 	ol.arrayOl { margin: 0; padding-left: 20px; }
@@ -61,12 +61,12 @@ li .jsonContents { margin-left: 0px; }
 		> li > span > span > json > {
 			.fa-minus-square-o, .fa-plus-square-o { left: -40px; }
 		}
-		li { color: grey; font-style: italic; font-family: Georgia, serif; list-style-type: decimal;
-			input { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-style: normal; }
+		li { color: grey; font-style: italic; list-style-type: decimal;
+			input { font-style: normal; }
 		}
 	}
 	li {
-		select, button { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; font-style: normal;}
+		select, button { font-style: normal;}
 	}
 	ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
 	li li {
