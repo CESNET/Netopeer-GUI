@@ -28,9 +28,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 		$scope.reload();
 
 		$scope.$watch('jsonData', function (newValue, oldValue) {
-			$timeout(function() {
-				$scope.jsonString = JSON.stringify(newValue);
-			}, 100);
+			$scope.jsonString = JSON.stringify(newValue);
 			if ( !isUndo && !isRedo && newValue !== oldValue ) {
 				historyIndex = historyIndex - historyUndo;
 				historyUndo = 0;
@@ -44,6 +42,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 			isUndo = false;
 			isRedo = false;
 		}, true);
+
 		$scope.$watch('jsonString', function (json) {
 			try {
 				$scope.jsonData = JSON.parse(json);
@@ -73,15 +72,27 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 		$scope.undo = function() {
 			var json = storage.revisions[historyIndex - historyUndo - 2];
 			isUndo = true;
-			$scope.jsonData = JSON.parse(json);
-			historyUndo++;
+			$scope.jsonString = '{}';
+
+			$timeout(function() {
+				isUndo = true;
+				$scope.jsonString = json;
+				//$scope.jsonData = JSON.parse(json);
+				historyUndo++;
+			}, 1);
 		};
 
 		$scope.redo = function() {
 			var json = storage.revisions[historyIndex - historyUndo];
 			isRedo = true;
-			$scope.jsonData = JSON.parse(json);
-			historyUndo--;
+			$scope.jsonString = '{}';
+
+			$timeout(function() {
+				isRedo = true;
+				$scope.jsonString = json;
+				//$scope.jsonData = JSON.parse(json);
+				historyUndo--;
+			}, 1);
 		};
 	}
 );
