@@ -1,4 +1,4 @@
-<i ng-click="toggleCollapse()" class="fa" ng-class="chevron"></i>
+<i ng-click="toggleCollapse()" class="fa toggle-control" ng-class="chevron"></i>
 <div class="jsonContents" ng-hide="collapsed">
 	<ol class="arrayOl" ui-sortable="sortableOptions" ng-model="child">
 		<li class="arrayItem" ng-repeat="val in child track by $index">

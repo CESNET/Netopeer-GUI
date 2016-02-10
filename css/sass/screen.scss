@@ -26,7 +26,7 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 		}
 	}
 	.addItemKeyInput { font-weight: bold; }
-	.fa-plus-square-o, .fa-minus-square-o { float: left; cursor: pointer; position: relative; top: -1em; right: 22px; margin-right: -15px; }
+	.toggle-control { float: left; cursor: pointer; position: relative; top: -1em; right: 22px; margin-right: -15px; }
 	> json > .fa-minus-square-o { display: none; }
 	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0;display: block;
 		i { display: block; }
@@ -55,11 +55,11 @@ li .jsonContents { margin-left: 0px; }
 	ol.arrayOl { margin: 0; padding-left: 20px; }
 	li {clear: both;min-height: 30px; }
 	ol.arrayOl {
-		.fa-minus-square-o, .fa-plus-square-o { margin-left: -20px; }
-		.fa-minus-square-o { top: 7px; }
-		.fa-plus-square-o { top: -16px; }
+		.toggle-control { margin-left: -20px; top: 1.3em; display: none; }
+		//.fa-minus-square-o { top: 7px; }
+		//.fa-plus-square-o { top: -16px; }
 		> li > span > span > json > {
-			.fa-minus-square-o, .fa-plus-square-o { left: -40px; }
+			.toggle-control { left: -40px; }
 		}
 		li { color: grey; font-style: italic; list-style-type: decimal;
 			input { font-style: normal; }
