@@ -217,6 +217,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 console.error("object to add to was " + obj);
             }
         };
+        scope.possibleNumber = function(val) {
+            return isNumber(val) ? parseFloat(val) : val;
+        };
+
         scope.changeValue = function(child, key, val) {
             child[key] = val;
             if (typeof child['@'+key] === "undefined") {
