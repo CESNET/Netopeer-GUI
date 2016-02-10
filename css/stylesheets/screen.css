@@ -1322,6 +1322,8 @@ li .jsonContents { margin-left: 0px; }
 .jsonView ol.arrayOl > li > span > span > json > .toggle-control { left: -40px; }
 .jsonView ol.arrayOl li { color: grey; font-style: italic; list-style-type: decimal; }
 .jsonView ol.arrayOl li input { font-style: normal; }
+.jsonView ol.arrayOl ol.arrayOl { margin-top: 15px; }
+.jsonView ol.arrayOl ol.arrayOl, .jsonView ol.arrayOl ol.arrayOl + add-item .block { margin-left: 25px; }
 .jsonView li select, .jsonView li button { font-style: normal; }
 .jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
 .jsonView li li { list-style-type: lower-roman; }

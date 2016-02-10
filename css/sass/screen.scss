@@ -64,6 +64,9 @@ li .jsonContents { margin-left: 0px; }
 		li { color: grey; font-style: italic; list-style-type: decimal;
 			input { font-style: normal; }
 		}
+		ol.arrayOl { margin-top: 15px;
+			&, & + add-item .block { margin-left: 25px; }
+		}
 	}
 	li {
 		select, button { font-style: normal;}
