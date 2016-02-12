@@ -6,6 +6,10 @@
 		<input type="checkbox" ng-model="val" ng-model-onblur ng-change="changeValue(child, key, val)" ng-if="isConfig(key, child)">
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
 	</span>
+	<span ng-switch-when="Enumeration" type="enumeration">
+		<select ng-model="val" ng-model-onblur ng-change="changeValue(child, key, val)" ng-if="isConfig(key, child)" ng-options="option for option in child['$@'+key]['enumval']"></select>
+		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
+	</span>
 	<span ng-switch-when="Number" type="number">
 		<input type="number" ng-model="val" ng-model-onblur ng-change="changeValue(child, key, val)" ng-if="isConfig(key, child)">
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>

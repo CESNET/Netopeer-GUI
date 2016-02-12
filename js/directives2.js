@@ -31,7 +31,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
       child: '=',
       type: '@',
       defaultCollapsed: '=',
-      hideCollapse: '='
+      hideCollapse: '=',
+      key: '='
     },
     controller: function($scope) {
       $scope.getTemplateUrl = function(type) {
@@ -50,9 +51,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var urlName = "Url";
         var refName = "Reference";
         var boolName = "Boolean";
+        var enumerationName = "Enumeration";
         var literalName = "Literal";
 
-        scope.valueTypes = [stringName, objectName, arrayName, numberName, urlName, refName, boolName, literalName];
+        scope.valueTypes = [stringName, objectName, arrayName, numberName, urlName, refName, boolName, enumerationName, literalName];
         scope.stringName = stringName;
         //scope.valueTypes = [stringName, objectName, arrayName, refName, boolName];
         scope.sortableOptions = {
@@ -85,6 +87,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             var schema = getSchemaFromKey(key, parent);
             // get custom yang datatype
             var type = Object.prototype.toString.call(obj);
+            var eltype = '';
 
             if (type === "[object Object]") {
                 return objectName;
@@ -96,9 +99,21 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 type = schema['type'];
             }
 
-            if(type === "Boolean" || type === "[object Boolean]"){
+            if (schema && typeof schema['eltype'] !== "undefined") {
+                eltype = schema['eltype'];
+            }
+
+            if (eltype === "container") {
+                return objectName;
+            } else if (eltype === "leaf-list") {
+                return arrayName;
+            } else if (type === "[object Array]"){
+                return arrayName;
+            } else if (type === "Boolean" || type === "[object Boolean]") {
                 return boolName;
-            } else if(isNumberType(type) || type === "[object Number]"){
+            } else if (type === 'enumeration') {
+                return enumerationName;
+            } else if (isNumberType(type) || type === "[object Number]") {
                 // TODO: check range
                 return numberName;
             } else {
@@ -108,8 +123,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var isNumber = function(n) {
           return !isNaN(parseFloat(n)) && isFinite(n);
         };
-        scope.getType = function(key, obj, parent) {
-            return getType(key, obj, parent);
+        scope.getType = getType;
+        scope.log = function(data) {
+            console.log(data);
         };
 
         var getSchemaFromKey = function(key, parent) {
@@ -118,6 +134,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             }
             return parent['$@'+key];
         };
+        scope.getSchemaFromKey = getSchemaFromKey;
 
         scope.isConfig = function(key, parent) {
             var schema = getSchemaFromKey(key, parent);
