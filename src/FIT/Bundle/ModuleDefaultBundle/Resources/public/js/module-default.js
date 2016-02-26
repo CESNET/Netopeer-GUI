@@ -475,6 +475,14 @@ function appendChanges($cover, $form) {
 		$(e).attr('name', modifiedName);
 	});
 
+	// disable all get-config inputs
+	$cover.find('.root').find('input:not([type="hidden"]):not([type="submit"]), select').each(function(i,e) {
+		if (!$(e).parents('.addedForm').length) {
+			$(e).attr('disabled', 'true');
+		}
+	});
+	$(".js-only-for-append-mode").show();
+
 	$cover.find('.active').removeClass('active');
 	formInputChanged = true;
 }

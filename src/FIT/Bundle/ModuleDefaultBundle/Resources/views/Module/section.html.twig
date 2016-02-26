@@ -131,11 +131,14 @@ if advised of the possibility of such damage.
 					{% include 'FITModuleDefaultBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
 					{% set iterator = iterator + 1 %}
 				{% endfor %}
-				{% if (ncFeatures is defined) and (ncFeatures["nc_feature_writablerunning"] is defined) %}
-					{# if (hideConfigSubmitButton is not defined) or hideConfigSubmitButton != true #}
-						<input type="submit" value="Commit all changes" />
-					{# endif #}
-				{% endif %}
+
+				<hr class="cleaner" />
+
+				<input type="submit" value="Apply changes" class="apply-changes"
+				{% if dataStore != "running" or sectionName|lower == "all" or ((ncFeatures is defined) and (dataStore == "running" and ncFeatures["nc_feature_writablerunning"] is defined)) %}
+				{% else %}
+					disabled="disabled"
+				{% endif %} />
 			</div>
 		</form>
 	{% else %}

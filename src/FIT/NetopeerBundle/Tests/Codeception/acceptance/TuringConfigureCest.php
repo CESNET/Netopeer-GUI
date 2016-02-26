@@ -86,8 +86,6 @@ class TuringConfigureCest
 
 		$I->seeNumberOfElements('form.addedForm', 1);
 
-		$I->fillField('input.value[name="configDataForm[symbol_--*--*?1!--*?1!--*?3!--*?2!]"]', '4');
-
 		$I->click('Commit all changes');
 		$I->waitForElementNotVisible('#ajax-spinner');
 
