@@ -2,10 +2,6 @@
 	path = install/mod_netconf
 	url = https://github.com/CESNET/mod_netconf.git
 
-[submodule "libyang"]
-	path = install/libyang
-	url = https://github.com/CESNET/libyang.git
-
 [submodule "netopeerangular"]
 	path = src/FIT/Bundle/ModuleDefaultBundle/Resources/netopeerangular
 	url = https://alexadav@bitbucket.org/alexadav/netopeerangular.git
