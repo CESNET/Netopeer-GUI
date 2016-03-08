@@ -67,7 +67,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 			removeSchemaNodes(jsonObj);
 			cleanJson = $filter('json')(jsonObj);
 			return cleanJson;
-		}
+		};
 
 		$scope.download = function (jsonData) {
 			var cleanJson = cleanupJSON(jsonData);

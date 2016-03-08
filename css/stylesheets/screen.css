@@ -1303,6 +1303,7 @@
 .jsonView .addObjectItemBtn i { display: block; }
 .jsonView .iconButton { float: right; margin-right: 10px; position: relative; top: -1px; z-index: 99999999999999; cursor: pointer; }
 .jsonView .jsonObjectKey { font-weight: bold; margin-right: 25px; }
+.jsonView .strike { text-decoration: line-through; }
 
 /* inputs */
 /* chevrons */

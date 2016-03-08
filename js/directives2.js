@@ -58,7 +58,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.stringName = stringName;
         //scope.valueTypes = [stringName, objectName, arrayName, refName, boolName];
         scope.sortableOptions = {
-            axis: 'y'
+            axis: 'y',
+            update: function(e, ui) {
+                setIetfOperation('replace', scope.$parent.$parent.newkey, scope.$parent.$parent.$parent.$parent.$parent.child);
+            }
         };
         if (scope.$parent.defaultCollapsed === undefined) {
             scope.collapsed = false;
@@ -87,7 +90,6 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             var schema = getSchemaFromKey(key, parent);
             // get custom yang datatype
             var type = Object.prototype.toString.call(obj);
-            var eltype = '';
 
             if (type === "[object Object]") {
                 return objectName;
@@ -99,9 +101,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 type = schema['type'];
             }
 
-            if (schema && typeof schema['eltype'] !== "undefined") {
-                eltype = schema['eltype'];
-            }
+            var eltype = getEltype(key, parent);
 
             if (eltype === "container") {
                 return objectName;
@@ -120,9 +120,21 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return literalName;
             }
         };
+        var getEltype = function(key, parent) {
+            var schema = getSchemaFromKey(key, parent);
+            // get custom yang datatype
+            var eltype = '';
+
+            if (schema && typeof schema['eltype'] !== "undefined") {
+                eltype = schema['eltype'];
+            }
+
+            return eltype;
+        };
         var isNumber = function(n) {
           return !isNaN(parseFloat(n)) && isFinite(n);
         };
+
         scope.getType = getType;
         scope.log = function(data) {
             console.log(data);
@@ -142,10 +154,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         scope.editBarVisible = function(key, parent) {
-            var schema = getSchemaFromKey(key, parent);
-            if (schema && typeof schema['type'] !== "undefined") {
-                var type = schema['type'];
-                return (type == "list" || type == "leaf-list" || type == "container");
+            var eltype = getEltype(key, parent);
+            if (eltype) {
+                return (eltype == "list" || eltype == "leaf-list" || eltype == "container");
             }
 
             return false;
@@ -159,25 +170,17 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 scope.chevron = "fa-plus-square-o";
             }
         };
-        scope.moveKey = function(obj, key, newkey) {
-            //moves key to newkey in obj
-            if (key !== newkey) {
-                obj[newkey] = obj[key];
-                delete obj[key];
-            }
-        };
         scope.deleteKey = function(key, obj, parent) {
             if (getType(key, obj, parent) == "Object") {
                 if( confirm('Delete "'+key+'" and all it contains?') ) {
-                    setIetfOperation(obj, key, 'remove');
-                    delete obj[key];
-                    obj[key] = {};
+                    setIetfOperation('remove', key, obj);
+                    //delete obj[key]; // TODO delete children
+
                 }
             } else if (getType(key, obj, parent) == "Array") {
                 if( confirm('Delete "'+obj[key]+'"?') ) {
-                    setIetfOperation(obj, key, 'remove');
-                    obj.splice(key, 1);
-                    obj[key] = {};
+                    setIetfOperation('remove', key, obj);
+                    //obj.splice(key, 1); // TODO delete children
                 }
             } else {
                 console.error("object to delete from was " + obj);
@@ -198,6 +201,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         if( !confirm('An item with the name "'+parent.keyName
                             +'" exists already. Do you really want to replace it?') ) {
                             return;
+                        } else {
+                            removeIetfOperation(parent.keyName, obj, parent);
+                            setIetfOperation('create', key, obj, parent);
                         }
                     }
                     // add item to object
@@ -217,6 +223,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     parent.keyName = "";
                     parent.valueName = "";
                     parent.showAddKey = false;
+                    setIetfOperation('create', key, obj);
                 }
             } else if (type == "Array") {
                 // add item to array
@@ -234,6 +241,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 }
                 parent.valueName = "";
                 parent.showAddKey = false;
+                setIetfOperation('create', key, obj);
             } else {
                 console.error("object to add to was " + obj);
             }
@@ -242,19 +250,100 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return isNumber(val) ? parseFloat(val) : val;
         };
 
-        scope.changeValue = function(child, key, val) {
+        scope.changeValue = function(val, key, child) {
             child[key] = val;
-            setIetfOperation(child, key, 'create');
+            setIetfOperation('replace', key, child);
         };
 
-        var setIetfOperation = function(child, key, operation) {
+        scope.isVisible = function(key, obj) {
+            var attr = getAttribute('ietf-netconf:operation', key, obj);
+            return !(attr && attr === "remove");
+        };
 
-            if (typeof child['@'+key] === "undefined") {
-                child['@'+key] = {
-                    'ietf-netconf:operation': ''
-                }
+        var getAttributeType = function(key, obj) {
+            var eltype = getEltype(key, obj);
+
+            if (eltype === "container" || eltype === 'list' || eltype === 'anydata') {
+                return 'anydata';
+            } else if (eltype === 'leaf' || eltype === 'anyxml') {
+                return 'anyxml';
+            } else if (eltype === "leaf-list") {
+                return 'leaf-list';
             }
-            child['@'+key]['ietf-netconf:operation'] = operation;
+            return 'not-supported';
+        };
+
+        scope.getAttributesNode = function(key, obj, generateEmpty) {
+            if (typeof generateEmpty === "undefined") {
+                generateEmpty = false;
+            }
+            var eltype = getAttributeType(key, obj);
+
+            switch (eltype) {
+                case 'anydata':
+                    if (typeof obj[key] !== "undefined") {
+                        if (generateEmpty && typeof obj[key]['@'] === "undefined") {
+                            obj[key]['@'] = {}; // create empty attributes object
+                        }
+                        if (typeof obj[key]['@'] !== "undefined") {
+                            return obj[key]['@'];
+                        }
+                    }
+                    break;
+                case 'leaf-list':
+                case 'anyxml':
+                    if (generateEmpty && typeof obj['@'+key] === "undefined") {
+                        obj['@'+key] = {}; // create empty attributes object
+                    }
+                    if (typeof obj['@'+key] !== "undefined") {
+                        return obj['@'+key];
+                    }
+                    break;
+                //case 'leaf-list':
+                //    if (typeof obj['@'+key] !== "undefined" && typeof obj['@'+key][attr] !== "undefined") {
+                //        return obj['@'+key][attr];
+                //    }
+                //    break;
+            }
+
+            return false;
+        };
+
+        var getAttribute = function(attr, key, obj) {
+            var node = scope.getAttributesNode(key, obj);
+            if (node !== false && typeof node[attr] !== "undefined") {
+                return node[attr];
+            }
+
+            return false;
+        };
+
+        var setAttribute = function(attr, val, key, obj) {
+            var node = scope.getAttributesNode(key, obj, true);
+
+            if (node) {
+                node[attr] = val;
+                return true;
+            }
+
+            return false;
+        };
+
+        var unsetAttribute = function(attr, key, obj) {
+            var node = scope.getAttributesNode(key, obj);
+            if (node) {
+                if (typeof node[attr] !== "undefined") delete node[attr];
+                return true;
+            }
+            return false;
+        };
+
+        var setIetfOperation = function(operation, key, obj) {
+            setAttribute('ietf-netconf:operation', operation, key, obj);
+        };
+
+        var removeIetfOperation = function(key, obj) {
+            unsetAttribute('ietf-netconf:operation', key, obj);
         };
 
         //////

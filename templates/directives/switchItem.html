@@ -3,19 +3,19 @@
 	<json ng-switch-when="Array" child="val" type="array" default-collapsed="defaultCollapsed"></json>
 
 	<span ng-switch-when="Boolean" type="boolean">
-		<input type="checkbox" ng-model="val" ng-model-onblur ng-change="changeValue(child, key, val)" ng-if="isConfig(key, child)">
+		<input type="checkbox" ng-model="val" ng-model-onblur ng-change="changeValue(val, key, child, $parent)" ng-if="isConfig(key, child)">
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
 	</span>
 	<span ng-switch-when="Enumeration" type="enumeration">
-		<select ng-model="val" ng-model-onblur ng-change="changeValue(child, key, val)" ng-if="isConfig(key, child)" ng-options="option for option in child['$@'+key]['enumval']"></select>
+		<select ng-model="val" ng-model-onblur ng-change="changeValue(val, key, child, $parent)" ng-if="isConfig(key, child)" ng-options="option for option in child['$@'+key]['enumval']"></select>
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
 	</span>
 	<span ng-switch-when="Number" type="number">
-		<input type="number" ng-model="val" ng-model-onblur ng-change="changeValue(child, key, val)" ng-if="isConfig(key, child)">
+		<input type="number" ng-model="val" ng-model-onblur ng-change="changeValue(val, key, child, $parent)" ng-if="isConfig(key, child)">
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
 	</span>
 	<span ng-switch-default class="jsonLiteral">
-		<input type="text" ng-model="val" placeholder="Empty" ng-model-onblur ng-change="changeValue(child, key, val)"  ng-if="isConfig(key, child)">
+		<input type="text" ng-model="val" placeholder="Empty" ng-model-onblur ng-change="changeValue(val, key, child, $parent)"  ng-if="isConfig(key, child)">
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
 	</span>
 </span>
