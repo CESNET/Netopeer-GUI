@@ -169,11 +169,15 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.deleteKey = function(key, obj, parent) {
             if (getType(key, obj, parent) == "Object") {
                 if( confirm('Delete "'+key+'" and all it contains?') ) {
+                    setIetfOperation(obj, key, 'remove');
                     delete obj[key];
+                    obj[key] = {};
                 }
             } else if (getType(key, obj, parent) == "Array") {
                 if( confirm('Delete "'+obj[key]+'"?') ) {
+                    setIetfOperation(obj, key, 'remove');
                     obj.splice(key, 1);
+                    obj[key] = {};
                 }
             } else {
                 console.error("object to delete from was " + obj);
@@ -240,12 +244,17 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
         scope.changeValue = function(child, key, val) {
             child[key] = val;
+            setIetfOperation(child, key, 'create');
+        };
+
+        var setIetfOperation = function(child, key, operation) {
+
             if (typeof child['@'+key] === "undefined") {
                 child['@'+key] = {
-                    'ietf-netconf:operation"': ''
+                    'ietf-netconf:operation': ''
                 }
             }
-            child['@'+key]['ietf-netconf:operation"'] = 'create';
+            child['@'+key]['ietf-netconf:operation'] = operation;
         };
 
         //////
