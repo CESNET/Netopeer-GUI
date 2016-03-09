@@ -97,10 +97,6 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return arrayName;
             }
 
-            if (schema && typeof schema['type'] !== "undefined") {
-                type = schema['type'];
-            }
-
             var eltype = getEltype(key, parent);
 
             if (eltype === "container") {
@@ -114,10 +110,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             } else if (type === 'enumeration') {
                 return enumerationName;
             } else if (isNumberType(type) || type === "[object Number]") {
-                // TODO: check range
                 return numberName;
             } else {
-                return literalName;
+                return stringName;
             }
         };
         var getEltype = function(key, parent) {
@@ -187,8 +182,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             }
         };
         scope.addItem = function(key, obj, parent) {
-            var type = getType(key, obj, parent);
-            if (type == "Object") {
+            var type = getType(parent.keyName, undefined, obj);
+            var parentType = getType(parent.$parent.$parent.$parent.$parent.key, obj);
+
+            if (parentType == "Object") {
                 // check input for key
                 if (parent.keyName == undefined || parent.keyName.length == 0){
                     alert("Please fill in a name");
@@ -207,7 +204,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         }
                     }
                     // add item to object
-                    switch(parent.valueType) {
+                    switch(type) {
                         case stringName: obj[parent.keyName] = parent.valueName ? parent.possibleNumber(parent.valueName) : "";
                                         break;
                         case objectName:  obj[parent.keyName] = {};
@@ -218,16 +215,18 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                                         break;
                         case boolName: obj[parent.keyName] = false;
                                         break;
+                        default:
+                            console.log('not implemented ' + parent.valueType); // TOOD
                     }
+                    setIetfOperation('create', parent.keyName, obj);
                     //clean-up
                     parent.keyName = "";
                     parent.valueName = "";
                     parent.showAddKey = false;
-                    setIetfOperation('create', key, obj);
                 }
-            } else if (type == "Array") {
+            } else if (parentType == "Array") {
                 // add item to array
-                switch(parent.valueType) {
+                switch(type) {
                     case stringName: obj.push(parent.valueName ? parent.valueName : "");
                                     break;
                     case objectName:  obj.push({});
@@ -238,10 +237,12 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                                     break;
                     case refName: obj.push({"Reference!!!!": "todo"});
                                     break;
+                    default:
+                        console.log('2not implemented ' + parent.valueType); // TOOD
                 }
+                setIetfOperation('replace', parent.$parent.$parent.$parent.$parent.key, parent.$parent.$parent.$parent.$parent.$parent.$parent.child); // TODO replace order in array
                 parent.valueName = "";
                 parent.showAddKey = false;
-                setIetfOperation('create', key, obj);
             } else {
                 console.error("object to add to was " + obj);
             }
@@ -258,6 +259,17 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.isVisible = function(key, obj) {
             var attr = getAttribute('ietf-netconf:operation', key, obj);
             return !(attr && attr === "remove");
+        };
+
+        scope.getAvailableNodeNames = function (key, obj, parent) {
+            console.log(key);console.log(obj);console.log(parent);
+            var children = parent.$parent.$parent.$parent.$parent.$parent.$parent.child['$@'+ parent.$parent.$parent.$parent.key]['children'];
+            angular.forEach(obj, function(value, key) {
+                if (key.indexOf('@') !== 0 && children.indexOf(key) !== -1) {
+                    children.splice(children.indexOf(key), 1);
+                }
+            });
+            return children;
         };
 
         var getAttributeType = function(key, obj) {
