@@ -295,8 +295,7 @@ class DefaultController extends BaseController
 	{
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$params = array(
-			'connIds' => array($key),
-			'filter' => '',
+			'connIds' => array($key)
 		);
 
 		if ($command === "getschema") {

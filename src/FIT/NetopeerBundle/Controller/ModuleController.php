@@ -303,22 +303,19 @@ class ModuleController extends BaseController {
 	 * @return RedirectResponse
 	 */
 	protected function redirectToFirstModule($key) {
-		// TODO
-		return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'all')));
-
-//		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		$retArr['key'] = $key;
 		$routeName = 'module';
-		$modules = $dataClass->getModels();
+		$modules = $connectionFunc->getModuleIdentifiersForCurrentDevice($key);
 		if (count($modules)) {
-			$module1st = array_shift($modules);
-			if (!isset($module1st["params"]["module"])) {
+			$first = array_shift($modules);
+			if (!isset($first["moduleName"])) {
 				/* ERROR - wrong structure of model entry */
 				$this->get('data_logger')
 						->err("Cannot get first model (redirect to 1st tab).",
-								array("message" => "\$module1st[\"params\"][\"module\"] is not set"));
+								array("message" => "\$first[\"moduleName\"] is not set"));
 			}
-			$retArr['module'] = $module1st["params"]["module"];
+			$retArr['module'] = $first["moduleName"];
 			return $this->redirect($this->generateUrl($routeName, $retArr));
 		} else {
 			return $this->redirect($this->generateUrl("module", array('key' => $key, 'module' => 'all')));
