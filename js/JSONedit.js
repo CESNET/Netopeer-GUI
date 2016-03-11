@@ -102,11 +102,11 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 
 		$scope.submitConfiguration = function(jsonData) {
 			var cleanJson = cleanupJSON(jsonData);
-			console.log(cleanJson);
+			cleanJson = JSON.parse(cleanJson);
 			$http({
 				url: window.location.href,
 				method: 'POST',
-				data: {editConfig: cleanJson}
+				data: cleanJson
 			}).then(function successCallback(data) {
 				alert('ok');
 				console.log(data);
