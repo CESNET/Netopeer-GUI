@@ -3,11 +3,6 @@ if MODNETCONF_OPT
 else
   MODNETCONF_OPT=
 endif
-if PYANG_OPT
-  PYANG_OPT=pyang
-else
-  PYANG_OPT=
-endif
 
 SUBDIRS=$(MODNETCONF_OPT) $(PYANG_OPT)
 
