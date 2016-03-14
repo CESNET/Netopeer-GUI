@@ -59,5 +59,9 @@ cp app/config/parameters.yml.dist app/config/parameters.yml
 php app/check.php
 php ./composer.phar self-update
 php ./composer.phar install
+cd install
+./bootstrap.sh && ./configure --without-modnetconf -q && make install
+service httpd restart
+service netopeerguid restart
 )
 
