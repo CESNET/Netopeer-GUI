@@ -55,7 +55,9 @@ make install
 cd /var/www/
 git clone -b netopeerguid --depth 1 https://github.com/CESNET/Netopeer-GUI
 cd Netopeer-GUI
+cp app/config/parameters.yml.dist app/config/parameters.yml
 php app/check.php
+php ./composer.phar self-update
 php ./composer.phar install
 )
 
