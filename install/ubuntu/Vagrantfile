@@ -1,0 +1,57 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/trusty64"
+  config.vm.provision "shell", inline: <<-SHELL
+sudo apt-get update
+
+# Build dependencies
+sudo apt-get install -y apache2 apache2-dev vim git autoconf automake pkg-config libtool wget libxml2-dev libssh2-1-dev gcc g\+\+ zlib1g-dev libssl-dev cmake libpcre3-dev libjson-c-dev make libxslt-dev libcurl4-openssl-dev libtool xsltproc python-setuptools libapr1-dev libaprutil1-dev
+
+# PHP dependencies:
+sudo apt-get install -y php5 php5-common php5-json php5-sqlite php5-odbc php5-intl
+
+# libssh
+(
+	wget https://red.libssh.org/attachments/download/177/libssh-0.7.2.tar.xz
+	tar -xJf libssh-0.7.2.tar.xz
+	mkdir -p libssh-0.7.2/build
+	cd libssh-0.7.2/build
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .. && make -j2 && sudo make install
+)
+
+(
+	git clone --depth 1 git://github.com/cejkato2/libwebsockets lws
+	mkdir lws/b
+	cd lws/b
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLWS_INSTALL_LIB_DIR=/usr/lib -DLIB_SUFFIX= .. && sudo make install
+)
+
+
+# pyang
+(
+	git clone --depth 1 https://github.com/mbj4668/pyang.git
+	cd pyang
+	python setup.py install
+)
+
+# libnetconf
+(
+	git clone --depth 1 https://github.com/CESNET/libnetconf.git
+	cd libnetconf
+	./configure --prefix=/usr --libdir=/usr/lib -q && make && make install
+)
+
+# mod_netconf
+(
+	git clone --depth 1 -b ubuntu https://github.com/CESNET/mod_netconf
+	cd mod_netconf
+	./bootstrap.sh && ./configure -q && make && make install
+)
+   SHELL
+end
