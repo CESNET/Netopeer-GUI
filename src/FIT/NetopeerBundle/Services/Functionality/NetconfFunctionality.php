@@ -322,7 +322,17 @@ class NetconfFunctionality {
 	private function addOptionalParams(array $targetArr, array $sourceArr, array $optionalParams) {
 		foreach ($optionalParams as $param) {
 			if (isset($sourceArr[$param])) {
-				$targetArr[$param] = $sourceArr[$param];
+				/**
+				 * if we want to set filter, filter must have some value
+				 * empty filter returns empty response, not all data
+				 */
+				if ($param === 'filter' && trim($sourceArr[$param]) !== "") {
+					$targetArr[$param] = $sourceArr[$param];
+
+				// set all other params with no limitations
+				} else {
+					$targetArr[$param] = $sourceArr[$param];
+				}
 			}
 		}
 
