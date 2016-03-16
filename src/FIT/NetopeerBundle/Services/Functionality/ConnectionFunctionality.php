@@ -231,11 +231,11 @@ class ConnectionFunctionality {
 					$arr[$matches[1]] = array(
 						'ns' => $matches[1],
 						'moduleName' => $matches[2],
+						'rootElementName' => '*',
 						'revision' => $matches[3],
 					);
 				}
 			}
-			$this->moduleIdentifiers = $arr;
 			return $arr;
 		}
 
@@ -250,35 +250,15 @@ class ConnectionFunctionality {
 	 *
 	 * @return array
 	 */
-	public function getRootNamesForModuleIdentifiers($key, array $identifiers) {
+	public function setRootNamesForModuleIdentifiers($key, array $rootElements) {
 		$newArr = array();
-		foreach ($identifiers as $ns => $ident) {
-			$ident['rootElem'] = $this->getRootNameForNS($key, $ident['ns']);
+		foreach ($this->getModuleIdentifiersForCurrentDevice($key) as $ns => $ident) {
+			if (isset($rootElements[$ident['moduleName']])) {
+				$ident['rootElementName'] = $rootElements[$ident['moduleName']];
+			}
 			$newArr[$ns] = $ident;
 		}
-
 		return $newArr;
-	}
-
-	/**
-	 * Get name of root element for module NS
-	 *
-	 * @param $key    Identifier of connection (connected device ID)
-	 * @param $ns
-	 *
-	 * @return string
-	 */
-	public function getRootNameForNS($key, $ns) {
-		$path = $this->getModelsDir().$this->getModulePathByNS($key, $ns);
-		$file = $path . '/filter.txt';
-		$rootElem = "";
-		if ( file_exists($file) ) {
-			$dom = new \DomDocument;
-			$dom->load($file);
-			$rootElem = $dom->documentElement->tagName;
-		}
-
-		return $rootElem;
 	}
 
 	/**
@@ -478,15 +458,19 @@ class ConnectionFunctionality {
 			$netconfFunc = $this->getContainer()->get('fitnetopeerbundle.service.netconf.functionality');
 			$json = json_decode($netconfFunc->handle('get', array('connIds' => array($key))), true);
 
-			$modifiedJson = array();
+			$modifiedJson = $elemNames = array();
 			foreach ($json as $name => $val) {
+				$names = explode(':', $name);
+				if (sizeof($names) > 1) {
+					$elemNames[$names[0]] = $names[1];
+				}
 				$newKey = substr($name, 0, strpos($name, ':'));
 				$modifiedJson[$newKey] = array($name => $val);
 			}
 
 			if ($this->getModuleIdentifiersForCurrentDevice($key)) {
-				foreach ( $this->getModuleIdentifiersForCurrentDevice( $key ) as $ns => $values ) {
-
+				$identifiers = $this->setRootNamesForModuleIdentifiers($key, $elemNames);
+				foreach ( $identifiers as $ns => $values ) {
 					$i                         = 0;
 					$moduleName                = $values['moduleName'];
 
@@ -495,20 +479,23 @@ class ConnectionFunctionality {
 					} else {
 						$configuration = array();
 					}
-
-					$models[ $moduleName ]     = array(
-						'path'      => "module",
-						"params"    => array(
-							'key'    => $key,
-							'module' => $moduleName,
-						),
-						"title"     => "detail of " . $this->getSectionName( $moduleName ),
-						"name"      => $this->getSectionName( $moduleName ),
-						"children"  => $this->buildSubmenu( $key, $moduleName, $configuration ),
-						"namespace" => $ns,
-						"version"   => $values['revision'],
-					);
-					$namespaces[ $moduleName ] = $ns;
+					if ($values["rootElementName"] !== "*") {
+						$models[$moduleName] = array(
+							'path'            => "module",
+							"params"          => array(
+								'key'    => $key,
+								'module' => $moduleName,
+							),
+							"title"           => "detail of " . $this->getSectionName($moduleName),
+							"name"            => $this->getSectionName($values["rootElementName"]),
+							"children"        => $this->buildSubmenu($key, $moduleName, $configuration),
+							"namespace"       => $ns,
+							"moduleName"          => $moduleName,
+							"rootElementName" => $values["rootElementName"],
+							"version"         => $values['revision'],
+						);
+					}
+					$namespaces[ $moduleName ] = $values;
 				}
 			} else {
 				$this->getLogger()->addError("Could not build MenuStructure", array('key' => $key));
@@ -564,19 +551,14 @@ class ConnectionFunctionality {
 	 * @param  string $subsection subsection name
 	 * @return array              array with config and state filter
 	 */
-	public function loadFilters(&$module, &$subsection) {
+	public function loadFilters($module, $subsection) {
 		$filterState = $filterConfig = "";
 
 		$namespaces = $this->getModelNamespaces($this->getContainer()->get('request')->get('key'));
 		if (isset($namespaces[$module])) {
-			$namespace = $namespaces[$module];
-			$filter = new \SimpleXMLElement("<".$module."></".$module.">");
-			$filter->addAttribute('xmlns', $namespace);
-			if ( $subsection ) {
-				$filter->addChild($subsection);
-			}
-
-			$filterState = $filterConfig  = str_replace('<?xml version="1.0"?'.'>', '', trim($filter->asXml()));
+			$module = $namespaces[$module];
+//			$filterState = $filterConfig  = '/'.$module['moduleName'].':'.$module['rootElementName'];
+			$filterState = $filterConfig  = '<'.$module['rootElementName'].' xmlns="'.$module['ns'].'" />"';
 		}
 
 		return array(
@@ -636,8 +618,8 @@ class ConnectionFunctionality {
 	 */
 	public function getNamespaceForModule($key, $module) {
 		$namespaces = $this->getModelNamespaces($key);
-		if (isset($namespaces[$module])) {
-			return $namespaces[$module];
+		if (isset($namespaces[$module]) && isset($namespaces[$module]['ns'])) {
+			return $namespaces[$module]['ns'];
 		} else {
 			return false;
 		}

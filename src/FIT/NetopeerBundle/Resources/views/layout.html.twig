@@ -95,7 +95,7 @@ if advised of the possibility of such damage.
 					{% if topmenu is defined %}
 						{% set i = 0 %}
 						{% for section in topmenu %}
-							<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="dynamic ajaxLink {% if sectionName is defined and sectionName == section.name %}active{% endif %} nth-{{i}}">{{section.name}}<span class="arrow"></span></a>
+							<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="dynamic ajaxLink {% if app.request.get('module') is defined and app.request.get('module') == section.moduleName %}active{% endif %} nth-{{i}}">{{section.name}}<span class="arrow"></span></a>
 							{% set i = i + 1 %}
 						{% endfor %}
 						<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "all" %}active{% endif %}" title="GET all information">All<span class="arrow"></span></a>
