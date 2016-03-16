@@ -207,10 +207,14 @@ class BaseController extends Controller
 		}
 
 		$this->setStateParams('connIds', array($key));
-		$this->setStateParams('filter', $filterState);
+		if ($filterState !== "") {
+			$this->setStateParams('filter', $filterState);
+		}
 
 		$this->setConfigParams('connIds', array($key));
-		$this->setConfigParams('filter', $filterConfig);
+		if ($filterConfig !== "") {
+			$this->setConfigParams('filter', $filterConfig);
+		}
 	}
 
 	/**

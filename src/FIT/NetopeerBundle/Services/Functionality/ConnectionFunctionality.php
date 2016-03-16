@@ -576,7 +576,7 @@ class ConnectionFunctionality {
 				$filter->addChild($subsection);
 			}
 
-			$filterState = $filterConfig  = str_replace('<?xml version="1.0"?'.'>', '', $filter->asXml());
+			$filterState = $filterConfig  = str_replace('<?xml version="1.0"?'.'>', '', trim($filter->asXml()));
 		}
 
 		return array(

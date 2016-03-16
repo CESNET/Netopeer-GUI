@@ -315,7 +315,7 @@ class NetconfFunctionality {
 	 *
 	 * @param array $targetArr
 	 * @param array $sourceArr
-	 * @param array $params
+	 * @param array $optionalParams
 	 *
 	 * @return mixed
 	 */
@@ -326,16 +326,11 @@ class NetconfFunctionality {
 				 * if we want to set filter, filter must have some value
 				 * empty filter returns empty response, not all data
 				 */
-				if ($param === 'filter' && trim($sourceArr[$param]) !== "") {
-					$targetArr[$param] = $sourceArr[$param];
-
-				// set all other params with no limitations
-				} else {
-					$targetArr[$param] = $sourceArr[$param];
+				if ($param !== "filter" || ($param === "filter" && trim($sourceArr[$param]) !== "")) {
+					$targetArr[$param] = trim($sourceArr[$param]);
 				}
 			}
 		}
-
 		return $targetArr;
 	}
 
