@@ -53,8 +53,8 @@ make install
 
 (
 cd /var/www/
-git clone -b netopeerguid --depth 1 https://github.com/CESNET/Netopeer-GUI
-cd Netopeer-GUI
+git clone -b netopeerguid --depth 1 https://github.com/CESNET/Netopeer-GUI netopeergui
+cd netopeergui
 cp app/config/parameters.yml.dist app/config/parameters.yml
 php app/check.php
 php ./composer.phar self-update
@@ -63,5 +63,7 @@ cd install
 ./bootstrap.sh && ./configure --without-modnetconf -q && make install
 service httpd restart
 service netopeerguid restart
+cd ..
+php app/console app:install --post=install
 )
 
