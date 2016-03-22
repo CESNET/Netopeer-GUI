@@ -4,4 +4,4 @@
 
 [submodule "netopeerangular"]
 	path = src/FIT/Bundle/ModuleDefaultBundle/Resources/netopeerangular
-	url = https://alexadav@bitbucket.org/alexadav/netopeerangular.git
+	url = https://bitbucket.org/alexadav/netopeerangular.git 
