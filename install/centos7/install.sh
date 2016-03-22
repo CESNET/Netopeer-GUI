@@ -43,7 +43,7 @@ cmake -DENABLE_TLS=ON -DENABLE_SSH=ON -DENABLE_BUILD_TESTS=OFF -DCMAKE_INSTALL_P
 ldconfig
 
 (
-git clone -b libyang --depth 1 https://github.com/CESNET/mod_netconf
+git clone -b netopeerguid --depth 1 https://github.com/CESNET/mod_netconf
 cd mod_netconf
 ./bootstrap.sh
 ./configure
@@ -63,7 +63,7 @@ cd install
 ./bootstrap.sh && ./configure --without-modnetconf -q && make install
 service httpd restart
 service netopeerguid restart
-cd ..
+cd /var/www/netopeergui 
 php app/console app:install --post=install
 )
 
