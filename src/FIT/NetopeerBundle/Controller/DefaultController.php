@@ -434,7 +434,8 @@ class DefaultController extends BaseController
 				return new JsonResponse($sessionArr);
 			}
 
-			$this->assign("stateArr", json_encode($sessionArr));
+			$this->assign('jsonEditable', false);
+			$this->assign("stateJson", json_encode($sessionArr));
 			$this->assign('hideStateSubmitButton', true);
 		} else if ($action == "reload") {
 			$params = array('key' => $key);

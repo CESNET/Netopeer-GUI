@@ -77,9 +77,11 @@ if advised of the possibility of such damage.
 			<div id="mainView" ng-controller="ConfigurationController">
 				<button ng-click="reload()">reload data</button>
 				<button ng-click="download(jsonData)">download as JSON</button>
+				{% if jsonEditable is not defined or jsonEditable != false %}
 				<button ng-click="submitConfiguration(jsonData)">Apply changes</button>
 				<button ng-click="undo()" ng-disabled="hasUndo()">history undo</button>
 				<button ng-click="redo()" ng-disabled="hasRedo()">history redo</button>
+				{% endif %}
 
 				<div class="jsonView">
 					<json child="jsonData" default-collapsed="false" type="object" hide-collapse="true"></json>
@@ -111,54 +113,6 @@ if advised of the possibility of such damage.
 	{% endif %}
 {% endblock singleContent %}
 {% endblock state %}
-
-{% block config %}
-	<h1 class="left">{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
-
-	<hr class="cleaner" />
-	{{ configJson }}
-	{% if (configArr is defined and not(configArr is empty)) or (isEmptyModule is defined and isEmptyModule == true) %}
-		<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
-			<div class="root">
-				{% if isEmptyModule is defined and isEmptyModule == true %}
-					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
-
-				{% elseif showRootElem is defined and showRootElem == true %}
-					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
-				{% endif %}
-
-				{% set iterator = 1 %}
-				{% for key, element in configArr %}
-					{% include 'FITModuleDefaultBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
-					{% set iterator = iterator + 1 %}
-				{% endfor %}
-
-				<hr class="cleaner" />
-
-				<input type="submit" value="Apply changes" class="apply-changes"
-				{% if dataStore != "running" or sectionName|lower == "all" or ((ncFeatures is defined) and (dataStore == "running" and ncFeatures["nc_feature_writablerunning"] is defined)) %}
-				{% else %}
-					disabled="disabled"
-				{% endif %} />
-			</div>
-		</form>
-	{% else %}
-		<div class="alert info">
-			No results found.
-		</div>
-		{% if additionalForm is defined %}
-			{{ additionalForm|raw }}
-		{% endif %}
-	{% endif %}
-
-	{% if modelTreeDump is defined %}
-		<div id="hiddenModelTreeDump">
-<pre>
-{{ modelTreeDump|raw }}
-</pre>
-		</div>
-	{% endif %}
-{% endblock config %}
 
 {% block notifications %}
 	{% if ncFeatures is defined and ncFeatures["nc_feature_notification"] is defined %}
