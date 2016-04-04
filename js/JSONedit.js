@@ -104,12 +104,13 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 			var cleanJson = cleanupJSON(jsonData);
 			cleanJson = JSON.parse(cleanJson);
 			$http({
-				url: window.location.href,
+				url: window.location.href + '?angular=true',
 				method: 'POST',
 				data: cleanJson
 			}).then(function successCallback(data) {
-				alert('ok');
-				console.log(data);
+				$.netopeergui.processResponseData(data.data, function() {
+					//$scope.reload();
+				});
 			}, function errorCallback(data) {
 				alert('error');
 				console.log('data');
