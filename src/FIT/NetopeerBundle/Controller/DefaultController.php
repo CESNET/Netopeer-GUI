@@ -47,6 +47,7 @@ namespace FIT\NetopeerBundle\Controller;
 use FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -338,20 +339,19 @@ class DefaultController extends BaseController
 	 */
 	public function handleBackupAction($key)
 	{
-		$netconfFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		$params = array(
-			'key' => $key,
-			'filter' => '',
+			'connIds' => array($key)
 		);
 
-		$res = $netconfFunc->handle('backup', $params, false);
+		$res = $netconfFunc->handle('get', $params, false);
 		$resp = new Response();
 		$resp->setStatusCode(200);
 		$resp->headers->set('Cache-Control', 'private');
 		$resp->headers->set('Content-Length', strlen($res));
 		$resp->headers->set('Content-Type', 'application/force-download');
-		$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.xml"', date("Y-m-d"), $connectionFunc->getHostFromKey($key)));
+		$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.json"', date("Y-m-d"), $connectionFunc->getHostFromKey($key)));
 		$resp->sendHeaders();
 		$resp->setContent($res);
 		$resp->sendContent();
@@ -430,10 +430,11 @@ class DefaultController extends BaseController
 			unset($sessionArr['_security_secured_area']);
 			unset($sessionArr['_security_commont_context']);
 
-//			$xml = Array2XML::createXML("session", $sessionArr);
-//			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
+			if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->get('angular') == "true") {
+				return new JsonResponse($sessionArr);
+			}
 
-			$this->assign("stateArr", $xml);
+			$this->assign("stateArr", json_encode($sessionArr));
 			$this->assign('hideStateSubmitButton', true);
 		} else if ($action == "reload") {
 			$params = array('key' => $key);

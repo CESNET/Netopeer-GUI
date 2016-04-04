@@ -274,7 +274,7 @@ class SamlUser extends \AerialShip\SamlSPBundle\Entity\SSOStateEntity implements
 	 *
 	 * @return SamlUser
 	 */
-	public function setCreatedOn($createdOn)
+	public function setCreatedOn(\DateTime $createdOn)
 	{
 		$this->createdOn = $createdOn;
 
