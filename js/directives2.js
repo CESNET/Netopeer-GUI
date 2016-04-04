@@ -73,7 +73,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         } else {
             scope.chevron = "fa-minus-square-o";
         }
-        
+
+        scope.jsonEditable = jsonEditable;
 
         //////
         // Helper functions

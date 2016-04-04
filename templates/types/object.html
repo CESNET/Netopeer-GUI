@@ -4,7 +4,7 @@
 		<span class="jsonObjectKey">
 			<span class="key-name" ng-model="newkey" ng-init="newkey=key">{{ key }}</span>
 			<!--<input class="keyinput" type="text" ng-model="newkey" ng-init="newkey=key" ng-blur="moveKey(child, key, newkey)"/>-->
-			<i class="iconButton deleteKeyBtn fa fa-trash" ng-click="deleteKey(key, child, $parent)" ng-if="!child['$@'+key]['mandatory']"></i>
+			<i class="iconButton deleteKeyBtn fa fa-trash" ng-click="deleteKey(key, child, $parent)" ng-if="child['$@'+key] && !child['$@'+key]['mandatory']"></i>
 
 			<i class="iconButton fa fa-question-circle" tooltip-placement="left" uib-tooltip="{{child['$@'+key]['description']}}" ng-if="child['$@'+key]['description']"></i>
 		</span>

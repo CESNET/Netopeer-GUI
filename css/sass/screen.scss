@@ -15,9 +15,9 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 .jsonView { padding: 30px 0 0 5px;
 	select.form-control { margin: 0; padding: 0; width: 100px; display: inline; height: 29px; padding-left: 5px;
 	}
-	input { height: 30px; margin: 0; padding: 0;
+	input { margin: 0; padding: 0;
 		&.form-control { width: 100px; display: inline; height: 29px; padding-left: 5px; }
-		&[type="text"], &[type="number"] { margin: 0; border: 1px solid #ccc; background: none; }
+		&[type="text"], &[type="number"] { margin: 0; border: 1px solid #ccc; background: #fff; }
 		&[type="checkbox"] { position: absolute; }
 		&.keyinput { font-weight: bold; }
 
@@ -32,7 +32,9 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 		i { display: block; }
 	}
 	.iconButton { float: right; margin-right: 10px; position: relative; top: -1px; z-index: 99999999999999; cursor: pointer; }
-	.jsonObjectKey { font-weight: bold; margin-right: 25px; }
+	.jsonObjectKey { font-weight: bold;
+		.key-name { margin-right: 25px; min-width: 130px; display: inline-block; }
+	}
 	.strike { text-decoration: line-through; }
 }
 
@@ -50,7 +52,7 @@ li .jsonContents { margin-left: 0px; }
 
 .jsonView {
 	.block { clear: both; display: block; margin-bottom: 0.5em; }
-	.jsonItemDesc { color: grey; font-style: italic; cursor: default; line-height: 30px; }
+	.jsonItemDesc { color: grey; cursor: default; line-height: 30px; }
 	.objectDesc { cursor: default; }
 	> json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
 	ol.arrayOl { margin: 0; padding-left: 20px; }
@@ -62,7 +64,7 @@ li .jsonContents { margin-left: 0px; }
 		> li > span > span > json > {
 			.toggle-control { left: -40px; }
 		}
-		li { color: grey; font-style: italic; list-style-type: decimal;
+		li { color: grey; list-style-type: decimal;
 			input { font-style: normal; }
 		}
 		ol.arrayOl { margin-top: 15px;
