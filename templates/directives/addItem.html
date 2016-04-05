@@ -1,12 +1,32 @@
 <div ng-switch on="showAddKey" class="block" >
 	<span ng-switch-when="true">
-		<span ng-show="getType(key, child, $parent) == 'Object'">
+		<!--ng-show="getType(key, child, $parent) != 'Array'"-->
+		<span>
 			<input placeholder="Name" type="text" ui-keyup="{'enter':'addItem(key, child, $parent)'}"
-						 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" autocomplete="off"
+						 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" autocomplete="off" ng-blur="changeParentKeyName($parent.keyName, child, $parent)"
 					/> :
 		</span>
+		<!--ng-if="getType($parent.keyName, undefined, $parent.$parent.$parent.child[$parent.$parent.$parent.$parent.key]) === 'Literal'"-->
+<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ui-keydown="{'enter':'addItem(key, child, $parent)'}"></select>
 
-		<input ng-show="getType($parent.keyName, undefined, child) != 'Object'" type="text" placeholder="Value" class="form-control input-sm addItemValueInput" ng-model="$parent.valueName" ui-keyup="{'enter':'addItem(key, child, $parent)'}"/>
+		<!--<span ng-switch on="$parent.valueType">-->
+			<!--<span ng-switch-when="Boolean" type="boolean">-->
+				<!--<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, key, child, $parent)"">-->
+			<!--</span>-->
+			<!--<span ng-switch-when="Enumeration" type="enumeration">-->
+				<!--<select ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, key, child, $parent)" ng-options="option for option in child['$@'+key]['enumval']"></select>-->
+			<!--</span>-->
+			<!--<span ng-switch-when="Number" type="number">-->
+				<!--<input type="number" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, key, child, $parent)">-->
+			<!--</span>-->
+			<!--<span ng-switch-default class="jsonLiteral">-->
+				<!--<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur-->
+							 <!--ng-change="changeValue(val, key, child, $parent)">-->
+			<!--</span>-->
+		<!--</span>-->
+
+		<!-- -->
+		<input ng-show="$parent.valueType != 'Object'" type="text" placeholder="Value" class="form-control input-sm addItemValueInput" ng-model="$parent.valueName"  ng-model-options='{ debounce: 1000 }' ui-keyup="{'enter':'addItem(key, child, $parent)'}"/>
 
 		<button class="btn btn-primary btn-sm" ng-click="addItem(key, child, $parent)">
 			Add

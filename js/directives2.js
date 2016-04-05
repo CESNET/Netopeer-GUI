@@ -4,7 +4,7 @@ var counts = {
   object: 0
 };
 
-var NetopeerGUI = angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap', 'configurationTemplates']);
+var NetopeerGUI = angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap', 'configurationTemplates', 'NetopeerGUIServices']);
 
 NetopeerGUI.directive('ngModelOnblur', function() {
     // override the default input to update on blur
@@ -24,7 +24,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         }
     };
 })
-.directive('json', function($compile, $log) {
+.directive('json', function($compile, $log, AjaxService, $cacheFactory, $rootScope) {
   return {
     restrict: 'E',
     scope: {
@@ -60,7 +60,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.sortableOptions = {
             axis: 'y',
             update: function(e, ui) {
-                setIetfOperation('replace', scope.$parent.$parent.newkey, scope.$parent.$parent.$parent.$parent.$parent.child);
+                setIetfOperation('replace', scope.$parent.$parent.newkey, scope.getParents($parent, 4).child);
             }
         };
         if (scope.$parent.defaultCollapsed === undefined) {
@@ -87,20 +87,13 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return type === "inet:uri";
         };
 
-        var getType = function(key, obj, parent) {
-            var schema = getSchemaFromKey(key, parent);
+        var getType = function(key, child, parent) {
             // get custom yang datatype
-            var type = Object.prototype.toString.call(obj);
-
-            if (type === "[object Object]") {
-                return objectName;
-            } else if(type === "[object Array]"){
-                return arrayName;
-            }
+            var type = Object.prototype.toString.call(child);
 
             var eltype = getEltype(key, parent);
 
-            if (eltype === "container") {
+            if (eltype === "container" || eltype === "list" || type === "[object Object]") {
                 return objectName;
             } else if (eltype === "leaf-list") {
                 return arrayName;
@@ -132,15 +125,51 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         scope.getType = getType;
+        scope.getEltype = getEltype;
         scope.log = function(data) {
             console.log(data);
         };
 
-        var getSchemaFromKey = function(key, parent) {
-            if (typeof parent === "undefined" || parent['$@'+key] === "undefined") {
-                return false;
+        var getSchemaFromKey = function(key, parent, child) {
+            if (typeof parent === "undefined" || typeof parent['$@'+key] === "undefined") {
+                if (typeof key === "undefined" || typeof parent === "undefined") return false;
+
+                var path = scope.getPath(parent, 'key');
+
+                var parentKey = path.replace('/', '').split(':');
+                var ns = parentKey[0] + ":";
+                var rootElem = parentKey[1];
+                path = path + '/' + key;
+
+                if (angular.isUndefined($rootScope.cache)) {
+                    //try {
+                    $rootScope.cache = $cacheFactory(window.location.href);
+                    //} catch (exception) {};
+                }
+                if (angular.isUndefined($rootScope.cache.get(path))) {
+                    AjaxService.loadSchema([connId], [path])
+                      .then(function successCallback(data) {
+                          var schema = data.data;
+
+                          if (typeof schema === "undefined" || typeof schema['$@'+ns+key] === "undefined") {
+                              return false;
+                          }
+                          // insert loaded schema into current object
+                          if (!angular.isUndefined(child)) {
+                              child['$@'+key] = schema['$@'+ns+key];
+                          }
+                          parent['$@'+key] = schema['$@'+ns+key];
+                          $rootScope.cache.put(path, parent['$@'+key]);
+                          return parent['$@'+key];
+                      }, function errorCallback(data) {
+                          return false;
+                      });
+                } else {
+                    return $rootScope.cache.get(path);
+                }
+            } else {
+                return parent['$@'+key];
             }
-            return parent['$@'+key];
         };
         scope.getSchemaFromKey = getSchemaFromKey;
 
@@ -184,7 +213,15 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
         scope.addItem = function(key, obj, parent) {
             var type = getType(parent.keyName, undefined, obj);
-            var parentType = getType(parent.$parent.$parent.$parent.$parent.key, obj);
+            var parentType = objectName;
+            //if (typeof parent.$parent.$parent !== "undefined") {
+                parentType = getType(scope.getParents(parent, 4).key, obj);
+            //}
+            //console.log(key);
+            //console.log(obj);
+            //console.log(parent);
+            //console.log(type);
+            //console.log(parentType);
 
             if (parentType == "Object") {
                 // check input for key
@@ -241,7 +278,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     default:
                         console.log('2not implemented ' + parent.valueType); // TOOD
                 }
-                setIetfOperation('replace', parent.$parent.$parent.$parent.$parent.key, parent.$parent.$parent.$parent.$parent.$parent.$parent.child); // TODO replace order in array
+                setIetfOperation('replace', scope.getParents(parent, 4).key, scope.getParents(parent, 6).child); // TODO replace order in array
                 parent.valueName = "";
                 parent.showAddKey = false;
             } else {
@@ -262,14 +299,28 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return !(attr && attr === "remove");
         };
 
-        scope.getAvailableNodeNames = function (key, obj, parent) {
-            console.log(key);console.log(obj);console.log(parent);
-            var children = parent.$parent.$parent.$parent.$parent.$parent.$parent.child['$@'+ parent.$parent.$parent.$parent.key]['children'];
-            angular.forEach(obj, function(value, key) {
+        scope.changeParentKeyName = function(key, child, $parent) {
+            var val = getType(key, child, $parent);
+            if (val) {
+                $parent.valueType = val;
+            }
+        };
+
+        scope.getAvailableNodeNames = function (key, child, parent) {
+            //console.log(key);console.log(child);console.log(parent);
+            var parentKeyName = scope.getParents(parent, 4).key;
+            var children = scope.getParents(parent, 6).child['$@'+ parentKeyName]['children'];
+
+            angular.forEach(child, function(value, key) {
                 if (key.indexOf('@') !== 0 && children.indexOf(key) !== -1) {
                     children.splice(children.indexOf(key), 1);
                 }
             });
+
+            angular.forEach(children, function (key, value) {
+                getSchemaFromKey(key, parent, child);
+            });
+
             return children;
         };
 
@@ -296,7 +347,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 case 'anydata':
                     if (typeof obj[key] !== "undefined") {
                         if (generateEmpty && typeof obj[key]['@'] === "undefined") {
-                            obj[key]['@'] = {}; // create empty attributes object
+                            try {
+                                obj[key]['@'] = {}; // create empty attributes object
+                            } catch (exception) {};
                         }
                         if (typeof obj[key]['@'] !== "undefined") {
                             return obj[key]['@'];
@@ -306,7 +359,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 case 'leaf-list':
                 case 'anyxml':
                     if (generateEmpty && typeof obj['@'+key] === "undefined") {
-                        obj['@'+key] = {}; // create empty attributes object
+                        try {
+                            obj['@'+key] = {}; // create empty attributes object
+                        } catch (exception) {};
                     }
                     if (typeof obj['@'+key] !== "undefined") {
                         return obj['@'+key];
@@ -321,6 +376,34 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
             return false;
         };
+
+        scope.getParents = function(obj, number) {
+            if (typeof obj === "undefined") return false;
+            var parent = obj;
+
+            for (var i = 0; i < number; i++) {
+                if (typeof parent.$parent === "undefined") {
+                    return parent;
+                }
+                parent = parent.$parent;
+            }
+            return parent;
+        }
+
+        scope.getPath = function(obj, target) {
+            if (typeof obj === "undefined") return false;
+            var parent = obj;
+            var res = '';
+
+            while (typeof parent.$parent !== "undefined" && parent.$parent !== null) {
+                parent = parent.$parent;
+                //if (typeof parent[target] !== "undefined") console.log(parent[target]);
+                if (parent.hasOwnProperty(target) && typeof parent[target] !== 'undefined') {
+                    res = '/' + parent[target] + res;
+                }
+            }
+            return res;
+        }
 
         var getAttribute = function(attr, key, obj) {
             var node = scope.getAttributesNode(key, obj);
