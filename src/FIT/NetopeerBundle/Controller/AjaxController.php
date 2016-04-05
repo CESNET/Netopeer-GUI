@@ -45,6 +45,7 @@ namespace FIT\NetopeerBundle\Controller;
 use FIT\NetopeerBundle\Controller\BaseController;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -308,5 +309,24 @@ class AjaxController extends BaseController
 
 			return $this->getAssignedVariablesArr();
 		}
+	}
+
+	/**
+	 * @param $key
+	 * @param $filter
+	 *
+	 * @Route("/ajax/schema/", name="loadSchemaByFilter")
+	 *
+	 * @return JsonResponse
+	 */
+	public function loadSchemaByFilterAction() {
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		$requestParams = json_decode($this->getRequest()->getContent(), true);
+		$params = array(
+			'connIds' => $requestParams['connIds'],
+			'filters' => $requestParams['filters']
+		);
+		$res = $netconfFunc->handle('query', $params);
+		return new JsonResponse(json_decode($res));
 	}
 }

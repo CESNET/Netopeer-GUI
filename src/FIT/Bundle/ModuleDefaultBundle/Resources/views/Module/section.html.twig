@@ -61,6 +61,9 @@ if advised of the possibility of such damage.
 
 {% block state %}
 {% block singleContent %}
+	<script type="text/javascript">
+		var jsonEditable = {% if jsonEditable is defined and jsonEditable == false %}false{% else %}true{% endif %};
+	</script>
 	{#<div class="edit-bar">#}
 		{#<span class="create-child"#}
 		{#rel="--*" data-typeahead-path="/symfony/app_dev.php/ajax/get-values-for-label/FORMID/0/nacm/XPATH/">new node</span>#}

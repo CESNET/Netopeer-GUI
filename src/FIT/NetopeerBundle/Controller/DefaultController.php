@@ -256,7 +256,7 @@ class DefaultController extends BaseController
 	public function reloadDeviceAction($key)
 	{
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
-		$netconfFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 
 		/* reload hello message */
 		$params = array('key' => $key);
@@ -430,7 +430,7 @@ class DefaultController extends BaseController
 			unset($sessionArr['_security_secured_area']);
 			unset($sessionArr['_security_commont_context']);
 
-			if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->get('angular') == "true") {
+			if ($this->getRequest()->get('angular') == "true") {
 				return new JsonResponse($sessionArr);
 			}
 
@@ -531,11 +531,20 @@ class DefaultController extends BaseController
 		$this->assign('key', $key);
 
 		if ($this->getRequest()->getMethod() == 'POST') {
-			$xmlOperations = $this->get("XMLoperations");
-			$postVals = $this->getRequest()->get("form");
-			$this->setSectionFormsParams($key);
-
-			$res = $xmlOperations->handleCreateEmptyModuleForm($key, $this->getConfigParams(), $postVals);
+			$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+			$arr = [];
+			$formData = $this->getRequest()->get('form');
+			$arr[$formData['modulePrefix']] = [];
+			$arr['@'.$formData['modulePrefix']] = [
+				'ietf-netconf:operation' => 'create'
+			];
+			$configParams = $this->getConfigParams();
+			$params = array(
+				'connIds' => array($key),
+				'target' => $configParams['source'],
+				'configs' => array(json_encode($arr))
+			);
+			$res = $netconfFunc->handle('editconfig', $params);
 			if ($res != 0) {
 				return $this->forward('FITNetopeerBundle:Default:reloadDevice', array('key' => $key));
 			}

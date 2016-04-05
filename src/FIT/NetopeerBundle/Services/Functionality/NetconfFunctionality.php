@@ -81,6 +81,9 @@ class NetconfFunctionality {
 	const MSG_NTF_GETHISTORY		= 18;
 	const MSG_VALIDATE			= 19;
 
+	const SCH_QUERY  = 100;
+	const SCH_MERGE  = 101;
+
 	/* subscription of notifications */
 	const CPBLT_NOTIFICATIONS		= "urn:ietf:params:netconf:capability:notification:1.0";
 	/*
@@ -541,6 +544,7 @@ class NetconfFunctionality {
 			"sessions" => $this->getConnectionFunctionality()->getHashFromKeys($params['connIds']),
 			"target" => $params['target'],
 			"configs" => $params['configs'],
+			"default-operation" => 'merge',
 		);
 		$editparams = $this->addOptionalParams($editparams, $params, array('source', 'default-operation', 'error-option', 'uri-source', 'test-option'));
 
@@ -633,7 +637,7 @@ class NetconfFunctionality {
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_LOCK,
 			"target"	=> $params['target'],
-			"session" 	=> array_values($sessionKeys)
+			"sessions" 	=> array_values($sessionKeys)
 		));
 
 		$lockedConnIds = array();
@@ -926,12 +930,82 @@ class NetconfFunctionality {
 
 		$validateParams = array(
 			"type" 		=> self::MSG_VALIDATE,
-			"session" 	=> $this->getConnectionFunctionality()->getHashFromKeys($params['connIds']),
+			"sessions" 	=> $this->getConnectionFunctionality()->getHashFromKeys($params['connIds']),
 			"target" 	=> $params['target'],
 		);
 		$validateParams = $this->addOptionalParams($validateParams, $params, array('url'));
 
 		$decoded = $this->execute_operation($sock, $validateParams);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * Query schema node by XPATH
+	 * key: type (int), value: 100
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: filters (array of strings with same index order as sessions), value: array of XPath (with "prefix" = module name) values of target node in schema (start with '/') or module names (do not start with '/')
+	 * Optional:
+	 * key: load_children(boolean, default = false), value: if set to true, children schema information will be loaded too. Otherwise only part "$@name": {'children': [...]} will be loaded.
+	 *
+	 * @param $sock
+	 * @param $params
+	 *
+	 * @return int|mixed
+	 */
+	public function handle_query(&$sock, &$params) {
+		$session = $this->getSession();
+
+		if (isset($params["sessions"]) && ($params["sessions"] !== "")) {
+			$sessionKeys = $params['sessions'];
+		} else {
+			if ($this->getConnectionFunctionality()->checkLoggedKeys() != 0) {
+				return 1;
+			}
+			$sessionKeys = $this->getConnectionFunctionality()->getHashFromKeys($params['connIds']);
+		}
+
+		$queryParams = array(
+			"type" 		=> self::SCH_QUERY,
+			"sessions" 	=> $sessionKeys,
+			"filters" 	=> $params['filters'],
+//			"load_children" => true
+		);
+		$queryParams = $this->addOptionalParams($queryParams, $params, array('load_children'));
+
+		$decoded = $this->execute_operation($sock, $queryParams);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
+	 * Query schema node by XPATH
+	 * key: type (int), value: 100
+	 * key: sessions (array of ints), value: array of SIDs
+	 * key: configurations (array of sJSON with same index order as sessions array), value: array of clean sJSON configurations without schema information
+	 *
+	 * @param $sock
+	 * @param $params
+	 *
+	 * @return int|mixed
+	 */
+	public function handle_merge(&$sock, &$params) {
+		$session = $this->getSession();
+
+		if (isset($params["sessions"]) && ($params["sessions"] !== "")) {
+			$sessionKeys = $params['sessions'];
+		} else {
+			if ($this->getConnectionFunctionality()->checkLoggedKeys() != 0) {
+				return 1;
+			}
+			$sessionKeys = $this->getConnectionFunctionality()->getHashFromKeys($params['connIds']);
+		}
+
+		$mergeParams = array(
+			"type" 		=> self::SCH_QUERY,
+			"sessions" 	=> $sessionKeys,
+			"configurations" 	=> $params['configurations'],
+		);
+
+		$decoded = $this->execute_operation($sock, $mergeParams);
 		return $this->checkDecodedData($decoded);
 	}
 
@@ -981,6 +1055,7 @@ class NetconfFunctionality {
 	 * @return array         	        response from mod_netconf
 	 */
 	private function execute_operation(&$sock, $params)	{
+		$this->logger->addInfo('Params for netconf: ' . var_export($params, true));
 		$operation = json_encode($params);
 		$this->write2socket($sock, $operation);
 		$response = $this->readnetconf($sock);
@@ -1105,7 +1180,13 @@ class NetconfFunctionality {
 				return $this->handle_notif_history($sock, $params);
 				break;
 			case "validate":
-				$res = $this->handle_validate($sock, $params, $result);
+				$res = $this->handle_validate($sock, $params);
+				break;
+			case "query":
+				$res = $this->handle_query($sock, $params);
+				break;
+			case "merge":
+				$res = $this->handle_merge($sock, $params);
 				break;
 			case "backup":
 				$params["source"] = "startup";

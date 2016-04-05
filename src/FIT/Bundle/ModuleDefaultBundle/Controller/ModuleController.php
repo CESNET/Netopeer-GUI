@@ -4,6 +4,7 @@ namespace FIT\Bundle\ModuleDefaultBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\ModuleControllerInterface;
 use FIT\NetopeerBundle\Models\XMLoperations;
+use FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -24,6 +25,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$res = $this->prepareVariablesForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 
 		/* parent module did not prepares data, but returns redirect response,
@@ -33,8 +35,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			return $res;
 		}
 
-		if ($this->getRequest()->getMethod() == 'POST') {
-			$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		if ($this->getRequest()->getMethod() == 'POST' && $this->getRequest()->get('angular') == "true") {
 			$configParams = $this->getConfigParams();
 			$postData = $this->getRequest()->getContent();
 			$params = array(
@@ -43,10 +44,14 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 				'configs' => array($postData)
 			);
 			$res = $netconfFunc->handle('editconfig', $params, true, $result);
-			return new JsonResponse(json_decode($res));
+			$this->get('session')->set('isAjax', true);
+			$this->removeAjaxBlock('moduleJavascripts');
+			$this->removeAjaxBlock('moduleStylesheet');
+			$this->removeAjaxBlock('state');
+			return $this->getTwigArr();
 		}
 
-		if ($this->getRequest()->isXmlHttpRequest() || $this->getRequest()->get('angular') == "true") {
+		if ($this->getRequest()->get('angular') == "true") {
 			$res = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 			return new JsonResponse(json_decode($res));
 		} else {

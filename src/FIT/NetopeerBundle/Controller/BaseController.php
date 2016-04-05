@@ -225,29 +225,28 @@ class BaseController extends Controller
 	protected function setEmptyModuleForm($key) {
 		$connectionFunc = $this->get("fitnetopeerbundle.service.connection.functionality");
 		$tmpArr = $connectionFunc->getModuleIdentifiersForCurrentDevice($key);
-		$tmpArr = $connectionFunc->getRootNamesForModuleIdentifiers($key, $tmpArr);
 
 		// use small hack when appending space at the end of key, which will fire all options in typeahead
 		$nsArr = array();
 		if (!empty($tmpArr)) {
 			foreach ($tmpArr as $key => $item) {
-				if ($item['rootElem'] != "") {
-					$modulesArr[$item['rootElem']] = (array)$key;
-					$nsArr[] = $key;
+				if ($item['moduleName'] != "") {
+					$modulesArr[$item['moduleName']] = '';// TODO
+					$nsArr[] = '';
 				}
 			}
 		}
 
 		$form = $this->createFormBuilder()
-				->add('name', 'text', array(
-								'label' => "Module name",
+				->add('modulePrefix', 'text', array(
+								'label' => "Prefix",
 								'attr' => array(
 										'class' => 'typeaheadName percent-width w-50',
 										'autocomplete' => 'off'
 								)
 						))
-				->add('namespace', 'text', array(
-								'label' => "Namespace",
+				->add('moduleName', 'text', array(
+								'label' => "Module name",
 								'attr' => array(
 										'class' => 'typeaheadNS percent-width w-50',
 										'autocomplete' => 'off'
@@ -435,6 +434,13 @@ class BaseController extends Controller
 			'template' => $templateNamespace,
 			'blockId' => $blockId,
 		);
+	}
+
+	/**
+	 * @param string $blockId               block name from template
+	 */
+	protected function removeAjaxBlock($blockId) {
+		unset($this->ajaxBlocksArr[$blockId]);
 	}
 
 	/**

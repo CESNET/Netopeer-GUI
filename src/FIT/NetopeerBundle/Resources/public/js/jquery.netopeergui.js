@@ -84,6 +84,9 @@ jQuery.extend({
 
 			// replace content of given block with new html
 			} else {
+				//console.log(id);
+				//console.log($("#" + id).html().trim());
+				//console.log(html.replace(" \/>", ">").trim());
 				var $blockEl = $("#" + id);
 				$blockEl.html(html);
 			}
@@ -202,6 +205,12 @@ jQuery.extend({
 				data: data,
 				type: type,
 				success: function(data, textStatus, jqXHR) {
+					if (typeof angular !== "undefined" && $("#mainView").length) {
+						$("#block--moduleJavascripts, #block--moduleStylesheet").html('');
+						var scope = angular.element(document.getElementById("mainView")).scope();
+						$("#mainView").remove();
+						scope.$destroy();
+					}
 					$.netopeergui.successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
 				},
 				error: function(qXHR, textStatus, errorThrown) {
