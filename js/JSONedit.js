@@ -58,6 +58,33 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 			var removeSchemaNodes = function(obj) {
 				traverse(obj).forEach(function (element, index, array) {
 					if (typeof this.key !== "undefined") {
+						var schemaPath = this.path.slice(0, -1);
+						var attrPath = this.path.slice(0, -1);
+						var attrChildPath = this.path.slice(0); // clone an array
+						schemaPath.push('$@'+this.key);
+						attrPath.push('@'+this.key);
+						attrChildPath.push('@');
+						var schema = traverse(obj).get(schemaPath);
+						var attr = traverse(obj).get(attrPath);
+						var attrChild = traverse(obj).get(attrChildPath);
+						//if (this.key == 'groups') {
+						//	console.log(attrChildPath);
+						//	console.log(attrChild);
+						//}
+						if ((!angular.isUndefined(attr) || !angular.isUndefined(attrChild)) || (!angular.isUndefined(schema) && schema['iskey'] == true)) {
+							// leave key elements
+
+						} else if (this.key.indexOf('$@') !== -1 || this.key.indexOf('@') !== -1) {
+							// leave attributes
+
+						} else if (this.notRoot && !angular.isUndefined(this.parent.key) && this.path.toString().indexOf('@') === -1) {
+							this.delete(true);
+						}
+					}
+				});
+
+				traverse(obj).forEach(function (element, index, array) {
+					if (typeof this.key !== "undefined") {
 						if (this.key.indexOf('$@') !== -1) {
 							this.remove();
 						}
