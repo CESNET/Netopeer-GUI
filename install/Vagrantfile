@@ -7,10 +7,6 @@ Vagrant.configure(2) do |config|
   config.vm.network "forwarded_port", guest: 80, host: 2280
 
   config.vm.provision "shell" do |s|
-	s.inline = "sed -i 's/SELINUX=\(enforcing\|permissive\)/SELINUX=disabled/g' /etc/selinux/config"
-  end
-
-  config.vm.provision "shell" do |s|
         s.path = "centos7/install.sh"
   end
 end
