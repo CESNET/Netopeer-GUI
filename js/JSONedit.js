@@ -2,9 +2,9 @@ var storage = Rhaboo.perishable(window.location.href);
 var historyIndex = 0,
 		historyUndo = 0;
 
-var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
+var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerGUIServices'])
 
-	.controller('ConfigurationController', function ($scope, $filter, $http, $window, $timeout, traverse) {
+	.controller('ConfigurationController', function ($scope, $filter, $http, $window, $timeout, traverse, AjaxService) {
 
 		storage.write('revisions', []);
 		storage.erase('revisions');
@@ -20,9 +20,14 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 				isRedo = false;
 
 		$scope.reload = function() {
-			$http.get(window.location.href + '?angular=true').success(function (data) {
-				$scope.jsonData = data;
-			});
+
+			AjaxService.reloadData()
+				.then(function successCallback(data) {
+					$scope.jsonData = data.data;
+				}, function errorCallback(data) {
+					alert('error');
+					console.log('data');
+				});
 		}
 
 		$scope.reload();
@@ -130,18 +135,15 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse'])
 		$scope.submitConfiguration = function(jsonData) {
 			var cleanJson = cleanupJSON(jsonData);
 			cleanJson = JSON.parse(cleanJson);
-			$http({
-				url: window.location.href + '?angular=true',
-				method: 'POST',
-				data: cleanJson
-			}).then(function successCallback(data) {
-				$.netopeergui.processResponseData(data.data, function() {
-					//$scope.reload();
+			AjaxService.submitConfiguration(cleanJson)
+				.then(function successCallback(data) {
+					$.netopeergui.processResponseData(data.data, function() {
+						//$scope.reload();
+					});
+				}, function errorCallback(data) {
+					alert('error');
+					console.log(data);
 				});
-			}, function errorCallback(data) {
-				alert('error');
-				console.log('data');
-			});
 		};
 	}
 );
