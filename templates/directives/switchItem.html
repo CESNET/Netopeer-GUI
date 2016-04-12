@@ -18,4 +18,6 @@
 		<input type="text" ng-model="val" placeholder="Empty" ng-model-onblur ng-change="changeValue(val, key, child, $parent)"  ng-if="isConfig(key, child)">
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
 	</span>
+
+	<!--<add-item ng-show="jsonEditable && !val.length"></add-item>-->
 </span>

@@ -13,10 +13,10 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 /* striped background */
 
 .jsonView { padding: 30px 0 0 5px;
-	select.form-control { margin: 0; padding: 0; width: 100px; display: inline; height: 29px; padding-left: 5px;
+	select.form-control { margin: 0; padding: 0; width: 100px; display: inline; padding-left: 5px;
 	}
 	input { margin: 0; padding: 0;
-		&.form-control { width: 100px; display: inline; height: 29px; padding-left: 5px; }
+		&.form-control { width: 100px; display: inline; padding-left: 5px; position: relative; z-index: 2; }
 		&[type="text"], &[type="number"] { margin: 0; border: 1px solid #ccc; background: #fff; }
 		&[type="checkbox"] { position: absolute; }
 		&.keyinput { font-weight: bold; }
@@ -31,9 +31,16 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0;display: block;
 		i { display: block; }
 	}
-	.iconButton { float: right; margin-right: 10px; position: relative; top: -1px; z-index: 99999999999999; cursor: pointer; }
+	.editbar { margin-left: 10px; float: right; }
+
+	.iconButton { margin-left: 5px; position: relative; top: -1px; z-index: 0; cursor: pointer; @include opacity(0.3);
+		&:hover { @include opacity(1); }
+	}
 	.jsonObjectKey { font-weight: bold;
 		.key-name { margin-right: 25px; min-width: 130px; display: inline-block; }
+		&.objectOrArrayCover {
+			> .key-name { min-width: 0; }
+		}
 	}
 	.strike { text-decoration: line-through; }
 }
@@ -52,9 +59,25 @@ li .jsonContents { margin-left: 0px; }
 
 .jsonView {
 	.block { clear: both; display: block; margin-bottom: 0.5em; }
+	.block, .arrayItem { position: relative; z-index: 1;
+		//> * { position: static; z-index: 2; }
+		&:hover {
+			&:before { content: ""; position: absolute; left: -100%; right: 0; background: rgba(#000, 0.1); padding: 3px 0px;
+				margin-top: -3px; height: 14px; z-index: 0; }
+		}
+	}
 	.jsonItemDesc { color: grey; cursor: default; line-height: 30px; }
 	.objectDesc { cursor: default; }
 	> json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
+	add-item { display: block; min-height: 20px;
+		.addObjectItemBtn { position: relative; z-index: 10; @include opacity(0.3);
+			&:hover { @include opacity(1); }
+		}
+	}
+	switch-item { margin-right: 15px; }
+	.arrayItem {
+		.jsonContents { margin-top: -14px; }
+	}
 	ol.arrayOl { margin: 0; padding-left: 20px; }
 	li {clear: both;min-height: 30px; }
 	ol.arrayOl {
@@ -67,7 +90,7 @@ li .jsonContents { margin-left: 0px; }
 		li { color: grey; list-style-type: decimal;
 			input { font-style: normal; }
 		}
-		ol.arrayOl { margin-top: 15px;
+		ol.arrayOl { margin-top: 25px;
 			&, & + add-item .block { margin-left: 25px; }
 		}
 	}

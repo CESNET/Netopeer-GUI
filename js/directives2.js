@@ -94,10 +94,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             var eltype = getEltype(key, parent);
 
             if (eltype === "container" || eltype === "list" || type === "[object Object]") {
+                if (type === "[object Array]") { return arrayName; }
                 return objectName;
-            } else if (eltype === "leaf-list") {
-                return arrayName;
-            } else if (type === "[object Array]"){
+            } else if (eltype === "leaf-list" || type === "[object Array]") {
                 return arrayName;
             } else if (type === "Boolean" || type === "[object Boolean]") {
                 return boolName;
@@ -155,12 +154,13 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                               return false;
                           }
                           // insert loaded schema into current object
+                          $rootScope.cache.put(path, parent['$@'+key]);
                           if (!angular.isUndefined(child)) {
                               child['$@'+key] = schema['$@'+ns+key];
+                          } else {
+                              parent['$@'+key] = schema['$@'+ns+key];
                           }
-                          parent['$@'+key] = schema['$@'+ns+key];
-                          $rootScope.cache.put(path, parent['$@'+key]);
-                          return parent['$@'+key];
+                          return schema['$@'+ns+key];
                       }, function errorCallback(data) {
                           return false;
                       });
@@ -185,6 +185,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             }
 
             return false;
+        };
+        scope.isObjectOrArray = function(key, val, parent) {
+            var type = getType(key, val, parent);
+            return (type == objectName || type == arrayName);
         };
         scope.toggleCollapse = function() {
             if (scope.collapsed) {
@@ -388,7 +392,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 parent = parent.$parent;
             }
             return parent;
-        }
+        };
 
         scope.getPath = function(obj, target) {
             if (typeof obj === "undefined") return false;
@@ -403,7 +407,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 }
             }
             return res;
-        }
+        };
 
         var getAttribute = function(attr, key, obj) {
             var node = scope.getAttributesNode(key, obj);
@@ -461,7 +465,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
     return function(items) {
         var result = {};
         angular.forEach(items, function(value, key) {
-            if (key.indexOf('@') !== 0) {
+            if (typeof key === "string" && key.indexOf('@') !== 0) {
                 result[key] = value;
             }
         });
