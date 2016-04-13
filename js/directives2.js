@@ -60,7 +60,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.sortableOptions = {
             axis: 'y',
             update: function(e, ui) {
-                setIetfOperation('replace', scope.$parent.$parent.newkey, scope.getParents($parent, 4).child);
+                setParentChanged(scope.$parent);
+                setIetfOperation('replace', scope.$parent.$parent.newkey, scope.getParents($parent, 4).child, scope.$parent);
             }
         };
         if (scope.$parent.defaultCollapsed === undefined) {
@@ -242,7 +243,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                             return;
                         } else {
                             removeIetfOperation(parent.keyName, obj, parent);
-                            setIetfOperation('create', key, obj, parent);
+                            setParentChanged(parent);
+                            setIetfOperation('create', key, obj);
                         }
                     }
                     // add item to object
@@ -260,6 +262,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         default:
                             console.log('not implemented ' + parent.valueType); // TOOD
                     }
+                    setParentChanged(parent);
                     setIetfOperation('create', parent.keyName, obj);
                     //clean-up
                     parent.keyName = "";
@@ -282,7 +285,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     default:
                         console.log('2not implemented ' + parent.valueType); // TOOD
                 }
-                setIetfOperation('replace', scope.getParents(parent, 4).key, scope.getParents(parent, 6).child); // TODO replace order in array
+                setParentChanged(parent);
+                setIetfOperation('replace', scope.getParents(parent, 4).key, scope.getParents(parent, 6).child, parent); // TODO replace order in array
                 parent.valueName = "";
                 parent.showAddKey = false;
             } else {
@@ -293,9 +297,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return isNumber(val) ? parseFloat(val) : val;
         };
 
-        scope.changeValue = function(val, key, child) {
+        scope.changeValue = function(val, key, child, parent) {
             child[key] = val;
-            setIetfOperation('replace', key, child);
+            setParentChanged(parent);
+            setIetfOperation('replace', key, child, parent);
         };
 
         scope.isVisible = function(key, obj) {
@@ -386,7 +391,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             var parent = obj;
 
             for (var i = 0; i < number; i++) {
-                if (typeof parent.$parent === "undefined") {
+                if (typeof parent.$parent === "undefined" || parent.$parent === null) {
                     return parent;
                 }
                 parent = parent.$parent;
@@ -438,8 +443,32 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return false;
         };
 
-        var setIetfOperation = function(operation, key, obj) {
+        var setIetfOperation = function(operation, key, obj, parent) {
+            var tmpParent = scope.getParents(parent, 11);
+            if (tmpParent.hasOwnProperty('key') && typeof scope.getParents(tmpParent, 2)['child'] !== 'undefined') {
+                if (getAttributeType(tmpParent['key'], scope.getParents(tmpParent, 2)['child']) == 'list') {
+                    key = tmpParent['key'];
+                    obj = scope.getParents(tmpParent, 2)['child'];
+                    if (operation == 'replace') {
+                        operation = 'merge';
+                    }
+                }
+            }
             setAttribute('ietf-netconf:operation', operation, key, obj);
+        };
+
+        var setParentChanged = function(parent) {
+            if (typeof parent === "undefined") return false;
+            var target = 'key';
+            while (typeof parent.$parent !== "undefined" && parent.$parent !== null) {
+                var obj = parent;
+                parent = parent.$parent;
+                var parentToSet = scope.getParents(parent, 2);
+                //console.log(parentToSet);
+                if (parent.hasOwnProperty(target) && typeof parent[target] !== 'undefined' && typeof parentToSet['child'] !== 'undefined') {
+                    setAttribute('netopeergui:status', 'changed', parent[target], parent['child']);
+                }
+            }
         };
 
         var removeIetfOperation = function(key, obj) {

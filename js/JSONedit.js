@@ -83,15 +83,25 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 							// leave attributes
 
 						} else if (this.notRoot && !angular.isUndefined(this.parent.key) && this.path.toString().indexOf('@') === -1) {
-							this.delete(true);
+							//this.delete(true);
 						}
 					}
 				});
 
+				// remove schema nodes
 				traverse(obj).forEach(function (element, index, array) {
 					if (typeof this.key !== "undefined") {
-						if (this.key.indexOf('$@') !== -1) {
+						if (this.key.indexOf('$@') !== -1 || this.key.indexOf('netopeergui:status') !== -1) {
 							this.remove();
+						}
+					}
+				});
+
+				// remove empty atribute nodes
+				traverse(obj).forEach(function (element, index, array) {
+					if (typeof this.key !== "undefined") {
+						if (this.key.indexOf('@') !== -1 && this.isLeaf) {
+							this.delete(true);
 						}
 					}
 				});
