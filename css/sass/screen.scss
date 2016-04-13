@@ -26,7 +26,7 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 		}
 	}
 	.addItemKeyInput { font-weight: bold; }
-	.toggle-control { float: left; cursor: pointer; position: relative; top: -1em; right: 22px; margin-right: -15px; }
+	.toggle-control { float: left; cursor: pointer; position: relative; top: -1em; right: 22px; margin-right: -15px; background: #f0f0f0; }
 	> json > .fa-minus-square-o { display: none; }
 	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0;display: block;
 		i { display: block; }
@@ -53,12 +53,16 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 
 /* basic layout */
 
-.jsonContents { margin-left: 25px; }
+.jsonContents { margin-left: 25px; position: relative;
+	&:before { content: ""; position: absolute; border-left: 1px solid #ccc; z-index: 0; top: 0;	bottom: 0; left: -17px; }
+	li .jsonContents { margin-left: 0px; }
+	li .jsonContents .jsonContents { margin-left: 25px; }
+	li .jsonContents .arrayOl .jsonContents { margin-left: 0px; }
+}
 
-li .jsonContents { margin-left: 0px; }
 
 .jsonView {
-	.block { clear: both; display: block; margin-bottom: 0.5em; }
+	.block { clear: both; display: block; margin-top: 0.5em; margin-bottom: 0.5em; }
 	.block, .arrayItem { position: relative; z-index: 1;
 		//> * { position: static; z-index: 2; }
 		&:hover {
@@ -74,12 +78,12 @@ li .jsonContents { margin-left: 0px; }
 			&:hover { @include opacity(1); }
 		}
 	}
-	switch-item { margin-right: 15px; }
+	//switch-item { margin-right: 15px; }
 	.arrayItem {
-		.jsonContents { margin-top: -14px; }
+		//.jsonContents { margin-top: -14px; }
 	}
-	ol.arrayOl { margin: 0; padding-left: 20px; }
-	li {clear: both;min-height: 30px; }
+	//ol.arrayOl { margin: 0; padding-left: 20px; }
+	li {clear: both; min-height: 26px; }
 	ol.arrayOl {
 		.toggle-control { margin-left: -20px; top: 1.3em; display: none; }
 		//.fa-minus-square-o { top: 7px; }
@@ -87,10 +91,10 @@ li .jsonContents { margin-left: 0px; }
 		> li > span > span > json > {
 			.toggle-control { left: -40px; }
 		}
-		li { color: grey; list-style-type: decimal;
+		li, li li { color: grey; list-style-type: decimal;
 			input { font-style: normal; }
 		}
-		ol.arrayOl { margin-top: 25px;
+		ol.arrayOl { margin-top: 0.5em;
 			&, & + add-item .block { margin-left: 25px; }
 		}
 	}
