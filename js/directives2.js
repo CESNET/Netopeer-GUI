@@ -227,12 +227,14 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.deleteKey = function(key, obj, parent) {
             if (getType(key, obj, parent) == "Object") {
                 if( confirm('Delete "'+key+'" and all it contains?') ) {
+                    setParentChanged(parent);
                     setIetfOperation('remove', key, obj);
                     //delete obj[key]; // TODO delete children
 
                 }
             } else if (getType(key, obj, parent) == "Array") {
                 if( confirm('Delete "'+obj[key]+'"?') ) {
+                    setParentChanged(parent);
                     setIetfOperation('remove', key, obj);
                     //obj.splice(key, 1); // TODO delete children
                 }
@@ -360,8 +362,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var getAttributeType = function(key, obj) {
             var eltype = getEltype(key, obj);
 
-            if (eltype === "container" || eltype === 'list' || eltype === 'anydata') {
+            if (eltype === "container" || eltype === 'anydata') {
                 return 'anydata';
+            } else if (eltype === 'list') {
+                return 'list';
             } else if (eltype === 'leaf' || eltype === 'anyxml') {
                 return 'anyxml';
             } else if (eltype === "leaf-list") {
@@ -375,7 +379,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 generateEmpty = false;
             }
             var eltype = getAttributeType(key, obj);
-
+            if (eltype == 'list') {
+                obj = scope.getParents(obj, 2);
+            }
             switch (eltype) {
                 case 'anydata':
                     if (typeof obj[key] !== "undefined") {
@@ -390,6 +396,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     }
                     break;
                 case 'leaf-list':
+                case 'list':
                 case 'anyxml':
                     if (generateEmpty && typeof obj['@'+key] === "undefined") {
                         try {
