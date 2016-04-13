@@ -92,6 +92,22 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             // get custom yang datatype
             var type = Object.prototype.toString.call(child);
 
+            if (!scope.jsonEditable) {
+                if (type === "[object Object]") {
+                    return objectName;
+                } else if (type === "[object Array]") {
+                    return arrayName;
+                } else if (type === "Boolean" || type === "[object Boolean]") {
+                    return boolName;
+                } else if (type === 'enumeration') {
+                    return enumerationName;
+                } else if (isNumberType(type) || type === "[object Number]") {
+                    return numberName;
+                } else {
+                    return stringName;
+                }
+            }
+
             var eltype = getEltype(key, parent);
 
             if (eltype === "container" || eltype === "list" || type === "[object Object]") {
@@ -110,6 +126,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             }
         };
         var getEltype = function(key, parent) {
+            if (!scope.jsonEditable) return;
+
             var schema = getSchemaFromKey(key, parent);
             // get custom yang datatype
             var eltype = '';
@@ -131,6 +149,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         var getSchemaFromKey = function(key, parent, child) {
+            if (!scope.jsonEditable) return;
+
             if (typeof parent === "undefined" || typeof parent['$@'+key] === "undefined") {
                 if (typeof key === "undefined" || typeof parent === "undefined") return false;
 
@@ -175,11 +195,15 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.getSchemaFromKey = getSchemaFromKey;
 
         scope.isConfig = function(key, parent) {
+            if (!scope.jsonEditable) return false;
+
             var schema = getSchemaFromKey(key, parent);
             return (schema && typeof schema['config'] !== "undefined" && schema['config'] === true);
         };
 
         scope.editBarVisible = function(key, parent) {
+            if (!scope.jsonEditable) return false;
+
             var eltype = getEltype(key, parent);
             if (eltype) {
                 return (eltype == "list" || eltype == "leaf-list" || eltype == "container");
