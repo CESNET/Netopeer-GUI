@@ -9,24 +9,24 @@
 		<!--ng-if="getType($parent.keyName, undefined, $parent.$parent.$parent.child[$parent.$parent.$parent.$parent.key]) === 'Literal'"-->
 <select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm"></select>
 
-		<!--<span ng-switch on="$parent.valueType">-->
-			<!--<span ng-switch-when="Boolean" type="boolean">-->
-				<!--<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, key, child, $parent)"">-->
-			<!--</span>-->
-			<!--<span ng-switch-when="Enumeration" type="enumeration">-->
-				<!--<select ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, key, child, $parent)" ng-options="option for option in child['$@'+key]['enumval']"></select>-->
-			<!--</span>-->
-			<!--<span ng-switch-when="Number" type="number">-->
-				<!--<input type="number" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, key, child, $parent)">-->
-			<!--</span>-->
-			<!--<span ng-switch-default class="jsonLiteral">-->
-				<!--<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur-->
-							 <!--ng-change="changeValue(val, key, child, $parent)">-->
-			<!--</span>-->
-		<!--</span>-->
+		<span ng-switch on="$parent.valueType">
+			<span ng-switch-when="Boolean" type="boolean">
+				<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)"">
+			</span>
+			<span ng-switch-when="Enumeration" type="enumeration">
+				<select ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option"></select>
+			</span>
+			<span ng-switch-when="Number" type="number">
+				<input type="number" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)">
+			</span>
+			<span ng-switch-default class="jsonLiteral">
+				<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur
+							 ng-change="changeValue(val, $parent.keyName, child, $parent)" ng-show="$parent.valueType != 'Object' && $parent.valueType != 'Array'">
+			</span>
+		</span>
 
 		<!-- -->
-		<input ng-show="$parent.valueType != 'Object'" type="text" placeholder="Value" class="form-control input-sm addItemValueInput" ng-model="$parent.valueName" />
+		<!--<input ng-show="$parent.valueType != 'Object'" type="text" placeholder="Value" class="form-control input-sm addItemValueInput" ng-model="$parent.valueName" />-->
 
 		<button class="btn btn-primary btn-sm" ng-click="addItem(key, child, $parent)">
 			Add

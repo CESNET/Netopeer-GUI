@@ -274,6 +274,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             //console.log(type);
             //console.log(parentType);
 
+            type = type || parentType;
+
             if (parentType == "Object") {
                 // check input for key
                 if (parent.keyName == undefined || parent.keyName.length == 0){
@@ -306,7 +308,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         case boolName: obj[parent.keyName] = false;
                                         break;
                         default:
-                            console.log('not implemented ' + parent.valueType); // TOOD
+                            console.log('not implemented type: ' + type + ' or parentType ' + parent.valueType); // TOOD
                     }
                     setParentChanged(parent);
                     setIetfOperation('create', parent.keyName, obj);
