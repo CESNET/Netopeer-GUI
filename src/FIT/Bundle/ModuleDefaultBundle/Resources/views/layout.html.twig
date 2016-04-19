@@ -15,6 +15,7 @@
 	{% javascripts
 	'@FITModuleDefaultBundle/Resources/public/netopeerangular/js/directives2.js'
 	'@FITModuleDefaultBundle/Resources/public/netopeerangular/js/directives/*'
+	'@FITModuleDefaultBundle/Resources/public/netopeerangular/js/services/*'
 	'@FITModuleDefaultBundle/Resources/public/netopeerangular/js/*'
 	'@FITModuleDefaultBundle/Resources/public/netopeerangular/public/*'
 	output='js/compiled/module-default.js'
@@ -24,7 +25,7 @@
 
 	<script>
 		var baseURL = '{{ app.request.baseUrl }}';
-		var jsonEditable = {% if jsonEditable is defined and jsonEditable == false %}false{% else %}true{% endif %};
+		var connId = '{{ app.request.get('key') }}';
 	</script>
 {% endblock %}
 
