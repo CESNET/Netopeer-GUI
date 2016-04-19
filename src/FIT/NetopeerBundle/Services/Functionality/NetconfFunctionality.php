@@ -43,6 +43,7 @@
 namespace FIT\NetopeerBundle\Services\Functionality;
 
 use FIT\Bundle\ModuleDefaultBundle\Controller\ModuleController;
+use FIT\NetopeerBundle\Services\Functionality\ConnectionFunctionality;
 use Monolog\Logger;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -421,11 +422,11 @@ class NetconfFunctionality {
 		}
 		$session = $this->getSession();
 		$sessionConnections = $session->get('session-connections');
-		$sessionKeys = $this->getConnectionFunctionality()->getHashFromKeys($params['connIds'], true);
+		$sessionKeys = $this->getConnectionFunctionality()->getHashFromKeys($params['connIds']);
 
 		$decoded = $this->execute_operation($sock,	array(
 			"type" 		=> self::MSG_DISCONNECT,
-			"sessions" 	=> array_keys($sessionKeys)
+			"sessions" 	=> $sessionKeys
 		));
 
 		if (sizeof($decoded)) {

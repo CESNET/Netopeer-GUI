@@ -153,10 +153,7 @@ jQuery.extend({
 
 			// process given data and hide spinner in success callback
 			this.processResponseData(data, function() {
-				setTimeout(function() {
-					$('#ajax-spinner').fadeOut();
-					clearTimeout(this.spinnerTimer);
-				}, 150);
+				this.hideSpinner();
 			});
 
 			// set clicked link as active
@@ -192,12 +189,7 @@ jQuery.extend({
 			// clear alerts block on every request
 			$("#block--alerts").html('');
 
-			/**
-			 * show spinner on every request
-			 */
-			$.netopeergui.spinnerTimer = setTimeout(function() {
-				$('#ajax-spinner').fadeIn();
-			}, 100);
+			$.netopeergui.showSpinner();
 
 			$.ajax({
 				url: href,
@@ -224,7 +216,24 @@ jQuery.extend({
 
 		// create animated spinner
 		createSpinner: function()	{
-			return this.spinner = $('<div></div>').attr('id', 'ajax-spinner').appendTo('body').hide();
+			if (!$('#ajax-spinner').length) {
+				return this.spinner = $('<div></div>').attr('id', 'ajax-spinner').appendTo('body').hide();
+			} else {
+				return this.spinner;
+			}
+		},
+
+		showSpinner: function() {
+			$.netopeergui.spinnerTimer = setTimeout(function() {
+				$('#ajax-spinner').fadeIn();
+			}, 100);
+		},
+
+		hideSpinner: function() {
+			setTimeout(function() {
+				$('#ajax-spinner').fadeOut();
+				clearTimeout(this.spinnerTimer);
+			}, 150);
 		},
 
 		// if exists modified form element, show confirm box
@@ -263,12 +272,7 @@ window.onpopstate = function(o) {
 
 		$("#block--alerts").html('');
 
-		/**
-		 * spinner zobrazit az po 100ms
-		 */
-		$.netopeergui.spinnerTimer = setTimeout(function() {
-			$('#ajax-spinner').fadeIn();
-		}, 100);
+		$.netopeergui.showSpinner();
 
 		$.ajax({
 			dataType: 'json',

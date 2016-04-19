@@ -558,7 +558,7 @@ class ConnectionFunctionality {
 		if (isset($namespaces[$module])) {
 			$module = $namespaces[$module];
 //			$filterState = $filterConfig  = '/'.$module['moduleName'].':'.$module['rootElementName'];
-			$filterState = $filterConfig  = '<'.$module['rootElementName'].' xmlns="'.$module['ns'].'" />"';
+			$filterState = $filterConfig  = '<'.$module['rootElementName'].' xmlns="'.$module['ns'].'" />';
 		}
 
 		return array(
@@ -599,10 +599,12 @@ class ConnectionFunctionality {
 	public function getModelNamespaces($key) {
 		if (!$this->modelNamespaces) {
 			$hashedKey = $this->getHashFromKeys($key);
-			$hashedKey = array_pop($hashedKey);
-			if ($hashedKey && $this->getCache()->contains('modelNamespaces_'.$hashedKey)) {
+			if (is_array($hashedKey)) {
+				$hashedKey = array_pop($hashedKey);
+				if ($hashedKey && $this->getCache()->contains('modelNamespaces_'.$hashedKey)) {
 //			$this->getLogger()->addInfo("Cached file for modelNamespaces found.", array('key' => 'modelNamespaces_'.$hashedKey));
-				return $this->getCache()->fetch('modelNamespaces_'.$hashedKey);
+					return $this->getCache()->fetch('modelNamespaces_'.$hashedKey);
+				}
 			}
 		}
 		return $this->modelNamespaces;
@@ -656,6 +658,7 @@ class ConnectionFunctionality {
 	 */
 	public function invalidateMenuStructureForKey($key) {
 		$hashedKey = $this->getHashFromKeys($key);
+		$hashedKey = array_pop($hashedKey);
 		if ($hashedKey && $this->getCache()->contains('modelNamespaces_'.$hashedKey)) {
 			$this->getLogger()->addInfo("Invalidate cached file", array('key' => 'modelNamespaces_'.$hashedKey));
 			$this->getCache()->delete('modelNamespaces_'.$hashedKey);
