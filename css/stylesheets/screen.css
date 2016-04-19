@@ -1290,6 +1290,7 @@
 /* striped background */
 .jsonView { padding: 30px 0 0 5px; }
 .jsonView select.form-control { margin: 0; padding: 0; width: 100px; display: inline; padding-left: 5px; }
+.jsonView input, .jsonView select { position: relative; z-index: 10; }
 .jsonView input { margin: 0; padding: 0; }
 .jsonView input.form-control { width: 100px; display: inline; padding-left: 5px; position: relative; z-index: 2; }
 .jsonView input[type="text"], .jsonView input[type="number"] { margin: 0; border: 1px solid #ccc; background: #fff; }
