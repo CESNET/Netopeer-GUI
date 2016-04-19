@@ -82,8 +82,8 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 						} else if (this.key.indexOf('$@') !== -1 || this.key.indexOf('@') !== -1) {
 							// leave attributes
 
-						} else if (this.notRoot && !angular.isUndefined(this.parent.key) && this.path.toString().indexOf('@') === -1) {
-							//this.delete(true);
+						} else if (this.notRoot && !angular.isUndefined(this.parent.key) && this.path.toString().indexOf('@') === -1 && this.isLeaf) {
+							this.remove();
 						}
 					}
 				});
@@ -100,7 +100,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 				// remove empty atribute nodes
 				traverse(obj).forEach(function (element, index, array) {
 					if (typeof this.key !== "undefined") {
-						if (this.key.indexOf('@') !== -1 && this.isLeaf) {
+						if ((this.key.indexOf('@') !== -1 && this.isLeaf) || (Object.prototype.toString.call(this.node) == '[object Array]' && !this.node.length)){
 							this.delete(true);
 						}
 					}

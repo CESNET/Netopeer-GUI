@@ -113,11 +113,11 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return objectName;
             } else if (eltype === "leaf-list") {
                 return arrayName;
-            } else if (type === "Boolean" || type === "[object Boolean]") {
+            } else if (eltype === "boolean" || type === "[object Boolean]") {
                 return boolName;
             } else if (eltype === 'enumeration') {
                 return enumerationName;
-            } else if (isNumberType(type) || type === "[object Number]") {
+            } else if (isNumberType(eltype) || type === "[object Number]") {
                 return numberName;
             } else if (type === "[object Object]") {
                 return objectName;
@@ -386,7 +386,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return 'anydata';
             } else if (eltype === 'list') {
                 return 'list';
-            } else if (eltype === 'leaf' || eltype === 'anyxml') {
+            } else if (eltype === 'leaf' || eltype === 'anyxml' || eltype === 'enumeration' || isNumberType(eltype)) {
                 return 'anyxml';
             } else if (eltype === "leaf-list") {
                 return 'leaf-list';
@@ -496,6 +496,11 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
         var setIetfOperation = function(operation, key, obj, parent) {
             var tmpParent = scope.getParents(parent, 11);
+            if (tmpParent.hasOwnProperty('key') && typeof scope.getParents(tmpParent, 2)['child'] !== 'undefined') {
+            } else {
+                tmpParent = scope.getParents(parent, 2);
+            }
+
             if (tmpParent.hasOwnProperty('key') && typeof scope.getParents(tmpParent, 2)['child'] !== 'undefined') {
                 if (getAttributeType(tmpParent['key'], scope.getParents(tmpParent, 2)['child']) == 'list') {
                     key = tmpParent['key'];

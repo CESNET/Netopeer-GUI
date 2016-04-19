@@ -7,7 +7,7 @@
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
 	</span>
 	<span ng-switch-when="Enumeration" type="enumeration">
-		<select ng-model="val" ng-model-onblur ng-change="changeValue(val, key, child, $parent)" ng-if="isConfig(key, child)" ng-options="option for option in getEnumValues(key, child, $parent)"></select>
+		<select ng-model="val" ng-model-onblur ng-change="changeValue(val, key, child, $parent)" ng-if="isConfig(key, child)" ng-options="option for option in getEnumValues(key, child, $parent) track by option"></select>
 		<span class="val" ng-if="!isConfig(key, child)">{{ val }}</span>
 	</span>
 	<span ng-switch-when="Number" type="number">
