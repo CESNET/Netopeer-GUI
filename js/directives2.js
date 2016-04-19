@@ -99,8 +99,6 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     return arrayName;
                 } else if (type === "Boolean" || type === "[object Boolean]") {
                     return boolName;
-                } else if (type === 'enumeration') {
-                    return enumerationName;
                 } else if (isNumberType(type) || type === "[object Number]") {
                     return numberName;
                 } else {
@@ -110,17 +108,21 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
             var eltype = getEltype(key, parent);
 
-            if (eltype === "container" || eltype === "list" || type === "[object Object]") {
+            if (eltype === "container" || eltype === "list") {
                 if (type === "[object Array]") { return arrayName; }
                 return objectName;
-            } else if (eltype === "leaf-list" || type === "[object Array]") {
+            } else if (eltype === "leaf-list") {
                 return arrayName;
             } else if (type === "Boolean" || type === "[object Boolean]") {
                 return boolName;
-            } else if (type === 'enumeration') {
+            } else if (eltype === 'enumeration') {
                 return enumerationName;
             } else if (isNumberType(type) || type === "[object Number]") {
                 return numberName;
+            } else if (type === "[object Object]") {
+                return objectName;
+            } else if (type === "[object Array]") {
+                return arrayName;
             } else {
                 return stringName;
             }
@@ -134,6 +136,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
             if (schema && typeof schema['eltype'] !== "undefined") {
                 eltype = schema['eltype'];
+                if (eltype == 'leaf' && typeof schema['typedef'] !== "undefined") {
+                    eltype = schema['typedef']['type'];
+                }
             }
 
             return eltype;
@@ -215,6 +220,16 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             var type = getType(key, val, parent);
             return (type == objectName || type == arrayName);
         };
+        scope.getEnumValues = function(key, child, parent) {
+            var schema = getSchemaFromKey(key, child);
+            if (schema && typeof schema['enumval'] !== "undefined") {
+                return schema['enumval'];
+            } else if (schema && typeof schema['typedef'] !== "undefined" && typeof schema['typedef']['enumval'] !== "undefined") {
+                return schema['typedef']['enumval'];
+            } else {
+                return [];
+            }
+        }
         scope.toggleCollapse = function() {
             if (scope.collapsed) {
                 scope.collapsed = false;
@@ -243,7 +258,12 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             }
         };
         scope.addItem = function(key, obj, parent) {
-            var type = getType(parent.keyName, undefined, obj);
+            if (typeof parent.valueType == "undefined") {
+                var type = getType(parent.keyName, undefined, obj);
+            } else {
+                var type = parent.ValueType;
+            }
+
             var parentType = objectName;
             //if (typeof parent.$parent.$parent !== "undefined") {
                 parentType = getType(scope.getParents(parent, 4).key, obj);
