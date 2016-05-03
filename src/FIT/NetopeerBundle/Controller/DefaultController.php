@@ -375,7 +375,7 @@ class DefaultController extends BaseController
 		$this->setActiveSectionKey($key);
 		$connectionFunc->buildMenuStructure($key);
 
-		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
+//		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleStylesheet');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'title');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'additionalTitle');

@@ -80,7 +80,7 @@ class ModuleController extends BaseController {
 		$this->bundleName = $bundleName;
 
 		if ($this->getRequest()->getSession()->get('isLocking') !== true) {
-			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleJavascripts');
+//			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleJavascripts');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'moduleStylesheet');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'title');
 			$this->addAjaxBlock($bundleName.':Module:section.html.twig', 'additionalTitle');

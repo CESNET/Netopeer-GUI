@@ -228,7 +228,7 @@ if advised of the possibility of such damage.
 				</div>
 			</section>
 		{% else %}
-			<section id="block--singleContent" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %} scrollable-cover" data-add-scrollable="true">
+			<section id="block--singleContent" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %} scrollable-cover" data-add-scrollable="true"{% block singlecontentAdditions %}{% endblock %}>
 				<div class="scrollable">
 				{% block singleContent %}
 				{% endblock singleContent %}

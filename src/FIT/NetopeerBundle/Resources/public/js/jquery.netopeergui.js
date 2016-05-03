@@ -199,8 +199,7 @@ jQuery.extend({
 				success: function(data, textStatus, jqXHR) {
 					if (typeof angular !== "undefined" && $("#mainView").length) {
 						$("#block--moduleJavascripts, #block--moduleStylesheet").html('');
-						var scope = angular.element(document.getElementById("mainView")).scope();
-						$("#mainView").remove();
+						var scope = angular.element(document.getElementById("block--singleContent")).scope();
 						scope.$destroy();
 					}
 					$.netopeergui.successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
@@ -295,7 +294,7 @@ jQuery(function($) {
 	$.netopeergui.createSpinner();
 
 	$(document).on('click', 'a.ajaxLink', function(e) {
-		//$.netopeergui.loadAjaxLink(e, $(this), $(this).attr('href'), "GET", '');
+		$.netopeergui.loadAjaxLink(e, $(this), $(this).attr('href'), "GET", '');
 	});
 
 	$("section, #block--leftColumn").on('submit', 'form', function(e) {
@@ -314,12 +313,12 @@ jQuery(function($) {
 			});
 		}
 
-		//$.netopeergui.loadAjaxLink(e, $(this), formAction, 'POST', serializedData);
+		$.netopeergui.loadAjaxLink(e, $(this), formAction, 'POST', serializedData);
 	});
 
 	$("body").on('submit', '.modal form', function(e) {
 		$(this).attr('data-callback', 'hideAndEmptyModalWindow()');
-		//$.netopeergui.loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
+		$.netopeergui.loadAjaxLink(e, $(this), $(this).attr('action'), 'POST', $(this).serialize());
 		
 	});
 });

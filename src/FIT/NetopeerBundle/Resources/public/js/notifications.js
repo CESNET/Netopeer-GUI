@@ -127,7 +127,8 @@ $.fn.notifWebSocket = function(key, wsUri) {
 			notifications[key].addMessage(evt.data);
 		};
 		this.websocket.onerror = function(evt) {
-			notifications[key].addError(evt.data);
+			console.log(evt);
+			notifications[key].addError(evt.data || 'Unknown error');
 		};
 
 		this.doSend = function(message) {
@@ -168,6 +169,8 @@ $.fn.notifWebSocket = function(key, wsUri) {
 			if (!notifOutput) {
 				notifInit();
 			}
+
+			if (!mess) return;
 
 			var parsed = mess;
 			var parsed_text = mess;
