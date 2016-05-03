@@ -1302,8 +1302,8 @@
 .jsonView > json > .fa-minus-square-o { display: none; }
 .jsonView .addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; display: block; }
 .jsonView .addObjectItemBtn i { display: block; }
-.jsonView .editbar { margin-left: 10px; float: right; }
-.jsonView .iconButton { margin-left: 5px; position: relative; top: -1px; z-index: 0; cursor: pointer; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30); opacity: 0.3; }
+.jsonView .editbar { margin-left: 0px; }
+.jsonView .iconButton { margin-left: 2px; position: relative; top: -1px; z-index: 0; cursor: pointer; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20); opacity: 0.2; }
 .jsonView .iconButton:hover { filter: progid:DXImageTransform.Microsoft.Alpha(enabled=false); opacity: 1; }
 .jsonView .jsonObjectKey { font-weight: bold; }
 .jsonView .jsonObjectKey .key-name { margin-right: 25px; min-width: 130px; display: inline-block; }
@@ -1322,7 +1322,9 @@
 
 .jsonView .block { clear: both; display: block; margin-top: 0.5em; margin-bottom: 0.5em; }
 .jsonView .block, .jsonView .arrayItem { position: relative; z-index: 1; }
-.jsonView .block:hover:before, .jsonView .arrayItem:hover:before { content: ""; position: absolute; left: -100%; right: 0; background: rgba(0, 0, 0, 0.1); padding: 3px 0px; margin-top: -3px; height: 14px; z-index: 0; }
+.jsonView .block:before, .jsonView .arrayItem:before { content: ""; position: absolute; left: -100%; right: 0; padding: 3px 0px; margin-top: -3px; height: 14px; z-index: 0; }
+.jsonView .block:hover:before, .jsonView .arrayItem:hover:before { background: rgba(0, 0, 0, 0.1); }
+.jsonView .block.modified:before, .jsonView .arrayItem.modified:before { background: rgba(0, 0, 255, 0.2); }
 .jsonView .jsonItemDesc { color: grey; cursor: default; line-height: 30px; }
 .jsonView .objectDesc { cursor: default; }
 .jsonView > json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
