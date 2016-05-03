@@ -474,7 +474,7 @@ class NetconfFunctionality {
 		$getParams = array(
 			"type" 		=> self::MSG_GET,
 			"sessions" 	=> $this->getConnectionFunctionality()->getHashFromKeys($params['connIds']),
-			"source" 	=> "running",
+			"source" 	=> $params['source'],
 			"strict"   => isset($params['strict']) ? $params['strict'] : false,
 		);
 		$getParams = $this->addOptionalParams($getParams, $params, array('filter'));

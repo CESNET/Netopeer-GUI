@@ -204,6 +204,7 @@ class BaseController extends Controller
 				$conn->setCurrentDatastore($sourceConfig);
 			}
 			$this->setConfigParams('source', $conn->getCurrentDatastore());
+			$this->setStateParams('source', $conn->getCurrentDatastore());
 		}
 
 		$this->setStateParams('connIds', array($key));
