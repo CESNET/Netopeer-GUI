@@ -237,7 +237,7 @@ class AjaxController extends BaseController
 		$filters = $connectionFunc->loadFilters($module, $subsection);
 
 		$params = array(
-			'key' => $key,
+			'connIds' => array($key),
 			'filter' => $filters['state'],
 			'target' => $target
 		);

@@ -153,7 +153,7 @@ jQuery.extend({
 
 			// process given data and hide spinner in success callback
 			this.processResponseData(data, function() {
-				this.hideSpinner();
+				$.netopeergui.hideSpinner();
 			});
 
 			// set clicked link as active

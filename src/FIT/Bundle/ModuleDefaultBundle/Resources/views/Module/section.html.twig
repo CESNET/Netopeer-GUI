@@ -39,22 +39,6 @@ if advised of the possibility of such damage.
 {% extends 'FITModuleDefaultBundle::layout.html.twig' %}
 {% block title %}Section {% if sectionName is defined and not(sectionName is empty) %}- {{sectionName}}{% endif %}{% endblock title %}
 
-{% block leftColumnAdditional %}
-	{% if (hideColumnControl is not defined) or (hideColumnControl is defined and hideColumnControl != true) %}
-		<div class="change-columns-layout nav-left">
-			<h5 class="left-column-base">Show as:</h5>
-			<a href="{{ path('changeColumnLayout', {"newValue": "true"}) }}" class="item ajaxLink" data-disable-history="true" title="Merged state & config">
-				<span class="bullet"></span>
-				Merged
-			</a>
-			<a href="{{ path('changeColumnLayout', {"newValue": "false"}) }}" class="item ajaxLink" data-disable-history="true" title="State & config separately">
-				<span class="bullet"></span>
-				Separate
-			</a>
-		</div>
-	{% endif %}
-{% endblock leftColumnAdditional %}
-
 {% set stateDefined = 'false' %}
 
 {% block htmlAdditions %} ng-app="NetopeerGUIApp"{% endblock %}

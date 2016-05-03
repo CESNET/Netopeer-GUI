@@ -156,7 +156,7 @@ if advised of the possibility of such damage.
 						<h4>RPC methods defined in model:</h4>
 						<div class="nav-left">
 						{% for rpc in rpcMethods %}
-							<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc.name}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc.name }}</a>
+							<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc }}</a>
 						{% endfor %}
 						</div>
 					{% endif %}
@@ -164,12 +164,10 @@ if advised of the possibility of such damage.
 
 				<div id="block--copyConfig">
 					{% block copyConfig %}
-					{% if stateArr is defined
-						and formConfig is defined
-					%}
+
+						{% if formConfig is defined %}
 						<h4>Change datastore</h4>
 						<div class="left-column-base">
-						{% if formConfig is defined %}
 							{% block filterConfig %}
 								<form action="" method="post" {{ form_enctype(formConfig) }} class="filter-form" name="formConfig" data-disable-active-link="true">
 									{{ form_widget(formConfig) }}
@@ -182,17 +180,14 @@ if advised of the possibility of such damage.
 									<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink button grey small left" data-disable-history="true">Validate this datastore</a>
 								{% endblock %}
 							</div>
-						{% endif %}
-						{% if formCopyConfig is defined %}
 							<hr class="cleaner" />
 							<h5>Copy active datastore to:</h5>
 							<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter-form" name="formCopyConfig">
 								{{ form_widget(formCopyConfig) }}
 								<input type="submit" value="Copy active datastore" class="button small grey left" />
 							</form>
-						{% endif %}
 						</div>
-					{% endif %}
+						{% endif %}
 					{% endblock %}
 				</div>
 

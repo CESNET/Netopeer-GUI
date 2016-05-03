@@ -464,9 +464,11 @@ class DefaultController extends BaseController
 	 *
 	 * @return bool
 	 */
-	private function getRPCXmlForMethod($rpcMethod, $module, $subsection = "") {
-		$rpcs = $this->createRPCListFromModel($module, $subsection);
-		return isset($rpcs[$rpcMethod]) ? $rpcs[$rpcMethod] : false;
+	private function getRPCXmlForMethod($rpcMethod, $key, $module) {
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		$rpc = $module.':'.$rpcMethod;
+		$json = $netconfFunc->handle('query', array('connIds' => array($key), 'load_children' => true, 'filters' => array('/'.$rpc)));
+		return $json;
 	}
 
 	/**
@@ -492,9 +494,6 @@ class DefaultController extends BaseController
 		$this->assign('key', $key);
 		$this->assign('module', $module);
 		$this->assign('rpcName', $rpcName);
-		// path for creating node typeahead
-		$valuesTypeaheadPath = $this->generateUrl("getValuesForLabel", array('formId' => "FORMID", 'key' => $key, 'xPath' => "XPATH"));
-		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
 
 		if ($this->getRequest()->getMethod() == 'POST') {
 			$xmlOperations = $this->get("XMLoperations");
@@ -506,7 +505,7 @@ class DefaultController extends BaseController
 			return new RedirectResponse($url);
 		}
 
-		$this->assign('rpcArr', $this->getRPCXmlForMethod($rpcName, $module));
+		$this->assign('rpcData', $this->getRPCXmlForMethod($rpcName, $key, $module));
 
 		return $this->getTwigArr();
 	}
@@ -534,15 +533,13 @@ class DefaultController extends BaseController
 			$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 			$arr = [];
 			$formData = $this->getRequest()->get('form');
-			$arr[$formData['modulePrefix']] = [];
-			$arr['@'.$formData['modulePrefix']] = [
-				'ietf-netconf:operation' => 'create'
-			];
-			$configParams = $this->getConfigParams();
+			$moduleName = $formData['modulePrefix'] . ':' . $formData['moduleName'];
+			$json = '{"'.$moduleName.'":{},"@'.$moduleName.'":{"ietf-netconf:operation":"create"}}';
+//			var_dump($this->getStateParams());exit;
 			$params = array(
 				'connIds' => array($key),
-				'target' => $configParams['source'],
-				'configs' => array(json_encode($arr))
+				'target' => 'running',
+				'configs' => array($json)
 			);
 			$res = $netconfFunc->handle('editconfig', $params);
 			if ($res != 0) {

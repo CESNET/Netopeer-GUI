@@ -160,6 +160,12 @@ class ConnectionFunctionality {
 		return $this->models;
 	}
 
+	public function getModelMetadata($key, $module) {
+		$models = $this->getModels($key);
+
+		return isset($models[$module]) ? $models[$module] : false;
+	}
+
 	/**
 	 * save model folder structure
 	 *
@@ -470,6 +476,7 @@ class ConnectionFunctionality {
 
 			if ($this->getModuleIdentifiersForCurrentDevice($key)) {
 				$identifiers = $this->setRootNamesForModuleIdentifiers($key, $elemNames);
+				$rootElems = array();
 				foreach ( $identifiers as $ns => $values ) {
 					$i                         = 0;
 					$moduleName                = $values['moduleName'];
@@ -494,9 +501,18 @@ class ConnectionFunctionality {
 							"rootElementName" => $values["rootElementName"],
 							"version"         => $values['revision'],
 						);
+						$rootElems[$moduleName] = $values["rootElementName"];
+						$schema = $netconfFunc->handle('query', array('connIds' => $key, 'filters' => array($moduleName)));
+						$decoded = json_decode($schema, true);
+						if (array_key_exists('rpcs', $decoded['$@@'.$moduleName])) {
+							$models[$moduleName]['rpcs'] = $decoded['$@@'.$moduleName]['rpcs'];
+						} else {
+							$models[$moduleName]['rpcs'] = array();
+						}
 					}
 					$namespaces[ $moduleName ] = $values;
 				}
+
 			} else {
 				$this->getLogger()->addError("Could not build MenuStructure", array('key' => $key));
 				// nothing
@@ -564,29 +580,6 @@ class ConnectionFunctionality {
 		return array(
 			'config' => $filterConfig,
 			'state' => $filterState
-		);
-	}
-
-	/**
-	 * loading file with RPCs for current module or subsection
-	 *
-	 * @param  string $module     module name
-	 * @param  string $subsection subsection name
-	 * @return array              array with config and state filter
-	 */
-	public function loadRPCsModel($module, $subsection) {
-		return;
-		// TODO
-		$path = $this->getPathToModels($module);
-		$file = $path.'rpc.wyin';
-
-		$rpcs_model = "";
-		if ( file_exists($file) ) {
-			$rpcs_model = file_get_contents($file);
-		}
-
-		return array(
-			'rpcs' => $rpcs_model,
 		);
 	}
 

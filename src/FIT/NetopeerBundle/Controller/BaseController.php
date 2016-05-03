@@ -286,16 +286,18 @@ class BaseController extends Controller
 	 *
 	 * @return array
 	 */
-	protected function createRPCListFromModel($module, $subsection = "")
+	protected function createRPCListFromModel($key, $module)
 	{
-		// TODO;
+		$connectionFunc = $this->get("fitnetopeerbundle.service.connection.functionality");
+		$model = $connectionFunc->getModelMetadata($key, $module);
+		if ($model) {
+			return $model['rpcs'];
+		} else {
+			return array();
+		}
+
+
 		return;
-		if (!empty($this::$rpcs)) return $this::$rpcs;
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
-		$rpcs = $dataClass->loadRPCsModel($module, $subsection);
 		$rpcxml = simplexml_load_string($rpcs["rpcs"]);
 		$rpcs = array();
 		if ($rpcxml) {

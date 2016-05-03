@@ -116,18 +116,17 @@ class ModuleController extends BaseController {
 		/** prepare necessary data for left column */
 		$this->setActiveSectionKey($key);
 		$this->setModuleOrSectionName($key, $module, $subsection);
-		$this->assign('rpcMethods', $this->createRPCListFromModel($module, $subsection));
+		$this->assign('rpcMethods', $this->createRPCListFromModel($key, $module));
 		$this->setModuleOutputStyles($key, $module);
 
 		// if form has been send, we well process it
 		if ($this->getRequest()->getMethod() == 'POST') {
-//			return $this->processSectionForms($key, $module, $subsection); // TODO
-			return;
+			return $this->processSectionForms($key, $module, $subsection);
+//			return;
 		}
 
 		// we will prepare filter form in column
 		$this->setSectionFilterForms($key);
-		$this->generateTypeaheadPath($key, $module, $subsection);
 
 		$activeNotifications = $this->getRequest()->getSession()->get('activeNotifications');
 		if ( !isset($activeNotifications[$key]) || $activeNotifications[$key] !== true ) {
@@ -268,34 +267,6 @@ class ModuleController extends BaseController {
 	}
 
 	/**
-	 * generates and assign typeahead placeholder path (for using in JS typeadhead function)
-	 *
-	 * @param $key
-	 * @param $module
-	 * @param $subsection
-	 */
-	protected function generateTypeaheadPath($key, $module, $subsection) {
-		// path for creating node typeahead
-		$typeaheadParams = array(
-				'formId' => "FORMID",
-				'connIds' => array($key),
-				'xPath' => "XPATH"
-		);
-		return; // TODO
-		$valuesTypeaheadPath = $this->generateUrl('getValuesForLabel', $typeaheadParams);
-		if (!is_null($module)) {
-			$typeaheadParams['module'] = $module;
-			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithModule', $typeaheadParams);
-		}
-		if (!is_null($subsection)) {
-			$typeaheadParams['subsection'] = $subsection;
-			$valuesTypeaheadPath = $this->generateUrl('getValuesForLabelWithSubsection', $typeaheadParams);
-		}
-
-		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
-	}
-
-	/**
 	 * Redirect to first available module or All section if no module is available
 	 *
 	 * @param $key      ID of connection
@@ -337,41 +308,20 @@ class ModuleController extends BaseController {
 			$this->setSectionFilterForms($key);
 		}
 
-		// processing filter on state part
-		if ( isset($post_vals['formType']) && $post_vals['formType'] == "formState") {
-			$res = $this->handleFilterState($key, $post_vals);
-			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
-
-			// processing filter on config part
-		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formConfig" ) {
+		// processing filter on config part
+		if ( isset($post_vals['formType']) && $post_vals['formType'] == "formConfig" ) {
 			$res = $this->handleFilterConfig($key);
 			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
 
 			// processing form on config - edit Config
 		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formCopyConfig" ) {
 			$res = $this->handleCopyConfig($key);
-
-			// processing form on config - edit Config
-		} elseif ( is_array($this->getRequest()->get('configDataForm')) ) {
-			$res = $this->get('XMLoperations')->handleEditConfigForm($key, $this->getConfigParams());
-
-			// processing duplicate node form
-		} elseif ( is_array($this->getRequest()->get('duplicatedNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleDuplicateNodeForm($key, $this->getConfigParams());
-
-			// processing new node form
-		} elseif ( is_array($this->getRequest()->get('newNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleNewNodeForm($key, $this->getConfigParams());
-
-			// processing remove node form
-		} elseif ( is_array($this->getRequest()->get('removeNodeForm')) ) {
-			$res = $this->get('XMLoperations')->handleRemoveNodeForm($key, $this->getConfigParams());
 		}
 
 		// we will redirect page after completion, because we want to load edited get and get-config
 		// and what's more, flash message lives exactly one redirect, so without redirect flash message
 		// would stay on the next page, what we do not want...
-		$retArr['connIds'] = array($key);
+		$retArr['key'] = $key;
 		$routeName = 'section';
 		if ( $module ) {
 			$retArr['module'] = $module;
