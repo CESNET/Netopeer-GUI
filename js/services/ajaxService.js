@@ -3,9 +3,10 @@ var services = angular.module('NetopeerGUIServices', [])
 .service('AjaxService', function ($http) {
 	$http.defaults.cache = true;
 
-	this.reloadData = function() {
+	this.reloadData = function(targetUrl) {
+		var url = targetUrl || window.location.href;
 		return $http({
-			url: window.location.href + '?angular=true',
+			url: url + '?angular=true',
 			method: 'GET'
 		});
 	};

@@ -76,11 +76,13 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         }
 
         scope.jsonEditable = jsonEditable;
+        scope.contentStatus = '';
 
         //////
         // Helper functions
         //////
         var isNumberType = function(type) {
+            if (!type) return false;
             return type.indexOf('int') >= 0;
         };
 
@@ -349,6 +351,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             child[key] = val;
             setParentChanged(parent);
             setIetfOperation('replace', key, child, parent);
+            scope.contentStatus = 'modified';
         };
 
         scope.isVisible = function(key, obj) {

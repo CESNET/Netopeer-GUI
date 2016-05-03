@@ -1,13 +1,15 @@
 <i ng-click="toggleCollapse()" class="fa toggle-control" ng-class="chevron" ng-if="!hideCollapse"></i>
 <div class="jsonContents" ng-hide="collapsed">
-	<span class="block" ng-repeat="(key, val) in child | skipAttributes" ng-if="isVisible(key, child, $parent)">
+	<span class="block" ng-repeat="(key, val) in child | skipAttributes" ng-if="isVisible(key, child, $parent)"> <!--ng-class="contentStatus"-->
 		<span ng-class="{'jsonObjectKey': 1, 'objectOrArrayCover': isObjectOrArray(key, val, child)}">
-			<span class="key-name" ng-model="newkey" ng-init="newkey=key">{{ key }}</span>
-			<!--<input class="keyinput" type="text" ng-model="newkey" ng-init="newkey=key" ng-blur="moveKey(child, key, newkey)"/>-->
-			<span class="editbar">
-				<i class="iconButton fa fa-question-circle" tooltip-placement="left" uib-tooltip="{{child['$@'+key]['description']}}" ng-if="child['$@'+key]['description']"></i>
-				<i class="iconButton deleteKeyBtn fa fa-trash" ng-click="deleteKey(key, child, $parent)" ng-if="child['$@'+key] && !child['$@'+key]['mandatory']"></i>
+			<span class="key-name" ng-init="newkey=key">
+				{{ key }}
+				<span class="editbar">
+					<i class="iconButton fa fa-question-circle" tooltip-placement="top" uib-tooltip="{{child['$@'+key]['description']}}" ng-if="child['$@'+key]['description']"></i>
+					<i class="iconButton deleteKeyBtn fa fa-trash" ng-click="deleteKey(key, child, $parent)" ng-if="child['$@'+key] && !child['$@'+key]['mandatory']"></i>
+				</span>
 			</span>
+			<!--<input class="keyinput" type="text" ng-model="newkey" ng-init="newkey=key" ng-blur="moveKey(child, key, newkey)"/>-->
 		</span>
 		<span class="jsonObjectValue">
 			<switch-item></switch-item>
