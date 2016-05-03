@@ -30,8 +30,6 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 				});
 		}
 
-		$scope.reload();
-
 		$scope.$watch('jsonData', function (newValue, oldValue) {
 			$scope.jsonString = JSON.stringify(newValue);
 			if ( !isUndo && !isRedo && newValue !== oldValue ) {
