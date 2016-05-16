@@ -2,6 +2,3 @@
 	path = install/mod_netconf
 	url = https://github.com/CESNET/mod_netconf.git
 
-[submodule "netopeerangular"]
-	path = src/FIT/Bundle/ModuleDefaultBundle/Resources/netopeerangular
-	url = https://bitbucket.org/alexadav/netopeerangular.git 
