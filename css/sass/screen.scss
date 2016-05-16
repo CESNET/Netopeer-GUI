@@ -59,7 +59,11 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 	&:before { content: ""; position: absolute; border-left: 1px solid #ccc; z-index: 0; top: 0;	bottom: 0; left: -17px; }
 	li .jsonContents { margin-left: 0px; }
 	li .jsonContents .jsonContents { margin-left: 25px; }
-	li .jsonContents .arrayOl .jsonContents { margin-left: 0px; }
+	li .jsonContents {
+		.arrayOl, .listOl {
+			.jsonContents { margin-left: 0px; }
+		}
+	}
 }
 
 
@@ -90,7 +94,8 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 	}
 	//ol.arrayOl { margin: 0; padding-left: 20px; }
 	li {clear: both; min-height: 26px; }
-	ol.arrayOl {
+	ol.listOl > .arrayItem { list-style: none !important; }
+	ol.arrayOl, ol.listOl {
 		.toggle-control { margin-left: -20px; top: 1.3em; display: none; }
 		//.fa-minus-square-o { top: 7px; }
 		//.fa-plus-square-o { top: -16px; }
@@ -100,7 +105,7 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 		li, li li { color: grey; list-style-type: decimal;
 			input { font-style: normal; }
 		}
-		ol.arrayOl { margin-top: 0.5em;
+		ol.arrayOl, ol.listOl { margin-top: 0.5em;
 			&, & + add-item .block { margin-left: 25px; }
 		}
 	}

@@ -47,6 +47,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var stringName = "Text";
         var objectName = "Object";
         var arrayName = "Array";
+        var listName = "List";
         var numberName = "Number";
         var urlName = "Url";
         var refName = "Reference";
@@ -54,7 +55,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var enumerationName = "Enumeration";
         var literalName = "Literal";
 
-        scope.valueTypes = [stringName, objectName, arrayName, numberName, urlName, refName, boolName, enumerationName, literalName];
+        scope.valueTypes = [stringName, objectName, arrayName, listName, numberName, urlName, refName, boolName, enumerationName, literalName];
         scope.stringName = stringName;
         //scope.valueTypes = [stringName, objectName, arrayName, refName, boolName];
         scope.sortableOptions = {
@@ -111,7 +112,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             var eltype = getEltype(key, parent);
 
             if (eltype === "container" || eltype === "list") {
-                if (type === "[object Array]") { return arrayName; }
+                if (type === "[object Array]") { return listName; }
                 return objectName;
             } else if (eltype === "leaf-list") {
                 return arrayName;
@@ -220,7 +221,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
         scope.isObjectOrArray = function(key, val, parent) {
             var type = getType(key, val, parent);
-            return (type == objectName || type == arrayName);
+            return (type == objectName || type == arrayName || type == listName);
         };
         scope.getEnumValues = function(key, child, parent) {
             var schema = getSchemaFromKey(key, child);
@@ -404,10 +405,12 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 generateEmpty = false;
             }
             var eltype = getAttributeType(key, obj);
-            if (eltype == 'list') {
-                obj = scope.getParents(obj, 2);
-            }
+            //if (key == 'state') {
+            //    console.log(getEltype(key, obj));
+            //    console.log(eltype);
+            //}
             switch (eltype) {
+                case 'container':
                 case 'anydata':
                     if (typeof obj[key] !== "undefined") {
                         if (generateEmpty && typeof obj[key]['@'] === "undefined") {
@@ -420,8 +423,20 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         }
                     }
                     break;
-                case 'leaf-list':
                 case 'list':
+                    obj = scope.getParents(obj, 2);
+                    if (generateEmpty && typeof obj['@'] === "undefined") {
+                        console.log(obj);
+                        console.log(scope);
+                        try {
+                            obj['@'] = {}; // create empty attributes object
+                        } catch (exception) {};
+                    }
+                    if (typeof obj['@'] !== "undefined") {
+                        return obj['@'];
+                    }
+                    break;
+                case 'leaf-list':
                 case 'anyxml':
                     if (generateEmpty && typeof obj['@'+key] === "undefined") {
                         try {
@@ -432,11 +447,6 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         return obj['@'+key];
                     }
                     break;
-                //case 'leaf-list':
-                //    if (typeof obj['@'+key] !== "undefined" && typeof obj['@'+key][attr] !== "undefined") {
-                //        return obj['@'+key][attr];
-                //    }
-                //    break;
             }
 
             return false;
@@ -508,11 +518,11 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
             if (tmpParent.hasOwnProperty('key') && typeof scope.getParents(tmpParent, 2)['child'] !== 'undefined') {
                 if (getAttributeType(tmpParent['key'], scope.getParents(tmpParent, 2)['child']) == 'list') {
-                    key = tmpParent['key'];
-                    obj = scope.getParents(tmpParent, 2)['child'];
-                    if (operation == 'replace') {
-                        operation = 'merge';
-                    }
+                    //key = tmpParent['key'];
+                    //obj = scope.getParents(tmpParent, 2)['child'];
+                    //if (operation == 'replace') {
+                    //    operation = 'merge';
+                    //}
                 }
             }
             setAttribute('ietf-netconf:operation', operation, key, obj);

@@ -1318,7 +1318,7 @@
 .jsonContents:before { content: ""; position: absolute; border-left: 1px solid #ccc; z-index: 0; top: 0; bottom: 0; left: -17px; }
 .jsonContents li .jsonContents { margin-left: 0px; }
 .jsonContents li .jsonContents .jsonContents { margin-left: 25px; }
-.jsonContents li .jsonContents .arrayOl .jsonContents { margin-left: 0px; }
+.jsonContents li .jsonContents .arrayOl .jsonContents, .jsonContents li .jsonContents .listOl .jsonContents { margin-left: 0px; }
 
 .jsonView .block { clear: both; display: block; margin-top: 0.5em; margin-bottom: 0.5em; }
 .jsonView .block, .jsonView .arrayItem { position: relative; z-index: 1; }
@@ -1332,12 +1332,13 @@
 .jsonView add-item .addObjectItemBtn { position: relative; z-index: 10; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30); opacity: 0.3; }
 .jsonView add-item .addObjectItemBtn:hover { filter: progid:DXImageTransform.Microsoft.Alpha(enabled=false); opacity: 1; }
 .jsonView li { clear: both; min-height: 26px; }
-.jsonView ol.arrayOl .toggle-control { margin-left: -20px; top: 1.3em; display: none; }
-.jsonView ol.arrayOl > li > span > span > json > .toggle-control { left: -40px; }
-.jsonView ol.arrayOl li, .jsonView ol.arrayOl li li { color: grey; list-style-type: decimal; }
-.jsonView ol.arrayOl li input, .jsonView ol.arrayOl li li input { font-style: normal; }
-.jsonView ol.arrayOl ol.arrayOl { margin-top: 0.5em; }
-.jsonView ol.arrayOl ol.arrayOl, .jsonView ol.arrayOl ol.arrayOl + add-item .block { margin-left: 25px; }
+.jsonView ol.listOl > .arrayItem { list-style: none !important; }
+.jsonView ol.arrayOl .toggle-control, .jsonView ol.listOl .toggle-control { margin-left: -20px; top: 1.3em; display: none; }
+.jsonView ol.arrayOl > li > span > span > json > .toggle-control, .jsonView ol.listOl > li > span > span > json > .toggle-control { left: -40px; }
+.jsonView ol.arrayOl li, .jsonView ol.arrayOl li li, .jsonView ol.listOl li, .jsonView ol.listOl li li { color: grey; list-style-type: decimal; }
+.jsonView ol.arrayOl li input, .jsonView ol.arrayOl li li input, .jsonView ol.listOl li input, .jsonView ol.listOl li li input { font-style: normal; }
+.jsonView ol.arrayOl ol.arrayOl, .jsonView ol.arrayOl ol.listOl, .jsonView ol.listOl ol.arrayOl, .jsonView ol.listOl ol.listOl { margin-top: 0.5em; }
+.jsonView ol.arrayOl ol.arrayOl, .jsonView ol.arrayOl ol.arrayOl + add-item .block, .jsonView ol.arrayOl ol.listOl, .jsonView ol.arrayOl ol.listOl + add-item .block, .jsonView ol.listOl ol.arrayOl, .jsonView ol.listOl ol.arrayOl + add-item .block, .jsonView ol.listOl ol.listOl, .jsonView ol.listOl ol.listOl + add-item .block { margin-left: 25px; }
 .jsonView li select, .jsonView li button { font-style: normal; }
 .jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
 .jsonView li li { list-style-type: lower-roman; }

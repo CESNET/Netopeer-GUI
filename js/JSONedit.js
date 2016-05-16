@@ -20,7 +20,6 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 				isRedo = false;
 
 		$scope.reload = function() {
-
 			AjaxService.reloadData()
 				.then(function successCallback(data) {
 					$scope.jsonData = data.data;
@@ -81,7 +80,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 							// leave attributes
 
 						} else if (this.notRoot && !angular.isUndefined(this.parent.key) && this.path.toString().indexOf('@') === -1 && this.isLeaf) {
-							this.remove();
+							//this.remove();
 						}
 					}
 				});
