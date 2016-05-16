@@ -502,17 +502,28 @@ class ConnectionFunctionality {
 							"version"         => $values['revision'],
 						);
 						$rootElems[$moduleName] = $values["rootElementName"];
-						$schema = $netconfFunc->handle('query', array('connIds' => $key, 'filters' => array($moduleName)));
-						$decoded = json_decode($schema, true);
+
+//						$schema = $netconfFunc->handle('query', array('connIds' => $key, 'filters' => array($moduleName)));
+//						$decoded = json_decode($schema, true);
+//						if (array_key_exists('rpcs', $decoded['$@@'.$moduleName])) {
+//							$models[$moduleName]['rpcs'] = $decoded['$@@'.$moduleName]['rpcs'];
+//						} else {
+//							$models[$moduleName]['rpcs'] = array();
+//						}
+					}
+					$namespaces[ $moduleName ] = $values;
+				}
+				$schema = $netconfFunc->handle('query', array('connIds' => $key, 'filters' => array(array_keys($rootElems))));
+				if ($schema !== 1) {
+					$decoded = json_decode($schema, true);
+					foreach ($rootElems as $moduleName => $val) {
 						if (array_key_exists('rpcs', $decoded['$@@'.$moduleName])) {
 							$models[$moduleName]['rpcs'] = $decoded['$@@'.$moduleName]['rpcs'];
 						} else {
 							$models[$moduleName]['rpcs'] = array();
 						}
 					}
-					$namespaces[ $moduleName ] = $values;
 				}
-
 			} else {
 				$this->getLogger()->addError("Could not build MenuStructure", array('key' => $key));
 				// nothing
