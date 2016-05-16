@@ -1,0 +1,76 @@
+{
+  "$@ietf-interfaces:interfaces": {
+    "eltype": "leaf",
+    "config": "false",
+    "type": "enumeration",
+    "enumval": ["int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64", "float", "string"],
+    "description": "The data type of the parameters argument.",
+    "mandatory": "false",
+    "iskey": "false",
+    "children": ["interface", "interface-state"]
+  },
+  "ietf-interfaces:interfaces": {
+
+    "$@interface": {
+      "eltype": "list",
+      "config": "true",
+      "type": "enumeration",
+      "iskey": "false"
+    },
+    "interface": [
+      {
+        "$@name": {
+          "config": "true",
+          "type": "string",
+          "description": "The data type of the parameters argument."
+        },
+        "name": "eth0",
+
+        "$@type": {
+          "typedef": {
+            "type": "uint8",
+            "range": "0 .. 100",
+            "description": "Percentage"
+          }
+        },
+        "type": "iana-if-type:ethernetCsmacd",
+
+        "$@enabled": {
+          "type": "boolean"
+        },
+        "enabled": false
+      },
+      {
+        "$@name": {
+          "config": "true",
+          "type": "string"
+        },
+        "name": "eth1",
+
+        "$@type": {
+          "typedef": {
+            "type": "uint8",
+            "range": "0 .. 100",
+            "description": "Percentage"
+          }
+        },
+        "type": "iana-if-type:ethernetCsmacd",
+        "enabled": true,
+        "ex-vlan:vlan-tagging": true
+      }
+    ]
+  },
+
+  "$@ietf-interfaces:interfaces-state": {
+    "eltype": "leaf",
+    "config": "false",
+    "type": "enumeration",
+    "enumval": ["int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64", "float", "string"],
+    "description": "The data type of the parameters argument.",
+    "mandatory": "false",
+    "iskey": "false"
+  },
+  "ietf-interfaces:interfaces-state": {
+
+  }
+}

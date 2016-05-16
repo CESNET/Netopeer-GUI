@@ -1,0 +1,413 @@
+<module xmlns="urn:ietf:params:xml:ns:yang:yin:1" xmlns:nemea="urn:cesnet:tmc:nemea:1.0" name="nemea">
+    <namespace uri="urn:cesnet:tmc:nemea:1.0"/>
+    <prefix value="nemea"/>
+    <organization>
+      <text>CESNET, z.s.p.o.</text>
+    </organization>
+    <contact>
+      <text>cejkat@cesnet.cz</text>
+    </contact>
+    <description>
+      <text>Module specifying configuration of Nemea supervisor.</text>
+    </description>
+    <revision date="2014-07-28">
+      <description>
+        <text>Model with state information and notification.</text>
+      </description>
+    </revision>
+    <typedef name="trapifc-type">
+      <type name="enumeration">
+        <enum name="TCP">
+          <description>
+            <text>IP/TCP for intermachine connections.</text>
+          </description>
+        </enum>
+        <enum name="UNIXSOCKET">
+          <description>
+            <text>UNIX socket for local connections.</text>
+          </description>
+        </enum>
+        <enum name="SERVICE">
+          <description>
+            <text>Service communication interface for module-supervisor communication.</text>
+          </description>
+        </enum>
+      </type>
+    </typedef>
+    <typedef name="trapifc-direction">
+      <type name="enumeration">
+        <enum name="IN">
+          <description>
+            <text>Input interface.</text>
+          </description>
+        </enum>
+        <enum name="OUT">
+          <description>
+            <text>Output interface.</text>
+          </description>
+        </enum>
+        <enum name="SERVICE">
+          <description>
+            <text>Service interface.</text>
+          </description>
+        </enum>
+      </type>
+    </typedef>
+    <container name="nemea-supervisor">
+      <container name="supervisor">
+        <leaf name="verbose">
+          <type name="boolean"/>
+          <default value="false"/>
+          <description>
+            <text>Verbose level of supervisor log.</text>
+          </description>
+        </leaf>
+        <leaf name="module-restarts">
+          <type name="uint8"/>
+          <default value="3"/>
+          <description>
+            <text>Global number of automatic restarts of a module that ends.</text>
+          </description>
+        </leaf>
+        <leaf name="logs-directory">
+          <type name="string"/>
+          <default value="/tmp/supervisor_logs/"/>
+          <description>
+            <text>Path to supervisor logs directory (also with outputs of started modules)</text>
+          </description>
+        </leaf>
+      </container>
+      <container name="available-modules">
+        <container name="search-paths">
+          <description>
+            <text>Directories searched by supervisor for Nemea modules</text>
+          </description>
+          <leaf-list name="path">
+            <type name="string"/>
+            <description>
+              <text>Individual path with nemea modules.</text>
+            </description>
+          </leaf-list>
+        </container>
+        <container name="modules">
+          <description>
+            <text>All Nemea modules that were found in search-paths</text>
+          </description>
+          <config value="false"/>
+          <list name="module">
+            <description>
+              <text>Describes one available module.</text>
+            </description>
+            <key value="name"/>
+            <config value="false"/>
+            <leaf name="name">
+              <type name="string"/>
+              <description>
+                <text>Name that is presented by the module.</text>
+              </description>
+              <config value="false"/>
+            </leaf>
+            <leaf name="description">
+              <type name="string"/>
+              <description>
+                <text>Description of the module.</text>
+              </description>
+              <config value="false"/>
+            </leaf>
+            <leaf name="number-out-ifc">
+              <type name="uint8"/>
+              <description>
+                <text>Number of module output interfaces.</text>
+              </description>
+              <config value="false"/>
+            </leaf>
+            <leaf name="number-in-ifc">
+              <type name="uint8"/>
+              <description>
+                <text>Number of module input interfaces.</text>
+              </description>
+              <config value="false"/>
+            </leaf>
+            <list name="parameter">
+              <description>
+                <text>Contains information about one particular parameter of the module.</text>
+              </description>
+              <key value="short-opt"/>
+              <config value="false"/>
+              <leaf name="short-opt">
+                <type name="string"/>
+                <description>
+                  <text>Short version of the module parameter.</text>
+                </description>
+                <config value="false"/>
+              </leaf>
+              <leaf name="long-opt">
+                <type name="string"/>
+                <description>
+                  <text>Long version of the module parameter.</text>
+                </description>
+                <config value="false"/>
+                <mandatory value="false"/>
+              </leaf>
+              <leaf name="description">
+                <type name="string"/>
+                <description>
+                  <text>Description of the module parameter</text>
+                </description>
+                <config value="false"/>
+              </leaf>
+              <leaf name="mandatory-argument">
+                <type name="boolean"/>
+                <description>
+                  <text>Information, whether the parameter has mandatory argument.</text>
+                </description>
+                <config value="false"/>
+              </leaf>
+              <leaf name="argument-type">
+                <type name="enumeration">
+                  <enum name="int8">
+                    <description>
+                      <text>int8 is expected for the parameter</text>
+                    </description>
+                  </enum>
+                  <enum name="int16">
+                    <description>
+                      <text>int16 is expected for the parameter</text>
+                    </description>
+                  </enum>
+                  <enum name="int32">
+                    <description>
+                      <text>int32 is expected for the parameter</text>
+                    </description>
+                  </enum>
+                  <enum name="int64">
+                    <description>
+                      <text>int64 is expected for the parameter</text>
+                    </description>
+                  </enum>
+                  <enum name="uint8">
+                    <description>
+                      <text>uint8 is expected for the parameter</text>
+                    </description>
+                  </enum>
+                  <enum name="uint16">
+                    <description>
+                      <text>uint16 is expected for the parameter</text>
+                    </description>
+                  </enum>
+                  <enum name="uint32">
+                    <description>
+                      <text>uint32 is expected for the parameter</text>
+                    </description>
+                  </enum>
+                  <enum name="uint64">
+                    <description>
+                      <text>uint64 is expected for the parameter</text>
+                    </description>
+                  </enum>
+                  <enum name="float">
+                    <description>
+                      <text>Float argument is expected for the parameter.</text>
+                    </description>
+                  </enum>
+                  <enum name="string">
+                    <description>
+                      <text>String argument is expected for the parameter.</text>
+                    </description>
+                  </enum>
+                </type>
+                <description>
+                  <text>The data type of the parameters argument.</text>
+                </description>
+                <config value="false"/>
+                <mandatory value="false"/>
+              </leaf>
+            </list>
+          </list>
+        </container>
+      </container>
+      <list name="modules">
+        <key value="name"/>
+        <leaf name="name">
+          <type name="string"/>
+          <description>
+            <text>Name of group of Nemea modules.</text>
+          </description>
+        </leaf>
+        <leaf name="enabled">
+          <type name="boolean"/>
+          <description>
+            <text>Activation of group of Nemea modules.</text>
+          </description>
+        </leaf>
+        <list name="module">
+          <key value="name"/>
+          <leaf name="name">
+            <type name="string"/>
+            <description>
+              <text>Unique name of the module.</text>
+            </description>
+          </leaf>
+          <leaf name="params">
+            <type name="string"/>
+            <description>
+              <text>Additional parameters of the module (program).</text>
+            </description>
+          </leaf>
+          <leaf name="enabled">
+            <type name="boolean"/>
+            <mandatory value="true"/>
+            <description>
+              <text>Specify whether to start the module or not.</text>
+            </description>
+          </leaf>
+          <leaf name="running">
+            <type name="boolean"/>
+            <config value="false"/>
+            <description>
+              <text>Specify whether the module is running.</text>
+            </description>
+          </leaf>
+          <leaf name="restart-counter">
+            <type name="uint8"/>
+            <config value="false"/>
+            <description>
+              <text>The number of repeated starts of the module.</text>
+            </description>
+          </leaf>
+          <leaf name="path">
+            <type name="string"/>
+            <mandatory value="true"/>
+            <description>
+              <text>Path to module (executable file).</text>
+            </description>
+          </leaf>
+          <leaf name="module-restarts">
+            <type name="uint8"/>
+            <default value="3"/>
+            <description>
+              <text>Global number of automatic restarts of a module that ends.</text>
+            </description>
+          </leaf>
+          <container name="trapinterfaces">
+            <list name="interface">
+              <key value="type direction params"/>
+              <leaf name="type">
+                <type name="trapifc-type"/>
+                <mandatory value="true"/>
+                <description>
+                  <text>Type of libtrap communication interface.</text>
+                </description>
+              </leaf>
+              <leaf name="direction">
+                <type name="trapifc-direction"/>
+                <mandatory value="true"/>
+                <description>
+                  <text>Type of libtrap communication interface.</text>
+                </description>
+              </leaf>
+              <leaf name="params">
+                <type name="string"/>
+                <mandatory value="true"/>
+                <description>
+                  <text>Parameters of libtrap interface: hostname,port for input interface; port for output interface.</text>
+                </description>
+              </leaf>
+              <leaf name="note">
+                <type name="string"/>
+                <description>
+                  <text>Optional note for interface</text>
+                </description>
+              </leaf>
+              <leaf name="sent-msg-cnt">
+                <type name="uint64"/>
+                <config value="false"/>
+                <description>
+                  <text>Number of sent messages.</text>
+                </description>
+              </leaf>
+              <leaf name="recv-msg-cnt">
+                <type name="uint64"/>
+                <config value="false"/>
+                <description>
+                  <text>Number of received messages.</text>
+                </description>
+              </leaf>
+              <leaf name="sent-buffer-cnt">
+                <type name="uint64"/>
+                <config value="false"/>
+                <description>
+                  <text>Number of sent buffers.</text>
+                </description>
+              </leaf>
+              <leaf name="autoflush-cnt">
+                <type name="uint64"/>
+                <config value="false"/>
+                <description>
+                  <text>Number of Auto-Flush calls.</text>
+                </description>
+              </leaf>
+              <leaf name="drop-buffer-cnt">
+                <type name="uint64"/>
+                <config value="false"/>
+                <description>
+                  <text>Number of dropped buffers.</text>
+                </description>
+              </leaf>
+              <leaf name="drop-msg-cnt">
+                <type name="uint64"/>
+                <config value="false"/>
+                <description>
+                  <text>Number of dropped messages.</text>
+                </description>
+              </leaf>
+            </list>
+          </container>
+        </list>
+      </list>
+    </container>
+    <notification name="moduleStatusChanged">
+      <description>
+        <text>Indicates that the status of module has changed.</text>
+      </description>
+      <leaf name="moduleName">
+        <type name="string"/>
+        <description>
+          <text>Module unique name.</text>
+        </description>
+      </leaf>
+      <leaf name="moduleStatus">
+        <description>
+          <text>Indicates the actual module status</text>
+        </description>
+        <type name="enumeration">
+          <enum name="started">
+            <description>
+              <text>The module was started.</text>
+            </description>
+          </enum>
+          <enum name="stopped">
+            <description>
+              <text>The module was stopped.</text>
+            </description>
+          </enum>
+          <enum name="restarted">
+            <description>
+              <text>The module was restarted.</text>
+            </description>
+          </enum>
+          <enum name="disabled">
+            <description>
+              <text>The module was disabled.</text>
+            </description>
+          </enum>
+        </type>
+      </leaf>
+      <leaf name="reason">
+        <type name="string"/>
+        <description>
+          <text>Reason of changing the status of module.</text>
+        </description>
+      </leaf>
+    </notification>
+  </module>

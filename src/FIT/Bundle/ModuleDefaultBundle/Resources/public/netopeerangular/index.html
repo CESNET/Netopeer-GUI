@@ -1,0 +1,44 @@
+<!doctype html>
+<html ng-app="NetopeerGUIApp">
+<head>
+	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="bower_components/jquery-ui/jquery-ui.min.js"></script>
+	<script src="bower_components/angular/angular.min.js"></script>
+	<script src="bower_components/ngTraverse/ngTraverse.js"></script>
+	<script src="bower_components/angular-ui-sortable/sortable.min.js"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+	<script src="bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js"></script>
+	<link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
+
+	<script src="node_modules/rhaboo/rhaboo.min.js"></script>
+
+	<script src="js/directives2.js"></script>
+	<script src="js/directives/addItem.js"></script>
+	<script src="js/directives/switchItem.js"></script>
+	<script src="js/JSONedit.js"></script>
+
+	<script src="public/templates.js"></script>
+
+	<link href="css/stylesheets/screen.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="mainView" ng-controller="ConfigurationController">
+	<h2>NetopeerGUI - JSON test</h2>
+	<button ng-click="download(jsonData)">download as JSON</button>
+	<button ng-click="undo()" ng-disabled="hasUndo()">history undo</button>
+	<button ng-click="redo()" ng-disabled="hasRedo()">history redo</button>
+
+	<div class="jsonView">
+		<json child="jsonData" default-collapsed="false" type="object" hide-collapse="true"></json>
+	</div>
+
+	<hr>
+	<div>
+		<textarea id="jsonTextarea" ng-model="jsonString"></textarea>
+		<span class="red" ng-if="!wellFormed">JSON not well-formed!</span>
+	</div>
+</div>
+
+</div>
+</body>
+</html>

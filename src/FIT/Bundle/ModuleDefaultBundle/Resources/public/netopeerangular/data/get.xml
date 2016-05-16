@@ -1,0 +1,173 @@
+<?xml version="1.0"?>
+<nemea-supervisor xmlns:all="urn:cesnet:tmc:nemea:1.0">
+    <modules>
+      <name>profile_name</name>
+      <enabled>true</enabled>
+      <module>
+        <name>nfreader</name>
+        <enabled>true</enabled>
+        <path>/data/svepes/bin/nfdump_reader</path>
+        <params>/data/svepes/nfreader_input.dat</params>
+        <trapinterfaces>
+          <interface>
+            <type>SERVICE</type>
+            <direction>SERVICE</direction>
+            <params>nfreader_service</params>
+          </interface>
+          <interface>
+            <type>UNIXSOCKET</type>
+            <direction>OUT</direction>
+            <params>nfreader_out</params>
+          </interface>
+        </trapinterfaces>
+        <running>false</running>
+        <restart-counter>0</restart-counter>
+      </module>
+      <module>
+        <name>flowcounter</name>
+        <enabled>true</enabled>
+        <path>/data/svepes/bin/flowcounter</path>
+        <trapinterfaces>
+          <interface>
+            <type>SERVICE</type>
+            <direction>SERVICE</direction>
+            <params>flowcounter_service</params>
+          </interface>
+          <interface>
+            <type>UNIXSOCKET</type>
+            <direction>IN</direction>
+            <params>nfreader_out</params>
+            <recv-msg-cnt>7708881</recv-msg-cnt>
+            <sent-msg-cnt>0</sent-msg-cnt>
+            <sent-buffer-cnt>0</sent-buffer-cnt>
+            <autoflush-cnt>0</autoflush-cnt>
+          </interface>
+        </trapinterfaces>
+        <running>true</running>
+        <restart-counter>0</restart-counter>
+      </module>
+    </modules>
+    <available-modules>
+      <search-paths>
+        <path>/data/svepes/bin/</path>
+      </search-paths>
+      <modules>
+        <module>
+          <name>flowcounter</name>
+          <description>Example module for counting number of incoming flow records.</description>
+          <number-in-ifc>1</number-in-ifc>
+          <number-out-ifc>0</number-out-ifc>
+          <parameter>
+            <short-opt>-u</short-opt>
+            <long-opt>--</long-opt>
+            <description>Specify UniRec template expected on the input interface.</description>
+            <mandatory-argument>false</mandatory-argument>
+            <argument-type/>
+          </parameter>
+          <parameter>
+            <short-opt>-p</short-opt>
+            <long-opt>--</long-opt>
+            <description>Show progress - print a dot every N flows.</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>int32</argument-type>
+          </parameter>
+          <parameter>
+            <short-opt>-P</short-opt>
+            <long-opt>--</long-opt>
+            <description>When showing progress, print CHAR instead of dot.</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>string</argument-type>
+          </parameter>
+          <parameter>
+            <short-opt>-o</short-opt>
+            <long-opt>--</long-opt>
+            <description>Send @VOLUME record filled with current counters every SEC second(s).</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>int32</argument-type>
+          </parameter>
+        </module>
+        <module>
+          <name>amplification_detection</name>
+        </module>
+        <module>
+          <name>nfdump_reader</name>
+          <description>This module reads a given nfdump file and outputs flow records in UniRec format. If more files are specified, all flows from the first file are read, then all flows from second file and so on.</description>
+          <number-in-ifc>0</number-in-ifc>
+          <number-out-ifc>1</number-out-ifc>
+          <parameter>
+            <short-opt>-F</short-opt>
+            <long-opt>--</long-opt>
+            <description>A file in nfdump format.</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>string</argument-type>
+          </parameter>
+          <parameter>
+            <short-opt>-f</short-opt>
+            <long-opt>--</long-opt>
+            <description>A nfdump-like filter expression. Only records matching the filter will be sent to the output.</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>string</argument-type>
+          </parameter>
+          <parameter>
+            <short-opt>-c</short-opt>
+            <long-opt>--</long-opt>
+            <description>Read only the first N flow records.</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>uint64</argument-type>
+          </parameter>
+          <parameter>
+            <short-opt>-n</short-opt>
+            <long-opt>--</long-opt>
+            <description>Don't send EOF message at the end.</description>
+            <mandatory-argument>false</mandatory-argument>
+            <argument-type/>
+          </parameter>
+          <parameter>
+            <short-opt>-T</short-opt>
+            <long-opt>--</long-opt>
+            <description>Replace original timestamps by record actual sending time.</description>
+            <mandatory-argument>false</mandatory-argument>
+            <argument-type/>
+          </parameter>
+          <parameter>
+            <short-opt>-D</short-opt>
+            <long-opt>--</long-opt>
+            <description>Fill DIR_BIT_FIELD according to record direction.</description>
+            <mandatory-argument>false</mandatory-argument>
+            <argument-type/>
+          </parameter>
+          <parameter>
+            <short-opt>-l</short-opt>
+            <long-opt>--</long-opt>
+            <description>Use link mask m for LINK_BIT_FIELD. m is 8-bit hexadecimal number e.g. m should be 1, c2, AB,...</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>string</argument-type>
+          </parameter>
+          <parameter>
+            <short-opt>-p</short-opt>
+            <long-opt>--</long-opt>
+            <description>Show progress - print a dot every N flows.</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>uint64</argument-type>
+          </parameter>
+          <parameter>
+            <short-opt>-r</short-opt>
+            <long-opt>--</long-opt>
+            <description>Rate limiting. Limiting sending flow rate to N records/sec.</description>
+            <mandatory-argument>true</mandatory-argument>
+            <argument-type>uint64</argument-type>
+          </parameter>
+          <parameter>
+            <short-opt>-R</short-opt>
+            <long-opt>--</long-opt>
+            <description>Real time re-sending. Resending records from given files in real time, respecting original timestamps (seconds). Since this mode is timestamp order dependent, real time re-sending is done only at approximate time.</description>
+            <mandatory-argument>false</mandatory-argument>
+            <argument-type/>
+          </parameter>
+        </module>
+        <module>
+          <name>brute_force_detector</name>
+        </module>
+      </modules>
+    </available-modules>
+  </nemea-supervisor>
