@@ -1340,7 +1340,7 @@
 .jsonView ol.arrayOl ol.arrayOl, .jsonView ol.arrayOl ol.listOl, .jsonView ol.listOl ol.arrayOl, .jsonView ol.listOl ol.listOl { margin-top: 0.5em; }
 .jsonView ol.arrayOl ol.arrayOl, .jsonView ol.arrayOl ol.arrayOl + add-item .block, .jsonView ol.arrayOl ol.listOl, .jsonView ol.arrayOl ol.listOl + add-item .block, .jsonView ol.listOl ol.arrayOl, .jsonView ol.listOl ol.arrayOl + add-item .block, .jsonView ol.listOl ol.listOl, .jsonView ol.listOl ol.listOl + add-item .block { margin-left: 25px; }
 .jsonView li select, .jsonView li button { font-style: normal; }
-.jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
+.jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner), .jsonView ol.listOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
 .jsonView li li { list-style-type: lower-roman; }
 .jsonView li li li { list-style-type: upper-roman; }
 .jsonView li li li li { list-style-type: lower-latin; }

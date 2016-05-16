@@ -112,7 +112,9 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 	li {
 		select, button { font-style: normal;}
 	}
-	ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
+	ol.arrayOl, ol.listOl {
+		li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
+	}
 	li li {
 		list-style-type: lower-roman;
 		li {

@@ -1,0 +1,19 @@
+{
+  "name": "netopeerangular",
+  "version": "0.0.0",
+  "description": "angular frontend for netopeer",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "~3.9.1",
+    "gulp-watch": "~4.3.5",
+    "gulp-angular-templatecache": "~1.8.0",
+    "gulp-templatecache": "~0.0.4",
+    "rhaboo": "~3.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD"
+}
