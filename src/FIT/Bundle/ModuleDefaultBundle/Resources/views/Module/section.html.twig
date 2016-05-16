@@ -105,7 +105,8 @@ if advised of the possibility of such damage.
 		{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
 			<script type="text/javascript">
 				var lookupIpUrl = '{{ path('lookupIp', {"ip": "REPLACE_IP"}) }}';
-				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");
+				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "wss://{{ app.request.host }}:8080/");
+
 				if ($(notifOutput).hasClass('hidden')) {
 					$(notifOutput).removeClass('hidden');
 					notifResizable();
