@@ -322,11 +322,14 @@ class AjaxController extends BaseController
 	public function loadSchemaByFilterAction() {
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$requestParams = json_decode($this->getRequest()->getContent(), true);
-		$params = array(
-			'connIds' => $requestParams['connIds'],
-			'filters' => $requestParams['filters']
-		);
-		$res = $netconfFunc->handle('query', $params);
-		return new JsonResponse(json_decode($res));
+		if (isset($requestParams['filters']) && array_key_exists(0, $requestParams['filters']) && $requestParams['filters'][0] !== '/') {
+			$params = array(
+				'connIds' => $requestParams['connIds'],
+				'filters' => $requestParams['filters']
+			);
+			$res = $netconfFunc->handle('query', $params);
+			return new JsonResponse(json_decode($res));
+		}
+		return new JsonResponse([]);
 	}
 }

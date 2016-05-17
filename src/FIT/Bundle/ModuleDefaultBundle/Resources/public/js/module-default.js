@@ -1,19 +1,21 @@
-var newNodeFormCnt;
-
 $(document).ready(function() {
 	initModuleDefaultJS();
 });
 
 function initModuleDefaultJS() {
-	newNodeFormCnt = 0;
-	
-	$("form[name=formConfigData]").on("change", "input, select", function(event){
-		formInputChanged = true;
+	//angular.bootstrap($('#block--singleContent'));
+	angular.element(document).ready(function() {
+		try {
+			angular.bootstrap(document, ['NetopeerGUIApp']);
+		} catch (err) {
+			var content = $('#block--singleContent');
+			angular.element(document).injector().invoke(function($compile) {
+				var scope = angular.element(content).scope();
+				$compile(content)(scope);
+			});
+		}
 	});
 
-	$("form[name=formConfigData] input[type=submit], form[name=newNodeForm].addedForm  input[type=submit]").on("click", function(event){
-		formInputChanged = false;
-	});
 
 	$("form").on("change", ".js-auto-submit-on-change", function() {
 		$(this).parents('form').submit();

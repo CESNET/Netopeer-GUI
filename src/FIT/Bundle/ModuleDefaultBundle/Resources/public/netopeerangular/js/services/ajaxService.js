@@ -14,14 +14,13 @@ var services = angular.module('NetopeerGUIServices', [])
 	this.loadSchema = function(connIds, filters) {
 		return $http({
 			url: baseURL + '/ajax/schema/',
-			method: 'POST',
 			data: {'angular': true, 'connIds': connIds, 'filters': filters}
 		});
 	};
 
-	this.submitConfiguration = function(cleanJson) {
+	this.submitConfiguration = function(cleanJson, targetUrl) {
 		return $http({
-			url: window.location.href + '?angular=true',
+			url: targetUrl || window.location.href,
 			method: 'POST',
 			data: cleanJson
 		});

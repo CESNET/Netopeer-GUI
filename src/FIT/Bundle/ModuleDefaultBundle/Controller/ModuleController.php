@@ -26,16 +26,10 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	{
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+
 		$res = $this->prepareVariablesForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 
-		/* parent module did not prepares data, but returns redirect response,
-		 * so we will follow this redirect
-		 */
-		if ($res instanceof RedirectResponse) {
-			return $res;
-		}
-
-		if ($this->getRequest()->getMethod() == 'POST' && $this->getRequest()->get('angular') == "true") {
+		if ($this->getRequest()->getMethod() === 'POST') {
 			$configParams = $this->getConfigParams();
 			$postData = $this->getRequest()->getContent();
 			$params = array(
@@ -45,11 +39,19 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			);
 			$res = $netconfFunc->handle('editconfig', $params, true, $result);
 			$this->get('session')->set('isAjax', true);
-			$this->removeAjaxBlock('moduleJavascripts');
-			$this->removeAjaxBlock('moduleStylesheet');
-			$this->removeAjaxBlock('state');
+//			$this->removeAjaxBlock('moduleJavascripts');
+//			$this->removeAjaxBlock('moduleStylesheet');
+//			$this->removeAjaxBlock('state');
 			return $this->getTwigArr();
 		}
+
+		/* parent module did not prepares data, but returns redirect response,
+		 * so we will follow this redirect
+		 */
+		if ($res instanceof RedirectResponse) {
+			return $res;
+		}
+
 
 		if ($this->getRequest()->get('angular') == "true") {
 			$res = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);

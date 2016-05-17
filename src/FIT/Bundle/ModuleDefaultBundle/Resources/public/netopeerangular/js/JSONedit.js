@@ -27,7 +27,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 					alert('error');
 					console.log('data');
 				});
-		}
+		};
 
 		$scope.$watch('jsonData', function (newValue, oldValue) {
 			$scope.jsonString = JSON.stringify(newValue);
@@ -144,7 +144,8 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 			$.netopeergui.showSpinner();
 			var cleanJson = cleanupJSON(jsonData);
 			cleanJson = JSON.parse(cleanJson);
-			AjaxService.submitConfiguration(cleanJson)
+
+			AjaxService.submitConfiguration(cleanJson, window.location.href)
 				.then(function successCallback(data) {
 					$.netopeergui.processResponseData(data.data, function() {
 						//$scope.reload();

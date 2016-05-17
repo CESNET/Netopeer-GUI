@@ -467,7 +467,7 @@ class DefaultController extends BaseController
 	private function getRPCXmlForMethod($rpcMethod, $key, $module) {
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$rpc = $module.':'.$rpcMethod;
-		$json = $netconfFunc->handle('query', array('connIds' => array($key), 'load_children' => true, 'filters' => array('/'.$rpc)));
+		$json = $netconfFunc->handle('query', array('connIds' => array($key), 'load_children' => true, 'filters' => array(array('/'.$rpc))));
 		return $json;
 	}
 

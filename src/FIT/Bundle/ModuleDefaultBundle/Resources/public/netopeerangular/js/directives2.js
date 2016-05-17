@@ -56,13 +56,11 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var literalName = "Literal";
 
         scope.valueTypes = [stringName, objectName, arrayName, listName, numberName, urlName, refName, boolName, enumerationName, literalName];
-        scope.stringName = stringName;
-        //scope.valueTypes = [stringName, objectName, arrayName, refName, boolName];
         scope.sortableOptions = {
             axis: 'y',
             update: function(e, ui) {
                 setParentChanged(scope.$parent);
-                setIetfOperation('replace', scope.$parent.$parent.newkey, scope.getParents($parent, 4).child, scope.$parent);
+                setIetfOperation('replace', scope.$parent.$parent.newkey, getParents($parent, 4).child, scope.$parent);
             }
         };
         if (scope.$parent.defaultCollapsed === undefined) {
@@ -111,8 +109,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
             var eltype = getEltype(key, parent);
 
-            if (eltype === "container" || eltype === "list") {
-                if (type === "[object Array]") { return listName; }
+            if (eltype === "list") {
+                return listName;
+            } else if (eltype === "container") {
                 return objectName;
             } else if (eltype === "leaf-list") {
                 return arrayName;
@@ -162,7 +161,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             if (typeof parent === "undefined" || typeof parent['$@'+key] === "undefined") {
                 if (typeof key === "undefined" || typeof parent === "undefined") return false;
 
-                var path = scope.getPath(parent, 'key');
+                var path = getPath(parent, 'key');
 
                 var parentKey = path.replace('/', '').split(':');
                 var ns = parentKey[0] + ":";
@@ -200,7 +199,6 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return parent['$@'+key];
             }
         };
-        scope.getSchemaFromKey = getSchemaFromKey;
 
         scope.isConfig = function(key, parent) {
             if (!scope.jsonEditable) return false;
@@ -209,16 +207,16 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return (schema && typeof schema['config'] !== "undefined" && schema['config'] === true);
         };
 
-        scope.editBarVisible = function(key, parent) {
-            if (!scope.jsonEditable) return false;
-
-            var eltype = getEltype(key, parent);
-            if (eltype) {
-                return (eltype == "list" || eltype == "leaf-list" || eltype == "container");
-            }
-
-            return false;
-        };
+        //scope.editBarVisible = function(key, parent) {
+        //    if (!scope.jsonEditable) return false;
+				//
+        //    var eltype = getEltype(key, parent);
+        //    if (eltype) {
+        //        return (eltype == "list" || eltype == "leaf-list" || eltype == "container");
+        //    }
+				//
+        //    return false;
+        //};
         scope.isObjectOrArray = function(key, val, parent) {
             var type = getType(key, val, parent);
             return (type == objectName || type == arrayName || type == listName);
@@ -261,27 +259,29 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             }
         };
         scope.addItem = function(key, obj, parent) {
-            if (typeof parent.valueType == "undefined") {
+            if (typeof parent.valueType === "undefined") {
                 var type = getType(parent.keyName, undefined, obj);
             } else {
-                var type = parent.ValueType;
+                parent.valueType = parent.valueType.replace('string:', '');
+                var type = parent.valueType;
             }
 
             var parentType = objectName;
             //if (typeof parent.$parent.$parent !== "undefined") {
-                parentType = getType(scope.getParents(parent, 4).key, obj);
+                parentType = getType(getParents(parent, 4).key, obj);
             //}
             //console.log(key);
             //console.log(obj);
             //console.log(parent);
             //console.log(type);
             //console.log(parentType);
-
-            type = type || parentType;
+            //console.log(scope);
 
             if (parentType == "Object") {
                 // check input for key
                 if (parent.keyName == undefined || parent.keyName.length == 0){
+                    //console.log(parent.keyName);
+                    //console.log(parent);
                     alert("Please fill in a name");
                 } else if (parent.keyName.indexOf("$") == 0){
                     alert("The name may not start with $ (the dollar sign)");
@@ -337,7 +337,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         console.log('2not implemented ' + parent.valueType); // TOOD
                 }
                 setParentChanged(parent);
-                setIetfOperation('replace', scope.getParents(parent, 4).key, scope.getParents(parent, 6).child, parent); // TODO replace order in array
+                setIetfOperation('replace', getParents(parent, 4).key, getParents(parent, 6).child, parent); // TODO replace order in array
                 parent.valueName = "";
                 parent.showAddKey = false;
             } else {
@@ -361,7 +361,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         scope.changeParentKeyName = function(key, child, $parent) {
-            var val = getType(key, child, $parent);
+            var val = getEltype(key, $parent);
+            console.log(key);
+            console.log(val);
             if (val) {
                 $parent.valueType = val;
             }
@@ -369,9 +371,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
         scope.getAvailableNodeNames = function (key, child, parent) {
             //console.log(key);console.log(child);console.log(parent);
-            var parentKeyName = scope.getParents(parent, 4).key;
-            var children = scope.getParents(parent, 6).child['$@'+ parentKeyName]['children'];
-
+            var parentKeyName = getParents(parent, 4).key;
+            var children = getParents(parent, 6).child['$@'+ parentKeyName]['children'];
             angular.forEach(child, function(value, key) {
                 if (key.indexOf('@') !== 0 && children.indexOf(key) !== -1) {
                     children.splice(children.indexOf(key), 1);
@@ -424,7 +425,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     }
                     break;
                 case 'list':
-                    obj = scope.getParents(obj, 2);
+                    obj = getParents(obj, 2);
                     if (generateEmpty && typeof obj['@'] === "undefined") {
                         console.log(obj);
                         console.log(scope);
@@ -452,7 +453,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return false;
         };
 
-        scope.getParents = function(obj, number) {
+        var getParents = function(obj, number) {
             if (typeof obj === "undefined") return false;
             var parent = obj;
 
@@ -465,7 +466,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return parent;
         };
 
-        scope.getPath = function(obj, target) {
+        var getPath = function(obj, target) {
             if (typeof obj === "undefined") return false;
             var parent = obj;
             var res = '';
@@ -510,16 +511,16 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         var setIetfOperation = function(operation, key, obj, parent) {
-            var tmpParent = scope.getParents(parent, 11);
-            if (tmpParent.hasOwnProperty('key') && typeof scope.getParents(tmpParent, 2)['child'] !== 'undefined') {
+            var tmpParent = getParents(parent, 11);
+            if (tmpParent.hasOwnProperty('key') && typeof getParents(tmpParent, 2)['child'] !== 'undefined') {
             } else {
-                tmpParent = scope.getParents(parent, 2);
+                tmpParent = getParents(parent, 2);
             }
 
-            if (tmpParent.hasOwnProperty('key') && typeof scope.getParents(tmpParent, 2)['child'] !== 'undefined') {
-                if (getAttributeType(tmpParent['key'], scope.getParents(tmpParent, 2)['child']) == 'list') {
+            if (tmpParent.hasOwnProperty('key') && typeof getParents(tmpParent, 2)['child'] !== 'undefined') {
+                if (getAttributeType(tmpParent['key'], getParents(tmpParent, 2)['child']) == 'list') {
                     //key = tmpParent['key'];
-                    //obj = scope.getParents(tmpParent, 2)['child'];
+                    //obj = getParents(tmpParent, 2)['child'];
                     //if (operation == 'replace') {
                     //    operation = 'merge';
                     //}
@@ -534,7 +535,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             while (typeof parent.$parent !== "undefined" && parent.$parent !== null) {
                 var obj = parent;
                 parent = parent.$parent;
-                var parentToSet = scope.getParents(parent, 2);
+                var parentToSet = getParents(parent, 2);
                 //console.log(parentToSet);
                 if (parent.hasOwnProperty(target) && typeof parent[target] !== 'undefined' && typeof parentToSet['child'] !== 'undefined') {
                     setAttribute('netopeergui:status', 'changed', parent[target], parent['child']);

@@ -1,43 +1,41 @@
-<div ng-switch on="showAddKey">
-	<span ng-switch-when="true">
-		<!--ng-show="getType(key, child, $parent) != 'Array'"-->
-		<span>
-			<input placeholder="Name" type="text"
-						 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" ng-model-onblur uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" autocomplete="off" ng-blur="changeParentKeyName($parent.keyName, child, $parent)"
-					/> :
-		</span>
-		<!--ng-if="getType($parent.keyName, undefined, $parent.$parent.$parent.child[$parent.$parent.$parent.$parent.key]) === 'Literal'"-->
-<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm"></select>
-
-		<span ng-switch on="$parent.valueType">
-			<span ng-switch-when="Boolean" type="boolean">
-				<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)"">
-			</span>
-			<span ng-switch-when="Enumeration" type="enumeration">
-				<select ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option"></select>
-			</span>
-			<span ng-switch-when="Number" type="number">
-				<input type="number" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)">
-			</span>
-			<span ng-switch-default class="jsonLiteral">
-				<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur
-							 ng-change="changeValue(val, $parent.keyName, child, $parent)" ng-show="$parent.valueType != 'Object' && $parent.valueType != 'Array'">
-			</span>
-		</span>
-
-		<!-- -->
-		<!--<input ng-show="$parent.valueType != 'Object'" type="text" placeholder="Value" class="form-control input-sm addItemValueInput" ng-model="$parent.valueName" />-->
-
-		<button class="btn btn-primary btn-sm" ng-click="addItem(key, child, $parent)">
-			Add
-		</button>
-		<button class="btn btn-default btn-sm" ng-click="$parent.showAddKey=false">
-			Cancel
-		</button>
+<span ng-if="showAddKey">
+	<span ng-show="$parent.valueType != 'Object' && $parent.valueType != 'Array'">
+		<input placeholder="Name" type="text"
+					 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" autocomplete="off" ng-blur="changeParentKeyName($parent.keyName, child, $parent)"
+				/> :
 	</span>
-	<span ng-switch-default>
-		<button class="addObjectItemBtn" ng-click="$parent.showAddKey = true">
-			<i class="fa fa-plus"></i>
-		</button>
-	</span>
-</div>
+
+	<select ng-model="$parent.valueType"  ng-model-onblur ng-options="option for option in valueTypes" class="form-control input-sm"></select>
+
+	<!--ng-change="changeValue($parent.valueName, $parent.keyName, child, $parent)"-->
+	<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur
+				  ng-show="$parent.valueType != 'Object' && $parent.valueType != 'Array'">
+
+	<!--<span ng-switch on="$parent.valueType">-->
+		<!--<span ng-switch-when="Boolean" type="boolean">-->
+			<!--<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)">-->
+		<!--</span>-->
+		<!--<span ng-switch-when="Enumeration" type="enumeration">-->
+			<!--<select ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option"></select>-->
+		<!--</span>-->
+		<!--<span ng-switch-when="Number" type="number">-->
+			<!--<input type="number" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)">-->
+		<!--</span>-->
+		<!--<span ng-switch-default class="jsonLiteral" type="text">-->
+			<!--<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur-->
+						 <!--ng-change="changeValue($parent.valueName, $parent.keyName, child, $parent)" ng-show="$parent.valueType != 'Object' && $parent.valueType != 'Array'">-->
+		<!--</span>-->
+	<!--</span>-->
+
+	<button class="btn btn-primary btn-sm" ng-click="addItem(key, child, $parent)">
+		Add
+	</button>
+	<button class="btn btn-default btn-sm" ng-click="$parent.showAddKey=false">
+		Cancel
+	</button>
+</span>
+<span ng-if="!showAddKey">
+	<button class="addObjectItemBtn" ng-click="$parent.showAddKey = true">
+		<i class="fa fa-plus"></i>
+	</button>
+</span>
