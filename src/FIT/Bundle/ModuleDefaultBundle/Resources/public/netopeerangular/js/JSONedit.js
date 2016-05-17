@@ -157,5 +157,9 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 					$.netopeergui.hideSpinner();
 				});
 		};
-	}
-);
+	})
+
+	.config(['$rootScopeProvider', function ($rootScopeProvider) {
+		$rootScopeProvider.digestTtl(20);
+	}])
+;
