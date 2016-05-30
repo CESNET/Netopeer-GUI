@@ -245,6 +245,7 @@ class AjaxController extends BaseController
 		$res = $netconfFunc->handle('validate', $params, false);
 		$this->getRequest()->getSession()->getFlashBag()->add('state '.(!$res ? 'success' : 'error'), 'Datastore '.$target.' is '.($res ? 'in' : '').'valid.');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'alerts');
+		$this->removeAjaxBlock('state');
 		$this->assign('dataStore', $target);
 		return $this->getTwigArr();
 	}

@@ -49,6 +49,7 @@ if advised of the possibility of such damage.
 	<script type="text/javascript">
 		var jsonEditable = {% if jsonEditable is defined and jsonEditable == false %}false{% else %}true{% endif %};
 	</script>
+	<div id="mainView">
 	{#<div class="edit-bar">#}
 		{#<span class="create-child"#}
 		{#rel="--*" data-typeahead-path="/symfony/app_dev.php/ajax/get-values-for-label/FORMID/0/nacm/XPATH/">new node</span>#}
@@ -62,8 +63,8 @@ if advised of the possibility of such damage.
 		{% if 1 or stateJson is defined %}
 			{#and (isEmptyModule is defined and isEmptyModule == true)#}
 			<hr class="cleaner" />
-			<div id="mainView" ng-init="reload()">
-				<button ng-click="reload()">reload data</button>
+			<div ng-init="reload('{{ app.request.uri }}'); resetRevisions()">
+				<button ng-click="reload('{{ app.request.uri }}')">reload data</button>
 				<button ng-click="download(jsonData)">download as JSON</button>
 				{% if jsonEditable is not defined or jsonEditable != false %}
 				<button ng-click="submitConfiguration(jsonData)">Apply changes</button>
@@ -97,6 +98,7 @@ if advised of the possibility of such damage.
 			{% endif %}
 		{% endif %}
 	{% endif %}
+	</div>
 {% endblock singleContent %}
 {% endblock state %}
 

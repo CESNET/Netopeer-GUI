@@ -1,7 +1,7 @@
 <span ng-if="showAddKey">
-	<span ng-show="$parent.valueType != 'Object' && $parent.valueType != 'Array'">
+	<span>
 		<input placeholder="Name" type="text"
-					 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" autocomplete="off" ng-blur="changeParentKeyName($parent.keyName, child, $parent)"
+					 class="form-control input-sm addItemKeyInput" nb-model-onblur ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" 					 ng-blur="changeParentKeyName($parent.keyName, child, $parent)"
 				/> :
 	</span>
 

@@ -32,7 +32,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
       type: '@',
       defaultCollapsed: '=',
       hideCollapse: '=',
-      key: '='
+      key: '=',
+      valueType: '=?valueType'
     },
     controller: function($scope) {
       $scope.getTemplateUrl = function(type) {
@@ -361,7 +362,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         scope.changeParentKeyName = function(key, child, $parent) {
-            var val = getEltype(key, $parent);
+            var val = getType(key, $parent);
             console.log(key);
             console.log(val);
             if (val) {
@@ -371,19 +372,23 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
         scope.getAvailableNodeNames = function (key, child, parent) {
             //console.log(key);console.log(child);console.log(parent);
-            var parentKeyName = getParents(parent, 4).key;
-            var children = getParents(parent, 6).child['$@'+ parentKeyName]['children'];
-            angular.forEach(child, function(value, key) {
-                if (key.indexOf('@') !== 0 && children.indexOf(key) !== -1) {
-                    children.splice(children.indexOf(key), 1);
-                }
-            });
+            try {
+                var parentKeyName = getParents(parent, 4).key;
+                var children = getParents(parent, 6).child['$@'+ parentKeyName]['children'];
+                angular.forEach(child, function(value, key) {
+                    if (key.indexOf('@') !== 0 && children.indexOf(key) !== -1) {
+                        children.splice(children.indexOf(key), 1);
+                    }
+                });
 
-            angular.forEach(children, function (key, value) {
-                getSchemaFromKey(key, parent, child);
-            });
+                angular.forEach(children, function (key, value) {
+                    getSchemaFromKey(key, parent, child);
+                });
 
-            return children;
+                return children;
+            } catch (err) {
+                return [];
+            }
         };
 
         var getAttributeType = function(key, obj) {

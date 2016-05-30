@@ -6,9 +6,14 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 
 	.controller('ConfigurationController', function ($scope, $filter, $http, $window, $timeout, traverse, AjaxService) {
 
-		storage.write('revisions', []);
-		storage.erase('revisions');
-		storage.write('revisions', []);
+		var resetRevisions = function() {
+			storage = Rhaboo.perishable(window.location.href);
+			historyIndex = 0;
+			historyUndo = 0;
+			storage.write('revisions', []);
+			storage.erase('revisions');
+			storage.write('revisions', []);
+		}
 
 		$scope.hasUndo = function() {
 			return (historyIndex - historyUndo - 1) <= 0;
@@ -20,14 +25,19 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 				isRedo = false;
 
 		$scope.reload = function() {
+			//console.log('fdjpasi');
+			//return;
 			AjaxService.reloadData()
 				.then(function successCallback(data) {
+					console.log('ok1');
 					$scope.jsonData = data.data;
 				}, function errorCallback(data) {
-					alert('error');
-					console.log('data');
+					//$scope.jsonData = {};
+					//console.log(data);
+					//alert('error1');
 				});
 		};
+		$scope.resetRevisions = resetRevisions;
 
 		$scope.$watch('jsonData', function (newValue, oldValue) {
 			$scope.jsonString = JSON.stringify(newValue);

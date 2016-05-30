@@ -81,6 +81,19 @@ jQuery.extend({
 			// browsers change the syntax of inserted <script> or <link> element by themselves, unify the inserted syntax of this elements
 			} else if ((id === "block--moduleJavascripts" || id === "block--moduleStylesheet") && $("#" + id).html().trim() == html.replace(" \/>", ">").trim()) {
 				// do not change content of styles or js if did not changed
+			} else if (id == 'block--singleContent' && typeof angular !== "undefined") {
+				var $blockEl = $("#" + id);
+
+				try {
+					angular.element(document).injector().invoke(function($compile) {
+						var scope = angular.element(document.querySelector('#' + id)).scope();
+						$blockEl.html($compile(html)(scope));
+						scope.$apply();
+					});
+				} catch (err) {
+					console.error(err);
+					$blockEl.html(html);
+				}
 
 			// replace content of given block with new html
 			} else {
@@ -151,6 +164,15 @@ jQuery.extend({
 				data.redirect = href;
 			}
 
+			// push requested URL into history (to enable forward and backward walkthrough)
+			if ($elem.data().disableHistory !== true) {
+				var historyHref = href;
+				if (data.historyHref !== "") {
+					historyHref = data.historyHref;
+				}
+				history.pushState(historyHref, "", historyHref);
+			}
+
 			// process given data and hide spinner in success callback
 			this.processResponseData(data, function() {
 				$.netopeergui.hideSpinner();
@@ -159,15 +181,6 @@ jQuery.extend({
 			// set clicked link as active
 			if ($('a[href="'+ href +'"]').length && $elem.data().disableActiveLink !== true) {
 				this.setActiveLink($('a[href="'+ href +'"]'));
-			}
-
-			// push requested URL into history (to enable forward and backward walkthrough)
-			if ($elem.data().disableHistory !== true) {
-				var historyHref = href;
-				if (data.historyHref !== "") {
-					historyHref = data.historyHref;
-				}
-				history.pushState(historyHref, "", historyHref);
 			}
 
 			// call callback defined in clicked link (or submitted form)
@@ -197,11 +210,19 @@ jQuery.extend({
 				data: data,
 				type: type,
 				success: function(data, textStatus, jqXHR) {
-					if (typeof angular !== "undefined" && $("#mainView").length) {
-						$("#block--moduleJavascripts, #block--moduleStylesheet").html('');
-						var scope = angular.element(document.getElementById("block--singleContent")).scope();
-						scope.$destroy();
-					}
+					//if (typeof angular !== "undefined" && $("#mainView").length) {
+					//	$("#block--moduleJavascripts, #block--moduleStylesheet").html('');
+					//	try {
+					//		var scope = angular.element(document).scope();
+					//		scope.jsonData = {};
+					//		scope.jsonString = "{}";
+					//		//console.log(scope);
+					//		//scope.$destroy();
+					//		$(".jsonView").empty();
+					//	} catch (err) {
+					//		// scope is not set
+					//	}
+					//}
 					$.netopeergui.successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
 				},
 				error: function(qXHR, textStatus, errorThrown) {
