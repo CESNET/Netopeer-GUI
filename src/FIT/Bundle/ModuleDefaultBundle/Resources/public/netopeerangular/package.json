@@ -10,7 +10,9 @@
     "gulp-templatecache": "~0.0.4",
     "rhaboo": "~3.2.2"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "gulp": "^3.9.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

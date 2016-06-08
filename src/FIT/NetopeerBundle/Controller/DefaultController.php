@@ -431,7 +431,13 @@ class DefaultController extends BaseController
 			unset($sessionArr['_security_commont_context']);
 
 			if ($this->getRequest()->get('angular') == "true") {
-				return new JsonResponse($sessionArr);
+				$res = array(
+					'variables' => array(
+						'jsonEditable' => !$this->getAssignedValueForKey('jsonEditable'),
+					),
+					'configuration' => $sessionArr,
+				);
+				return new JsonResponse($res);
 			}
 
 			$this->assign('jsonEditable', false);

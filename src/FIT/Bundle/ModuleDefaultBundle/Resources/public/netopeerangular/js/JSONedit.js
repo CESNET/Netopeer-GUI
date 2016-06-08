@@ -1,10 +1,21 @@
-var storage = Rhaboo.perishable(window.location.href);
+var storage;
 var historyIndex = 0,
 		historyUndo = 0;
 
-var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerGUIServices'])
+var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse', 'NetopeerGUIServices'])
 
-	.controller('ConfigurationController', function ($scope, $filter, $http, $window, $timeout, traverse, AjaxService) {
+	.controller('ConfigurationController', function ($rootScope, $scope, $filter, $http, $routeParams, $location, $window, $timeout, traverse, AjaxService) {
+
+		$rootScope.$on("$routeChangeStart", function (event, next, current) {
+			$.netopeergui.createSpinner();
+			$.netopeergui.showSpinner();
+		});
+
+		$rootScope.$on("$routeChangeSuccess", function (event, next, current) {
+			$.netopeergui.hideSpinner();
+			$("#block--topMenu a.active").removeClass('active');
+			$('#block--topMenu a[href="'+window.location.hash+'"]').addClass('active');
+		});
 
 		var resetRevisions = function() {
 			storage = Rhaboo.perishable(window.location.href);
@@ -14,6 +25,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 			storage.erase('revisions');
 			storage.write('revisions', []);
 		}
+		$scope.moduleName = $routeParams.moduleName;
 
 		$scope.hasUndo = function() {
 			return (historyIndex - historyUndo - 1) <= 0;
@@ -25,12 +37,17 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 				isRedo = false;
 
 		$scope.reload = function() {
-			//console.log('fdjpasi');
-			//return;
-			AjaxService.reloadData()
+			var targetUrl;
+			if (typeof $routeParams.action !== "undefined") {
+				targetUrl = window.location.origin + window.location.pathname.replace('sections', 'info-page') + $routeParams.action + '/';
+			} else {
+				targetUrl = window.location.origin + window.location.pathname + $scope.moduleName + '/';
+			}
+
+			AjaxService.reloadData(targetUrl)
 				.then(function successCallback(data) {
-					console.log('ok1');
-					$scope.jsonData = data.data;
+					$scope.jsonEditable = jsonEditable = data.data.variables.jsonEditable;
+					$scope.jsonData = data.data.configuration;
 				}, function errorCallback(data) {
 					//$scope.jsonData = {};
 					//console.log(data);
@@ -157,19 +174,33 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngTraverse', 'NetopeerG
 
 			AjaxService.submitConfiguration(cleanJson, window.location.href)
 				.then(function successCallback(data) {
-					$.netopeergui.processResponseData(data.data, function() {
+					var tmpData = data.data;
+					delete(tmpData.snippets['block--state']);
+					$.netopeergui.processResponseData(tmpData, function() {
 						//$scope.reload();
 						$.netopeergui.hideSpinner();
 					});
 				}, function errorCallback(data) {
-					alert('error');
 					console.log(data);
+					alert('error2');
 					$.netopeergui.hideSpinner();
 				});
 		};
 	})
 
-	.config(['$rootScopeProvider', function ($rootScopeProvider) {
+	.config(['$rootScopeProvider', '$routeProvider', function ($rootScopeProvider, $routeProvider) {
 		$rootScopeProvider.digestTtl(20);
+
+		$routeProvider
+			.when('/module/:moduleName', {
+				templateUrl: 'main/view.html',
+				controller: 'ConfigurationController'
+			})
+			.when('/action/:action', {
+				templateUrl: 'main/view.html',
+				controller: 'ConfigurationController'
+			})
+			.otherwise($("#block--topMenu .nth-0").attr('href').replace('#', ''))
+		;
 	}])
 ;

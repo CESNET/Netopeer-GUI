@@ -54,8 +54,14 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 
 
 		if ($this->getRequest()->get('angular') == "true") {
-			$res = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
-			return new JsonResponse(json_decode($res));
+			$resData = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
+			$res = array(
+				'variables' => array(
+					'jsonEditable' => !$this->getAssignedValueForKey('jsonEditable'),
+				),
+				'configuration' => json_decode($resData),
+			);
+			return new JsonResponse($res);
 		} else {
 			$this->assign('singleColumnLayout', true);
 			return $this->getTwigArr();

@@ -24,7 +24,8 @@
     "angular-ui-sortable": "0.12.x",
     "angular-bootstrap": "~0.14.1",
     "angular-history": "~0.x.x",
-    "ngTraverse": "0.x.x"
+    "ngTraverse": "0.x.x",
+    "angular-route": "^1.5.6"
   },
   "moduleType": [],
   "private": true

@@ -3,13 +3,13 @@ $(document).ready(function() {
 });
 
 function initModuleDefaultJS() {
-	angular.element(document).ready(function() {
-		try {
-			if (!angular.element(document).injector()) {
-				angular.bootstrap(angular.element(document), ['NetopeerGUIApp']);
-			}
-		} catch (err) {}
-	});
+	//angular.element(document).ready(function() {
+	//	try {
+	//		if (!angular.element(document).injector()) {
+	//			angular.bootstrap(document, ['NetopeerGUIApp']);
+	//		}
+	//	} catch (err) {}
+	//});
 
 	$("form").on("change", ".js-auto-submit-on-change", function() {
 		$(this).parents('form').submit();

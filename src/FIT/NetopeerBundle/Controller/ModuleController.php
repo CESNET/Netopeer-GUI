@@ -105,7 +105,8 @@ class ModuleController extends BaseController {
 
 		/* Show the first module we have */
 		if ( $module == null ) {
-			return $this->redirectToFirstModule($key);
+//			in angular we want to show the only section route
+//			return $this->redirectToFirstModule($key);
 		}
 
 		// now, we could set forms params with filter (even if we don't have module or subsection)

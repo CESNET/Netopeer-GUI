@@ -82,18 +82,18 @@ jQuery.extend({
 			} else if ((id === "block--moduleJavascripts" || id === "block--moduleStylesheet") && $("#" + id).html().trim() == html.replace(" \/>", ">").trim()) {
 				// do not change content of styles or js if did not changed
 			} else if (id == 'block--singleContent' && typeof angular !== "undefined") {
-				var $blockEl = $("#" + id);
-
-				try {
-					angular.element(document).injector().invoke(function($compile) {
-						var scope = angular.element(document.querySelector('#' + id)).scope();
-						$blockEl.html($compile(html)(scope));
-						scope.$apply();
-					});
-				} catch (err) {
-					console.error(err);
-					$blockEl.html(html);
-				}
+				//var $blockEl = $("#" + id);
+                //
+				//try {
+				//	angular.element(document).injector().invoke(function($compile) {
+				//		var scope = angular.element(document.querySelector('#' + id)).scope();
+				//		$blockEl.html($compile(html)(scope));
+				//		scope.$apply();
+				//	});
+				//} catch (err) {
+				//	console.error(err);
+				//	$blockEl.html(html);
+				//}
 
 			// replace content of given block with new html
 			} else {
