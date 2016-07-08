@@ -170,33 +170,38 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 var rootElem = parentKey[1];
                 path = path + '/' + key;
 
-                if (angular.isUndefined($rootScope.cache)) {
-                    //try {
-                    $rootScope.cache = $cacheFactory(window.location.href);
-                    //} catch (exception) {};
-                }
-                if (angular.isUndefined($rootScope.cache.get(path))) {
-                    AjaxService.loadSchema([connId], [path])
-                      .then(function successCallback(data) {
-                          var schema = data.data;
+                //if (angular.isUndefined($rootScope.cache)) {
+                //    $rootScope.cache = {};
+                //}
+                //if (angular.isUndefined($rootScope.cache[window.location.href])) {
+                //    //try {
+                //    $rootScope.cache[window.location.href] = $cacheFactory(window.location.href);
+                //    //} catch (exception) {};
+                //}
+                //if (angular.isUndefined($rootScope.cache[window.location.href].get(path))) {
+                //    AjaxService.loadSchema([connId], [path])
+                //      .then(function successCallback(data) {
+                //          var schema = data.data;
+                //
+                //          if (typeof schema === "undefined" || typeof schema['$@'+ns+key] === "undefined") {
+                //              return false;
+                //          }
+                //          // insert loaded schema into current object
+                //          //$rootScope.cache[window.location.href].put(path, parent['$@'+key]);
+                //          //if (!angular.isUndefined(child)) {
+                //          //    child['$@'+key] = schema['$@'+ns+key];
+                //          //} else {
+                //          //    parent['$@'+key] = schema['$@'+ns+key];
+                //          //}
+                //          return schema['$@'+ns+key];
+                //      }, function errorCallback(data) {
+                //          return false;
+                //      });
+                //} else {
+                //    return $rootScope.cache[window.location.href].get(path);
+                //}
 
-                          if (typeof schema === "undefined" || typeof schema['$@'+ns+key] === "undefined") {
-                              return false;
-                          }
-                          // insert loaded schema into current object
-                          $rootScope.cache.put(path, parent['$@'+key]);
-                          if (!angular.isUndefined(child)) {
-                              child['$@'+key] = schema['$@'+ns+key];
-                          } else {
-                              parent['$@'+key] = schema['$@'+ns+key];
-                          }
-                          return schema['$@'+ns+key];
-                      }, function errorCallback(data) {
-                          return false;
-                      });
-                } else {
-                    return $rootScope.cache.get(path);
-                }
+                return false;
             } else {
                 return parent['$@'+key];
             }
