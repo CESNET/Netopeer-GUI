@@ -1298,7 +1298,7 @@
 .jsonView input.keyinput { font-weight: bold; }
 .jsonView input[type="text"].addItemKeyInput, .jsonView input[type="text"].addItemValueInput { border: 1px solid #ccc; background: white; margin-left: 0; }
 .jsonView .addItemKeyInput { font-weight: bold; }
-.jsonView .toggle-control { float: left; cursor: pointer; position: relative; top: -1em; right: 22px; margin-right: -15px; background: #f0f0f0; }
+.jsonView .toggle-control { float: left; cursor: pointer; position: relative; right: 22px; margin-right: -15px; background: #f0f0f0; }
 .jsonView > json > .fa-minus-square-o { display: none; }
 .jsonView .addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; display: block; }
 .jsonView .addObjectItemBtn i { display: block; }

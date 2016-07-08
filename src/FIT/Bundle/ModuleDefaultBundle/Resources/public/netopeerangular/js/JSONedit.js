@@ -24,7 +24,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			storage.write('revisions', []);
 			storage.erase('revisions');
 			storage.write('revisions', []);
-		}
+		};
 		$scope.moduleName = $routeParams.moduleName;
 
 		$scope.hasUndo = function() {
@@ -36,7 +36,8 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		var isUndo = false,
 				isRedo = false;
 
-		$scope.reload = function() {
+		$scope.reloadData = function () {
+			//console.log('reload');
 			var targetUrl;
 			if (typeof $routeParams.action !== "undefined") {
 				targetUrl = window.location.origin + window.location.pathname.replace('sections', 'info-page') + $routeParams.action + '/';
@@ -47,7 +48,9 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			AjaxService.reloadData(targetUrl)
 				.then(function successCallback(data) {
 					$scope.jsonEditable = jsonEditable = data.data.variables.jsonEditable;
+					//$scope.jsonString = JSON.stringify(data.data.configuration);
 					$scope.jsonData = data.data.configuration;
+					//console.log('success reload');
 				}, function errorCallback(data) {
 					//$scope.jsonData = {};
 					//console.log(data);
@@ -57,7 +60,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		$scope.resetRevisions = resetRevisions;
 
 		$scope.$watch('jsonData', function (newValue, oldValue) {
-			$scope.jsonString = JSON.stringify(newValue);
+			//$scope.jsonString = JSON.stringify(newValue);
 			if ( !isUndo && !isRedo && newValue !== oldValue ) {
 				historyIndex = historyIndex - historyUndo;
 				historyUndo = 0;
@@ -72,14 +75,14 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			isRedo = false;
 		}, true);
 
-		$scope.$watch('jsonString', function (json) {
-			try {
-				$scope.jsonData = JSON.parse(json);
-				$scope.wellFormed = true;
-			} catch (e) {
-				$scope.wellFormed = false;
-			}
-		}, true);
+		//$scope.$watch('jsonString', function (json) {
+		//	try {
+		//		$scope.jsonData = JSON.parse(json);
+		//		$scope.wellFormed = true;
+		//	} catch (e) {
+		//		$scope.wellFormed = false;
+		//	}
+		//}, true);
 
 		var cleanupJSON = function(jsonData) {
 			var cleanJson = $filter('json')(jsonData);
@@ -143,12 +146,13 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		$scope.undo = function() {
 			var json = storage.revisions[historyIndex - historyUndo - 2];
 			isUndo = true;
-			$scope.jsonString = '{}';
+			//$scope.jsonString = '{}';
+			$scope.jsonData = {};
 
 			$timeout(function() {
 				isUndo = true;
-				$scope.jsonString = json;
-				//$scope.jsonData = JSON.parse(json);
+				//$scope.jsonString = json;
+				$scope.jsonData = JSON.parse(json);
 				historyUndo++;
 			}, 1);
 		};
@@ -156,12 +160,13 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		$scope.redo = function() {
 			var json = storage.revisions[historyIndex - historyUndo];
 			isRedo = true;
-			$scope.jsonString = '{}';
+			//$scope.jsonString = '{}';
+			$scope.jsonData = {};
 
 			$timeout(function() {
 				isRedo = true;
-				$scope.jsonString = json;
-				//$scope.jsonData = JSON.parse(json);
+				//$scope.jsonString = json;
+				$scope.jsonData = JSON.parse(json);
 				historyUndo--;
 			}, 1);
 		};
@@ -175,14 +180,15 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			AjaxService.submitConfiguration(cleanJson, window.location.href)
 				.then(function successCallback(data) {
 					var tmpData = data.data;
+					//console.log(tmpData);
 					delete(tmpData.snippets['block--state']);
 					$.netopeergui.processResponseData(tmpData, function() {
 						//$scope.reload();
 						$.netopeergui.hideSpinner();
 					});
 				}, function errorCallback(data) {
-					console.log(data);
-					alert('error2');
+					//console.log(data);
+					//alert('error2');
 					$.netopeergui.hideSpinner();
 				});
 		};

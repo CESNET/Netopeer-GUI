@@ -1,4 +1,4 @@
-<span ng-if="showAddKey">
+<span ng-if="showAddKey && jsonEditable">
 	<span>
 		<input placeholder="Name" type="text"
 					 class="form-control input-sm addItemKeyInput" nb-model-onblur ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" 					 ng-blur="changeParentKeyName($parent.keyName, child, $parent)"

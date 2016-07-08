@@ -57,7 +57,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			$resData = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 			$res = array(
 				'variables' => array(
-					'jsonEditable' => !$this->getAssignedValueForKey('jsonEditable'),
+					'jsonEditable' => true,
 				),
 				'configuration' => json_decode($resData),
 			);

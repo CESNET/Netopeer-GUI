@@ -35,14 +35,15 @@ NetopeerGUI.directive('ngModelOnblur', function() {
       key: '=',
       valueType: '=?valueType'
     },
-    controller: function($scope) {
-      $scope.getTemplateUrl = function(type) {
-          if (typeof type === 'undefined') {
-              type = $scope.type;
-          }
-          //return baseURL + '/bundles/fitmoduledefault/netopeerangular/templates/types/'+type+'.html';
-          return 'types/'+type+'.html';
-      };
+    controller: function($scope) {},
+    templateUrl: function(elem, attr){
+        var type = attr.type;
+        if (typeof type === 'undefined') {
+            type = 'object';
+        }
+        type = type.charAt(0).toUpperCase() + type.slice(1);
+        //return baseURL + '/bundles/fitmoduledefault/netopeerangular/templates/types/'+type+'.html';
+        return 'types/'+type+'.html';
     },
     link: function(scope, element, attributes) {
         var stringName = "Text";
@@ -301,16 +302,22 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     }
                     // add item to object
                     switch(type) {
-                        case stringName: obj[parent.keyName] = parent.valueName ? parent.possibleNumber(parent.valueName) : "";
-                                        break;
-                        case objectName:  obj[parent.keyName] = {};
-                                        break;
-                        case arrayName:   obj[parent.keyName] = [];
-                                        break;
-                        case refName: obj[parent.keyName] = {"Reference!!!!": "todo"};
-                                        break;
-                        case boolName: obj[parent.keyName] = false;
-                                        break;
+                        case stringName:
+                        case numberName:
+                            obj[parent.keyName] = parent.valueName ? parent.possibleNumber(parent.valueName) : "";
+                            break;
+                        case objectName:
+                            obj[parent.keyName] = {};
+                            break;
+                        case arrayName:
+                            obj[parent.keyName] = [];
+                            break;
+                        case refName:
+                            obj[parent.keyName] = {"Reference!!!!": "todo"};
+                            break;
+                        case boolName:
+                            obj[parent.keyName] = false;
+                            break;
                         default:
                             console.log('not implemented type: ' + type + ' or parentType ' + parent.valueType); // TOOD
                     }
@@ -324,7 +331,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             } else if (parentType == "Array") {
                 // add item to array
                 switch(type) {
-                    case stringName: obj.push(parent.valueName ? parent.valueName : "");
+                    case stringName:
+                    case numberName:
+                        obj.push(parent.valueName ? parent.valueName : "");
                                     break;
                     case objectName:  obj.push({});
                                     break;
@@ -432,8 +441,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 case 'list':
                     obj = getParents(obj, 2);
                     if (generateEmpty && typeof obj['@'] === "undefined") {
-                        console.log(obj);
-                        console.log(scope);
+                        //console.log(obj);
+                        //console.log(scope);
                         try {
                             obj['@'] = {}; // create empty attributes object
                         } catch (exception) {};
@@ -497,8 +506,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
         var setAttribute = function(attr, val, key, obj) {
             var node = scope.getAttributesNode(key, obj, true);
-
-            if (node) {
+            if (node !== false) {
                 node[attr] = val;
                 return true;
             }
@@ -508,7 +516,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
         var unsetAttribute = function(attr, key, obj) {
             var node = scope.getAttributesNode(key, obj);
-            if (node) {
+            if (node !== false) {
                 if (typeof node[attr] !== "undefined") delete node[attr];
                 return true;
             }
@@ -560,10 +568,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         // sometimes having a different ng-model and then saving it on ng-change
         // into the object or array is necessary for all updates to work
 
-        var newElement = '<div ng-include="getTemplateUrl()"></div>';
-        newElement = angular.element(newElement);
-        $compile(newElement)(scope);
-        element.replaceWith ( newElement );
+        //var newElement = '<div ng-include="getTemplateUrl()"></div>';
+        //newElement = angular.element(newElement);
+        //$compile(newElement)(scope);
+        //element.replaceWith ( newElement );
     }
   };
 })

@@ -433,7 +433,7 @@ class DefaultController extends BaseController
 			if ($this->getRequest()->get('angular') == "true") {
 				$res = array(
 					'variables' => array(
-						'jsonEditable' => !$this->getAssignedValueForKey('jsonEditable'),
+						'jsonEditable' => false,
 					),
 					'configuration' => $sessionArr,
 				);

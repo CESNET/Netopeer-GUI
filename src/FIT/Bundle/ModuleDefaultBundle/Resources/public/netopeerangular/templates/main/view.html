@@ -1,8 +1,8 @@
 <h1 class="left">Config &amp; State data</h1>
 
 <hr class="cleaner" />
-<div ng-init="reload(moduleName); resetRevisions()">
-    <button ng-click="reload(moduleName)">reload data</button>
+<div ng-init="reloadData(moduleName); resetRevisions()">
+    <button ng-click="reloadData(moduleName)">reload data</button>
     <button ng-click="download(jsonData)">download as JSON</button>
 
     <button ng-click="submitConfiguration(jsonData)" ng-if="jsonEditable">Apply changes</button>
@@ -13,9 +13,9 @@
         <json child="jsonData" default-collapsed="false" type="object" hide-collapse="true"></json>
     </div>
 
-    <hr>
-    <div>
-        <textarea id="jsonTextarea" ng-model="jsonString"></textarea>
-        <span class="red" ng-if="!wellFormed">JSON not well-formed!</span>
-    </div>
+    <!--<hr>-->
+    <!--<div>-->
+        <!--<textarea id="jsonTextarea" ng-model="jsonString"></textarea>-->
+        <!--<span class="red" ng-if="!wellFormed">JSON not well-formed!</span>-->
+    <!--</div>-->
 </div>
