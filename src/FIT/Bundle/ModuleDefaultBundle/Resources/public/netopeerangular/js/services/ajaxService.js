@@ -14,6 +14,7 @@ var services = angular.module('NetopeerGUIServices', [])
 	this.loadSchema = function(connIds, filters) {
 		return $http({
 			url: baseURL + '/ajax/schema/',
+			method: 'POST',
 			data: {'angular': true, 'connIds': connIds, 'filters': filters}
 		});
 	};
