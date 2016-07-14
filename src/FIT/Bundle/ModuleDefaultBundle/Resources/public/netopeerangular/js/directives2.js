@@ -121,6 +121,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return boolName;
             } else if (eltype === 'enumeration') {
                 return enumerationName;
+            } else if (eltype === 'string') {
+                return stringName;
             } else if (isNumberType(eltype) || type === "[object Number]") {
                 return numberName;
             } else if (type === "[object Object]") {
@@ -380,11 +382,22 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         scope.changeParentKeyName = function(key, child, $parent) {
-            var val = getType(key, $parent);
-            console.log(key);
-            console.log(val);
+            getSchemaFromKey(key, parent.child, child);
+            var val = getType(key, child, $parent.child);
+            var eltype = getEltype(key, $parent.child);
             if (val) {
                 $parent.valueType = val;
+            }
+        };
+
+        scope.initParentValueType  = function($parent) {
+            switch ($parent.type) {
+                case listName:
+                    $parent.valueType = objectName;
+                    break;
+                case arrayName:
+                    $parent.valueType = stringName;
+                    break;
             }
         };
 

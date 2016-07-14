@@ -1,15 +1,16 @@
 <span ng-if="showAddKey && jsonEditable">
-	<span>
+
+	<span ng-show="$parent.type !== 'List' && $parent.type !== 'Array'">
 		<input placeholder="Name" type="text"
-					 class="form-control input-sm addItemKeyInput" nb-model-onblur ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" 					 ng-blur="changeParentKeyName($parent.keyName, child, $parent)"
+					 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" 					 ng-blur="changeParentKeyName($parent.keyName, child, $parent)"
 				/> :
 	</span>
 
-	<select ng-model="$parent.valueType"  ng-model-onblur ng-options="option for option in valueTypes" class="form-control input-sm"></select>
+	<select ng-model="$parent.valueType"  ng-model-onblur ng-options="option for option in valueTypes" class="form-control input-sm" ng-show="$parent.type !== 'List' && $parent.type !== 'Array'" ng-init="initParentValueType($parent)"></select>
 
 	<!--ng-change="changeValue($parent.valueName, $parent.keyName, child, $parent)"-->
 	<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur
-				  ng-show="$parent.valueType != 'Object' && $parent.valueType != 'Array'">
+				  ng-show="$parent.valueType !== 'Object' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:Array' && $parent.type !== 'List'">
 
 	<!--<span ng-switch on="$parent.valueType">-->
 		<!--<span ng-switch-when="Boolean" type="boolean">-->
@@ -36,6 +37,7 @@
 </span>
 <span ng-if="!showAddKey">
 	<button class="addObjectItemBtn" ng-click="$parent.showAddKey = true">
-		<i class="fa fa-plus"></i>
+		<i class="fa fa-plus" ng-if="$parent.type !== 'List'"></i>
+		<i class="fa fa-plus-circle" ng-if="$parent.type === 'List' "></i>
 	</button>
 </span>
