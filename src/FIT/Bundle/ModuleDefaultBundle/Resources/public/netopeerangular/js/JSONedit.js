@@ -109,8 +109,8 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 						} else if (this.key.indexOf('$@') !== -1 || this.key.indexOf('@') !== -1) {
 							// leave attributes
 
-						} else if (this.notRoot && !angular.isUndefined(this.parent.key) && this.path.toString().indexOf('@') === -1 && this.isLeaf) {
-							//this.remove();
+						} else if (this.notRoot && !angular.isUndefined(this.parent.key) && this.path.toString().indexOf('@') === -1 && this.isLeaf && !Array.isArray(this.parent.node)) {
+							this.remove();
 						}
 					}
 				});
