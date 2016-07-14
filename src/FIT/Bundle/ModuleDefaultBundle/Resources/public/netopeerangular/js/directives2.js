@@ -356,7 +356,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         console.log('2not implemented ' + parent.valueType); // TOOD
                 }
                 setParentChanged(parent);
-                setIetfOperation('replace', getParents(parent, 4).key, getParents(parent, 6).child, parent); // TODO replace order in array
+                setIetfOperation('replace', getParents(parent, 3).key, getParents(parent, 1).child, parent); // TODO replace order in array
                 parent.valueName = "";
                 parent.showAddKey = false;
             } else {
