@@ -315,6 +315,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     switch(type) {
                         case stringName:
                         case numberName:
+                        case enumerationName:
                             obj[parent.keyName] = parent.valueName ? parent.possibleNumber(parent.valueName) : "";
                             break;
                         case objectName:

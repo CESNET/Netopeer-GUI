@@ -95,11 +95,11 @@ if advised of the possibility of such damage.
 					{% if topmenu is defined %}
 						{% set i = 0 %}
 						{% for section in topmenu %}
-							<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="dynamic ajaxLink {% if app.request.get('module') is defined and app.request.get('module') == section.moduleName %}active{% endif %} nth-{{i}}">{{section.name}}<span class="arrow"></span></a>
+							<a href="#!module/{{ section.params.module }}" title="{{section.title}} ({{section.namespace}})" class="dynamic {% if app.request.get('module') is defined and app.request.get('module') == section.moduleName %}active{% endif %} nth-{{i}}">{{section.name}}<span class="arrow"></span></a>
 							{% set i = i + 1 %}
 						{% endfor %}
-						<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "all" %}active{% endif %}" title="GET all information">All<span class="arrow"></span></a>
-						<a href="{{ path("createEmptyModule", {"key":app.request.get('key')}) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "empty datastore" %}active{% endif %}" title="Insert into empty datastore">+<span class="arrow"></span></a>
+						<a href="#!module/all" class="dynamic {% if sectionName is defined and sectionName|lower == "all" %}active{% endif %}" title="GET all information">All<span class="arrow"></span></a>
+						<a href="#!{{ path("createEmptyModule", {"key":app.request.get('key')}) }}" class="dynamic {% if sectionName is defined and sectionName|lower == "empty datastore" %}active{% endif %}" title="Insert into empty datastore">+<span class="arrow"></span></a>
 					{% endif %}
 				{% endif %}
 
@@ -146,6 +146,7 @@ if advised of the possibility of such damage.
 					</div>
 
 					{% block rpcMethods %}
+						<div id="block--rpcMethods">
 						{% if rpcMethods is defined and rpcMethods|length > 0 %}
 							<h4>RPC methods defined in model:</h4>
 							<div class="nav-left">
@@ -154,6 +155,7 @@ if advised of the possibility of such damage.
 								{% endfor %}
 							</div>
 						{% endif %}
+						</div>
 					{% endblock rpcMethods%}
 
 					<div id="block--copyConfig">

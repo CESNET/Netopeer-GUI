@@ -399,7 +399,7 @@ class ConnectionFunctionality {
 	 * @param  int|array $keys      session connection keys
 	 * @param  string $targetDataStore    target datastore identifier
 	 */
-	private function updateConnLock($keys, $targetDataStore) {
+	public function updateConnLock($keys, $targetDataStore) {
 		if (is_int($keys)) {
 			$keys = array($keys);
 		}
