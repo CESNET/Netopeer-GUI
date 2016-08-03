@@ -113,7 +113,16 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 		select, button { font-style: normal;}
 	}
 	ol.listOl {
-		> li + li { border-top: 1px dotted #ccc; padding-top: 1em; }
+		> li {
+			&.arrayItem {
+				&:before { display: none; }
+			}
+			+ li { border-top: 1px dotted #ccc; padding-top: 1em; }
+		}
+
+	}
+	ol.arrayOl {
+		margin-left: 25px;
 	}
 	ol.arrayOl, ol.listOl {
 		li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
