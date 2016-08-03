@@ -405,7 +405,16 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             //console.log(key);console.log(child);console.log(parent);
             try {
                 var parentKeyName = getParents(parent, 4).key;
-                var children = getParents(parent, 6).child['$@'+ parentKeyName]['children'];
+                if (typeof parentKeyName === "undefined") {
+                    parentKeyName = getParents(parent, 3).key;
+                }
+                var parents = getParents(parent, 6);
+                if (typeof parents.child['$@'+ parentKeyName] !== "undefined") {
+                    var children = parents.child['$@'+ parentKeyName]['children'];
+                } else {
+                    var children = parents.val['$@'+ parentKeyName]['children'];
+                }
+                //console.log(parents);console.log(children);
                 angular.forEach(child, function(value, key) {
                     if (key.indexOf('@') !== 0 && children.indexOf(key) !== -1) {
                         children.splice(children.indexOf(key), 1);
