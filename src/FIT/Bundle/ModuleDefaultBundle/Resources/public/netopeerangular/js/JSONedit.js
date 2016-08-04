@@ -45,16 +45,24 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				targetUrl = window.location.origin + window.location.pathname + $scope.moduleName + '/';
 			}
 
+			$.netopeergui.showSpinner();
 			AjaxService.reloadData(targetUrl)
 				.then(function successCallback(data) {
 					$scope.jsonEditable = jsonEditable = data.data.variables.jsonEditable;
 					//$scope.jsonString = JSON.stringify(data.data.configuration);
 					$scope.jsonData = data.data.configuration;
+
+					var tmpData = data.data;
+					$.netopeergui.processResponseData(tmpData, function() {
+						//$scope.reload();
+						$.netopeergui.hideSpinner();
+					});
 					//console.log('success reload');
 				}, function errorCallback(data) {
 					//$scope.jsonData = {};
 					//console.log(data);
 					//alert('error1');
+					$.netopeergui.hideSpinner();
 				});
 		};
 		$scope.resetRevisions = resetRevisions;
@@ -181,10 +189,12 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				.then(function successCallback(data) {
 					var tmpData = data.data;
 					//console.log(tmpData);
-					delete(tmpData.snippets['block--state']);
+					if (typeof tmpData.snippets['block--state'] !== "undefined") {
+						delete(tmpData.snippets['block--state']);
+					}
 					$.netopeergui.processResponseData(tmpData, function() {
 						//$scope.reload();
-						$.netopeergui.hideSpinner();
+						//$.netopeergui.hideSpinner();
 					});
 				}, function errorCallback(data) {
 					//console.log(data);

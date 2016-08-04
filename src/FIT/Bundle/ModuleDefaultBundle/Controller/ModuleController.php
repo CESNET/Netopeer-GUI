@@ -29,7 +29,9 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 
 		$res = $this->prepareVariablesForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
 
-		if ($this->getRequest()->getMethod() === 'POST') {
+		if ($this->getRequest()->getMethod() == 'POST') {
+			$this->setSectionFilterForms( $key );
+
 			$configParams = $this->getConfigParams();
 			$postData = $this->getRequest()->getContent();
 			$params = array(
@@ -52,14 +54,21 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			return $res;
 		}
 
-
 		if ($this->getRequest()->get('angular') == "true") {
 			$resData = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
+
+			// load content of snippets
+			$this->get('session')->set('isAjax', true);
+			$this->removeAjaxBlock('topMenu');
+			$content = json_decode($this->getTwigArr()->getContent(), true);
+
+
 			$res = array(
 				'variables' => array(
 					'jsonEditable' => true,
 				),
 				'configuration' => json_decode($resData),
+				'snippets' => $content['snippets'],
 			);
 			return new JsonResponse($res);
 		} else {

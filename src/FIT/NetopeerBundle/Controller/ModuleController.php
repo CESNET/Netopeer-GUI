@@ -319,6 +319,8 @@ class ModuleController extends BaseController {
 			$res = $this->handleCopyConfig($key);
 		}
 
+		/*
+		 * TODO: remove?
 		// we will redirect page after completion, because we want to load edited get and get-config
 		// and what's more, flash message lives exactly one redirect, so without redirect flash message
 		// would stay on the next page, what we do not want...
@@ -337,6 +339,7 @@ class ModuleController extends BaseController {
 			$this->getRequest()->getSession()->set('isAjax', true);
 		}
 		return $this->redirect($this->generateUrl($routeName, $retArr));
+		*/
 	}
 
 	/**

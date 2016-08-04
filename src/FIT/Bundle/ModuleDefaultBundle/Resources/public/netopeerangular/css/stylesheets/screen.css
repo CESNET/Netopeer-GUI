@@ -1342,7 +1342,7 @@
 .jsonView li select, .jsonView li button { font-style: normal; }
 .jsonView ol.listOl > li.arrayItem:before { display: none; }
 .jsonView ol.listOl > li + li { border-top: 1px dotted #ccc; padding-top: 1em; }
-.jsonView ol.arrayOl { margin-left: 25px; }
+.jsonView ol.arrayOl { margin-left: 25px; margin-top: 15px; }
 .jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner), .jsonView ol.listOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
 .jsonView li li { list-style-type: lower-roman; }
 .jsonView li li li { list-style-type: upper-roman; }

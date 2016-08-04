@@ -122,7 +122,7 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 
 	}
 	ol.arrayOl {
-		margin-left: 25px;
+		margin-left: 25px; margin-top: 15px;
 	}
 	ol.arrayOl, ol.listOl {
 		li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
