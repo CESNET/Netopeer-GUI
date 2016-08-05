@@ -161,7 +161,16 @@ class ModuleController extends BaseController {
 		// loading state part = get Action
 		// we will load it every time, because state column will we show everytime
 		try {
-			if ( ($json = $netconfFunc->handle('get', $this->getStateParams())) != 1 ) {
+
+			// we can not call get on other than running datastore
+			$params = $this->getStateParams();
+			$command = 'get';
+			if ( isset($params['source']) && $params['source'] !== 'running' ) {
+				$command = 'getconfig';
+				$params = $this->getConfigParams();
+			}
+
+			if ( ($json = $netconfFunc->handle($command, $params)) != 1 ) {
 				$this->assign("stateJson", $json);
 				return $json;
 			}

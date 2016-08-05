@@ -194,7 +194,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 					}
 					$.netopeergui.processResponseData(tmpData, function() {
 						//$scope.reload();
-						//$.netopeergui.hideSpinner();
+						$.netopeergui.hideSpinner();
 					});
 				}, function errorCallback(data) {
 					//console.log(data);

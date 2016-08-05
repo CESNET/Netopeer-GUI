@@ -220,6 +220,28 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             return (schema && typeof schema['config'] !== "undefined" && schema['config'] === true);
         };
 
+        scope.isKey = function(key, parent) {
+            if (!scope.jsonEditable) return false;
+
+            var schema = getSchemaFromKey(key, parent);
+            return (schema &&
+                (typeof schema['iskey'] !== "undefined" && schema['iskey'] === true)
+            );
+        };
+
+        scope.isMandatory = function(key, parent) {
+            if (!scope.jsonEditable) return false;
+
+            var schema = getSchemaFromKey(key, parent);
+            return (schema &&
+              (
+                (typeof schema['iskey'] !== "undefined" && schema['iskey'] === true)
+                ||
+                (typeof schema['mandatory'] !== "undefined" && schema['mandatory'] === true)
+              )
+            );
+        };
+
         //scope.editBarVisible = function(key, parent) {
         //    if (!scope.jsonEditable) return false;
 				//

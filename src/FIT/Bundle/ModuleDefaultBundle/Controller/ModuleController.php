@@ -34,17 +34,20 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 
 			$configParams = $this->getConfigParams();
 			$postData = $this->getRequest()->getContent();
-			$params = array(
-				'connIds' => array($key),
-				'target' => $configParams['source'],
-				'configs' => array($postData)
-			);
-			$res = $netconfFunc->handle('editconfig', $params, true, $result);
-			$this->get('session')->set('isAjax', true);
+			if (strpos($postData, 'form') !== 0) {
+				$params = array(
+					'connIds' => array($key),
+					'target' => $configParams['source'],
+					'configs' => array($postData)
+				);
+				$res = $netconfFunc->handle('editconfig', $params, true, $result);
+
+				$this->get('session')->set('isAjax', true);
 //			$this->removeAjaxBlock('moduleJavascripts');
 //			$this->removeAjaxBlock('moduleStylesheet');
 //			$this->removeAjaxBlock('state');
-			return $this->getTwigArr();
+				return $this->getTwigArr();
+			}
 		}
 
 		/* parent module did not prepares data, but returns redirect response,

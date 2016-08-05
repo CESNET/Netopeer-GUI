@@ -6,7 +6,8 @@
 				{{ key }}
 				<span class="editbar">
 					<i class="iconButton fa fa-question-circle" tooltip-placement="top" uib-tooltip="{{child['$@'+key]['description']}}" ng-if="child['$@'+key]['description']"></i>
-					<i class="iconButton deleteKeyBtn fa fa-trash" ng-click="deleteKey(key, child, $parent)" ng-if="child['$@'+key] && !child['$@'+key]['mandatory']"></i>
+					<i class="iconButton fa fa-asterisk red" tooltip-placement="top" uib-tooltip="Mandatory" ng-if="isMandatory(key, child)"></i>
+					<i class="iconButton deleteKeyBtn fa fa-trash" ng-click="deleteKey(key, child, $parent)" ng-if="!isMandatory(key, child)"></i>
 				</span>
 			</span>
 			<!--<input class="keyinput" type="text" ng-model="newkey" ng-init="newkey=key" ng-blur="moveKey(child, key, newkey)"/>-->
