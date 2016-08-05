@@ -6,41 +6,26 @@
 				/> :
 	</span>
 
-	<select ng-model="$parent.valueType"  ng-model-onblur ng-options="option for option in valueTypes" class="form-control input-sm" ng-show="$parent.type !== 'List' && $parent.type !== 'Array'" ng-init="initParentValueType($parent)"></select>
+	<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ng-show="$parent.type !== 'List' && $parent.type !== 'Array'" ng-init="initParentValueType($parent)"></select>
 
-	<!--<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur-->
-				 <!--ng-show="$parent.valueType !== 'Object' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:Array' && $parent.type !== 'List'">-->
+	<span ng-show="$parent.valueType !== 'Object' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:Array' && $parent.type !== 'List'">
+		<input type="text" ng-model="$parent.valueName" ng-model-onblur placeholder="Empty">
+	</span>
 
+	<!--ng-if="$parent.valueType !== 'string:Enumeration' && $parent.valueType !== 'string:Boolean' && $parent.valueType !== 'string:Number' && $parent.valueType !== 'Enumeration' && $parent.valueType !== 'Boolean' && $parent.valueType !== 'Number'"-->
 
-<span ng-switch on="$parent.valueType" ng-show="$parent.valueType !== 'Object' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:Array' && $parent.type !== 'List'">
-	<span ng-switch-when="Boolean">
-		<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur>
-	</span>
-	<span ng-switch-when="Enumeration">
-		<select ng-model="$parent.valueName" ng-model-onblur ng-options="option for option in getEnumValues(key, child, $parent) track by option"></select>
-	</span>
-	<span ng-switch-when="Number">
-		<input type="number" ng-model="$parent.valueName" ng-model-onblur>
-	</span>
-	<span ng-switch-default>
-		<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur>
-	</span>
-</span>
-	<!--<span ng-switch on="$parent.valueType">-->
-		<!--<span ng-switch-when="Boolean" type="boolean">-->
-			<!--<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)">-->
-		<!--</span>-->
-		<!--<span ng-switch-when="Enumeration" type="enumeration">-->
-			<!--<select ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option"></select>-->
-		<!--</span>-->
-		<!--<span ng-switch-when="Number" type="number">-->
-			<!--<input type="number" ng-model="$parent.valueName" ng-model-onblur ng-change="changeValue(val, $parent.keyName, child, $parent)">-->
-		<!--</span>-->
-		<!--<span ng-switch-default class="jsonLiteral" type="text">-->
-			<!--<input type="text" ng-model="$parent.valueName" placeholder="Empty" ng-model-onblur-->
-						 <!--ng-change="changeValue($parent.valueName, $parent.keyName, child, $parent)" ng-show="$parent.valueType != 'Object' && $parent.valueType != 'Array'">-->
-		<!--</span>-->
+	<!--<span ng-if="$parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration'">-->
+		<!--<select ng-model="$parent.valueName" ng-model-onblur ng-options="option for option in getEnumValues(key, child, $parent) track by option"></select>-->
 	<!--</span>-->
+
+	<!--<span ng-if="$parent.valueType == 'string:Boolean' || $parent.valueType == 'Boolean'">-->
+		<!--<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur>-->
+	<!--</span>-->
+
+	<!--<span ng-if="$parent.valueType == 'string:Number' || $parent.valueType == 'Number'">-->
+		<!--<input type="number" ng-model="$parent.valueName" ng-model-onblur>-->
+	<!--</span>-->
+
 
 	<button class="btn btn-primary btn-sm" ng-click="addItem(key, child, $parent)">
 		Add

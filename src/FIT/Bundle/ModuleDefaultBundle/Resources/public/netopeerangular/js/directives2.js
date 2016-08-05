@@ -358,7 +358,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                             obj[parent.keyName] = {"Reference!!!!": "todo"};
                             break;
                         case boolName:
-                            obj[parent.keyName] = false;
+                            obj[parent.keyName] = parent.valueName ? true : false;
                             break;
                         default:
                             console.log('not implemented type: ' + type + ' or parentType ' + parent.valueType); // TOOD
@@ -413,9 +413,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         };
 
         scope.changeParentKeyName = function(key, child, $parent) {
-            getSchemaFromKey(key, parent.child, child);
-            var val = getType(key, child, $parent.child);
-            var eltype = getEltype(key, $parent.child);
+            getSchemaFromKey(key, $parent, child);
+            var val = getType(key, null, child);
             if (val) {
                 $parent.valueType = val;
             }
