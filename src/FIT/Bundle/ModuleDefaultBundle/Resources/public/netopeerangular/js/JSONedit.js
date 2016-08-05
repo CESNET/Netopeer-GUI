@@ -25,12 +25,18 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			storage.erase('revisions');
 			storage.write('revisions', []);
 		};
+		var revisionsExists = function() {
+			return !(angular.isUndefined(storage) || angular.isUndefined(storage.revisions));
+		}
 		$scope.moduleName = $routeParams.moduleName;
 
 		$scope.hasUndo = function() {
 			return (historyIndex - historyUndo - 1) <= 0;
 		};
 		$scope.hasRedo = function() {
+			if (!revisionsExists()) {
+				return true;
+			}
 			return (historyIndex - historyUndo) >= storage.revisions.length;
 		};
 		var isUndo = false,
@@ -74,8 +80,10 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				historyUndo = 0;
 
 				// prevent the future
-				storage.revisions.slice(0, historyIndex + 1);
-				storage.revisions.push(JSON.stringify(newValue));
+				if (revisionsExists()) {
+					storage.revisions.slice(0, historyIndex + 1);
+					storage.revisions.push(JSON.stringify(newValue));
+				}
 
 				historyIndex++;
 			}
