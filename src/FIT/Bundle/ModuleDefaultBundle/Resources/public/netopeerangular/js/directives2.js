@@ -4,6 +4,8 @@ var counts = {
   object: 0
 };
 
+var schemaAjaxBlacklist = [];
+
 var NetopeerGUI = angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap', 'configurationTemplates', 'NetopeerGUIServices']);
 
 NetopeerGUI.directive('ngModelOnblur', function() {
@@ -185,24 +187,30 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     //} catch (exception) {};
                 }
                 if (angular.isUndefined($rootScope.cache[window.location.href].get(path))) {
-                    AjaxService.loadSchema([connId], [path])
-                      .then(function successCallback(data) {
-                          var schema = data.data;
+                    var schemaBlacklistKey = connId + path;
+                    if (schemaAjaxBlacklist.indexOf(schemaBlacklistKey) === -1) {
+                        AjaxService.loadSchema([connId], [path])
+                          .then(function successCallback(data) {
+                              var schema = data.data;
 
-                          if (typeof schema === "undefined" || typeof schema['$@'+ns+key] === "undefined") {
+                              if (typeof schema === "undefined" || typeof schema['$@'+ns+key] === "undefined") {
+                                  schemaAjaxBlacklist.push(schemaBlacklistKey);
+                                  return false;
+                              }
+                              //insert loaded schema into current object
+                              //$rootScope.cache[window.location.href].put(path, parent['$@'+key]);
+                              if (!angular.isUndefined(child)) {
+                                  child['$@'+key] = schema['$@'+ns+key];
+                              } else {
+                                  parent['$@'+key] = schema['$@'+ns+key];
+                              }
+                              return schema['$@'+ns+key];
+                          }, function errorCallback(data) {
+                              schemaAjaxBlacklist.push(schemaBlacklistKey);
                               return false;
-                          }
-                          //insert loaded schema into current object
-                          //$rootScope.cache[window.location.href].put(path, parent['$@'+key]);
-                          if (!angular.isUndefined(child)) {
-                              child['$@'+key] = schema['$@'+ns+key];
-                          } else {
-                              parent['$@'+key] = schema['$@'+ns+key];
-                          }
-                          return schema['$@'+ns+key];
-                      }, function errorCallback(data) {
-                          return false;
-                      });
+                          });
+                    }
+
                 } else {
                     return $rootScope.cache[window.location.href].get(path);
                 }
