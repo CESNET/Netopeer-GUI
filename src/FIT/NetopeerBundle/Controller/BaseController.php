@@ -291,6 +291,7 @@ class BaseController extends Controller
 	{
 		$connectionFunc = $this->get("fitnetopeerbundle.service.connection.functionality");
 		$model = $connectionFunc->getModelMetadata($key, $module);
+
 		if ($model) {
 			return $model['rpcs'];
 		} else {

@@ -146,16 +146,17 @@ if advised of the possibility of such damage.
 					</div>
 
 					{% block rpcMethods %}
-						<div id="block--rpcMethods">
-						{% if rpcMethods is defined and rpcMethods|length > 0 %}
-							<h4>RPC methods defined in model:</h4>
-							<div class="nav-left">
-								{% for rpc in rpcMethods %}
-									<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc }}</a>
-								{% endfor %}
-							</div>
-						{% endif %}
-						</div>
+						{#TODO: make RPC method working (angular in modal window#}
+						{#<div id="block--rpcMethods">#}
+						{#{% if rpcMethods is defined and rpcMethods|length > 0 %}#}
+							{#<h4>RPC methods defined in model:</h4>#}
+							{#<div class="nav-left">#}
+								{#{% for rpc in rpcMethods %}#}
+									{#<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc }}</a>#}
+								{#{% endfor %}#}
+							{#</div>#}
+						{#{% endif %}#}
+						{#</div>#}
 					{% endblock rpcMethods%}
 
 					<div id="block--copyConfig">
