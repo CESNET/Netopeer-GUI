@@ -508,7 +508,7 @@ class NetconfFunctionality {
 			"source" 	=> $params['source'],
 			"strict"   => isset($params['strict']) ? $params['strict'] : false,
 		);
-		$this->addOptionalParams($getconfigParams, $params, array('filter'));
+		$getconfigParams = $this->addOptionalParams($getconfigParams, $params, array('filter'));
 
 		$decoded = $this->execute_operation($sock, $getconfigParams);
 		return $this->checkDecodedData($decoded);
