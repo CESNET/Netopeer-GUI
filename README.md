@@ -45,16 +45,18 @@ To install, **run** the following commands:
 	# go to apache web directory
 	cd /var/www
 	
-    git clone --recursive -b netopeerguid https://github.com/cesnet/netopeer-gui.git
-    # OR for already cloned repos or older GIT versions use
-    #
-    # git clone -b netopeerguid https://github.com/cesnet/netopeer-gui.git
-    # cd netopeergui
-    # git submodule update --init --recursive 
+    git clone netopeerguid https://github.com/cesnet/netopeer-gui.git
     
     cd netopeer-gui
     
+    # build from predefined scripts    
     cd install
+    ./(centos6|centos7)/install.sh
+
+    # or build manually
+    git submodule update --init --recursive 
+    cd install
+
     ./bootstrap.sh
     
     # for change some variables, look at ./configure --help
