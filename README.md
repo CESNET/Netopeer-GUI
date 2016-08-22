@@ -5,6 +5,8 @@ NetopeerGUI is web graphical user interface for configuring devices based on pro
 
 NetopeerGUI is developed as [Symfony2 app](http://symfony.com).
 
+**Important: This is new version using Libnetconf2 and NetopeerGUID**. It might contain some new bugs, especially in UI, but we are trying to improve all the stuff. You can use older version [v1.0](https://github.com/CESNET/Netopeer-GUI/tree/v1.0.0), which is working with Libnetconf1 and mod_netconf, if you need.
+
 ## NetopeerGUI demo installation - using Vagrant on CentOS7
 
 If you do not have a vagrant box for CentOS7 box yet, use:
@@ -72,7 +74,7 @@ To install, **run** the following commands:
     php ./composer.phar install
 
 ### Underhood - install folder
-Install folder includes necesarry files for communicating with NETCONF devices. It contains also [mod_netconf](https://github.com/CESNET/mod_netconf) submodule. This causes, why `--recursive` in git clone is necessary. For **mod_netconf** update follow instructions on [mod_netconf](https://github.com/CESNET/mod_netconf) site.
+Install folder includes necesarry files for communicating with NETCONF devices. For **mod_netconf** update follow instructions on [mod_netconf](https://github.com/CESNET/mod_netconf) site.
 
 Configure script check all dependencies and prepares all resources for install. 
 
