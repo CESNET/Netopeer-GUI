@@ -1,0 +1,10 @@
+<i ng-click="toggleCollapse()" class="fa toggle-control" ng-class="chevron"></i>
+<div class="jsonContents" ng-hide="collapsed">
+	<!-- TODO: sortable only if user-sorted = autohor -->
+	<ol class="listOl" ui-sortable="sortableOptions" ng-model="child">
+		<li class="arrayItem" ng-repeat="val in child track by $index">
+			<span><switch-item></switch-item></span>
+		</li>
+	</ol>
+	<add-item ng-show="jsonEditable" valueType="Object"></add-item>
+</div>

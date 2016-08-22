@@ -195,10 +195,10 @@ hr.cleaner {
   clear: both; }
 
 .red {
-  color: #820101; }
+  color: #820101 !important; }
 
 .green {
-  color: #007711; }
+  color: #007711 !important; }
 
 .cover-wo-alerts {
   position: relative;
@@ -333,7 +333,7 @@ nav#block--topMenu > a.active span.arrow, div#block--topMenu > a.active span.arr
   display: block;
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
-  border-top: 8px solid black; }
+  border-top: 8px solid #000001; }
 nav#block--topMenu .header-icon, div#block--topMenu .header-icon {
   background: #002034;
   padding: 0px 4px;

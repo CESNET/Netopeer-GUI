@@ -81,9 +81,25 @@ jQuery.extend({
 			// browsers change the syntax of inserted <script> or <link> element by themselves, unify the inserted syntax of this elements
 			} else if ((id === "block--moduleJavascripts" || id === "block--moduleStylesheet") && $("#" + id).html().trim() == html.replace(" \/>", ">").trim()) {
 				// do not change content of styles or js if did not changed
+			} else if (id == 'block--singleContent' && typeof angular !== "undefined") {
+				//var $blockEl = $("#" + id);
+                //
+				//try {
+				//	angular.element(document).injector().invoke(function($compile) {
+				//		var scope = angular.element(document.querySelector('#' + id)).scope();
+				//		$blockEl.html($compile(html)(scope));
+				//		scope.$apply();
+				//	});
+				//} catch (err) {
+				//	console.error(err);
+				//	$blockEl.html(html);
+				//}
 
 			// replace content of given block with new html
 			} else {
+				//console.log(id);
+				//console.log($("#" + id).html().trim());
+				//console.log(html.replace(" \/>", ">").trim());
 				var $blockEl = $("#" + id);
 				$blockEl.html(html);
 			}
@@ -148,19 +164,6 @@ jQuery.extend({
 				data.redirect = href;
 			}
 
-			// process given data and hide spinner in success callback
-			this.processResponseData(data, function() {
-				setTimeout(function() {
-					$('#ajax-spinner').fadeOut();
-					clearTimeout(this.spinnerTimer);
-				}, 150);
-			});
-
-			// set clicked link as active
-			if ($('a[href="'+ href +'"]').length && $elem.data().disableActiveLink !== true) {
-				this.setActiveLink($('a[href="'+ href +'"]'));
-			}
-
 			// push requested URL into history (to enable forward and backward walkthrough)
 			if ($elem.data().disableHistory !== true) {
 				var historyHref = href;
@@ -168,6 +171,16 @@ jQuery.extend({
 					historyHref = data.historyHref;
 				}
 				history.pushState(historyHref, "", historyHref);
+			}
+
+			// process given data and hide spinner in success callback
+			this.processResponseData(data, function() {
+				$.netopeergui.hideSpinner();
+			});
+
+			// set clicked link as active
+			if ($('a[href="'+ href +'"]').length && $elem.data().disableActiveLink !== true) {
+				this.setActiveLink($('a[href="'+ href +'"]'));
 			}
 
 			// call callback defined in clicked link (or submitted form)
@@ -189,12 +202,7 @@ jQuery.extend({
 			// clear alerts block on every request
 			$("#block--alerts").html('');
 
-			/**
-			 * show spinner on every request
-			 */
-			$.netopeergui.spinnerTimer = setTimeout(function() {
-				$('#ajax-spinner').fadeIn();
-			}, 100);
+			$.netopeergui.showSpinner();
 
 			$.ajax({
 				url: href,
@@ -202,6 +210,19 @@ jQuery.extend({
 				data: data,
 				type: type,
 				success: function(data, textStatus, jqXHR) {
+					//if (typeof angular !== "undefined" && $("#mainView").length) {
+					//	$("#block--moduleJavascripts, #block--moduleStylesheet").html('');
+					//	try {
+					//		var scope = angular.element(document).scope();
+					//		scope.jsonData = {};
+					//		scope.jsonString = "{}";
+					//		//console.log(scope);
+					//		//scope.$destroy();
+					//		$(".jsonView").empty();
+					//	} catch (err) {
+					//		// scope is not set
+					//	}
+					//}
 					$.netopeergui.successAjaxFunction(data, textStatus, jqXHR, href, $THIS);
 				},
 				error: function(qXHR, textStatus, errorThrown) {
@@ -215,7 +236,24 @@ jQuery.extend({
 
 		// create animated spinner
 		createSpinner: function()	{
-			return this.spinner = $('<div></div>').attr('id', 'ajax-spinner').appendTo('body').hide();
+			if (!$('#ajax-spinner').length) {
+				return this.spinner = $('<div></div>').attr('id', 'ajax-spinner').appendTo('body').hide();
+			} else {
+				return this.spinner;
+			}
+		},
+
+		showSpinner: function() {
+			$.netopeergui.spinnerTimer = setTimeout(function() {
+				$('#ajax-spinner').fadeIn();
+			}, 100);
+		},
+
+		hideSpinner: function() {
+			setTimeout(function() {
+				$('#ajax-spinner').fadeOut();
+				clearTimeout(this.spinnerTimer);
+			}, 150);
 		},
 
 		// if exists modified form element, show confirm box
@@ -254,12 +292,7 @@ window.onpopstate = function(o) {
 
 		$("#block--alerts").html('');
 
-		/**
-		 * spinner zobrazit az po 100ms
-		 */
-		$.netopeergui.spinnerTimer = setTimeout(function() {
-			$('#ajax-spinner').fadeIn();
-		}, 100);
+		$.netopeergui.showSpinner();
 
 		$.ajax({
 			dataType: 'json',

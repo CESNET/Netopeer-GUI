@@ -33,7 +33,10 @@
 # in contract, strict liability, or tort (including negligence or
 # otherwise) arising in any way out of the use of this software, even
 # if advised of the possibility of such damage.
- 
+
+imports:
+  - { resource: "functionality.yml" }
+
 services:
     data_logger:
         class: Symfony\Bridge\Monolog\Logger
@@ -42,27 +45,23 @@ services:
              - [pushHandler, [@data_handler]]
 
     data_handler:
-        class: Monolog\Handler\StreamHandler       
+        class: Monolog\Handler\StreamHandler
         arguments: [%kernel.logs_dir%/%kernel.environment%.data.log]
 
     authentication_handler:
         class: FIT\NetopeerBundle\Handler\AuthenticationHandler
-        arguments: [@service_container, @data_logger, @DataModel]
+        arguments: [@service_container]
 
-    DataModel:
-        class: %netopeer.data.class%
-        arguments: [@service_container, @data_logger]
-
-    XMLoperations:
-        class: FIT\NetopeerBundle\Models\XMLoperations
-        arguments: [@service_container, @data_logger, @DataModel]
+#    XMLoperations:
+#        class: FIT\NetopeerBundle\Models\XMLoperations
+#        arguments: [@service_container, @data_logger, @fitnetopeerbundle.service.netconf.functionality]
 
     BaseConnection:
         class: FIT\NetopeerBundle\Entity\BaseConnection
         arguments: [@doctrine.orm.entity_manager, @security.context, @data_logger]
 
     SamlToState:
-        class: FIT\NetopeerBundle\Models\SamlToState
+        class: FIT\NetopeerBundle\Services\Managers\SamlToState
         arguments: [@service_container, @data_logger]
 
     netopeer.twig.netopeer_twig_extension:
@@ -72,7 +71,7 @@ services:
 
     moduleListener:
         class: FIT\NetopeerBundle\EventListener\ModuleListener
-        arguments: [@DataModel, @doctrine.orm.entity_manager, @data_logger]
+        arguments: [@fitnetopeerbundle.service.connection.functionality, @doctrine.orm.entity_manager, @data_logger]
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelController }
 
@@ -83,13 +82,3 @@ services:
         arguments:
             - file                       # just modify this value to use another cache
             #- {'cache_dir': /tmp/cache } # you can omit this if you don't use FileCache or if the default value is ok for you
-
-    ajaxController:
-        class: FIT\NetopeerBundle\Controller\AjaxController
-        arguments:
-            container: "@service_container"
-
-    securityController:
-        class: FIT\NetopeerBundle\Controller\SecurityController
-        arguments:
-            container: "@service_container"

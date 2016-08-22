@@ -38,7 +38,7 @@ if advised of the possibility of such damage.
 
 <!DOCTYPE html>
 
-<html lang="en">
+<html lang="en"{% block htmlAdditions %}{% endblock %}>
 <head>
 	<meta charset="utf-8" />
 	<meta name="description" content="" />
@@ -95,11 +95,11 @@ if advised of the possibility of such damage.
 					{% if topmenu is defined %}
 						{% set i = 0 %}
 						{% for section in topmenu %}
-							<a href="{{ path(section.path, section.params) }}" title="{{section.title}} ({{section.namespace}})" class="dynamic ajaxLink {% if sectionName is defined and sectionName == section.name %}active{% endif %} nth-{{i}}">{{section.name}}<span class="arrow"></span></a>
+							<a href="#!module/{{ section.params.module }}" title="{{section.title}} ({{section.namespace}})" class="dynamic {% if app.request.get('module') is defined and app.request.get('module') == section.moduleName %}active{% endif %} nth-{{i}}">{{section.name}}<span class="arrow"></span></a>
 							{% set i = i + 1 %}
 						{% endfor %}
-						<a href="{{ path("module", {"key":app.request.get('key'),"module":'all'} ) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "all" %}active{% endif %}" title="GET all information">All<span class="arrow"></span></a>
-						<a href="{{ path("createEmptyModule", {"key":app.request.get('key')}) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "empty datastore" %}active{% endif %}" title="Insert into empty datastore">+<span class="arrow"></span></a>
+						<a href="#!module/all" class="dynamic {% if sectionName is defined and sectionName|lower == "all" %}active{% endif %}" title="GET all information">All<span class="arrow"></span></a>
+						<a href="#!{{ path("createEmptyModule", {"key":app.request.get('key')}) }}" class="dynamic {% if sectionName is defined and sectionName|lower == "empty datastore" %}active{% endif %}" title="Insert into empty datastore">+<span class="arrow"></span></a>
 					{% endif %}
 				{% endif %}
 
@@ -109,7 +109,7 @@ if advised of the possibility of such damage.
 
 				{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and
 				not isSingleInstance %}
-					<a href='{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
+					<a href='#!{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
 				{% endif %}
 
 				<div id="userpane" class="static dropdown">
@@ -132,114 +132,106 @@ if advised of the possibility of such damage.
 		</nav>
 
 		<div class="cover-wo-alerts">
-		{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
-		{# if submenu is defined and submenu #}
-		<nav id="block--leftColumn" class="scrollable-cover" data-add-scrollable="true">
-			{% block leftColumn %}
-				{% if sectionName is defined %}<h3>
-					{% if isModule is defined and isModule %}
-					<a href="{{ path("module", {"key":app.request.get('key'),"module":app.request.get('module')} ) }}" class="ajaxLink">
+			{% set addToColumnClass = '' %} {# nastaveni prazdne promenne, aby nedochazelo k vypisu nedefinovane promenne #}
+			{# if submenu is defined and submenu #}
+			<nav id="block--leftColumn" class="scrollable-cover" data-add-scrollable="true">
+				{% block leftColumn %}
+					{% if sectionName is defined %}<h3>
 						{{ sectionName }}
-					</a>
-					{% else %}
-						{{ sectionName }}
-					{% endif %}
-					</h3>{% endif %}
-				<div class="nav-left">
-				{% for subsection in submenu %}
-					<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="ajaxLink {% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
-				{% endfor %}
-				</div>
-
-				{% block rpcMethods %}
-					{% if rpcMethods is defined and rpcMethods|length > 0 %}
-						<h4>RPC methods defined in model:</h4>
-						<div class="nav-left">
-						{% for rpc in rpcMethods %}
-							<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc.name}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc.name }}</a>
+						</h3>{% endif %}
+					<div class="nav-left">
+						{% for subsection in submenu %}
+							<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="ajaxLink {% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 						{% endfor %}
-						</div>
-					{% endif %}
-				{% endblock rpcMethods%}
+					</div>
 
-				<div id="block--copyConfig">
-					{% block copyConfig %}
-					{% if stateArr is defined
-						and formConfig is defined
-					%}
-						<h4>Change datastore</h4>
-						<div class="left-column-base">
-						{% if formConfig is defined %}
-							{% block filterConfig %}
-								<form action="" method="post" {{ form_enctype(formConfig) }} class="filter-form" name="formConfig" data-disable-active-link="true">
-									{{ form_widget(formConfig) }}
-								</form>
-							{% endblock filterConfig %}
+					{% block rpcMethods %}
+						{#TODO: make RPC method working (angular in modal window#}
+						{#<div id="block--rpcMethods">#}
+						{#{% if rpcMethods is defined and rpcMethods|length > 0 %}#}
+							{#<h4>RPC methods defined in model:</h4>#}
+							{#<div class="nav-left">#}
+								{#{% for rpc in rpcMethods %}#}
+									{#<a href="{{ path('showRPCForm', {'key': app.request.get('key'), 'module': app.request.get('module'), 'rpcName': rpc}) }}" class="item has-bullet ajaxLink" data-disable-history="true" data-do-not-activate="true"><span class="bullet"></span>{{ rpc }}</a>#}
+								{#{% endfor %}#}
+							{#</div>#}
+						{#{% endif %}#}
+						{#</div>#}
+					{% endblock rpcMethods%}
 
-							<div id="block--sourceValidation">
-								{% block sourceValidation %}
-									{# duplicated in config form filter !#}
-									<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink button grey small left" data-disable-history="true">Validate this datastore</a>
-								{% endblock %}
-							</div>
-						{% endif %}
-						{% if formCopyConfig is defined %}
-							<hr class="cleaner" />
-							<h5>Copy active datastore to:</h5>
-							<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter-form" name="formCopyConfig">
-								{{ form_widget(formCopyConfig) }}
-								<input type="submit" value="Copy active datastore" class="button small grey left" />
-							</form>
-						{% endif %}
-						</div>
-					{% endif %}
-					{% endblock %}
-				</div>
+					<div id="block--copyConfig">
+						{% block copyConfig %}
 
-				<div id="block--moduleOutputStyleChange">
-				{% block moduleOutputStyleChange %}
-					{% if moduleStylesForm is defined %}
-					<h3>Change output style</h3>
-						<div class="left-column-base">
-						<form action="" method="post" {{ form_enctype(moduleStylesForm) }} class="filter-form" name="outputStyle">
-							{{ form_widget(moduleStylesForm.controllerAction) }}
-						</form>
-						</div>
-					{% endif %}
-				{% endblock moduleOutputStyleChange %}
-				</div>
+							{% if formConfig is defined %}
+								<h4>Change datastore</h4>
+								<div class="left-column-base">
+									{% block filterConfig %}
+										<form action="" method="post" {{ form_enctype(formConfig) }} class="filter-form" name="formConfig" data-disable-active-link="true">
+											{{ form_widget(formConfig) }}
+										</form>
+									{% endblock filterConfig %}
 
-				<div id="block--leftColumnAdditional">
-				{% block leftColumnAdditional %}
-				{% endblock leftColumnAdditional %}
-				</div>
+									<div id="block--sourceValidation">
+										{% block sourceValidation %}
+											{# duplicated in config form filter !#}
+									{#<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink button grey small left" data-disable-history="true">Validate this datastore</a>#}
+										{% endblock %}
+									</div>
+									<hr class="cleaner" />
+									<h5>Copy active datastore to:</h5>
+									<form action="" method="post" {{ form_enctype(formCopyConfig) }} class="filter-form" name="formCopyConfig">
+										{{ form_widget(formCopyConfig) }}
+										<input type="submit" value="Copy active datastore" class="button small grey left" />
+									</form>
+								</div>
+							{% endif %}
+						{% endblock %}
+					</div>
 
-			{% endblock leftColumn %}
-		</nav>
-		{% set addToColumnClass = ' left-nav-defined' %}
-		{# endif #}
+					<div id="block--moduleOutputStyleChange">
+						{% block moduleOutputStyleChange %}
+							{% if moduleStylesForm is defined %}
+								<h3>Change output style</h3>
+								<div class="left-column-base">
+									<form action="" method="post" {{ form_enctype(moduleStylesForm) }} class="filter-form" name="outputStyle">
+										{{ form_widget(moduleStylesForm.controllerAction) }}
+									</form>
+								</div>
+							{% endif %}
+						{% endblock moduleOutputStyleChange %}
+					</div>
 
-		{% if singleColumnLayout == false %}
-			<section id="block--state" class="column{{addToColumnClass}} scrollable-cover" data-add-scrollable="true">
-				<div class="scrollable">
-				{% block state %}
-				{% endblock state %}
-				</div>
-			</section>
-			<section id="block--config" class="column{{addToColumnClass}} scrollable-cover" data-add-scrollable="true">
-				<div class="scrollable">
-				{% block config %}
-				{% endblock config %}
-				</div>
-			</section>
-		{% else %}
-			<section id="block--singleContent" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %} scrollable-cover" data-add-scrollable="true">
-				<div class="scrollable">
-				{% block singleContent %}
-				{% endblock singleContent %}
-				</div>
-			</section>
-		{% endif %}
+					<div id="block--leftColumnAdditional">
+						{% block leftColumnAdditional %}
+						{% endblock leftColumnAdditional %}
+					</div>
+
+				{% endblock leftColumn %}
+			</nav>
+			{% set addToColumnClass = ' left-nav-defined' %}
+			{# endif #}
+
+			{% if singleColumnLayout == false %}
+				<section id="block--state" class="column{{addToColumnClass}} scrollable-cover" data-add-scrollable="true">
+					<div class="scrollable">
+						{% block state %}
+						{% endblock state %}
+					</div>
+				</section>
+				<section id="block--config" class="column{{addToColumnClass}} scrollable-cover" data-add-scrollable="true">
+					<div class="scrollable">
+						{% block config %}
+						{% endblock config %}
+					</div>
+				</section>
+			{% else %}
+				<section id="block--singleContent" class="{{addToColumnClass}}{% block singleContentClass %}{% endblock singleContentClass %} scrollable-cover" data-add-scrollable="true"{% block singlecontentAdditions %}{% endblock %}>
+					<div class="scrollable">
+						{% block singleContent %}
+						{% endblock singleContent %}
+					</div>
+				</section>
+			{% endif %}
 		</div>
 
 		<section class="column-alerts" id="block--alerts">
@@ -259,7 +251,7 @@ if advised of the possibility of such damage.
 
 	{% else %}
 		<nav id="block--topMenu">
-				<a href="{{ path('connections') }}" title="Home" id="ico-home"></a>
+			<a href="{{ path('connections') }}" title="Home" id="ico-home"></a>
 		</nav>
 
 		<article id="block--singleContent">

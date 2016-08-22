@@ -5,34 +5,58 @@ NetopeerGUI is web graphical user interface for configuring devices based on pro
 
 NetopeerGUI is developed as [Symfony2 app](http://symfony.com).
 
-## NetopeerGUI demo - virtual machine
+## NetopeerGUI demo installation - using Vagrant on CentOS7
 
-You can download VirtualBox image from https://www.liberouter.org/docs/2015-05-11-netopeer-demo.ova
+If you do not have a vagrant box for CentOS7 box yet, use:
+	
+	vagrant box add centos/7 --provider=virtualbox
 
-To import this image into VirtualBox, just follow these steps:
+Clone this repository and run following:
 
-1. Import *.ova file into VirtualBox: File > Import appliance
-2. Run new virtual system. After automatic login, you will see README with next instructions.
-3. It's recommended to install VirtualBox Guest Additions (for better system support).
+	cd install
+	vagrant up
+	vagrant ssh
+	sudo su
+	sed -i 's/SELINUX=\(enforcing\|permissive\)/SELINUX=disabled/g' /etc/selinux/config
+	exit; exit
+	# due to SElinux settings
+	vagrant reload
+	vagrant ssh
+	sudo su
+	cd /var/www/netopeergui
+	php composer.phar install
+	service httpd restart
+	service netopeerguid restart
+	
+After that, you can run NetopeerGUI on local port :2280, so open http://localhost:2280/netopeergui
+Username and password is admin:pass. Now, you can connect to any NETCONF device.
+
+TODO: vagrant does not install service correctly yet, will be repaired. Removing problems with SElinux are in progress.
 
 ## Installation
-**Install pyang** from https://code.google.com/p/pyang/
 
-After tha, **run** the following commands:
+Requirements:
+* all dependencies will be checked during installation script
+* https://github.com/CESNET/libnetconf2 (will be installed in make install)
+* https://github.com/CESNET/mod_netconf/tree/netopeerguid (will be installed in make install)
+
+To install, **run** the following commands:
 
 	# go to apache web directory
 	cd /var/www
 	
-    git clone --recursive https://github.com/cesnet/netopeer-gui.git
-    # OR for already cloned repos or older GIT versions use
-    #
-    # git clone https://github.com/cesnet/netopeer-gui.git
-    # cd netopeergui
-    # git submodule update --init --recursive 
+    git clone netopeerguid https://github.com/cesnet/netopeer-gui.git
     
     cd netopeer-gui
     
+    # build from predefined scripts    
     cd install
+    ./(centos6|centos7)/install.sh
+
+    # or build manually
+    git submodule update --init --recursive 
+    cd install
+
     ./bootstrap.sh
     
     # for change some variables, look at ./configure --help

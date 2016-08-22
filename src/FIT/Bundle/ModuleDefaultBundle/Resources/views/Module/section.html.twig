@@ -39,151 +39,84 @@ if advised of the possibility of such damage.
 {% extends 'FITModuleDefaultBundle::layout.html.twig' %}
 {% block title %}Section {% if sectionName is defined and not(sectionName is empty) %}- {{sectionName}}{% endif %}{% endblock title %}
 
-{% block leftColumnAdditional %}
-	{% if (hideColumnControl is not defined) or (hideColumnControl is defined and hideColumnControl != true) %}
-		<div class="change-columns-layout nav-left">
-			<h5 class="left-column-base">Show as:</h5>
-			<a href="{{ path('changeColumnLayout', {"newValue": "true"}) }}" class="item ajaxLink" data-disable-history="true" title="Merged state & config">
-				<span class="bullet"></span>
-				Merged
-			</a>
-			<a href="{{ path('changeColumnLayout', {"newValue": "false"}) }}" class="item ajaxLink" data-disable-history="true" title="State & config separately">
-				<span class="bullet"></span>
-				Separate
-			</a>
-		</div>
-	{% endif %}
-{% endblock leftColumnAdditional %}
-
 {% set stateDefined = 'false' %}
+
+{% block htmlAdditions %} ng-app="NetopeerGUIApp"{% endblock %}
+{#{% block singlecontentAdditions %} ng-controller="ConfigurationController"{% endblock %}#}
+
+{% block topMenu %}
+	{% if not isSingleInstance %}
+		<a href="{{ path('connections') }}" title="Home" class="static ico-home header-icon ajaxLink {% if activeAction is defined and activeAction == "home" %}active{% endif %}" data-callback="setIndexActions()"><span></span>Connections</a>
+	{% endif %}
+	{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
+		{% if lockedConn == false %}
+			<a href="{{ path("handleConnection", {"command": "lock", "key": app.request.get('key')} ) }}" title="Lock" class="static ico-unlock header-icon" data-disable-history="true" data-do-not-activate="true"><span></span></a>
+		{% else %}
+			<a href="{{ path("handleConnection", {"command": "unlock", "key": app.request.get('key')} ) }}" title="Unlock" class="static ico-lock header-icon" data-disable-history="true" data-do-not-activate="true"><span></span></a>
+		{% endif %}
+		<a href="#/action/session" title="Session info" class="static ico-session header-icon"><span></span></a>
+		<a href="#/{{ path("handleBackup", {"key": app.request.get('key')}) }}" title="Backup connection" class="static ico-download header-icon"><span></span></a>
+		<a href="{{ path("reloadDevice", {"key": app.request.get('key')}) }}" title="Refresh data" class="ico-refresh header-icon ajaxLink" data-do-not-activate="true" data-disable-history="true"><span></span></a>
+		{% if topmenu is defined %}
+			{% set i = 0 %}
+			{% for section in topmenu %}
+				<a href="#/module/{{ section.params.module }}" title="{{section.title}} ({{section.namespace}})" class="dynamic  nth-{{i}} {% if i == 0 %}active{% endif %}">{{section.name}}<span class="arrow"></span></a>
+				{% set i = i + 1 %}
+			{% endfor %}
+			<a href="#/module/all" class="dynamic" title="GET all information">All<span class="arrow"></span></a>
+			{# TODO: make empty module working #}
+			{#<a href="{{ path("createEmptyModule", {"key":app.request.get('key')}) }}" class="dynamic ajaxLink {% if sectionName is defined and sectionName|lower == "empty datastore" %}active{% endif %}" title="Insert into empty datastore">+<span class="arrow"></span></a>#}
+			{#<a href="#/module/empty" class="dynamic title="Insert into empty datastore">+<span class="arrow"></span></a>#}
+		{% endif %}
+	{% endif %}
+
+	<div id="alerts-icon" class="static">
+		<a href="" title="Show alerts" class="static header-icon ico-alerts"><span></span><strong class="count">0</strong></a>
+	</div>
+
+	{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and
+	not isSingleInstance %}
+		<a href='#/{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
+	{% endif %}
+
+	<div id="userpane" class="static dropdown">
+		<a data-toggle="dropdown" href="#"><strong>{{ app.user.username|default(app.user) }}</strong> <span class="caret"></span></a>
+		<ul class="dropdown-menu" role="menu" aria-labelledby="uLabel">
+			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
+				<li><a href="{% if app.user.getTargetedID is defined %}{{ path('aerial_ship_saml_sp.security.logout') }}{% else %}{{ path('_logout') }}{% endif %}" class="log-out">Log out</a>
+				</li>
+			{% endif %}
+		</ul>
+	</div>
+
+	<div class="others-cover">
+		<div class="show-link header-icon ico-arrow-down">
+			<span></span>
+			<div class="others"></div>
+		</div>
+	</div>
+{% endblock topMenu %}
 
 {% block state %}
 {% block singleContent %}
-	{#<div class="edit-bar">#}
-		{#<span class="create-child"#}
-		{#rel="--*" data-typeahead-path="/symfony/app_dev.php/ajax/get-values-for-label/FORMID/0/nacm/XPATH/">new node</span>#}
-	{#</div>#}
-
-	{% set stateDefined = 'true' %}
-	{% if configSingleContent is defined %}
-		{{ configSingleContent|raw }}
-	{% else %}
-		<h1 class="left">{% if stateSectionTitle is defined %}{{stateSectionTitle}}{% else %}Config &amp; State data{% endif %}</h1>
-		{% if stateArr is defined and (not(stateArr is empty) or (isEmptyModule is defined and isEmptyModule == true)) %}
-			<hr class="cleaner" />
-			<div class="alert info display-none js-only-for-append-mode">You can not change the values of existing configuration while adding new configuration. Apply your changes first.
-			</div>
-			<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
-				<div class="root">
-					<div class="display-none js-only-for-append-mode">
-						{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
-							<input type="hidden" name="configDataForm[commit_all_button]" value="true" />
-							<input type="submit" value="Apply changes" class="apply-changes"
-							{% if dataStore != "running" or sectionName|lower == "all" or ((ncFeatures is defined) and (dataStore == "running" and ncFeatures["nc_feature_writablerunning"] is defined)) %}
-							{% else %}
-								disabled="disabled"
-							{% endif %} />
-						{% endif %}
-					</div>
-
-					{# new item insertion#}
-					{% if isEmptyModule is defined and isEmptyModule == true %}
-
-						{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
-					{% elseif showRootElem is defined and showRootElem == true %}
-						{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': stateArr, 'xpath': '/*[1]', 'key': stateArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
-					{% endif %}
-
-					{% set iterator = 1 %}
-					{% for key, element in stateArr %}
-						{% include 'FITModuleDefaultBundle:State:parent.html.twig' with {'element': stateArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
-						{% set iterator = iterator + 1 %}
-					{% endfor %}
-
-					{% if (hideStateSubmitButton is not defined) or hideStateSubmitButton != true %}
-						<hr class="cleaner" />
-
-						<input type="hidden" name="configDataForm[commit_all_button]" value="true" />
-						<input type="submit" value="Apply changes" class="apply-changes"
-						{% if dataStore != "running" or sectionName|lower == "all" or ((ncFeatures is defined) and (dataStore == "running" and ncFeatures["nc_feature_writablerunning"] is defined)) %}
-						{% else %}
-							disabled="disabled"
-						{% endif %} />
-					{% endif %}
-				</div>
-			</form>
-			{% if modelTreeDump is defined %}
-			<div id="hiddenModelTreeDump">
-<pre>
-{{ modelTreeDump|raw }}
-</pre>
-			</div>
-			{% endif %}
-		{% else %}
-			<div class="alert info">
-				No results found.
-			</div>
-			{% if additionalForm is defined %}
-				{{ additionalForm|raw }}
-			{% endif %}
-		{% endif %}
-	{% endif %}
+	<script type="text/javascript">
+		var jsonEditable = {% if jsonEditable is defined and jsonEditable == false %}false{% else %}true{% endif %};
+	</script>
+	<div id="mainView" ng-view></div>
 {% endblock singleContent %}
 {% endblock state %}
-
-{% block config %}
-	<h1 class="left">{% if configSectionTitle is defined %}{{configSectionTitle}}{% else %}Config data only{% endif %}</h1>
-
-	<hr class="cleaner" />
-	{% if (configArr is defined and not(configArr is empty)) or (isEmptyModule is defined and isEmptyModule == true) %}
-		<form action="" method="post" name="formConfigData" data-disable-history="true" data-serialize-children="true" class="form">
-			<div class="root">
-				{% if isEmptyModule is defined and isEmptyModule == true %}
-					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false} %}
-
-				{% elseif showRootElem is defined and showRootElem == true %}
-					{% include 'FITModuleDefaultBundle:Config:leaf.html.twig' with {'element': configArr, 'xpath': '/*[1]', 'key': configArr.getName, 'level': 0, 'addLevel': true, 'iterator': 1, 'hasChildren': false, 'forceShowEditBar': true, 'isRootElem': true} %}
-				{% endif %}
-
-				{% set iterator = 1 %}
-				{% for key, element in configArr %}
-					{% include 'FITModuleDefaultBundle:Config:parent.html.twig' with {'element': configArr.current(), 'level': 0, 'xpath': '/*', 'iterator': iterator} %}
-					{% set iterator = iterator + 1 %}
-				{% endfor %}
-
-				<hr class="cleaner" />
-
-				<input type="submit" value="Apply changes" class="apply-changes"
-				{% if dataStore != "running" or sectionName|lower == "all" or ((ncFeatures is defined) and (dataStore == "running" and ncFeatures["nc_feature_writablerunning"] is defined)) %}
-				{% else %}
-					disabled="disabled"
-				{% endif %} />
-			</div>
-		</form>
-	{% else %}
-		<div class="alert info">
-			No results found.
-		</div>
-		{% if additionalForm is defined %}
-			{{ additionalForm|raw }}
-		{% endif %}
-	{% endif %}
-
-	{% if modelTreeDump is defined %}
-		<div id="hiddenModelTreeDump">
-<pre>
-{{ modelTreeDump|raw }}
-</pre>
-		</div>
-	{% endif %}
-{% endblock config %}
 
 {% block notifications %}
 	{% if ncFeatures is defined and ncFeatures["nc_feature_notification"] is defined %}
 		{% if (app.request.get('key') is defined) and (not (app.request.get('key') is empty)) and (lockedConn is defined) %}
 			<script type="text/javascript">
 				var lookupIpUrl = '{{ path('lookupIp', {"ip": "REPLACE_IP"}) }}';
-				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "ws://{{ app.request.host }}:8080/");
+				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "wss://{{ app.request.host }}:8080/");
+
+				window.onbeforeunload = function() {
+					var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "wss://{{ app.request.host }}:8080/");
+					socket.close();
+				};
 				if ($(notifOutput).hasClass('hidden')) {
 					$(notifOutput).removeClass('hidden');
 					notifResizable();

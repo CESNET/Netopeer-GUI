@@ -44,11 +44,10 @@
 namespace FIT\NetopeerBundle\Controller;
 
 
-use FIT\NetopeerBundle\Models\Array2XML;
-
-// these import the "@Route" and "@Template" annotations
+use FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
@@ -92,11 +91,11 @@ class DefaultController extends BaseController
 		 */
 		$session = $this->getRequest()->getSession();
 		$singleInstance = $this->container->getParameter('fit_netopeer.single_instance');
-		// DependencyInjection (DI) - defined in Resources/config/services.yml
+
 		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
+		 * @var NetconfFunctionality
 		 */
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'title');
 		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'additionalTitle');
@@ -166,7 +165,7 @@ class DefaultController extends BaseController
 
 				// state flash = state -> left column in the layout
 				$result = "";
-				$res = $dataClass->handle("connect", $params, false, $result);
+				$res = $netconfFunc->handle("connect", $params, false, $result);
 
 				// if connection is broken (Could not connect)
 				if ($res == 0) {
@@ -190,7 +189,7 @@ class DefaultController extends BaseController
 						$baseConn->saveConnectionIntoDB($post_vals['host'], $post_vals['port'], $post_vals['user']);
 					} else {
 						// update models
-						$dataClass->updateLocalModels($result);
+						$netconfFunc->updateLocalModels($result);
 						setcookie("singleInstanceLoginFailed", false);
 						return $this->redirect($this->generateUrl('handleConnection', array('command' => 'get', 'key' => $result)));
 					}
@@ -256,18 +255,15 @@ class DefaultController extends BaseController
 	 */
 	public function reloadDeviceAction($key)
 	{
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 
 		/* reload hello message */
-		$params = array('key' => $key);
-		if (($res = $dataClass->handle("reloadhello", $params) == 0)) {
+		$params = array('sessions' => array($key));
+		if (($res = $netconfFunc->handle("reloadhello", $params) == 0)) {
 		}
 
-		$dataClass->updateLocalModels($key);
-		$dataClass->invalidateAndRebuildMenuStructureForKey($key);
+		$connectionFunc->invalidateAndRebuildMenuStructureForKey($key);
 
 		//reconstructs a routing path and gets a routing array called $route_params
 		if ($this->getRequest()->isXmlHttpRequest()) {
@@ -298,10 +294,9 @@ class DefaultController extends BaseController
 	 */
 	public function handleConnectionAction($command, $key, $identifier = "")
 	{
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$params = array(
-			'key' => $key,
-			'filter' => '',
+			'connIds' => array($key)
 		);
 
 		if ($command === "getschema") {
@@ -319,8 +314,7 @@ class DefaultController extends BaseController
 			$params['target'] = $this->getCurrentDatastoreForKey($key);
 			$this->getRequest()->getSession()->set('isLocking', true);
 		}
-
-		$res = $dataClass->handle($command, $params, false);
+		$res = $netconfFunc->handle($command, $params, false);
 
 		if ( $res != 1 && !in_array($command, array("connect", "disconnect"))) {
 			return $this->redirect($this->generateUrl('section', array('key' => $key)));
@@ -345,19 +339,19 @@ class DefaultController extends BaseController
 	 */
 	public function handleBackupAction($key)
 	{
-		$dataClass = $this->get('DataModel');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		$params = array(
-			'key' => $key,
-			'filter' => '',
+			'connIds' => array($key)
 		);
 
-		$res = $dataClass->handle('backup', $params, false);
+		$res = $netconfFunc->handle('get', $params, false);
 		$resp = new Response();
 		$resp->setStatusCode(200);
 		$resp->headers->set('Cache-Control', 'private');
 		$resp->headers->set('Content-Length', strlen($res));
 		$resp->headers->set('Content-Type', 'application/force-download');
-		$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.xml"', date("Y-m-d"), $dataClass->getHostFromKey($key)));
+		$resp->headers->set('Content-Disposition', sprintf('attachment; filename="%s-%s.json"', date("Y-m-d"), $connectionFunc->getHostFromKey($key)));
 		$resp->sendHeaders();
 		$resp->setContent($res);
 		$resp->sendContent();
@@ -376,14 +370,12 @@ class DefaultController extends BaseController
 	 */
 	public function sessionInfoAction($key, $action)
 	{
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
-		parent::setActiveSectionKey($key);
-		$dataClass->buildMenuStructure($key);
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		$this->setActiveSectionKey($key);
+		$connectionFunc->buildMenuStructure($key);
 
-		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
+//		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleJavascripts');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'moduleStylesheet');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'title');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'additionalTitle');
@@ -391,6 +383,8 @@ class DefaultController extends BaseController
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'alerts');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'topMenu');
 		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'leftColumn');
+
+		// TODO
 
 		if ( $action == "session" ) {
 			/**
@@ -428,7 +422,7 @@ class DefaultController extends BaseController
 						}
 					}
 
-					$connVarsArr['connection-'.$connKey][$connKey]['nc_features'] = $dataClass->getCapabilitiesArrForKey($connKey);
+					$connVarsArr['connection-'.$connKey][$connKey]['nc_features'] = $connectionFunc->getCapabilitiesArrForKey($connKey);
 				}
 				$sessionArr['session-connections'] = $connVarsArr;
 			}
@@ -436,14 +430,22 @@ class DefaultController extends BaseController
 			unset($sessionArr['_security_secured_area']);
 			unset($sessionArr['_security_commont_context']);
 
-			$xml = Array2XML::createXML("session", $sessionArr);
-			$xml = simplexml_load_string($xml->saveXml(), 'SimpleXMLIterator');
+			if ($this->getRequest()->get('angular') == "true") {
+				$res = array(
+					'variables' => array(
+						'jsonEditable' => false,
+					),
+					'configuration' => $sessionArr,
+				);
+				return new JsonResponse($res);
+			}
 
-			$this->assign("stateArr", $xml);
+			$this->assign('jsonEditable', false);
+			$this->assign("stateJson", json_encode($sessionArr));
 			$this->assign('hideStateSubmitButton', true);
 		} else if ($action == "reload") {
 			$params = array('key' => $key);
-			$dataClass->handle("reloadhello", $params);
+			$netconfFunc->handle("reloadhello", $params);
 		}
 
 		$this->assign('singleColumnLayout', true);
@@ -468,9 +470,11 @@ class DefaultController extends BaseController
 	 *
 	 * @return bool
 	 */
-	private function getRPCXmlForMethod($rpcMethod, $module, $subsection = "") {
-		$rpcs = $this->createRPCListFromModel($module, $subsection);
-		return isset($rpcs[$rpcMethod]) ? $rpcs[$rpcMethod] : false;
+	private function getRPCXmlForMethod($rpcMethod, $key, $module) {
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		$rpc = $module.':'.$rpcMethod;
+		$json = $netconfFunc->handle('query', array('connIds' => array($key), 'load_children' => true, 'filters' => array(array('/'.$rpc))));
+		return $json;
 	}
 
 	/**
@@ -496,9 +500,6 @@ class DefaultController extends BaseController
 		$this->assign('key', $key);
 		$this->assign('module', $module);
 		$this->assign('rpcName', $rpcName);
-		// path for creating node typeahead
-		$valuesTypeaheadPath = $this->generateUrl("getValuesForLabel", array('formId' => "FORMID", 'key' => $key, 'xPath' => "XPATH"));
-		$this->assign('valuesTypeaheadPath', $valuesTypeaheadPath);
 
 		if ($this->getRequest()->getMethod() == 'POST') {
 			$xmlOperations = $this->get("XMLoperations");
@@ -510,7 +511,7 @@ class DefaultController extends BaseController
 			return new RedirectResponse($url);
 		}
 
-		$this->assign('rpcArr', $this->getRPCXmlForMethod($rpcName, $module));
+		$this->assign('rpcData', $this->getRPCXmlForMethod($rpcName, $key, $module));
 
 		return $this->getTwigArr();
 	}
@@ -535,11 +536,18 @@ class DefaultController extends BaseController
 		$this->assign('key', $key);
 
 		if ($this->getRequest()->getMethod() == 'POST') {
-			$xmlOperations = $this->get("XMLoperations");
-			$postVals = $this->getRequest()->get("form");
-			$this->setSectionFormsParams($key);
-
-			$res = $xmlOperations->handleCreateEmptyModuleForm($key, $this->getConfigParams(), $postVals);
+			$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+			$arr = [];
+			$formData = $this->getRequest()->get('form');
+			$moduleName = $formData['modulePrefix'] . ':' . $formData['moduleName'];
+			$json = '{"'.$moduleName.'":{},"@'.$moduleName.'":{"ietf-netconf:operation":"create"}}';
+//			var_dump($this->getStateParams());exit;
+			$params = array(
+				'connIds' => array($key),
+				'target' => 'running',
+				'configs' => array($json)
+			);
+			$res = $netconfFunc->handle('editconfig', $params);
 			if ($res != 0) {
 				return $this->forward('FITNetopeerBundle:Default:reloadDevice', array('key' => $key));
 			}

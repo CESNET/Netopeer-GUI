@@ -28,7 +28,7 @@ parameters:
     #fit_netopeer.single_instance.host: 'localhost'
     #fit_netopeer.single_instance.port: '830'
 
-    netopeer.data.class: FIT\NetopeerBundle\Models\Data
+    netopeer.netconf.functionality: FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality
 
 # Twig Configuration
 twig:

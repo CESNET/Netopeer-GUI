@@ -56,19 +56,19 @@ class ModuleListener
 	 */
 	private $logger;
 	/**
-	 * @var Data
+	 * @var ConnectionFunctionality
 	 */
-	private $dataModel;
+	private $connectionFunc;
 
 	/**
-	 * @param Data          $dataModel
+	 * @param Data          $connectionFunc
 	 * @param EntityManager $em
 	 * @param Logger        $logger
 	 * @param
 	 */
-	public function __construct($dataModel = null, $em = null, $logger = null)
+	public function __construct($connectionFunc = null, $em = null, $logger = null)
 	{
-		$this->dataModel = $dataModel;
+		$this->connectionFunc = $connectionFunc;
 		$this->em = $em;
 		$this->logger = $logger;
 	}
@@ -86,9 +86,9 @@ class ModuleListener
 			if (in_array($attributes->get("_route"), array("module", "subsection"))) {
 
 				// get available namespaces for this connection
-				$namespace = $this->dataModel->getNamespaceForModule($attributes->get('key'), $attributes->get('module'));
+				$namespace = $this->connectionFunc->getNamespaceForModule($attributes->get('key'), $attributes->get('module'));
 				if ($namespace !== false) {
-					$record = $this->dataModel->getModuleControllers($attributes->get('module'), $namespace);
+					$record = $this->connectionFunc->getModuleControllers($attributes->get('module'), $namespace);
 
 					if ($record) {
 						// get all saved controllers from DB
@@ -97,7 +97,7 @@ class ModuleListener
 						/**
 						 * @var ConnectionSession $conn
 						 */
-						$conn = $this->dataModel->getConnectionSessionForKey($attributes->get('key'));
+						$conn = $this->connectionFunc->getConnectionSessionForKey($attributes->get('key'));
 						$activeController = $conn->getActiveControllersForNS($namespace);
 
 						// if we don't have any saved (preferred) controller, we will use first from DB

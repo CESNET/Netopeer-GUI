@@ -1,18 +1,39 @@
 {% extends 'FITNetopeerBundle::layout.html.twig' %}
 
 {% block moduleJavascripts %}
+	{#<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/bower_components/jquery/dist/jquery.min.js') }}"></script>#}
+	<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/bower_components/jquery-ui/jquery-ui.min.js') }}"></script>
+	<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/bower_components/angular/angular.min.js') }}"></script>
+	<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/bower_components/ngTraverse/ngTraverse.js') }}"></script>
+	<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/bower_components/angular-ui-sortable/sortable.min.js') }}"></script>
+	<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/bower_components/angular-route/angular-route.min.js') }}"></script>
+	<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/bower_components/angular-bootstrap/ui-bootstrap.min.js') }}"></script>
+	<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/bower_components/angular-bootstrap/ui-bootstrap-tpls.min.js') }}"></script>
+	<script src="{{ asset('bundles/fitmoduledefault/netopeerangular/node_modules/rhaboo/rhaboo.min.js') }}"></script>
+
+	{#'@FITModuleDefaultBundle/Resources/public/js/tooltip/gips.js'#}
+	{#'@FITModuleDefaultBundle/Resources/public/js/*'#}
 	{% javascripts
-	'@FITModuleDefaultBundle/Resources/public/js/tooltip/gips.js'
+	'@FITModuleDefaultBundle/Resources/public/netopeerangular/js/directives2.js'
+	'@FITModuleDefaultBundle/Resources/public/netopeerangular/js/directives/*'
+	'@FITModuleDefaultBundle/Resources/public/netopeerangular/js/services/*'
+	'@FITModuleDefaultBundle/Resources/public/netopeerangular/js/*'
+	'@FITModuleDefaultBundle/Resources/public/netopeerangular/public/*'
 	'@FITModuleDefaultBundle/Resources/public/js/*'
 	output='js/compiled/module-default.js'
 	%}
 	<script src="{{ asset_url }}"></script>
 	{% endjavascripts %}
+
+	<script>
+		var baseURL = '{{ app.request.baseUrl }}';
+		var connId = '{{ app.request.get('key') }}';
+	</script>
 {% endblock %}
 
 {% block moduleStylesheet %}
 	{% stylesheets
-	'bundles/fitmoduledefault/style/*'
+	'bundles/fitmoduledefault/netopeerangular/css/stylesheets/screen.css'
 	filter='cssrewrite'
 	output='css/module-default.css'
 	%}

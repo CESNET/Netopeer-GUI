@@ -159,23 +159,20 @@ class BaseController extends Controller
 		);
 		$this->assign('app', $app);
 
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 		if (!in_array($this->getRequest()->get('_route'), array('connections', '_login')) &&
 				!strpos($this->getRequest()->get('_controller'), 'AjaxController')) {
 			if (!in_array($this->getRequest()->get('_route'), array('createEmptyModule'))) {
-				$dataClass->buildMenuStructure($this->activeSectionKey);
+				$connectionFunc->buildMenuStructure($this->getActiveSectionKey());
 			}
-			$this->assign('topmenu', $dataClass->getModels());
-			$this->assign('submenu', $dataClass->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
+			$this->assign('topmenu', $connectionFunc->getModels($this->getActiveSectionKey()));
+			$this->assign('submenu', $connectionFunc->getSubmenu($this->submenuUrl, $this->getRequest()->get('key')));
 		}
 
 		try {
 			$key = $this->getRequest()->get('key');
 			if ($key != "") {
-				$conn = $dataClass->getConnectionSessionForKey($key);
+				$conn = $connectionFunc->getConnectionSessionForKey($key);
 				if ($conn !== false) {
 					$this->assign('lockedConn', $conn->getLockForDatastore());
 					$this->assign('sessionStatus', $conn->sessionStatus);
@@ -187,7 +184,7 @@ class BaseController extends Controller
 			$session->getFlashBag()->add('error', "Trying to use unknown connection. Please, connect to the device.");
 		}
 
-		$this->assign("ncFeatures", $dataClass->getCapabilitiesArrForKey($key));
+		$this->assign("ncFeatures", $connectionFunc->getCapabilitiesArrForKey($key));
 	}
 
 	/**
@@ -199,24 +196,26 @@ class BaseController extends Controller
 	 * @param string  $sourceConfig source param of config
 	 */
 	protected function setSectionFormsParams($key, $filterState = "", $filterConfig = "", $sourceConfig = "") {
-		/**
-		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
-		 */
-		$dataClass = $this->get('DataModel');
-		$conn = $dataClass->getConnectionSessionForKey($key);
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$conn = $connectionFunc->getConnectionSessionForKey($key);
 
 		if ($conn) {
 			if ($sourceConfig !== "") {
 				$conn->setCurrentDatastore($sourceConfig);
 			}
 			$this->setConfigParams('source', $conn->getCurrentDatastore());
+			$this->setStateParams('source', $conn->getCurrentDatastore());
 		}
 
-		$this->setStateParams('key', $key);
-		$this->setStateParams('filter', $filterState);
+		$this->setStateParams('connIds', array($key));
+		if ($filterState !== "") {
+			$this->setStateParams('filter', $filterState);
+		}
 
-		$this->setConfigParams('key', $key);
-		$this->setConfigParams('filter', $filterConfig);
+		$this->setConfigParams('connIds', array($key));
+		if ($filterConfig !== "") {
+			$this->setConfigParams('filter', $filterConfig);
+		}
 	}
 
 	/**
@@ -225,31 +224,30 @@ class BaseController extends Controller
 	 * @param $key    Identifier of connection (connected device ID)
 	 */
 	protected function setEmptyModuleForm($key) {
-		$dataClass = $this->get("DataModel");
-		$tmpArr = $dataClass->getModuleIdentifiersForCurrentDevice($key);
-		$tmpArr = $dataClass->getRootNamesForModuleIdentifiers($key, $tmpArr);
+		$connectionFunc = $this->get("fitnetopeerbundle.service.connection.functionality");
+		$tmpArr = $connectionFunc->getModuleIdentifiersForCurrentDevice($key);
 
 		// use small hack when appending space at the end of key, which will fire all options in typeahead
 		$nsArr = array();
 		if (!empty($tmpArr)) {
 			foreach ($tmpArr as $key => $item) {
-				if ($item['rootElem'] != "") {
-					$modulesArr[$item['rootElem']] = (array)$key;
-					$nsArr[] = $key;
+				if ($item['moduleName'] != "") {
+					$modulesArr[$item['moduleName']] = '';// TODO
+					$nsArr[] = '';
 				}
 			}
 		}
 
 		$form = $this->createFormBuilder()
-				->add('name', 'text', array(
-								'label' => "Module name",
+				->add('modulePrefix', 'text', array(
+								'label' => "Prefix",
 								'attr' => array(
 										'class' => 'typeaheadName percent-width w-50',
 										'autocomplete' => 'off'
 								)
 						))
-				->add('namespace', 'text', array(
-								'label' => "Namespace",
+				->add('moduleName', 'text', array(
+								'label' => "Module name",
 								'attr' => array(
 										'class' => 'typeaheadNS percent-width w-50',
 										'autocomplete' => 'off'
@@ -269,13 +267,13 @@ class BaseController extends Controller
 	protected function setOnlyConfigSection() {
 		$this->get('session')->set('singleColumnLayout', false);
 		$this->assign('singleColumnLayout', false);
-		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'state');
+//		$this->addAjaxBlock('FITModuleDefaultBundle:Module:section.html.twig', 'state');
 		$this->assign('hideColumnControl', true);
 		$this->assign('showConfigFilter', true);
 
-		$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Module:section.html.twig');
-		$html = $template->renderBlock('config', $this->getAssignedVariablesArr());
-		$this->assign('configSingleContent', $html);
+//		$template = $this->get('twig')->loadTemplate('FITModuleDefaultBundle:Module:section.html.twig');
+//		$html = $template->renderBlock('config', $this->getAssignedVariablesArr());
+//		$this->assign('configSingleContent', $html);
 
 		$this->get('session')->set('singleColumnLayout', true);
 		$this->assign('singleColumnLayout', true);
@@ -289,14 +287,19 @@ class BaseController extends Controller
 	 *
 	 * @return array
 	 */
-	protected function createRPCListFromModel($module, $subsection = "")
+	protected function createRPCListFromModel($key, $module)
 	{
-		if (!empty($this::$rpcs)) return $this::$rpcs;
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
-		$rpcs = $dataClass->loadRPCsModel($module, $subsection);
+		$connectionFunc = $this->get("fitnetopeerbundle.service.connection.functionality");
+		$model = $connectionFunc->getModelMetadata($key, $module);
+
+		if ($model) {
+			return $model['rpcs'];
+		} else {
+			return array();
+		}
+
+
+		return;
 		$rpcxml = simplexml_load_string($rpcs["rpcs"]);
 		$rpcs = array();
 		if ($rpcxml) {
@@ -347,11 +350,8 @@ class BaseController extends Controller
 	 * @return bool|string
 	 */
 	protected function getCurrentDatastoreForKey($key) {
-		/**
-		 * @var $dataClass \FIT\NetopeerBundle\Models\Data
-		 */
-		$dataClass = $this->get('DataModel');
-		$conn = $dataClass->getConnectionSessionForKey($key);
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$conn = $connectionFunc->getConnectionSessionForKey($key);
 
 		if ($conn) {
 			return $conn->getCurrentDatastore();
@@ -413,6 +413,10 @@ class BaseController extends Controller
 	 * @return int|null   section key
 	 */
 	public function getActiveSectionKey() {
+		$requestKey = intval($this->getRequest()->get('key'));
+		if (is_null($this->activeSectionKey) && isset($requestKey)) {
+			return $requestKey;
+		}
 		return $this->activeSectionKey;
 	}
 
@@ -434,6 +438,13 @@ class BaseController extends Controller
 			'template' => $templateNamespace,
 			'blockId' => $blockId,
 		);
+	}
+
+	/**
+	 * @param string $blockId               block name from template
+	 */
+	protected function removeAjaxBlock($blockId) {
+		unset($this->ajaxBlocksArr[$blockId]);
 	}
 
 	/**

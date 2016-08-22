@@ -1,0 +1,6 @@
+*.DS_STORE
+*.swp
+bower_components/*
+node_modules
+.idea
+css/.sass-cache

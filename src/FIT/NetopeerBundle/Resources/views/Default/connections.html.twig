@@ -39,33 +39,6 @@ if advised of the possibility of such damage.
 {% extends 'FITNetopeerBundle::layout.html.twig' %}
 
 {% block javascripts %}
-	{% if (getSchemaWithAjax is defined and getSchemaWithAjax == true) %}
-		{#% set idForAjaxGetSchema = 0 %#}
-		<script type="text/javascript">
-			$(document).ready(function() {
-				var idForAjaxGetSchema = {{ idForAjaxGetSchema }};
-				var targetConfigure = $("#row-" + idForAjaxGetSchema + " .configure");
-				targetConfigure.find('> a').hide();
-				$("<span/>", {
-					'class': 'loading',
-					text: "Loading..."
-				}).appendTo(targetConfigure);
-				$.get("{{ path("getSchema", {"key": idForAjaxGetSchema} ) }}", function(data) {
-					var dataArr = $.parseJSON(data);
-					targetConfigure.find(".loading").remove();
-					targetConfigure.find("> a").show();
-					if (dataArr['message']) {
-						var flash = prepareFlashMessage(dataArr['message']);
-						$("#block--alerts").append($(flash));
-					}
-					reloadHistoryOfConnectedDevices();
-					if (dataArr['status'] == "success") {
-						getNotifWebSocket(idForAjaxGetSchema, "{{ sessionHash }}", "ws://{{ app.request.host }}:8080/");
-					}
-				});
-			});
-		</script>
-	{% endif %}
 	<script type="text/javascript">
 		var historyOfConnectedDevices = "{{ path("historyOfConnectedDevices") }}";
 		var profilesOfConnectedDevices = "{{ path("profilesOfConnectedDevices") }}";
@@ -107,7 +80,7 @@ if advised of the possibility of such damage.
 				<tr id="row-{{ index }}">
 					<td>{{ key.time }}</td>
 					<td>{{ key.host }}</td>
-					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": index } ) }}' class="ajaxLink"><span id="ico-conf"></span>Configure device</a></td>
+					<td class="configure"><a href='{{ path("handleConnection", {"command": "get", "key": index } ) }}'><span id="ico-conf"></span>Configure device</a></td>
 					<td><a href='{{ path("handleConnection", {"command": "disconnect", "key": index} ) }}' class="ajaxLink" data-disable-history="true" data-callback="disconnectCallback({{ index }})">Disconnect</a></td>
 				</tr>
 			{% endfor %}

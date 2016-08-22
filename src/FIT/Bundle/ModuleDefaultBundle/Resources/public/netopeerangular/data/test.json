@@ -1,0 +1,515 @@
+{
+  "jsonQ_root": {
+    "$@ietf-interfaces:interfaces": {
+      "eltype": "leaf",
+      "config": "false",
+      "type": "enumeration",
+      "enumval": [
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float",
+        "string"
+      ],
+      "description": "The data type of the parameters argument.",
+      "mandatory": "false",
+      "iskey": "false",
+      "children": [
+        "interface",
+        "interface-state"
+      ]
+    },
+    "ietf-interfaces:interfaces": {
+      "$@interface": {
+        "eltype": "list",
+        "config": "true",
+        "type": "enumeration",
+        "iskey": "false"
+      },
+      "interface": [
+        {
+          "$@name": {
+            "config": "true",
+            "type": "string"
+          },
+          "name": "eth0",
+          "$@type": {
+            "typedef": {
+              "type": "uint8",
+              "range": "0 .. 100",
+              "description": "Percentage"
+            }
+          },
+          "type": "iana-if-type:ethernetCsmacd",
+          "$@enabled": {
+            "type": "boolean"
+          },
+          "enabled": false
+        },
+        {
+          "$@name": {
+            "config": "true",
+            "type": "string"
+          },
+          "name": "eth1",
+          "$@type": {
+            "typedef": {
+              "type": "uint8",
+              "range": "0 .. 100",
+              "description": "Percentage"
+            }
+          },
+          "type": "iana-if-type:ethernetCsmacd",
+          "enabled": true,
+          "ex-vlan:vlan-tagging": true
+        }
+      ]
+    },
+    "$@ietf-interfaces:interfaces-state": {
+      "eltype": "leaf",
+      "config": "false",
+      "type": "enumeration",
+      "enumval": [
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float",
+        "string"
+      ],
+      "description": "The data type of the parameters argument.",
+      "mandatory": "false",
+      "iskey": "false"
+    },
+    "ietf-interfaces:interfaces-state": {}
+  },
+  "jsonQ_current": [
+    {
+      "path": []
+    }
+  ],
+  "$@ietf-interfaces:interfaces": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces"
+      ]
+    }
+  ],
+  "eltype": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces",
+        "eltype"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "$@interface",
+        "eltype"
+      ]
+    },
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces-state",
+        "eltype"
+      ]
+    }
+  ],
+  "config": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces",
+        "config"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "$@interface",
+        "config"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@name",
+        "config"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "$@name",
+        "config"
+      ]
+    },
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces-state",
+        "config"
+      ]
+    }
+  ],
+  "type": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "$@interface",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@name",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@type",
+        "typedef",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@enabled",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "$@name",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "$@type",
+        "typedef",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "type"
+      ]
+    },
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces-state",
+        "type"
+      ]
+    }
+  ],
+  "enumval": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces",
+        "enumval"
+      ]
+    },
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces-state",
+        "enumval"
+      ]
+    }
+  ],
+  "description": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces",
+        "description"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@type",
+        "typedef",
+        "description"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "$@type",
+        "typedef",
+        "description"
+      ]
+    },
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces-state",
+        "description"
+      ]
+    }
+  ],
+  "mandatory": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces",
+        "mandatory"
+      ]
+    },
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces-state",
+        "mandatory"
+      ]
+    }
+  ],
+  "iskey": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces",
+        "iskey"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "$@interface",
+        "iskey"
+      ]
+    },
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces-state",
+        "iskey"
+      ]
+    }
+  ],
+  "children": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces",
+        "children"
+      ]
+    }
+  ],
+  "ietf-interfaces:interfaces": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces"
+      ]
+    }
+  ],
+  "$@interface": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "$@interface"
+      ]
+    }
+  ],
+  "interface": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface"
+      ]
+    }
+  ],
+  "$@name": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@name"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "$@name"
+      ]
+    }
+  ],
+  "name": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "name"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "name"
+      ]
+    }
+  ],
+  "$@type": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@type"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "$@type"
+      ]
+    }
+  ],
+  "typedef": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@type",
+        "typedef"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "$@type",
+        "typedef"
+      ]
+    }
+  ],
+  "range": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@type",
+        "typedef",
+        "range"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "$@type",
+        "typedef",
+        "range"
+      ]
+    }
+  ],
+  "$@enabled": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "$@enabled"
+      ]
+    }
+  ],
+  "enabled": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "0",
+        "enabled"
+      ]
+    },
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "enabled"
+      ]
+    }
+  ],
+  "ex-vlan:vlan-tagging": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces",
+        "interface",
+        "1",
+        "ex-vlan:vlan-tagging"
+      ]
+    }
+  ],
+  "$@ietf-interfaces:interfaces-state": [
+    {
+      "path": [
+        "$@ietf-interfaces:interfaces-state"
+      ]
+    }
+  ],
+  "ietf-interfaces:interfaces-state": [
+    {
+      "path": [
+        "ietf-interfaces:interfaces-state"
+      ]
+    }
+  ],
+  "length": 1,
+  "selector": []
+}

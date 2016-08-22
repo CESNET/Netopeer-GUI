@@ -4,9 +4,11 @@ namespace FIT\Bundle\ModuleDefaultBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\ModuleControllerInterface;
 use FIT\NetopeerBundle\Models\XMLoperations;
+use FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController implements ModuleControllerInterface
@@ -22,17 +24,59 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 	 */
 	public function moduleAction($key, $module = null, $subsection = null)
 	{
-		/**
-		 * @var \FIT\NetopeerBundle\Models\Data $dataClass
-		 */
-		$dataClass = $this->get('DataModel');
-		$res = $this->prepareDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+
+		$res = $this->prepareVariablesForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
+
+		if ($this->getRequest()->getMethod() == 'POST') {
+			$this->setSectionFilterForms( $key );
+
+			$configParams = $this->getConfigParams();
+			$postData = $this->getRequest()->getContent();
+			if (strpos($postData, 'form') !== 0) {
+				$params = array(
+					'connIds' => array($key),
+					'target' => $configParams['source'],
+					'configs' => array($postData)
+				);
+				$res = $netconfFunc->handle('editconfig', $params, true, $result);
+
+				$this->get('session')->set('isAjax', true);
+//			$this->removeAjaxBlock('moduleJavascripts');
+//			$this->removeAjaxBlock('moduleStylesheet');
+//			$this->removeAjaxBlock('state');
+				return $this->getTwigArr();
+			}
+		}
 
 		/* parent module did not prepares data, but returns redirect response,
 		 * so we will follow this redirect
 		 */
 		if ($res instanceof RedirectResponse) {
 			return $res;
+		}
+
+		if ($this->getRequest()->get('angular') == "true") {
+			$resData = $this->loadDataForModuleAction("FITModuleDefaultBundle", $key, $module, $subsection);
+
+			// load content of snippets
+			$this->get('session')->set('isAjax', true);
+			$this->removeAjaxBlock('topMenu');
+			$content = json_decode($this->getTwigArr()->getContent(), true);
+
+
+			$res = array(
+				'variables' => array(
+					'jsonEditable' => true,
+				),
+				'configuration' => json_decode($resData),
+				'snippets' => $content['snippets'],
+			);
+			return new JsonResponse($res);
+		} else {
+			$this->assign('singleColumnLayout', true);
+			return $this->getTwigArr();
 		}
 
 		// check if we have only root module
@@ -59,7 +103,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			$this->assign('singleColumnLayout', true);
 			$this->setOnlyConfigSection();
 		} else {
-			$conn = $dataClass->getConnectionSessionForKey($key);
+			$conn = $connectionFunc->getConnectionSessionForKey($key);
 			if ($conn->getCurrentDatastore() !== "running") {
 				$this->loadConfigArr(false, $merge);
 				$this->setOnlyConfigSection();

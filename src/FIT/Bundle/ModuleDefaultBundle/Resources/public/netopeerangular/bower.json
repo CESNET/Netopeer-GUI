@@ -1,0 +1,32 @@
+{
+  "name": "JSONtest",
+  "version": "0.0.1",
+  "description": "test for netopeergui",
+  "repository": "https://github.com/mb21/JSONedit",
+  "homepage": "http://mb21.github.io/JSONedit/",
+  "license": "MIT License",
+  "main": [
+    "css/styles.css",
+    "js/JSONedit.js"
+  ],
+  "ignore": [
+    "index.html",
+    "js/JSONedit.js",
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "font-awesome-sass": "4.x.x",
+    "angular": "~1.4.7",
+    "angular-ui-sortable": "0.12.x",
+    "angular-bootstrap": "~0.14.1",
+    "angular-history": "~0.x.x",
+    "ngTraverse": "0.x.x",
+    "angular-route": "^1.5.6"
+  },
+  "moduleType": [],
+  "private": true
+}
