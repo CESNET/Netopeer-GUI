@@ -545,6 +545,7 @@ class NetconfFunctionality {
 			"target" => $params['target'],
 			"configs" => $params['configs'],
 			"default-operation" => 'merge',
+			"error-option" => 'rollback-on-error',
 		);
 		$editparams = $this->addOptionalParams($editparams, $params, array('source', 'default-operation', 'error-option', 'uri-source', 'test-option'));
 
