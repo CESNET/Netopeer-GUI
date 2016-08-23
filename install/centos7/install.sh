@@ -12,7 +12,7 @@ cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLIB_INSTALL_DIR=/usr/lib64 .. && make -
 )
 
 (
-git clone -b devel --depth 1 https://github.com/CESNET/libyang.git
+git clone --depth 1 https://github.com/CESNET/libyang.git
 mkdir -p libyang/build
 cd libyang/build
 cmake -DCMAKE_INSTALL_PREFIX=/usr -DLIB_INSTALL_DIR=lib64 -DENABLE_BUILD_TESTS=OFF .. && sudo make install && sudo make install
@@ -27,7 +27,7 @@ cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .. && make -j2 && sudo make install
 )
 
 (
-git clone --depth 1 git://github.com/cejkato2/libwebsockets lws
+git clone --depth 1 https://github.com/warmcat/libwebsockets.git lws
 mkdir lws/b
 cd lws/b
 cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLWS_INSTALL_LIB_DIR=/usr/lib -DLIB_SUFFIX=64 .. && sudo make install
@@ -35,7 +35,7 @@ cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLWS_INSTALL_LIB_DIR=/usr/lib -DLIB_SUFF
 
 # libnetconf2
 (
-git clone -b devel --depth 1 https://github.com/CESNET/libnetconf2.git
+git clone --depth 1 https://github.com/CESNET/libnetconf2.git
 mkdir -p libnetconf2/build
 cd libnetconf2/build
 cmake -DENABLE_TLS=ON -DENABLE_SSH=ON -DENABLE_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr -DLIB_INSTALL_DIR=lib64 .. && sudo make install
@@ -43,8 +43,8 @@ cmake -DENABLE_TLS=ON -DENABLE_SSH=ON -DENABLE_BUILD_TESTS=OFF -DCMAKE_INSTALL_P
 ldconfig
 
 (
-git clone -b netopeerguid --depth 1 https://github.com/CESNET/mod_netconf
-cd mod_netconf
+git clone --depth 1 https://github.com/CESNET/netopeerguid
+cd netopeerguid
 ./bootstrap.sh
 ./configure
 make
@@ -53,12 +53,13 @@ make install
 
 (
 cd /var/www/
-git clone -b netopeerguid --depth 1 https://github.com/CESNET/Netopeer-GUI netopeergui
+git clone --depth 1 https://github.com/CESNET/Netopeer-GUI netopeergui
 cd netopeergui
 cp app/config/parameters.yml.dist app/config/parameters.yml
 php app/check.php
 php ./composer.phar self-update
 php ./composer.phar install
+php app/check.php
 cd install
 ./bootstrap.sh && ./configure --without-modnetconf -q && make install
 service httpd restart
