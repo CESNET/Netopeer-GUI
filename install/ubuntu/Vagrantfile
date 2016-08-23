@@ -6,18 +6,18 @@
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
 Vagrant.configure(2) do |config|
-  config.vm.box = "ubuntu/trusty64"
+  config.vm.box = "bento/ubuntu-15.04"
+  config.vm.network "forwarded_port", guest: 80, host: 3280
   config.vm.provision "shell", inline: <<-SHELL
 sudo apt-get update
 
 # Build dependencies
-sudo apt-get install -y apache2 apache2-dev vim git autoconf automake pkg-config libtool wget libxml2-dev libssh2-1-dev gcc g\+\+ zlib1g-dev libssl-dev cmake libpcre3-dev libjson-c-dev make libxslt-dev libcurl4-openssl-dev libtool xsltproc python-setuptools libapr1-dev libaprutil1-dev sysv-rc-conf
+sudo apt-get install -y apache2 apache2-dev vim git autoconf automake pkg-config libtool wget libxml2-dev libssh2-1-dev gcc g\+\+ zlib1g-dev libssl-dev cmake libpcre3-dev libjson-c-dev make libxslt-dev libcurl4-openssl-dev libtool xsltproc python-setuptools libapr1-dev libaprutil1-dev 
 
 # PHP dependencies:
 sudo apt-get install -y php5 php5-common php5-json php5-sqlite php5-odbc php5-intl
 
 export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib64/pkgconfig
-alias chkconfig=sysv-rc-conf
 
 # libssh
 (

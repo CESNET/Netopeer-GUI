@@ -27,13 +27,14 @@ Clone this repository and run following:
 	sudo su
 	cd /var/www/netopeergui
 	php composer.phar install
+	./install-no-composer.sh
 	service httpd restart
 	service netopeerguid restart
 	
 After that, you can run NetopeerGUI on local port :2280, so open http://localhost:2280/netopeergui
 Username and password is admin:pass. Now, you can connect to any NETCONF device.
 
-TODO: vagrant does not install service correctly yet, will be repaired. Removing problems with SElinux are in progress.
+TODO: Removing problems with SElinux are in progress.
 
 ## You can use Vagrant for Ubuntu too
 
