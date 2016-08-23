@@ -1,4 +1,3 @@
-
-[submodule "install/netopeerguid"]
+[submodule "netopeerguid"]
 	path = install/netopeerguid
 	url = https://github.com/CESNET/netopeerguid
