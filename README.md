@@ -35,6 +35,13 @@ Username and password is admin:pass. Now, you can connect to any NETCONF device.
 
 TODO: vagrant does not install service correctly yet, will be repaired. Removing problems with SElinux are in progress.
 
+## You can use Vagrant for Ubuntu too
+
+Clone this repository and run following:
+
+	cd install/ubuntu
+	vagrant up
+
 ## Installation
 
 Requirements:
@@ -53,7 +60,7 @@ To install, **run** the following commands:
     
     # build from predefined scripts    
     cd install
-    ./(centos6|centos7)/install.sh
+    ./centos7/install.sh
 
     # or build manually
     git submodule update --init --recursive 
