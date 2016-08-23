@@ -1,4 +1,4 @@
-[submodule "mod_netconf"]
-	path = install/mod_netconf
-	url = https://github.com/CESNET/mod_netconf.git
 
+[submodule "install/netopeerguid"]
+	path = install/netopeerguid
+	url = https://github.com/CESNET/netopeerguid

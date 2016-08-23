@@ -16,6 +16,8 @@ sudo apt-get install -y apache2 apache2-dev vim git autoconf automake pkg-config
 # PHP dependencies:
 sudo apt-get install -y php5 php5-common php5-json php5-sqlite php5-odbc php5-intl
 
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH}:/usr/lib64/pkgconfig
+
 # libssh
 (
 	wget https://red.libssh.org/attachments/download/177/libssh-0.7.2.tar.xz
@@ -26,32 +28,44 @@ sudo apt-get install -y php5 php5-common php5-json php5-sqlite php5-odbc php5-in
 )
 
 (
-	git clone --depth 1 git://github.com/cejkato2/libwebsockets lws
+	git clone --depth 1 https://github.com/CESNET/libyang.git
+	mkdir -p libyang/build
+	cd libyang/build
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DLIB_INSTALL_DIR=lib64 -DENABLE_BUILD_TESTS=OFF .. && sudo make install && sudo make install
+)
+
+(
+	wget https://cmocka.org/files/1.0/cmocka-1.0.1.tar.xz
+	tar -xJf cmocka-1.0.1.tar.xz
+	mkdir -p cmocka-1.0.1/build
+	cd cmocka-1.0.1/build
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr .. && make -j2 && sudo make install
+)
+
+(
+	git clone --depth 1 https://github.com/warmcat/libwebsockets.git lws
 	mkdir lws/b
 	cd lws/b
-	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLWS_INSTALL_LIB_DIR=/usr/lib -DLIB_SUFFIX= .. && sudo make install
+	cmake -DCMAKE_INSTALL_PREFIX:PATH=/usr -DLWS_INSTALL_LIB_DIR=/usr/lib64 -DLIB_SUFFIX= .. && sudo make install
 )
 
-
-# pyang
+# libnetconf2
 (
-	git clone --depth 1 https://github.com/mbj4668/pyang.git
-	cd pyang
-	python setup.py install
+	git clone --depth 1 https://github.com/CESNET/libnetconf2.git
+	mkdir -p libnetconf2/build
+	cd libnetconf2/build
+	cmake -DENABLE_TLS=ON -DENABLE_SSH=ON -DENABLE_BUILD_TESTS=OFF -DCMAKE_INSTALL_PREFIX=/usr -DLIB_INSTALL_DIR=lib64 .. && sudo make install
 )
+ldconfig
 
-# libnetconf
+# netopeerguid
 (
-	git clone --depth 1 https://github.com/CESNET/libnetconf.git
-	cd libnetconf
-	./configure --prefix=/usr --libdir=/usr/lib -q && make && make install
-)
-
-# mod_netconf
-(
-	git clone --depth 1 -b ubuntu https://github.com/CESNET/mod_netconf
-	cd mod_netconf
-	./bootstrap.sh && ./configure -q && make && make install
+	git clone --depth 1 https://github.com/CESNET/netopeerguid
+	cd netopeerguid
+	./bootstrap.sh
+	./configure
+	make
+	make install
 )
    SHELL
 end

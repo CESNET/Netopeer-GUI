@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.63])
-AC_INIT([netopeergui], [1.0.0], [cejkat@cesnet.cz])
+AC_INIT([netopeergui], [2.0.0], [cejkat@cesnet.cz])
 AM_INIT_AUTOMAKE([foreign silent-rules tar-pax])
 
 USERNAME=`git config --get user.name`
@@ -22,7 +22,7 @@ AC_SUBST(webguidir)
 if test "x$webguiname" == x; then
 	webguiname=$(cd ..; basename $PWD)
 fi
-AC_ARG_VAR(webguiname, [Installation directory name for webgui [netconfwebgui]])
+AC_ARG_VAR(webguiname, [Installation directory name for webgui [netopeergui]])
 AC_SUBST(webguiname)
 
 if test "x$httpdconfddir" == x; then
@@ -31,8 +31,8 @@ fi
 AC_ARG_VAR(httpdconfddir, [Directory for Apache configuration files [/etc/httpd/conf.d]])
 AC_SUBST(httpdconfddir)
 
-AC_ARG_WITH(modnetconf, AC_HELP_STRING([--without-modnetconf],[Do not compile and install mod_netconf.]), [], [with_modnetconf="yes"])
-AM_CONDITIONAL([MODNETCONF_OPT], [test "x$with_modnetconf" != "xno"])
+AC_ARG_WITH(netopeerguid, AC_HELP_STRING([--without-netopeerguid],[Do not compile and install netopeerguid.]), [], [with_netopeerguid="yes"])
+AM_CONDITIONAL([NETOPEERGUID_OPT], [test "x$with_netopeerguid" != "xno"])
 
 # Check for rpmbuild
 AC_CHECK_PROG(RPMBUILD, [rpmbuild], [rpmbuild], [""])
@@ -64,7 +64,7 @@ AM_CONDITIONAL(MAKE_RPMS, test x$RPMBUILD != x)
 
 # Checks for library functions.
 
-AC_CONFIG_SUBDIRS(mod_netconf)
+AC_CONFIG_SUBDIRS(netopeerguid)
 AC_CONFIG_FILES([Makefile
 		netopeergui.conf])
 AC_OUTPUT
@@ -86,7 +86,7 @@ echo "  LIBS.................: $LIBS"
 echo "  CFLAGS...............: $CFLAGS"
 echo
 echo "Components"
-echo "  mod_netconf..........: $with_modnetconf"
+echo "  netopeerguid.........: $with_netopeerguid"
 echo
 echo "Installation...........: make install (as root if needed, with 'su' or 'sudo')"
 echo "  prefix...............: $prefix"

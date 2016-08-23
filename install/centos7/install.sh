@@ -68,4 +68,3 @@ cd /var/www/netopeergui
 php app/console app:install --post=install
 chcon -R -t httpd_sys_rw_content_t /var/www/netopeergui/app/{cache,logs}
 )
-

@@ -1,10 +1,10 @@
 if MODNETCONF_OPT
-  MODNETCONF_OPT=mod_netconf
+  MODNETCONF_OPT=netopeerguid
 else
   MODNETCONF_OPT=
 endif
 
-SUBDIRS=$(MODNETCONF_OPT) $(PYANG_OPT)
+SUBDIRS=$(MODNETCONF_OPT)
 
 RPMDIR = RPMBUILD
 
@@ -24,7 +24,6 @@ rpm:
 	rm -rf "$(RPMDIR)/SOURCES/$(RPMFILENAME)"
 	mkdir -p $(RPMDIR)/BUILD/ $(RPMDIR)/SRPMS/ $(RPMDIR)/RPMS/ $(RPMDIR)/SOURCES
 	make ${AM_MAKEFLAGS} distdir='$(RPMDIR)/SOURCES/$(RPMFILENAME)' distdir
-	cp apache/src/mod_netconf.conf "$(RPMDIR)/SOURCES/$(RPMFILENAME)"
 	find "$(RPMDIR)" -name '*.back' -exec rm -f {} \;
 	( cd "$(RPMDIR)/SOURCES/"; tar -z -c -f $(RPMFILENAME)-$(RELEASE).tar.gz $(RPMFILENAME); rm -rf $(RPMFILENAME); )
 	$(RPMBUILD) -ba $(PACKAGE_NAME).spec --define "_topdir `pwd`/$(RPMDIR)";
