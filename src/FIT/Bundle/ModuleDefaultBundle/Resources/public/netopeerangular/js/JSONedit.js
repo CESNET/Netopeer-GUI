@@ -64,7 +64,6 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 					$scope.jsonEditable = jsonEditable = data.data.variables.jsonEditable;
 					$scope.datastore = datastore = data.data.variables.datastore;
 					//$scope.jsonString = JSON.stringify(data.data.configuration);
-					$scope.jsonData = {};
 					$scope.jsonData = data.data.configuration;
 
 					var tmpData = data.data;
@@ -209,10 +208,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			AjaxService.submitConfiguration(cleanJson, window.location.href)
 				.then(function successCallback(data) {
 					var tmpData = data.data;
-					//console.log(tmpData);
-					if (typeof tmpData.snippets['block--state'] !== "undefined") {
-						delete(tmpData.snippets['block--state']);
-					}
+
 					$.netopeergui.processResponseData(tmpData, function() {
 						//$scope.reload();
 						$.netopeergui.hideSpinner();
@@ -231,10 +227,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			AjaxService.commitConfiguration(window.location.href)
 				.then(function successCallback(data) {
 					var tmpData = data.data;
-					//console.log(tmpData);
-					if (typeof tmpData.snippets['block--state'] !== "undefined") {
-						delete(tmpData.snippets['block--state']);
-					}
+
 					$.netopeergui.processResponseData(tmpData, function() {
 						//$scope.reload();
 						$.netopeergui.hideSpinner();
