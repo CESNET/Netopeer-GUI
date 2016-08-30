@@ -1,7 +1,7 @@
 var services = angular.module('NetopeerGUIServices', [])
 
 .service('AjaxService', function ($http) {
-	$http.defaults.cache = true;
+	$http.defaults.cache = false;
 
 	this.reloadData = function(targetUrl) {
 		var url = targetUrl || window.location.href;

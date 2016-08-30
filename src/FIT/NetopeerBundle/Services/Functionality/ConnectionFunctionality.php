@@ -585,7 +585,12 @@ class ConnectionFunctionality {
 		if (isset($namespaces[$module])) {
 			$module = $namespaces[$module];
 //			$filterState = $filterConfig  = '/'.$module['moduleName'].':'.$module['rootElementName'];
-			$filterState = $filterConfig  = '<'.$module['rootElementName'].' xmlns="'.$module['ns'].'" />';
+			if ($subsection) {
+				$filterState = $filterConfig  = '<'.$module['rootElementName'].' xmlns="'.$module['ns'].'"><'.$subsection.'/></'.$module['rootElementName'].'>';
+			} else {
+				$filterState = $filterConfig  = '<'.$module['rootElementName'].' xmlns="'.$module['ns'].'" />';
+			}
+
 		}
 
 		return array(
