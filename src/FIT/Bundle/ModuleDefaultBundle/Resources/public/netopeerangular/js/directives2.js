@@ -352,6 +352,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         case objectName:
                             obj[parent.keyName] = {};
                             break;
+                        case listName:
                         case arrayName:
                             obj[parent.keyName] = [];
                             break;
@@ -380,6 +381,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                                     break;
                     case objectName:  obj.push({});
                                     break;
+                    case listName:
                     case arrayName:   obj.push([]);
                                     break;
                     case boolName:   obj.push(false);
@@ -394,6 +396,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 parent.valueName = "";
                 parent.showAddKey = false;
             } else {
+                parent.child = {};
+                parent.child[parent.keyName] = {};
                 console.error("object to add to was " + obj);
             }
         };
@@ -440,6 +444,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     parentKeyName = getParents(parent, 3).key;
                 }
                 var parents = getParents(parent, 6);
+                if (parents.id === parents.$root.id) {
+                    parents = getParents(parent, 4);
+                }
                 if (typeof parents.child['$@'+ parentKeyName] !== "undefined") {
                     var children = parents.child['$@'+ parentKeyName]['children'];
                 } else {
