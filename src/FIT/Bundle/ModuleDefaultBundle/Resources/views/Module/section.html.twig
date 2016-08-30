@@ -97,6 +97,12 @@ if advised of the possibility of such damage.
 	</div>
 {% endblock topMenu %}
 
+{% block leftSubsection %}
+	{% for subsection in submenu %}
+		<a href="#/module/{{ subsection.params.module }}/{{ subsection.params.subsection }}" title="{{subsection.title}}" class="{% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
+	{% endfor %}
+{% endblock leftSubsection %}
+
 {% block state %}
 {% block singleContent %}
 	<script type="text/javascript">

@@ -42,13 +42,20 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		var isUndo = false,
 				isRedo = false;
 
-		$scope.reloadData = function () {
-			//console.log('reload');
+		$scope.reloadData = function (processResponseData) {
 			var targetUrl;
+
+			if (typeof processResponseData === "undefined") {
+				processResponseData = true;
+			}
+
 			if (typeof $routeParams.action !== "undefined") {
 				targetUrl = window.location.origin + window.location.pathname.replace('sections', 'info-page') + $routeParams.action + '/';
 			} else {
 				targetUrl = window.location.origin + window.location.pathname + $scope.moduleName + '/';
+				if (!angular.isUndefined($routeParams.sectionName)) {
+					targetUrl += $routeParams.sectionName + '/';
+				}
 			}
 
 			$.netopeergui.showSpinner();
@@ -57,13 +64,18 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 					$scope.jsonEditable = jsonEditable = data.data.variables.jsonEditable;
 					$scope.datastore = datastore = data.data.variables.datastore;
 					//$scope.jsonString = JSON.stringify(data.data.configuration);
+					$scope.jsonData = {};
 					$scope.jsonData = data.data.configuration;
 
 					var tmpData = data.data;
+					if (!processResponseData) {
+						delete tmpData.snippets['block--singleContent'];
+						delete tmpData.snippets['block--state'];
+					}
 					$.netopeergui.processResponseData(tmpData, function() {
-						//$scope.reload();
 						$.netopeergui.hideSpinner();
 					});
+
 					//console.log('success reload');
 				}, function errorCallback(data) {
 					//$scope.jsonData = {};
@@ -240,6 +252,10 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 
 		$routeProvider
 			.when('/module/:moduleName', {
+				templateUrl: 'main/view.html',
+				controller: 'ConfigurationController'
+			})
+			.when('/module/:moduleName/:sectionName', {
 				templateUrl: 'main/view.html',
 				controller: 'ConfigurationController'
 			})

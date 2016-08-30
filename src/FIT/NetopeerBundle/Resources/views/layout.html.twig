@@ -140,9 +140,11 @@ if advised of the possibility of such damage.
 						{{ sectionName }}
 						</h3>{% endif %}
 					<div class="nav-left">
+						{% block leftSubsection %}
 						{% for subsection in submenu %}
 							<a href="{{ path(subsection.path, subsection.params) }}" title="{{subsection.title}}" class="ajaxLink {% if subsectionName is defined and subsectionName == subsection.name %}active{% endif %}">{{subsection.name}}</a>
 						{% endfor %}
+						{% endblock leftSubsection %}
 					</div>
 
 					{% block rpcMethods %}
@@ -166,7 +168,7 @@ if advised of the possibility of such damage.
 								<h4>Change datastore</h4>
 								<div class="left-column-base">
 									{% block filterConfig %}
-										<form action="" method="post" {{ form_enctype(formConfig) }} class="filter-form" name="formConfig" data-disable-active-link="true">
+										<form action="" method="post" {{ form_enctype(formConfig) }} class="filter-form" name="formConfig" data-disable-active-link="true" data-disable-history="true">
 											{{ form_widget(formConfig) }}
 										</form>
 									{% endblock filterConfig %}
