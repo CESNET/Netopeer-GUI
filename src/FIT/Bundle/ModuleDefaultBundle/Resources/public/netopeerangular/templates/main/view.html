@@ -6,6 +6,8 @@
     <button ng-click="download(jsonData)">download as JSON</button>
 
     <button ng-click="submitConfiguration(jsonData)" ng-if="jsonEditable">Apply changes</button>
+    <button ng-click="commitConfiguration()" ng-if="datastore == 'candidate'">Commit</button>
+
     <button ng-click="undo()" ng-disabled="hasUndo()" ng-if="jsonEditable">history undo</button>
     <button ng-click="redo()" ng-disabled="hasRedo()" ng-if="jsonEditable">history redo</button>
 

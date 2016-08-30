@@ -26,4 +26,12 @@ var services = angular.module('NetopeerGUIServices', [])
 			data: cleanJson
 		});
 	};
+
+	this.commitConfiguration = function(targetUrl) {
+		return $http({
+			url: targetUrl || window.location.href,
+			method: 'POST',
+			data: {'angular': true, 'action': 'commit'}
+		});
+	};
 });

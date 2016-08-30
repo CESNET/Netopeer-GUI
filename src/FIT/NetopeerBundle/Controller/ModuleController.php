@@ -309,7 +309,7 @@ class ModuleController extends BaseController {
 	 * @param  int    $key                key of connected server
 	 * @param  string $module = null      module name
 	 * @param  string $subsection = null  subsection name
-	 * @return RedirectResponse           redirect to page, which was this method called from
+	 * @return int
 	 */
 	protected function processSectionForms($key, $module = null, $subsection = null) {
 		$post_vals = $this->getRequest()->get("form");
@@ -320,12 +320,12 @@ class ModuleController extends BaseController {
 
 		// processing filter on config part
 		if ( isset($post_vals['formType']) && $post_vals['formType'] == "formConfig" ) {
-			$res = $this->handleFilterConfig($key);
 			$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'topMenu');
+			return $this->handleFilterConfig($key);
 
 			// processing form on config - edit Config
 		} elseif ( isset($post_vals['formType']) && $post_vals['formType'] == "formCopyConfig" ) {
-			$res = $this->handleCopyConfig($key);
+			return $this->handleCopyConfig($key);
 		}
 
 		/*
