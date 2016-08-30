@@ -189,7 +189,6 @@ class DefaultController extends BaseController
 						$baseConn->saveConnectionIntoDB($post_vals['host'], $post_vals['port'], $post_vals['user']);
 					} else {
 						// update models
-						$netconfFunc->updateLocalModels($result);
 						setcookie("singleInstanceLoginFailed", false);
 						return $this->redirect($this->generateUrl('handleConnection', array('command' => 'get', 'key' => $result)));
 					}

@@ -80,7 +80,7 @@ if advised of the possibility of such damage.
 	{% endif %}
 
 	<div id="userpane" class="static dropdown">
-		<a data-toggle="dropdown" href="#"><strong>{{ app.user.username|default(app.user) }}</strong> <span class="caret"></span></a>
+		<a data-toggle="dropdown"><strong>{{ app.user.username|default(app.user) }}</strong> <span class="caret"></span></a>
 		<ul class="dropdown-menu" role="menu" aria-labelledby="uLabel">
 			{% if is_granted('IS_AUTHENTICATED_FULLY') %}
 				<li><a href="{% if app.user.getTargetedID is defined %}{{ path('aerial_ship_saml_sp.security.logout') }}{% else %}{{ path('_logout') }}{% endif %}" class="log-out">Log out</a>
