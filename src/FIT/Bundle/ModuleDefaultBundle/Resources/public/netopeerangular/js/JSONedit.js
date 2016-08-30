@@ -29,6 +29,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			return !(angular.isUndefined(storage) || angular.isUndefined(storage.revisions));
 		}
 		$scope.moduleName = $routeParams.moduleName;
+		$scope.datastore = 'running';
 
 		$scope.hasUndo = function() {
 			return (historyIndex - historyUndo - 1) <= 0;
@@ -62,7 +63,11 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 			AjaxService.reloadData(targetUrl)
 				.then(function successCallback(data) {
 					$scope.jsonEditable = jsonEditable = data.data.variables.jsonEditable;
-					$scope.datastore = datastore = data.data.variables.datastore;
+					var datastore = 'running';
+					if (typeof data.data.variables.datastore !== "undefined") {
+						datastore = data.data.variables.datastore;
+					}
+					$scope.datastore = datastore;
 					//$scope.jsonString = JSON.stringify(data.data.configuration);
 					$scope.jsonData = data.data.configuration;
 
