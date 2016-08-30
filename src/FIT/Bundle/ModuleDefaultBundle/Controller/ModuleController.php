@@ -41,6 +41,9 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 					'connIds' => array($key)
 				);
 				$res = $netconfFunc->handle('commit', $params, true, $result);
+				if ($res !== 1 && $res !== -1) {
+					$this->get('session')->getFlashBag()->add( 'state success', "Config has been edited successfully");
+				}
 
 				$this->get('session')->set('isAjax', true);
 				return $this->getTwigArr();
@@ -51,6 +54,9 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 					'configs' => array($postData)
 				);
 				$res = $netconfFunc->handle('editconfig', $params, true, $result);
+				if ($res !== 1 && $res !== -1) {
+					$this->get('session')->getFlashBag()->add( 'state success', "Config has been edited successfully");
+				}
 
 				$this->get('session')->set('isAjax', true);
 				return $this->getTwigArr();

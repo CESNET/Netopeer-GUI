@@ -1236,8 +1236,8 @@ class NetconfFunctionality {
 
 		if ( isset($res) && $res !== 1 && $res !== -1) {
 			return $res;
-		} else if ($res !== -1) {
-			return 1;
+//		} else if ($res !== -1) {
+//			return 1;
 		}
 		return 0;
 	}
