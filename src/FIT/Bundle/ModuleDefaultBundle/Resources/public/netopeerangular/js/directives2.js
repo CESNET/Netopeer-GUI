@@ -64,9 +64,10 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             axis: 'y',
             update: function(e, ui) {
                 setParentChanged(scope.$parent);
-                setIetfOperation('replace', scope.$parent.$parent.newkey, getParents($parent, 4).child, scope.$parent);
+                setIetfOperation('replace', getParents(scope.$parent, 1).newkey, getParents(scope.$parent, 1).child, getParents(scope.$parent, 4).child);
             }
         };
+
         if (scope.$parent.defaultCollapsed === undefined) {
             scope.collapsed = false;
         } else {
