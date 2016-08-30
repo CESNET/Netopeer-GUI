@@ -81,6 +81,7 @@ class NetconfFunctionality {
 	const MSG_RELOADHELLO			= 17;
 	const MSG_NTF_GETHISTORY		= 18;
 	const MSG_VALIDATE			= 19;
+	const MSG_COMMIT            = 20;
 
 	const SCH_QUERY  = 100;
 	const SCH_MERGE  = 101;
@@ -941,6 +942,30 @@ class NetconfFunctionality {
 	}
 
 	/**
+	 * Commit datastore into datastore
+	 * key: type (int), value: 20
+	 * key: sessions (array of ints), value: array of SIDs
+	 *
+	 * @param $sock
+	 * @param $params
+	 *
+	 * @return int|mixed
+	 */
+	public function handle_commit(&$sock, &$params) {
+		if ( $this->getConnectionFunctionality()->checkLoggedKeys() != 0) {
+			return 1;
+		}
+
+		$validateParams = array(
+			"type" 		=> self::MSG_COMMIT,
+			"sessions" 	=> $this->getConnectionFunctionality()->getHashFromKeys($params['connIds']),
+		);
+
+		$decoded = $this->execute_operation($sock, $validateParams);
+		return $this->checkDecodedData($decoded);
+	}
+
+	/**
 	 * Query schema node by XPATH
 	 * key: type (int), value: 100
 	 * key: sessions (array of ints), value: array of SIDs
@@ -1182,6 +1207,9 @@ class NetconfFunctionality {
 				break;
 			case "validate":
 				$res = $this->handle_validate($sock, $params);
+				break;
+			case "commit":
+				$res = $this->handle_commit($sock, $params);
 				break;
 			case "query":
 				$res = $this->handle_query($sock, $params);

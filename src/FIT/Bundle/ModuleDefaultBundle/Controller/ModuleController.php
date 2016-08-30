@@ -34,7 +34,17 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 
 			$configParams = $this->getConfigParams();
 			$postData = $this->getRequest()->getContent();
-			if (strpos($postData, 'form') !== 0) {
+			$postArr = json_decode($postData, true);
+
+			if (isset($postArr['action']) && $postArr['action'] == "commit") {
+				$params = array(
+					'connIds' => array($key)
+				);
+				$res = $netconfFunc->handle('commit', $params, true, $result);
+
+				$this->get('session')->set('isAjax', true);
+				return $this->getTwigArr();
+			} elseif (strpos($postData, 'form') !== 0) {
 				$params = array(
 					'connIds' => array($key),
 					'target' => $configParams['source'],
@@ -43,9 +53,6 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 				$res = $netconfFunc->handle('editconfig', $params, true, $result);
 
 				$this->get('session')->set('isAjax', true);
-//			$this->removeAjaxBlock('moduleJavascripts');
-//			$this->removeAjaxBlock('moduleStylesheet');
-//			$this->removeAjaxBlock('state');
 				return $this->getTwigArr();
 			}
 		}
@@ -65,10 +72,11 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			$this->removeAjaxBlock('topMenu');
 			$content = json_decode($this->getTwigArr()->getContent(), true);
 
-
+			$conn = $connectionFunc->getConnectionSessionForKey($key);
 			$res = array(
 				'variables' => array(
 					'jsonEditable' => true,
+					'datastore' => $conn->getCurrentDatastore(),
 				),
 				'configuration' => json_decode($resData),
 				'snippets' => $content['snippets'],
