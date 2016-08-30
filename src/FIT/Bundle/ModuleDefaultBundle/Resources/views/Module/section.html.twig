@@ -46,7 +46,7 @@ if advised of the possibility of such damage.
 
 {% block topMenu %}
 	{% if not isSingleInstance %}
-		<a href="{{ path('connections') }}" title="Home" class="static ico-home header-icon ajaxLink {% if activeAction is defined and activeAction == "home" %}active{% endif %}" data-callback="setIndexActions()"><span></span>Connections</a>
+		<a href="{{ path('connections') }}" title="Home" class="static ico-home header-icon {% if activeAction is defined and activeAction == "home" %}active{% endif %}" data-callback="setIndexActions()"><span></span>Connections</a>
 	{% endif %}
 	{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and lockedConn is defined %}
 		{% if lockedConn == false %}
