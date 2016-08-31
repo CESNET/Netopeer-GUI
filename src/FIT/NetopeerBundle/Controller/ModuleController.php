@@ -189,6 +189,22 @@ class ModuleController extends BaseController {
 	}
 
 	/**
+	 * Gets XML file with requested RPC method only.
+	 *
+	 * @param        $rpcMethod
+	 * @param        $module
+	 * @param string $subsection
+	 *
+	 * @return bool
+	 */
+	protected function getRPCXmlForMethod($rpcMethod, $key, $module) {
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		$rpc = $module.':'.$rpcMethod;
+		$json = $netconfFunc->handle('query', array('connIds' => array($key), 'load_children' => true, 'filters' => array(array('/'.$rpc))));
+		return $json;
+	}
+
+	/**
 	 * @param int    $key    ID of connection
 	 * @param string $module name of current module
 	 *
