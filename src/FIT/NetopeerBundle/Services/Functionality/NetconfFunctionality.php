@@ -439,10 +439,14 @@ class NetconfFunctionality {
 						array( "error" => var_export( $response, true ) ) );
 					$session->getFlashBag()->add( 'error', "Could not disconnect session " . $sid . " from server. " );
 				}
-
 				$key = array_search( $sid, $sessionKeys );
-				if ( $key ) {
-					unset( $sessionConnections[ $key ] );
+
+				foreach ($sessionConnections as $k => $sess) {
+					$connSess = unserialize($sess);
+					if ($connSess->hash === $sid) {
+						unset($sessionConnections[$k]);
+						break;
+					}
 				}
 			}
 		} else {
