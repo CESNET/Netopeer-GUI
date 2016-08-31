@@ -397,7 +397,11 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 parent.showAddKey = false;
             } else {
                 parent.child = {};
-                parent.child[parent.keyName] = {};
+                parent.child[parent.keyName] = {
+                    '@': {
+                        'ietf-netconf:operation': 'create'
+                    }
+                };
                 console.error("object to add to was " + obj);
             }
         };
