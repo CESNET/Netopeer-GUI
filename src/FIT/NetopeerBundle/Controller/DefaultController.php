@@ -293,6 +293,7 @@ class DefaultController extends BaseController
 	 */
 	public function handleConnectionAction($command, $key, $identifier = "")
 	{
+		$this->addAjaxBlock('FITNetopeerBundle:Default:connections.html.twig', 'config');
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$params = array(
 			'connIds' => array($key)
