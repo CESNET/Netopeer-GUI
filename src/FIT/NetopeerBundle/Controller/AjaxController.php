@@ -221,24 +221,19 @@ class AjaxController extends BaseController
 	/**
 	 * Call validate in mod_netconf
 	 *
-	 * @Route("/ajax/validate-source/{key}/{target}/{module}", name="validateSource")
+	 * @Route("/ajax/validate-source/{key}/{target}", name="validateSource")
 	 *
 	 * @param $key    Identifier of connection (connected device ID)
 	 * @param $target
-	 * @param $module
 	 * @return array
 	 */
-	public function validateSource($key, $target, $module)
+	public function validateSource($key, $target)
 	{
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
 
-		$subsection = null;
-		$filters = $connectionFunc->loadFilters($module, $subsection);
-
 		$params = array(
 			'connIds' => array($key),
-			'filter' => $filters['state'],
 			'target' => $target
 		);
 

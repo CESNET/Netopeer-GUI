@@ -176,7 +176,7 @@ if advised of the possibility of such damage.
 									<div id="block--sourceValidation">
 										{% block sourceValidation %}
 											{# duplicated in config form filter !#}
-									{#<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore, "module": app.request.get('module')}) }}" class="ajaxLink button grey small left" data-disable-history="true">Validate this datastore</a>#}
+											<a href="{{ path('validateSource', {"key": app.request.get('key'), "target": dataStore}) }}" class="ajaxLink button grey small left" data-disable-history="true">Validate this datastore</a>
 										{% endblock %}
 									</div>
 									<hr class="cleaner" />
