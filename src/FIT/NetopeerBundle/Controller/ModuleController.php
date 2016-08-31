@@ -158,6 +158,12 @@ class ModuleController extends BaseController {
 	protected function loadDataForModuleAction($bundleName, $key, $module = null, $subsection = null) {
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 
+		if ($module === 'add-new-module') {
+			$json = '';
+			$this->assign('stateJson', $json);
+			return $json;
+		}
+
 		// loading state part = get Action
 		// we will load it every time, because state column will we show everytime
 		try {
