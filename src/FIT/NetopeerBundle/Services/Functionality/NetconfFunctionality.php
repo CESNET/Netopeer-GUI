@@ -792,6 +792,7 @@ class NetconfFunctionality {
 			"contents" => $params['contents'],
 		);
 
+		$session = $this->getSession();
 		$decoded = $this->execute_operation($sock, $genericParams);
 
 		foreach ($decoded as $sid => $response) {

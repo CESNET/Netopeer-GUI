@@ -18,7 +18,12 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		});
 
 		var resetRevisions = function() {
-			storage = Rhaboo.perishable(window.location.href);
+			try {
+				storage = Rhaboo.perishable(window.location.href);
+			} catch (e) {
+				storage = Rhaboo.persistent(window.location.href);
+			}
+
 			historyIndex = 0;
 			historyUndo = 0;
 			storage.write('revisions', []);
@@ -30,6 +35,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		}
 		$scope.moduleName = $routeParams.moduleName;
 		$scope.datastore = 'running';
+		$scope.rpcName = false;
 
 		$scope.hasUndo = function() {
 			return (historyIndex - historyUndo - 1) <= 0;
@@ -52,6 +58,8 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 
 			if (typeof $routeParams.action !== "undefined") {
 				targetUrl = window.location.origin + window.location.pathname.replace('sections', 'info-page') + $routeParams.action + '/';
+			} else if (typeof $routeParams.rpcName !== "undefined") {
+				targetUrl = window.location.origin + window.location.pathname.replace('sections', 'sections/rpc') + $routeParams.moduleName + '/' + $routeParams.rpcName;
 			} else {
 				targetUrl = window.location.origin + window.location.pathname + $scope.moduleName + '/';
 				if (!angular.isUndefined($routeParams.sectionName)) {
@@ -68,8 +76,12 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 						datastore = data.data.variables.datastore;
 					}
 					$scope.datastore = datastore;
-					//$scope.jsonString = JSON.stringify(data.data.configuration);
-					$scope.jsonData = data.data.configuration;
+					var rpcName = false;
+					if (typeof data.data.variables.rpcName !== "undefined") {
+						rpcName = data.data.variables.rpcName;
+					}
+					$scope.rpcName = rpcName;
+					$scope.jsonData = data.data.configuration || {};
 
 					var tmpData = data.data;
 					if (!processResponseData) {
@@ -225,6 +237,27 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				});
 		};
 
+		$scope.submitRpc = function(jsonData) {
+			$.netopeergui.createSpinner();
+			$.netopeergui.showSpinner();
+			var cleanJson = cleanupJSON(jsonData);
+			cleanJson = JSON.parse(cleanJson);
+
+			AjaxService.submitRpc(cleanJson, window.location.href)
+				.then(function successCallback(data) {
+					var tmpData = data.data;
+
+					$.netopeergui.processResponseData(tmpData, function() {
+						//$scope.reload();
+						$.netopeergui.hideSpinner();
+					});
+				}, function errorCallback(data) {
+					//console.log(data);
+					//alert('error2');
+					$.netopeergui.hideSpinner();
+				});
+		};
+
 		$scope.commitConfiguration = function() {
 			$.netopeergui.createSpinner();
 			$.netopeergui.showSpinner();
@@ -254,6 +287,10 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				controller: 'ConfigurationController'
 			})
 			.when('/module/:moduleName/:sectionName', {
+				templateUrl: 'main/view.html',
+				controller: 'ConfigurationController'
+			})
+			.when('/rpc/:moduleName/:rpcName', {
 				templateUrl: 'main/view.html',
 				controller: 'ConfigurationController'
 			})

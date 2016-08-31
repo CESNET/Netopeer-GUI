@@ -8,7 +8,7 @@
 
 	<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ng-show="$parent.type !== 'List' && $parent.type !== 'Array'" ng-init="initParentValueType($parent)"></select>
 
-	<span ng-show="$parent.valueType !== 'Object' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:Array' && $parent.type !== 'List'">
+	<span ng-show="$parent.valueType !== 'Object' && $parent.valueType !== 'List' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:List' && $parent.valueType !== 'string:Array' && $parent.type !== 'List'">
 		<input type="text" ng-model="$parent.valueName" ng-model-onblur placeholder="Empty">
 	</span>
 

@@ -4,6 +4,7 @@ namespace FIT\Bundle\ModuleDefaultBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\ModuleControllerInterface;
 use FIT\NetopeerBundle\Models\XMLoperations;
+use FIT\NetopeerBundle\Services\Functionality\ConnectionFunctionality;
 use FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -44,6 +45,15 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 				if ($res !== 1 && $res !== -1) {
 					$this->get('session')->getFlashBag()->add( 'state success', "Config has been edited successfully");
 				}
+
+				$this->get('session')->set('isAjax', true);
+				return $this->getTwigArr();
+			} elseif (isset($postArr['action']) && $postArr['action'] == "rpc") {
+				$params = array(
+					'connIds' => array($key),
+				    'contents' => array($postArr['data'])
+				);
+				$res = $netconfFunc->handle('generic', $params, true, $result);
 
 				$this->get('session')->set('isAjax', true);
 				return $this->getTwigArr();
@@ -123,6 +133,54 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 				$this->setOnlyConfigSection();
 			}
 			$this->assign('singleColumnLayout', true);
+		}
+
+		return $this->getTwigArr();
+	}
+
+	/**
+	 * Prepares view for RPC form (generates RPC form)
+	 *
+	 * @Route("/sections/rpc/{key}/{module}/{rpcName}/", name="showRPCForm", requirements={"key" = "\d+"})
+	 * @Template("FITModuleDefaultBundle:Module:showRPCForm.html.twig")
+	 *
+	 * @param $key    Identifier of connection (connected device ID)
+	 * @param $module
+	 * @param $rpcName
+	 *
+	 * @return array|Response
+	 */
+	public function rpcAction($key, $module, $rpcName) {
+		/**
+		 * @var ConnectionFunctionality $connectionFunc
+		 */
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+
+		$res = $this->prepareVariablesForModuleAction("FITModuleDefaultBundle", $key, $module);
+		$this->assign('rpcName', $rpcName);
+
+		if ($this->getRequest()->get('angular') == "true") {
+			$resData = $this->getRPCXmlForMethod($rpcName, $key, $module);
+
+			// load content of snippets
+			$this->get('session')->set('isAjax', true);
+			$this->removeAjaxBlock('topMenu');
+			$content = json_decode($this->getTwigArr()->getContent(), true);
+
+			$conn = $connectionFunc->getConnectionSessionForKey($key);
+			$res = array(
+				'variables' => array(
+					'jsonEditable' => true,
+					'rpcName' => $rpcName,
+					'datastore' => $conn->getCurrentDatastore(),
+				),
+				'configuration' => json_decode($resData),
+				'snippets' => $content['snippets'],
+			);
+			return new JsonResponse($res);
+		} else {
+			$this->assign('singleColumnLayout', true);
+			return $this->getTwigArr();
 		}
 
 		return $this->getTwigArr();

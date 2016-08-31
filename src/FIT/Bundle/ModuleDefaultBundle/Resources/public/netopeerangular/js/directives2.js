@@ -168,7 +168,12 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             if (typeof parent === "undefined" || typeof parent['$@'+key] === "undefined") {
                 if (typeof key === "undefined" || typeof parent === "undefined") return false;
 
-                var path = getPath(parent, 'key');
+                var path = '';
+                if (typeof parent.$parent === "undefined") {
+                    child = parent;
+                    parent = scope.$parent;
+                }
+                path = getPath(parent, 'key');
 
                 var parentKey = path.replace('/', '').split(':');
                 var ns = parentKey[0] + ":";
@@ -187,15 +192,24 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     $rootScope.cache[window.location.href] = $cacheFactory(window.location.href);
                     //} catch (exception) {};
                 }
+                var hashCode = function(str){
+                    var hash = 0;
+                    if (str.length == 0) return hash;
+                    for (var i = 0; i < str.length; i++) {
+                        var char = str.charCodeAt(i);
+                        hash = ((hash<<5)-hash)+char;
+                        hash = hash & hash; // Convert to 32bit integer
+                    }
+                    return hash;
+                };
                 if (angular.isUndefined($rootScope.cache[window.location.href].get(path))) {
-                    var schemaBlacklistKey = connId + path;
+                    var schemaBlacklistKey = hashCode('' + connId + path + '');
                     if (schemaAjaxBlacklist.indexOf(schemaBlacklistKey) === -1) {
                         AjaxService.loadSchema([connId], [path])
                           .then(function successCallback(data) {
                               var schema = data.data;
-
+                              schemaAjaxBlacklist.push(schemaBlacklistKey);
                               if (typeof schema === "undefined" || typeof schema['$@'+ns+key] === "undefined") {
-                                  schemaAjaxBlacklist.push(schemaBlacklistKey);
                                   return false;
                               }
                               //insert loaded schema into current object
