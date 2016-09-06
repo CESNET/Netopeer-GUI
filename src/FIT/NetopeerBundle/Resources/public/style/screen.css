@@ -880,10 +880,17 @@ form.form#login-form {
 form.form#login-form .desc {
   font-size: 0.95em;
   margin-bottom: 25px; }
+form.form#login-form > div {
+  display: block;
+  overflow: hidden; }
 form.form#login-form label {
   width: 20%;
   margin-right: 5%;
   float: left; }
+form.form#login-form label + ul {
+  float: left;
+  margin-top: 20px;
+  color: #820101; }
 form.form#login-form input[type="text"], form.form#login-form textarea, form.form#login-form input[type="password"] {
   width: 70%;
   float: left; }
@@ -920,7 +927,7 @@ form.form input {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box; }
-form.form input[type="text"], form.form textarea, form.form input[type="password"], form.form input.text {
+form.form input[type="text"], form.form textarea, form.form input[type="password"], form.form input[type="email"], form.form input.text {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;

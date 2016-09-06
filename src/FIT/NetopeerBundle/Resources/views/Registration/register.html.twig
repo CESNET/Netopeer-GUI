@@ -38,48 +38,40 @@ if advised of the possibility of such damage.
 
 {% extends 'FITNetopeerBundle::layout.html.twig' %}
 {% block title %}
-	Log in is required for this site!
+	Register new user
 {% endblock %}
 {% block content %}
 
 	<div id="login-hp">
 
+
 		{# data odesíláme na login_check #}
-		<form action="{% if isSingleInstance %}{{ path('single_instance_login') }}{% else %}{{ path('login_check') }}{% endif %}" method="post" id="login-form" class="form">
-			<legend>
-				{% if isSingleInstance %}
-					Connect to the local device!
-					<input type="hidden" name="form[host]" value="{{ singleInstanceHost|default('localhost')}}" />
-					<input type="hidden" name="form[port]" value="{{ singleInstancePort|default('830') }}" />
-					<input type="hidden" name="isSingleInstance" value="true" />
-				{% else %}
-					Log in is required for this site!
-				{% endif %}
-			</legend>
+		{{ form_start(form, {'attr': {'id': 'login-form', 'class': 'form'}}) }}
+		<legend style="text-align: center; width: 100%;">
+			Register new user
+		</legend>
 
-			{% block flashes %}
-				{% for type, flashMessages in array_unique(app.session.flashbag.all()) %}
-					{% for flashMessage in flashMessages %}
-						<div class="alert {{ type }}">
-							{{ flashMessage|raw }}
-						</div>
-					{% endfor %}
+		{% block flashes %}
+			{% for type, flashMessages in array_unique(app.session.flashbag.all()) %}
+				{% for flashMessage in flashMessages %}
+					<div class="alert {{ type }}">
+						{{ flashMessage|raw }}
+					</div>
 				{% endfor %}
-			{% endblock flashes %}
-			
-			{% if error %}
-			    <div class="alert error">{{ error.message }}</div>
-			{% endif %}
+			{% endfor %}
+		{% endblock flashes %}
 
-		    <label for="username">Username:</label>
-		    {# pro správnou funkci se musí parametry poslané na login_check jmenovat _username a _password #}
-		    <input type="text" id="username" name="{% if isSingleInstance %}form[user]{% else %}_username{% endif %}" value="{{ last_username }}" /><br/>
-		 
-		    <label for="password">Password:</label>
-		    <input type="password" id="password" name="{% if isSingleInstance %}form[password]{% else %}_password{% endif %}" /><br/>
-		 
-		    <input type="submit" name="login" value="Log in" />{% if not isSingleInstance %}<span class="login-alternative"><a href="{{ path('register') }}">sign up</a></span><span class="login-alternative"> login using <a href="{{ app.request.basePath }}/saml/sp/login">eduID</a>{% endif %}</span>
-		</form>
+		{% if error is defined and error.message is defined %}
+			<div class="alert error">{{ error.message }}</div>
+		{% endif %}
+
+		{{ form_row(form.username) }}
+		{{ form_row(form.password.first) }}
+		{{ form_row(form.password.second) }}
+
+		<input type="submit" value="Sign up"/>
+		<span class="login-alternative"><a href="{{ path('_login') }}">log in</a></span>
+		{{ form_end(form) }}
 
 	</div>
 

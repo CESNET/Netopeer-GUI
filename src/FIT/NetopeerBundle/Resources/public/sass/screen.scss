@@ -289,7 +289,12 @@ form.form { margin: 15px 0px;
 	&#login-form { width: 400px; margin: 0px auto;
 		.desc { font-size: 0.95em; margin-bottom: 25px; }
 
-		label { width: 20%; margin-right: 5%; float: left; }
+		> div { display: block; overflow: hidden; }
+
+		label { width: 20%; margin-right: 5%; float: left;
+			+ ul { float: left; margin-top: 20px; color: $color-danger; }
+		}
+
 		input { 
 			&[type="text"], &[type="password"] { width: 70%; float: left; }	
 			&[type="submit"] { margin-left: 25%; }
@@ -307,7 +312,7 @@ form.form { margin: 15px 0px;
 		&.percent-width { width: 15%; }
 	}
 	input { @include box-sizing(border-box);
-		&[type="text"], &[type="password"], &.text { @include box-sizing(border-box); width: $form-input-width; height: $form-input-height; line-height: $form-input-height; padding: $form-input-padding; border: 1px solid $form-input-border; background: $form-input-background; margin-top: 10px; @include inline-block; @include border-radius($form-input-radius); font-size: $form-input-font-size;
+		&[type="text"], &[type="password"], &[type="email"], &.text { @include box-sizing(border-box); width: $form-input-width; height: $form-input-height; line-height: $form-input-height; padding: $form-input-padding; border: 1px solid $form-input-border; background: $form-input-background; margin-top: 10px; @include inline-block; @include border-radius($form-input-radius); font-size: $form-input-font-size;
 		}
 		&[type="submit"] { @extend .button; }
 		&[disabled="true"], &[disabled="disabled"] {
