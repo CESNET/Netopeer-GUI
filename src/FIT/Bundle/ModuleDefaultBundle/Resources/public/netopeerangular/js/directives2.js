@@ -439,7 +439,13 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             getSchemaFromKey(key, $parent, child);
             var val = getType(key, null, child);
             if (val) {
-                $parent.valueType = val;
+                $parent.valueType = val;$parent.valueType = val;
+            }
+        };
+
+        scope.changeParentValueName = function(val, child, $parent) {
+            if (val !== '') {
+                $parent.valueName = val;
             }
         };
 

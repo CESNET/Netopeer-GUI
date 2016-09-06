@@ -1,30 +1,17 @@
 <span ng-if="showAddKey && jsonEditable">
 
 	<span ng-show="$parent.type !== 'List' && $parent.type !== 'Array'">
-		<input placeholder="Name" type="text"
-					 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" 					 ng-blur="changeParentKeyName($parent.keyName, child, $parent)"
+		<input placeholder="{{ typeaheadNoResults ? 'No name available' : 'Type a letter' }}" type="text"
+					 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" typeahead-min-length="0" typeahead-no-results="typeaheadNoResults" ng-blur="changeParentKeyName($parent.keyName, child, $parent);showSelectbox = true"
 				/> :
 	</span>
 
-	<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ng-show="$parent.type !== 'List' && $parent.type !== 'Array'" ng-init="initParentValueType($parent)"></select>
+	<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ng-show="showSelectbox && $parent.type !== 'List' && $parent.type !== 'Array' && $parent.keyName" ng-init="initParentValueType($parent)"></select>
 
-	<span ng-show="$parent.valueType !== 'Object' && $parent.valueType !== 'List' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:List' && $parent.valueType !== 'string:Array' && $parent.type !== 'List'">
-		<input type="text" ng-model="$parent.valueName" ng-model-onblur placeholder="Empty">
+	<span ng-show="$parent.keyName && $parent.valueType !== 'Object' && $parent.valueType !== 'List' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:List' && $parent.valueType !== 'string:Array' && $parent.type !== 'List'">
+		<input type="{{ $parent.valueType == 'string:Number' || $parent.valueType == 'Number' ? 'number' : $parent.valueType == 'string:Boolean' || $parent.valueType == 'Boolean' ? 'checkbox' : 'text' }}" ng-model="$parent.valueName" ng-model-onblur placeholder="Set a value" ng-show="!($parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration')">
+		<select ng-model="selectboxValue" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option" ng-if="$parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration'" ng-model-onblur ng-blur="$parent.valueName = selectboxValue;"></select>
 	</span>
-
-	<!--ng-if="$parent.valueType !== 'string:Enumeration' && $parent.valueType !== 'string:Boolean' && $parent.valueType !== 'string:Number' && $parent.valueType !== 'Enumeration' && $parent.valueType !== 'Boolean' && $parent.valueType !== 'Number'"-->
-
-	<!--<span ng-if="$parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration'">-->
-		<!--<select ng-model="$parent.valueName" ng-model-onblur ng-options="option for option in getEnumValues(key, child, $parent) track by option"></select>-->
-	<!--</span>-->
-
-	<!--<span ng-if="$parent.valueType == 'string:Boolean' || $parent.valueType == 'Boolean'">-->
-		<!--<input type="checkbox" ng-model="$parent.valueName" ng-model-onblur>-->
-	<!--</span>-->
-
-	<!--<span ng-if="$parent.valueType == 'string:Number' || $parent.valueType == 'Number'">-->
-		<!--<input type="number" ng-model="$parent.valueName" ng-model-onblur>-->
-	<!--</span>-->
 
 
 	<button class="btn btn-primary btn-sm" ng-click="addItem(key, child, $parent)">
@@ -36,7 +23,7 @@
 </span>
 <span ng-if="!showAddKey">
 	<button class="addObjectItemBtn" ng-click="$parent.showAddKey = true">
-		<i class="fa fa-plus" ng-if="$parent.type !== 'List'"></i>
-		<i class="fa fa-plus-circle" ng-if="$parent.type === 'List' "></i>
+		<i class="fa fa-plus" ng-if="$parent.type !== 'List'" tooltip-placement="top" uib-tooltip="Add new item"></i>
+		<i class="fa fa-plus-circle" ng-if="$parent.type === 'List' " tooltip-placement="top" uib-tooltip="Add new {{$parent.$parent.$parent.newkey}}"></i>
 	</button>
 </span>
