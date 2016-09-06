@@ -93,6 +93,7 @@ security:
 
     access_control:
         - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY}
+        - { path: ^/register, roles: IS_AUTHENTICATED_ANONYMOUSLY}
         - { path: ^/saml/sp/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/saml/sp/acs$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/(login_check|connections|section|ajax), roles: ROLE_USER}
