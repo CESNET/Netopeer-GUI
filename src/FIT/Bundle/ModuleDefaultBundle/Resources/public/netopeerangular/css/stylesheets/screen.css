@@ -1298,10 +1298,13 @@
 .jsonView .addItemKeyInput { font-weight: bold; }
 .jsonView .toggle-control { float: left; cursor: pointer; position: relative; right: 22px; margin-right: -15px; background: #f0f0f0; }
 .jsonView > json > .fa-minus-square-o { display: none; }
-.jsonView .addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; display: block; }
+.jsonView .addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0; display: block; cursor: pointer; }
 .jsonView .addObjectItemBtn i { display: block; }
+.jsonView .addObjectItemBtn i.fa-plus-circle { position: absolute; left: -23px; background: #fff; }
+.jsonView .addObjectItemBtn .tooltip { min-width: 150px; }
 .jsonView .editbar { margin-left: 0px; }
-.jsonView .iconButton { margin-left: 2px; position: relative; top: -1px; z-index: 0; cursor: pointer; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20); opacity: 0.2; }
+.jsonView .iconButton { margin-left: 2px; position: relative; top: -1px; z-index: 0; cursor: help; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=20); opacity: 0.2; }
+.jsonView .iconButton.deleteKeyBtn { cursor: pointer; }
 .jsonView .iconButton:hover { filter: progid:DXImageTransform.Microsoft.Alpha(enabled=false); opacity: 1; }
 .jsonView .jsonObjectKey { font-weight: bold; }
 .jsonView .jsonObjectKey .key-name { margin-right: 25px; min-width: 130px; display: inline-block; }
@@ -1327,8 +1330,8 @@
 .jsonView .objectDesc { cursor: default; }
 .jsonView > json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
 .jsonView add-item { display: block; min-height: 20px; }
-.jsonView add-item .addObjectItemBtn { position: relative; z-index: 10; filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=30); opacity: 0.3; }
-.jsonView add-item .addObjectItemBtn:hover { filter: progid:DXImageTransform.Microsoft.Alpha(enabled=false); opacity: 1; }
+.jsonView add-item .addObjectItemBtn { position: relative; z-index: 10; color: rgba(0, 0, 0, 0.3) !important; }
+.jsonView add-item .addObjectItemBtn:hover { color: #000 !important; }
 .jsonView li { clear: both; min-height: 26px; }
 .jsonView ol.listOl > .arrayItem, .jsonView ul.dropdown-menu li { list-style: none !important; }
 .jsonView ol.arrayOl .toggle-control, .jsonView ol.listOl .toggle-control { margin-left: -20px; top: 1.3em; display: none; }
@@ -1341,7 +1344,7 @@
 .jsonView ol.listOl > li.arrayItem:before { display: none; }
 .jsonView ol.listOl > li + li { border-top: 1px dotted #ccc; padding-top: 1em; }
 .jsonView ol.arrayOl { margin-left: 25px; margin-top: 15px; }
-.jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner), .jsonView ol.listOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
+.jsonView ol.arrayOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner):not(i), .jsonView ol.listOl li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner):not(i) { color: black; }
 .jsonView li li { list-style-type: lower-roman; }
 .jsonView li li li { list-style-type: upper-roman; }
 .jsonView li li li li { list-style-type: lower-latin; }

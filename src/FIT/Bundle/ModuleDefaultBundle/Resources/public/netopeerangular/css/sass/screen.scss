@@ -28,12 +28,16 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 	.addItemKeyInput { font-weight: bold; }
 	.toggle-control { float: left; cursor: pointer; position: relative; right: 22px; margin-right: -15px; background: #f0f0f0; }
 	> json > .fa-minus-square-o { display: none; }
-	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0;display: block;
-		i { display: block; }
+	.addObjectItemBtn { background-color: transparent; border-color: transparent; padding: 0; border: 0;display: block; cursor: pointer;
+		i { display: block;
+			&.fa-plus-circle { position: absolute; left: -23px; background: #fff; }
+		}
+		.tooltip { min-width: 150px; }
 	}
 	.editbar { margin-left: 0px; }
 
-	.iconButton { margin-left: 2px; position: relative; top: -1px; z-index: 0; cursor: pointer; @include opacity(0.2);
+	.iconButton { margin-left: 2px; position: relative; top: -1px; z-index: 0; cursor: help; @include opacity(0.2);
+		&.deleteKeyBtn { cursor: pointer; }
 		&:hover { @include opacity(1); }
 	}
 	.jsonObjectKey { font-weight: bold;
@@ -82,8 +86,8 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 	.objectDesc { cursor: default; }
 	> json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
 	add-item { display: block; min-height: 20px;
-		.addObjectItemBtn { position: relative; z-index: 10; @include opacity(0.3);
-			&:hover { @include opacity(1); }
+		.addObjectItemBtn { position: relative; z-index: 10; color: rgba(#000, 0.3) !important;
+			&:hover { color: #000 !important; }
 		}
 	}
 	//switch-item { margin-right: 15px; }
@@ -123,7 +127,7 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 		margin-left: 25px; margin-top: 15px;
 	}
 	ol.arrayOl, ol.listOl {
-		li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner) { color: black; }
+		li *:not(.btn):not(.jsonItemDesc):not(.tooltip-inner):not(i) { color: black; }
 	}
 	li li {
 		list-style-type: lower-roman;
