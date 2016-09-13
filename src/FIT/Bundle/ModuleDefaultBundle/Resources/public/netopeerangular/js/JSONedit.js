@@ -4,7 +4,7 @@ var historyIndex = 0,
 
 var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse', 'NetopeerGUIServices'])
 
-	.controller('ConfigurationController', function ($rootScope, $scope, $filter, $http, $routeParams, $location, $window, $timeout, traverse, AjaxService) {
+	.controller('ConfigurationController', function ($rootScope, $scope, $filter, $http, $route, $routeParams, $location, $window, $timeout, traverse, AjaxService) {
 
 		$rootScope.$on("$routeChangeStart", function (event, next, current) {
 			$.netopeergui.createSpinner();
@@ -48,6 +48,10 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		};
 		var isUndo = false,
 				isRedo = false;
+
+		$scope.reload = function() {
+			$route.reload();
+		}
 
 		$scope.reloadData = function (processResponseData) {
 			var targetUrl;

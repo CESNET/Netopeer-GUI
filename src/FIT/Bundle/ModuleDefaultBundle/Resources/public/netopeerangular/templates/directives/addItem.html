@@ -10,12 +10,12 @@
 	<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ng-show="showSelectbox && $parent.type !== 'List' && $parent.type !== 'Array' && $parent.keyName" ng-init="initParentValueType($parent)"></select>
 
 	<span ng-show="$parent.type === 'Array' || ($parent.keyName && $parent.valueType !== 'Object' && $parent.valueType !== 'List' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:List' && $parent.valueType !== 'string:Array' && $parent.type !== 'List')">
-		<input type="{{ $parent.valueType == 'string:Number' || $parent.valueType == 'Number' ? 'number' : $parent.valueType == 'string:Boolean' || $parent.valueType == 'Boolean' ? 'checkbox' : 'text' }}" ng-model="$parent.valueName" ng-model-onblur placeholder="Set a value" ng-show="!($parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration')">
-		<select ng-model="selectboxValue" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option" ng-if="$parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration'" ng-model-onblur ng-blur="$parent.valueName = selectboxValue;"></select>
+		<input type="{{ $parent.valueType == 'string:Number' || $parent.valueType == 'Number' ? 'number' : $parent.valueType == 'string:Boolean' || $parent.valueType == 'Boolean' ? 'checkbox' : 'text' }}" ng-model="newValueName" ng-blur="changeParentValueName(newValueName, child, $parent)" placeholder="Set a value" ng-show="!($parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration')">
+		<select ng-model="selectboxValue" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option" ng-if="$parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration'" ng-blur="$parent.valueName = selectboxValue;"></select>
 	</span>
 
 
-	<button class="btn btn-primary btn-sm" ng-click="addItem(key, child, $parent)">
+	<button class="btn btn-primary btn-sm" ng-click="addItem($parent.keyName, child, $parent)">
 		Add
 	</button>
 	<button class="btn btn-default btn-sm" ng-click="$parent.showAddKey=false">
