@@ -218,9 +218,6 @@ hr.cleaner {
   font-weight: normal;
   border: 1px solid #003f67;
   cursor: pointer;
-  -moz-box-shadow: 0px 0px 8px 0px #aaa;
-  -webkit-box-shadow: 0px 0px 8px 0px #aaa;
-  box-shadow: 0px 0px 8px 0px #aaa;
   margin: 15px 0px;
   position: relative;
   z-index: 1;
@@ -233,21 +230,23 @@ hr.cleaner {
   -moz-box-shadow: inset 0px 2px 5px 0px rgba(255, 255, 255, 0.25);
   -webkit-box-shadow: inset 0px 2px 5px 0px rgba(255, 255, 255, 0.25);
   box-shadow: inset 0px 2px 5px 0px rgba(255, 255, 255, 0.25); }
-.button:hover, form.form input[type="submit"]:hover {
+.button:disabled, form.form input[type="submit"]:disabled {
+  cursor: not-allowed; }
+.button:hover:not(:disabled), form.form input[type="submit"]:hover:not(:disabled) {
   background-color: #002339;
   border-color: #00101a; }
 .button.red, form.form input.red[type="submit"] {
   background-color: #820101;
   border: 1px solid #690101;
   color: #fff; }
-.button.red:hover, form.form input.red[type="submit"]:hover {
+.button.red:hover:not(:disabled), form.form input.red[type="submit"]:hover:not(:disabled) {
   background-color: #360000;
   border-color: #1d0000; }
 .button.grey, form.form input.grey[type="submit"] {
   background-color: #666;
   border: 1px solid #595959;
   color: #fff; }
-.button.grey:hover, form.form input.grey[type="submit"]:hover {
+.button.grey:hover:not(:disabled), form.form input.grey[type="submit"]:hover:not(:disabled) {
   background-color: #404040;
   border-color: #404040; }
 .button.small, form.form input.small[type="submit"] {
