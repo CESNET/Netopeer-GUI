@@ -74,7 +74,7 @@ if advised of the possibility of such damage.
 
 	{% if app.request.get('key') is defined and not (app.request.get('key') is empty) and
 	not isSingleInstance %}
-		<a href='#/{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
+		<a href='{{ path("handleConnection", {"command": "disconnect", "key": app.request.get('key')} ) }}' class="static disconnect" data-disable-history="true" title="Disconnect from device">Disconnect</a>
 	{% endif %}
 
 	<div id="userpane" class="static dropdown">
