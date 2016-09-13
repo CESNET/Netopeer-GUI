@@ -159,7 +159,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         scope.getType = getType;
         scope.getEltype = getEltype;
         scope.log = function(data) {
-            console.log(data);
+            $log.log(data);
         };
 
         var getSchemaFromKey = function(key, parent, child) {
