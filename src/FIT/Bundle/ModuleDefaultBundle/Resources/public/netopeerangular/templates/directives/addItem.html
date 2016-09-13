@@ -2,7 +2,8 @@
 
 	<span ng-show="$parent.type !== 'List' && $parent.type !== 'Array'">
 		<input placeholder="{{ typeaheadNoResults ? 'No name available' : 'Type a letter' }}" type="text"
-					 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" typeahead-min-length="0" typeahead-no-results="typeaheadNoResults" ng-blur="changeParentKeyName($parent.keyName, child, $parent);showSelectbox = true"
+					 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" typeahead-min-length="0" typeahead-loading="loadingResponses"
+					 typeahead-editable="false" typeahead-no-results="typeaheadNoResults" typeahead-focus ng-blur="changeParentKeyName($parent.keyName, child, $parent);showSelectbox = true"
 				/> :
 	</span>
 
