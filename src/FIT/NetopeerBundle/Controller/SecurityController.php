@@ -86,6 +86,12 @@ class SecurityController extends BaseController
 		$request = $this->getRequest();
 		$session = $request->getSession();
 
+		$securityContext = $this->get('security.context');
+		if( $securityContext->isGranted('IS_AUTHENTICATED_REMEMBERED') ){
+                        // authenticated REMEMBERED, FULLY will imply REMEMBERED (NON anonymous)
+                        return $this->redirect($this->generateUrl('connections'));
+                }
+
 		// get the login error if there is one
 		if ($request->attributes->has(SecurityContext::AUTHENTICATION_ERROR)) {
 			$error = $request->attributes->get(SecurityContext::AUTHENTICATION_ERROR);
