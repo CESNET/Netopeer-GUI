@@ -103,9 +103,6 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			return $this->getTwigArr();
 		}
 
-		// check if we have only root module
-		$this->checkEmptyRootModule($key, $res);
-
 		// we will load config part only if two column layout is enabled or we are in all section or datastore is not running (which has two column always)
 		$tmp = $this->getConfigParams();
 		if ($module === 'all') {
