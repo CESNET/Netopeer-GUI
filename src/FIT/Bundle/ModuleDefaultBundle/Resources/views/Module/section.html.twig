@@ -118,8 +118,7 @@ if advised of the possibility of such damage.
 				var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "wss://{{ app.request.host }}:8080/");
 
 				window.onbeforeunload = function() {
-					var socket = getNotifWebSocket({{ app.request.get('key') }}, "{% if sessionHash is defined %}{{sessionHash}}{% endif %}", "wss://{{ app.request.host }}:8080/");
-					socket.close();
+					socket.websocket.close();
 				};
 				if ($(notifOutput).hasClass('hidden')) {
 					$(notifOutput).removeClass('hidden');
