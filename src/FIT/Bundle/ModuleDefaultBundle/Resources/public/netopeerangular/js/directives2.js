@@ -59,7 +59,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var enumerationName = "Enumeration";
         var literalName = "Literal";
 
-        scope.valueTypes = [stringName, objectName, arrayName, listName, numberName, urlName, refName, boolName, enumerationName, literalName];
+        scope.valueTypes = [literalName, stringName, objectName, arrayName, listName, numberName, boolName, enumerationName];
         scope.sortableOptions = {
             axis: 'y',
             update: function(e, ui) {
