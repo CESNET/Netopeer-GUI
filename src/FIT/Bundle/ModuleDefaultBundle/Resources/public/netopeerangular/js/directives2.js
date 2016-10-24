@@ -5,6 +5,7 @@ var counts = {
 };
 
 var schemaAjaxBlacklist = [];
+var schemaAjaxCached = {};
 
 var NetopeerGUI = angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap', 'configurationTemplates', 'NetopeerGUIServices']);
 
@@ -219,11 +220,22 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                               } else {
                                   parent['$@'+key] = schema['$@'+ns+key];
                               }
+                              schemaAjaxCached[schemaBlacklistKey] = schema['$@'+ns+key];
                               return schema['$@'+ns+key];
                           }, function errorCallback(data) {
                               schemaAjaxBlacklist.push(schemaBlacklistKey);
                               return false;
                           });
+
+                    // for list items
+                    } else if (typeof schemaAjaxCached[schemaBlacklistKey] !== "undefined") {
+                        var schema = schemaAjaxCached[schemaBlacklistKey];
+                        if (!angular.isUndefined(child)) {
+                            child['$@'+key] = schema;
+                        } else {
+                            parent['$@'+key] = schema;
+                        }
+                        return schema;
                     }
 
                 } else {
