@@ -472,9 +472,9 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     parents = getParents(parent, 4);
                 }
                 if (typeof parents.child['$@'+ parentKeyName] !== "undefined") {
-                    var children = parents.child['$@'+ parentKeyName]['children'];
+                    var children = parents.child['$@'+ parentKeyName]['children'].slice(0);
                 } else {
-                    var children = parents.val['$@'+ parentKeyName]['children'];
+                    var children = parents.val['$@'+ parentKeyName]['children'].slice(0);
                 }
                 //console.log(parents);console.log(children);
                 angular.forEach(child, function(value, key) {
