@@ -1331,7 +1331,7 @@
 .jsonView .jsonItemDesc { color: grey; cursor: default; line-height: 30px; }
 .jsonView .objectDesc { cursor: default; }
 .jsonView > json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
-.jsonView add-item { display: block; min-height: 20px; }
+.jsonView add-item { display: block; min-height: 20px; margin-top: 0.5em; }
 .jsonView add-item .addObjectItemBtn { position: relative; z-index: 10; color: rgba(0, 0, 0, 0.3) !important; }
 .jsonView add-item .addObjectItemBtn:hover { color: #000 !important; }
 .jsonView li { clear: both; min-height: 26px; }

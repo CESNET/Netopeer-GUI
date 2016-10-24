@@ -13,7 +13,7 @@
 
 	<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm hidden" ng-show="showSelectbox && $parent.type !== 'List' && $parent.type !== 'Array' && $parent.keyName" ng-init="initParentValueType($parent)"></select>
 	<span ng-show="$parent.type === 'Array' || ($parent.keyName && $parent.valueType !== 'Object' && $parent.valueType !== 'List' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:List' && $parent.valueType !== 'string:Array' && $parent.type !== 'List')">
-		<input type="{{ $parent.valueType == 'string:Number' || $parent.valueType == 'Number' ? 'number' : $parent.valueType == 'string:Boolean' || $parent.valueType == 'Boolean' ? 'checkbox' : 'text' }}" ng-model="newValueName" ng-blur="changeParentValueName(newValueName, child, $parent)" placeholder="Set a value" ng-show="!($parent.valueType == 'string:Enumeration' || $parent.valueTy	pe == 'Enumeration')">
+		<input type="{{ $parent.valueType == 'string:Number' || $parent.valueType == 'Number' ? 'number' : $parent.valueType == 'string:Boolean' || $parent.valueType == 'Boolean' ? 'checkbox' : 'text' }}" ng-model="newValueName" ng-blur="changeParentValueName(newValueName, child, $parent)" placeholder="Set a value" ng-show="!($parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration')">
 		<select ng-model="selectboxValue" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option" ng-if="$parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration'" ng-blur="$parent.valueName = selectboxValue;"></select>
 	</span>
 
@@ -34,8 +34,10 @@
 </span>
 
 <span ng-if="!showAddKey">
-	<button class="addObjectItemBtn" ng-click="$parent.showAddKey = true">
-		<i class="fa fa-plus" ng-if="$parent.type !== 'List'" tooltip-placement="top" uib-tooltip="Add new item"></i>
-		<i class="fa fa-plus-circle" ng-if="$parent.type === 'List' " tooltip-placement="top" uib-tooltip="Add new {{$parent.$parent.$parent.newkey}}"></i>
+	<button class="addObjectItemBtn" ng-show="$parent.type !== 'List'" ng-click="$parent.showAddKey = true">
+		<i class="fa fa-plus" tooltip-placement="top" uib-tooltip="Add new item"></i>
+	</button>
+	<button class="addObjectItemBtn" ng-show="$parent.type === 'List'" ng-click="changeParentKeyName('', child, $parent); initParentValueType($parent); addItem('', child, $parent)">
+		<i class="fa fa-plus-circle" tooltip-placement="top" uib-tooltip="Add new {{$parent.$parent.$parent.newkey}}"></i>
 	</button>
 </span>

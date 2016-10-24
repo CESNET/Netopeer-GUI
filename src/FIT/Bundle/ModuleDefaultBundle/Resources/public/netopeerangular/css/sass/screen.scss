@@ -85,7 +85,7 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 	.jsonItemDesc { color: grey; cursor: default; line-height: 30px; }
 	.objectDesc { cursor: default; }
 	> json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
-	add-item { display: block; min-height: 20px;
+	add-item { display: block; min-height: 20px; margin-top: 0.5em;
 		.addObjectItemBtn { position: relative; z-index: 10; color: rgba(#000, 0.3) !important;
 			&:hover { color: #000 !important; }
 		}
