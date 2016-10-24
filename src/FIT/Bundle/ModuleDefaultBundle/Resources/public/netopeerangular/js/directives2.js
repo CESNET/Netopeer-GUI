@@ -353,7 +353,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         } else {
                             removeIetfOperation(parent.keyName, obj, parent);
                             setParentChanged(parent);
-                            setIetfOperation('create', key, obj);
+                            setIetfOperation('replace', key, obj);
                         }
                     }
                     // add item to object
@@ -478,7 +478,17 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 }
                 //console.log(parents);console.log(children);
                 angular.forEach(child, function(value, key) {
-                    if (key.indexOf('@') !== 0 && children.indexOf(key) !== -1) {
+                    if (
+                      key.indexOf('@') !== 0
+                      && (children.indexOf(key) !== -1)
+                      && (
+                        // we dont want slice removed elements
+                        typeof child[key]['@'] === "undefined" || (
+                            typeof child[key]['@'] !== "undefined"
+                            && typeof child[key]['@']['ietf-netconf:operation'] === "undefined"
+                        )
+                      )
+                    ) {
                         children.splice(children.indexOf(key), 1);
                     }
                 });
