@@ -13,7 +13,7 @@
 		<select ng-model="selectboxValue" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option" ng-if="$parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration'" ng-blur="$parent.valueName = selectboxValue;"></select>
 	</span>
 
-
+	<strong ng-if="$parent.$parent.$parent.newkey">{{$parent.$parent.$parent.newkey}}</strong>
 	<button class="btn btn-primary btn-sm" ng-click="addItem($parent.keyName, child, $parent)">
 		Add
 	</button>
