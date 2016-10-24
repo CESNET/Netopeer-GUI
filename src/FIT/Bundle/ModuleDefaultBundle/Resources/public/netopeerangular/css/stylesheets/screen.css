@@ -1286,6 +1286,8 @@
 
 /* JSON VIEW */
 /* striped background */
+.button-left-offset { margin-left: 2em; }
+
 .jsonView { padding: 30px 0 0 5px; }
 .jsonView select.form-control { margin: 0; padding: 0; width: 100px; display: inline; padding-left: 5px; }
 .jsonView input, .jsonView select { position: relative; z-index: 10; }
@@ -1355,3 +1357,5 @@
 /* first brace */
 /* array numbering */
 .sortable-placeholder { height: 20px; display: block; }
+
+.schema-cover { width: 100%; max-height: 30vh; overflow: auto; background: #e0e0e0; padding: 1em; color: #333; }

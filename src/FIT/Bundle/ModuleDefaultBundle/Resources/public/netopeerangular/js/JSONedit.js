@@ -36,6 +36,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		$scope.moduleName = $routeParams.moduleName;
 		$scope.datastore = 'running';
 		$scope.rpcName = false;
+		$scope.yangSchema = 'TODO';
 
 		$scope.hasUndo = function() {
 			return (historyIndex - historyUndo - 1) <= 0;

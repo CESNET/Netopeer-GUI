@@ -242,6 +242,13 @@ hr.cleaner {
 .button.red:hover:not(:disabled), form.form input.red[type="submit"]:hover:not(:disabled) {
   background-color: #360000;
   border-color: #1d0000; }
+.button.button-green, form.form input.button-green[type="submit"] {
+  background-color: #007711;
+  border: 1px solid #005e0d;
+  color: #fff; }
+.button.button-green:hover:not(:disabled), form.form input.button-green[type="submit"]:hover:not(:disabled) {
+  background-color: #002b06;
+  border-color: #001102; }
 .button.grey, form.form input.grey[type="submit"] {
   background-color: #666;
   border: 1px solid #595959;
@@ -252,6 +259,9 @@ hr.cleaner {
 .button.small, form.form input.small[type="submit"] {
   padding: 4px 6px;
   font-size: 0.9em; }
+.button i.fa, form.form input[type="submit"] i.fa {
+  padding-left: 0.4em;
+  padding-right: 0.4em; }
 
 .button-link {
   cursor: pointer;

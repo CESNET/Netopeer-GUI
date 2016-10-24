@@ -69,10 +69,14 @@ hr.cleaner { width: 100%; height: 0px; margin: 0px; border: 0px none; color: tra
 	&.red { background-color: $button-danger-background; border: 1px solid darken($button-danger-background, 5%); color: #fff;
 		&:hover:not(:disabled) { background-color: darken($button-danger-background, 15%); border-color: darken($button-danger-background, 20%); }
 	}
+	&.button-green { background-color: $button-success-background; border: 1px solid darken($button-success-background, 5%); color: #fff;
+		&:hover:not(:disabled) { background-color: darken($button-success-background, 15%); border-color: darken($button-success-background, 20%); }
+	}
 	&.grey { background-color: $button-secondary-background; border: 1px solid darken($button-secondary-background, 5%); color: #fff;
 		&:hover:not(:disabled) { background-color: darken($button-secondary-background, 15%); border-color: darken($button-secondary-background, 15%); }
 	}
 	&.small { padding: 4px 6px; font-size: 0.9em; }
+	i.fa { padding-left: 0.4em; padding-right: 0.4em; }
 }
 .button-link { cursor: pointer; @include inline-block; @include link-colors($link-color, $link-color-hover);
 	&.red { color: $color-danger; }
