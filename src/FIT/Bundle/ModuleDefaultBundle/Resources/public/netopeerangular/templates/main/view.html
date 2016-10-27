@@ -3,10 +3,10 @@
 <hr class="cleaner" />
 <div ng-init="reloadData(false); resetRevisions()">
     <button class="button small" ng-click="reload()"><i class="fa fa-refresh"></i> reload data</button>
-    <button class="button small" ng-click="showSchema = !showSchema;"><i class="fa fa-info"></i> toggle schema</button>
+    <button class="button small" ng-click="loadSchema(); showSchema = !showSchema;" ng-show="jsonEditable"><i class="fa fa-info"></i> toggle schema</button>
 
-    <button class="button small" ng-click="undo()" ng-class="{'grey': hasUndo()}" ng-disabled="hasUndo()" ng-if="jsonEditable"><i class="fa fa-undo"></i> history undo</button>
-    <button class="button small" ng-click="redo()" ng-class="{'grey': hasRedo()}" ng-disabled="hasRedo()" ng-if="jsonEditable"><i class="fa fa-repeat"></i> history redo</button>
+    <button class="button small" ng-click="undo()" ng-class="{'grey': hasUndo()}" ng-disabled="hasUndo()" ng-show="jsonEditable"><i class="fa fa-undo"></i> history undo</button>
+    <button class="button small" ng-click="redo()" ng-class="{'grey': hasRedo()}" ng-disabled="hasRedo()" ng-show="jsonEditable"><i class="fa fa-repeat"></i> history redo</button>
 
     <button class="button small button-left-offset" ng-click="download(jsonData)"><i class="fa fa-download"></i> Download as JSON</button>
     <button class="button small" ng-click="submitRpc(jsonData)" ng-if="jsonEditable && rpcName"><i class="fa fa-send"></i> Send RPC</button>
@@ -14,7 +14,9 @@
     <button class="button small button-green" ng-click="submitConfiguration(jsonData)" ng-if="jsonEditable && !rpcName"><i class="fa fa-save"></i> Apply changes</button>
 
     <div ng-if="showSchema" class="schema-cover">
-        {{ yangSchema }}
+<pre>
+{{ yangSchema }}
+</pre>
     </div>
 
     <div class="jsonView">

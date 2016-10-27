@@ -36,7 +36,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		$scope.moduleName = $routeParams.moduleName;
 		$scope.datastore = 'running';
 		$scope.rpcName = false;
-		$scope.yangSchema = 'TODO';
+		$scope.yangSchema = 'not loaded yet...';
 
 		$scope.hasUndo = function() {
 			return (historyIndex - historyUndo - 1) <= 0;
@@ -106,6 +106,16 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				});
 		};
 		$scope.resetRevisions = resetRevisions;
+
+		$scope.loadSchema = function() {
+			var targetUrl = window.location.origin + window.location.pathname.replace('sections', 'ajax/schema') + '?moduleName=' + $routeParams.moduleName;
+			AjaxService.loadSchema(targetUrl)
+				.then(function successCallback(data) {
+					$scope.yangSchema = data.data;
+				}, function errorCallback(data) {
+					$scope.yangSchema = 'Schema loading failed';
+				});
+		}
 
 		$scope.$watch('jsonData', function (newValue, oldValue) {
 			//$scope.jsonString = JSON.stringify(newValue);

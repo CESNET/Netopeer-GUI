@@ -155,4 +155,6 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 
 .sortable-placeholder { height: 20px; display: block; }
 
-.schema-cover { width: 100%; max-height: 30vh; overflow: auto; background: #e0e0e0; padding: 1em; color: #333; }
+.schema-cover { width: 100%; max-height: 30vh; overflow: auto; background: #e0e0e0; padding: 1em; color: #333;
+	pre { line-height: 1.5em; font-family: Monospace; font-size: 1.05em; }
+}
