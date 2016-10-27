@@ -313,7 +313,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				templateUrl: 'main/view.html',
 				controller: 'ConfigurationController'
 			})
-			.otherwise($("#block--topMenu .nth-0").attr('href').replace('#', ''))
+			.otherwise($("#block--topMenu .nth-0").attr('href').replace('#', '').replace(':', '%3A'))
 		;
 	}])
 ;
