@@ -43,7 +43,6 @@
 namespace FIT\NetopeerBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\BaseController;
-use FIT\NetopeerBundle\Services\Functionality\ConnectionFunctionality;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -312,12 +311,40 @@ class AjaxController extends BaseController
 	 * @param $key
 	 * @param $filter
 	 *
-	 * @Route("/ajax/schema/{key}/", name="loadSchemaByFilter")
+	 * @Route("/ajax/schema/", name="loadSchemaByFilter")
+	 *
+	 * @return JsonResponse
+	 */
+	public function loadSchemaByFilterAction() {
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		if ($this->getRequest()->getContent() !== "") {
+			$requestParams = json_decode($this->getRequest()->getContent(), true);
+		} else {
+			$requestParams['filters'] = $this->getRequest()->get('filters');
+			$requestParams['connIds'] = $this->getRequest()->get('connIds');
+		}
+
+		if (isset($requestParams['filters']) && array_key_exists(0, $requestParams['filters']) && $requestParams['filters'][0] !== '/') {
+			$params = array(
+				'connIds' => $requestParams['connIds'],
+				'filters' => array($requestParams['filters'])
+			);
+			$res = $netconfFunc->handle('query', $params);
+			return new JsonResponse(json_decode($res));
+		}
+		return new JsonResponse([]);
+	}
+
+	/**
+	 * @param $key
+	 * @param $filter
+	 *
+	 * @Route("/ajax/getschema/{key}/", name="getSchemaByFilter")
 	 * @param $key    Identifier of connection (connected device ID)
 	 *
 	 * @return JsonResponse
 	 */
-	public function loadSchemaByFilterAction($key) {
+	public function getSchemaByFilterAction($key) {
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 		/**
 		 * @var ConnectionFunctionality $connectionFunc

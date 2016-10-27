@@ -107,9 +107,9 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		};
 		$scope.resetRevisions = resetRevisions;
 
-		$scope.loadSchema = function() {
-			var targetUrl = window.location.origin + window.location.pathname.replace('sections', 'ajax/schema') + '?moduleName=' + $routeParams.moduleName;
-			AjaxService.loadSchema(targetUrl)
+		$scope.getSchema = function() {
+			var targetUrl = window.location.origin + window.location.pathname.replace('sections', 'ajax/getschema') + '?moduleName=' + $routeParams.moduleName;
+			AjaxService.getSchema(targetUrl)
 				.then(function successCallback(data) {
 					$scope.yangSchema = data.data;
 				}, function errorCallback(data) {

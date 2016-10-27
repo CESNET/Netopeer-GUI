@@ -3,7 +3,7 @@
 <hr class="cleaner" />
 <div ng-init="reloadData(false); resetRevisions()">
     <button class="button small" ng-click="reload()"><i class="fa fa-refresh"></i> reload data</button>
-    <button class="button small" ng-click="loadSchema(); showSchema = !showSchema;" ng-show="jsonEditable"><i class="fa fa-info"></i> toggle schema</button>
+    <button class="button small" ng-click="getSchema(); showSchema = !showSchema;" ng-show="jsonEditable"><i class="fa fa-info"></i> toggle schema</button>
 
     <button class="button small" ng-click="undo()" ng-class="{'grey': hasUndo()}" ng-disabled="hasUndo()" ng-show="jsonEditable"><i class="fa fa-undo"></i> history undo</button>
     <button class="button small" ng-click="redo()" ng-class="{'grey': hasRedo()}" ng-disabled="hasRedo()" ng-show="jsonEditable"><i class="fa fa-repeat"></i> history redo</button>
