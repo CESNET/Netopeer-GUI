@@ -113,7 +113,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 }
             }
 
-            var eltype = getEltype(key, parent);
+            var eltype = getEltype(key, parent, true);
 
             if (eltype === "list") {
                 return listName;
@@ -137,7 +137,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return stringName;
             }
         };
-        var getEltype = function(key, parent) {
+        var getEltype = function(key, parent, getTypedef) {
             if (!scope.jsonEditable) return;
 
             var schema = getSchemaFromKey(key, parent);
@@ -146,7 +146,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
             if (schema && typeof schema['eltype'] !== "undefined") {
                 eltype = schema['eltype'];
-                if (eltype == 'leaf' && typeof schema['typedef'] !== "undefined") {
+                if (eltype == 'leaf' && typeof schema['typedef'] !== "undefined" && getTypedef === true) {
                     eltype = schema['typedef']['type'];
                 }
             }
@@ -515,8 +515,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             }
         };
 
-        var getAttributeType = function(key, obj) {
-            var eltype = getEltype(key, obj);
+        var getAttributeType = function(key, obj, getTypedef) {
+            var eltype = getEltype(key, obj, getTypedef);
 
             if (eltype === "container" || eltype === 'anydata') {
                 return 'anydata';
@@ -534,11 +534,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             if (typeof generateEmpty === "undefined") {
                 generateEmpty = false;
             }
-            var eltype = getAttributeType(key, obj);
-            //if (key == 'state') {
-            //    console.log(getEltype(key, obj));
-            //    console.log(eltype);
-            //}
+            var eltype = getAttributeType(key, obj, false);
+
             switch (eltype) {
                 case 'container':
                 case 'anydata':
