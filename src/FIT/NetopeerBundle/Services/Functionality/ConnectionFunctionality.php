@@ -496,7 +496,7 @@ class ConnectionFunctionality {
 							),
 							"title"           => "detail of " . $this->getSectionName($moduleName),
 							"name"            => $this->getSectionName($values["rootElementName"]),
-							"children"        => $this->buildSubmenu($key, $moduleName, $configuration),
+							"children"        => $this->buildSubmenu($key, $moduleNameRoot, $configuration),
 							"namespace"       => $ns,
 							"moduleName"          => $moduleName,
 							"rootElementName" => $values["rootElementName"],
