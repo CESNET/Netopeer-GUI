@@ -165,7 +165,14 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 		$this->assign('rpcName', $rpcName);
 
 		if ($this->getRequest()->get('angular') == "true") {
-			$resData = $this->getRPCXmlForMethod($rpcName, $key, $module);
+			$moduleName = explode(':', $module);
+			$resData = $this->getRPCXmlForMethod($rpcName, $key, $moduleName[0]);
+
+			$data = json_decode($resData);
+//			$schemaRPCName = '$@'.$moduleName[0].':'.$rpcName;
+//			if (isset($data->$schemaRPCName)) {
+////				$data = array($module => (object)null, $schemaRPCName => $data->$schemaRPCName);
+//			}
 
 			// load content of snippets
 			$this->get('session')->set('isAjax', true);
@@ -179,7 +186,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 					'rpcName' => $rpcName,
 					'datastore' => $conn->getCurrentDatastore(),
 				),
-				'configuration' => json_decode($resData),
+				'configuration' => $data,
 				'snippets' => $content['snippets'],
 			);
 			return new JsonResponse($res);
