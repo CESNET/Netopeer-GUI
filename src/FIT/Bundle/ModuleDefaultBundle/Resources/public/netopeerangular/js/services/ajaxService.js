@@ -11,6 +11,13 @@ var services = angular.module('NetopeerGUIServices', [])
 		});
 	};
 
+	this.getSchema = function(targetUrl) {
+		return $http({
+			url: targetUrl || window.location.href,
+			method: 'GET'
+		});
+	};
+
 	this.loadSchema = function(connIds, filters) {
 		return $http({
 			url: baseURL + '/ajax/schema/',

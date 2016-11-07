@@ -3,27 +3,41 @@
 	<span ng-show="$parent.type !== 'List' && $parent.type !== 'Array'">
 		<input placeholder="{{ typeaheadNoResults ? 'No name available' : 'Type a letter' }}" type="text"
 					 class="form-control input-sm addItemKeyInput" ng-model="$parent.keyName" autocomplete="off" uib-typeahead="subchild for subchild in getAvailableNodeNames(key, child, $parent)" typeahead-min-length="0" typeahead-loading="loadingResponses" typeahead-no-results="typeaheadNoResults" typeahead-focus ng-blur="changeParentKeyName($parent.keyName, child, $parent);showSelectbox = true"
-				/> :
+				/>
 	</span>
 
-	<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm" ng-show="showSelectbox && $parent.type !== 'List' && $parent.type !== 'Array' && $parent.keyName" ng-init="initParentValueType($parent)"></select>
+	<span class="editbar" ng-if="child['$@'+$parent.keyName]">
+		<i class="iconButton fa fa-question-circle" tooltip-placement="top" uib-tooltip="{{child['$@'+$parent.keyName]['description']}}" ng-if="child['$@'+$parent.keyName]['description']"></i>
+		<i class="iconButton fa fa-asterisk red" tooltip-placement="top" uib-tooltip="Mandatory" ng-if="isMandatory($parent.keyName, child)"></i>
+	</span>
 
+	<select ng-model="$parent.valueType" ng-options="option for option in valueTypes" class="form-control input-sm hidden" ng-show="showSelectbox && $parent.type !== 'List' && $parent.type !== 'Array' && $parent.keyName" ng-init="initParentValueType($parent)"></select>
 	<span ng-show="$parent.type === 'Array' || ($parent.keyName && $parent.valueType !== 'Object' && $parent.valueType !== 'List' && $parent.valueType !== 'Array' && $parent.valueType !== 'string:Object' && $parent.valueType !== 'string:List' && $parent.valueType !== 'string:Array' && $parent.type !== 'List')">
 		<input type="{{ $parent.valueType == 'string:Number' || $parent.valueType == 'Number' ? 'number' : $parent.valueType == 'string:Boolean' || $parent.valueType == 'Boolean' ? 'checkbox' : 'text' }}" ng-model="newValueName" ng-blur="changeParentValueName(newValueName, child, $parent)" placeholder="Set a value" ng-show="!($parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration')">
 		<select ng-model="selectboxValue" ng-options="option for option in getEnumValues($parent.keyName, child, $parent) track by option" ng-if="$parent.valueType == 'string:Enumeration' || $parent.valueType == 'Enumeration'" ng-blur="$parent.valueName = selectboxValue;"></select>
 	</span>
 
-
+	<strong ng-if="$parent.type === 'List' && $parent.$parent.$parent.newkey">{{$parent.$parent.$parent.newkey}}</strong>
 	<button class="btn btn-primary btn-sm" ng-click="addItem($parent.keyName, child, $parent)">
 		Add
 	</button>
 	<button class="btn btn-default btn-sm" ng-click="$parent.showAddKey=false">
 		Cancel
 	</button>
+
+	<table ng-if="child['$@'+$parent.keyName]" class="add-item-info-list">
+		<tr ng-repeat="type in ['eltype', 'type', 'default', 'cases', 'units', 'children', 'description']" ng-if="child['$@'+$parent.keyName][type]">
+			<td><strong>{{ type }}</strong></td>
+			<td>{{ child['$@'+$parent.keyName][type] }}</td>
+		</tr>
+	</table>
 </span>
+
 <span ng-if="!showAddKey">
-	<button class="addObjectItemBtn" ng-click="$parent.showAddKey = true">
-		<i class="fa fa-plus" ng-if="$parent.type !== 'List'" tooltip-placement="top" uib-tooltip="Add new item"></i>
-		<i class="fa fa-plus-circle" ng-if="$parent.type === 'List' " tooltip-placement="top" uib-tooltip="Add new {{$parent.$parent.$parent.newkey}}"></i>
+	<button class="addObjectItemBtn" ng-show="$parent.type !== 'List'" ng-click="$parent.showAddKey = true">
+		<i class="fa fa-plus" tooltip-placement="top" uib-tooltip="Add new item"></i>
+	</button>
+	<button class="addObjectItemBtn" ng-show="$parent.type === 'List'" ng-click="changeParentKeyName('', child, $parent); initParentValueType($parent); addItem('', child, $parent)">
+		<i class="fa fa-plus-circle" tooltip-placement="top" uib-tooltip="Add new {{$parent.$parent.$parent.newkey}}"></i>
 	</button>
 </span>

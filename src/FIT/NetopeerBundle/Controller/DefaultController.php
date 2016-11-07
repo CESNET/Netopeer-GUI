@@ -258,7 +258,7 @@ class DefaultController extends BaseController
 		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
 
 		/* reload hello message */
-		$params = array('sessions' => array($key));
+		$params = array('connIds' => array($key));
 		if (($res = $netconfFunc->handle("reloadhello", $params) == 0)) {
 		}
 

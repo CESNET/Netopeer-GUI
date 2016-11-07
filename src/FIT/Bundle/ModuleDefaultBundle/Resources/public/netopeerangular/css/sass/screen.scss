@@ -9,7 +9,7 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 /* JSON VIEW */
 
 /* striped background */
-
+.button-left-offset { margin-left: 2em; }
 .jsonView { padding: 30px 0 0 5px;
 	select.form-control { margin: 0; padding: 0; width: 100px; display: inline; padding-left: 5px;
 	}
@@ -85,7 +85,7 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 	.jsonItemDesc { color: grey; cursor: default; line-height: 30px; }
 	.objectDesc { cursor: default; }
 	> json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
-	add-item { display: block; min-height: 20px;
+	add-item { display: block; min-height: 20px; margin-top: 0.5em;
 		.addObjectItemBtn { position: relative; z-index: 10; color: rgba(#000, 0.3) !important;
 			&:hover { color: #000 !important; }
 		}
@@ -155,3 +155,6 @@ $fa-font-path: "../netopeer-gui/bundles/fitmoduledefault/netopeerangular/css/fon
 
 .sortable-placeholder { height: 20px; display: block; }
 
+.schema-cover { width: 100%; max-height: 30vh; overflow: auto; background: #e0e0e0; padding: 1em; color: #333;
+	pre { line-height: 1.5em; font-family: Monospace; font-size: 1.05em; }
+}

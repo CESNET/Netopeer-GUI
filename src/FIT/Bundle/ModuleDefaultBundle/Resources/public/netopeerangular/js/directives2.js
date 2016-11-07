@@ -5,6 +5,7 @@ var counts = {
 };
 
 var schemaAjaxBlacklist = [];
+var schemaAjaxCached = {};
 
 var NetopeerGUI = angular.module('JSONedit', ['ui.sortable', 'ui.bootstrap', 'configurationTemplates', 'NetopeerGUIServices']);
 
@@ -59,7 +60,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
         var enumerationName = "Enumeration";
         var literalName = "Literal";
 
-        scope.valueTypes = [stringName, objectName, arrayName, listName, numberName, urlName, refName, boolName, enumerationName, literalName];
+        scope.valueTypes = [literalName, stringName, objectName, arrayName, listName, numberName, boolName, enumerationName];
         scope.sortableOptions = {
             axis: 'y',
             update: function(e, ui) {
@@ -112,7 +113,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 }
             }
 
-            var eltype = getEltype(key, parent);
+            var eltype = getEltype(key, parent, true);
 
             if (eltype === "list") {
                 return listName;
@@ -136,7 +137,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 return stringName;
             }
         };
-        var getEltype = function(key, parent) {
+        var getEltype = function(key, parent, getTypedef) {
             if (!scope.jsonEditable) return;
 
             var schema = getSchemaFromKey(key, parent);
@@ -145,7 +146,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
 
             if (schema && typeof schema['eltype'] !== "undefined") {
                 eltype = schema['eltype'];
-                if (eltype == 'leaf' && typeof schema['typedef'] !== "undefined") {
+                if (eltype == 'leaf' && typeof schema['typedef'] !== "undefined" && getTypedef === true) {
                     eltype = schema['typedef']['type'];
                 }
             }
@@ -219,11 +220,22 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                               } else {
                                   parent['$@'+key] = schema['$@'+ns+key];
                               }
+                              schemaAjaxCached[schemaBlacklistKey] = schema['$@'+ns+key];
                               return schema['$@'+ns+key];
                           }, function errorCallback(data) {
                               schemaAjaxBlacklist.push(schemaBlacklistKey);
                               return false;
                           });
+
+                    // for list items
+                    } else if (typeof schemaAjaxCached[schemaBlacklistKey] !== "undefined") {
+                        var schema = schemaAjaxCached[schemaBlacklistKey];
+                        if (!angular.isUndefined(child)) {
+                            child['$@'+key] = schema;
+                        } else {
+                            parent['$@'+key] = schema;
+                        }
+                        return schema;
                     }
 
                 } else {
@@ -353,7 +365,7 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                         } else {
                             removeIetfOperation(parent.keyName, obj, parent);
                             setParentChanged(parent);
-                            setIetfOperation('create', key, obj);
+                            setIetfOperation('replace', key, obj);
                         }
                     }
                     // add item to object
@@ -472,13 +484,23 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                     parents = getParents(parent, 4);
                 }
                 if (typeof parents.child['$@'+ parentKeyName] !== "undefined") {
-                    var children = parents.child['$@'+ parentKeyName]['children'];
+                    var children = parents.child['$@'+ parentKeyName]['children'].slice(0);
                 } else {
-                    var children = parents.val['$@'+ parentKeyName]['children'];
+                    var children = parents.val['$@'+ parentKeyName]['children'].slice(0);
                 }
                 //console.log(parents);console.log(children);
                 angular.forEach(child, function(value, key) {
-                    if (key.indexOf('@') !== 0 && children.indexOf(key) !== -1) {
+                    if (
+                      key.indexOf('@') !== 0
+                      && (children.indexOf(key) !== -1)
+                      && (
+                        // we dont want slice removed elements
+                        typeof child[key]['@'] === "undefined" || (
+                            typeof child[key]['@'] !== "undefined"
+                            && typeof child[key]['@']['ietf-netconf:operation'] === "undefined"
+                        )
+                      )
+                    ) {
                         children.splice(children.indexOf(key), 1);
                     }
                 });
@@ -493,8 +515,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             }
         };
 
-        var getAttributeType = function(key, obj) {
-            var eltype = getEltype(key, obj);
+        var getAttributeType = function(key, obj, getTypedef) {
+            var eltype = getEltype(key, obj, getTypedef);
 
             if (eltype === "container" || eltype === 'anydata') {
                 return 'anydata';
@@ -512,11 +534,8 @@ NetopeerGUI.directive('ngModelOnblur', function() {
             if (typeof generateEmpty === "undefined") {
                 generateEmpty = false;
             }
-            var eltype = getAttributeType(key, obj);
-            //if (key == 'state') {
-            //    console.log(getEltype(key, obj));
-            //    console.log(eltype);
-            //}
+            var eltype = getAttributeType(key, obj, false);
+
             switch (eltype) {
                 case 'container':
                 case 'anydata':

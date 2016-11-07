@@ -334,4 +334,53 @@ class AjaxController extends BaseController
 		}
 		return new JsonResponse([]);
 	}
+
+	/**
+	 * @param $key
+	 * @param $filter
+	 *
+	 * @Route("/ajax/getschema/{key}/", name="getSchemaByFilter")
+	 * @param $key    Identifier of connection (connected device ID)
+	 *
+	 * @return JsonResponse
+	 */
+	public function getSchemaByFilterAction($key) {
+		$netconfFunc = $this->get('fitnetopeerbundle.service.netconf.functionality');
+		/**
+		 * @var ConnectionFunctionality $connectionFunc
+		 */
+		$connectionFunc = $this->get('fitnetopeerbundle.service.connection.functionality');
+
+		if ($this->getRequest()->getContent() !== "") {
+			$requestParams = json_decode($this->getRequest()->getContent(), true);
+		} else {
+			if ($this->getRequest()->get('connIds')) {
+				$requestParams['connIds'] = $this->getRequest()->get('connIds');
+			} else {
+				$requestParams['connIds'] = 0;
+			}
+
+			if ($this->getRequest()->get('identifier')) {
+				$requestParams['identifier'] = $this->getRequest()->get('identifier');
+			}
+			if ($this->getRequest()->get('version')) {
+				$requestParams['version'] = $this->getRequest()->get('version');
+			}
+			if ($this->getRequest()->get('format')) {
+				$requestParams['format'] = $this->getRequest()->get('format');
+			}
+		}
+
+		$namespaces = $connectionFunc->getModelNamespaces($requestParams['connIds']);
+		if (!isset($requestParams['identifier']) && $this->getRequest()->get('moduleName')) {
+			$requestParams['identifier'] = $namespaces[$this->getRequest()->get('moduleName')]['moduleName'];
+			$requestParams['version'] = $namespaces[$this->getRequest()->get('moduleName')]['revision'];
+		}
+
+		if (isset($requestParams['identifier'])) { //  && array_key_exists(0, $requestParams['identifier']) && $requestParams['identifier'][0] !== '/'
+			$res = $netconfFunc->handle('getschema', $requestParams);
+			return new JsonResponse($res);
+		}
+		return new JsonResponse([]);
+	}
 }

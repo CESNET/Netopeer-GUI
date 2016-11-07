@@ -36,6 +36,7 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 		$scope.moduleName = $routeParams.moduleName;
 		$scope.datastore = 'running';
 		$scope.rpcName = false;
+		$scope.yangSchema = 'not loaded yet...';
 
 		$scope.hasUndo = function() {
 			return (historyIndex - historyUndo - 1) <= 0;
@@ -105,6 +106,16 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				});
 		};
 		$scope.resetRevisions = resetRevisions;
+
+		$scope.getSchema = function() {
+			var targetUrl = window.location.origin + window.location.pathname.replace('sections', 'ajax/getschema') + '?moduleName=' + $routeParams.moduleName;
+			AjaxService.getSchema(targetUrl)
+				.then(function successCallback(data) {
+					$scope.yangSchema = data.data;
+				}, function errorCallback(data) {
+					$scope.yangSchema = 'Schema loading failed';
+				});
+		}
 
 		$scope.$watch('jsonData', function (newValue, oldValue) {
 			//$scope.jsonString = JSON.stringify(newValue);
@@ -298,11 +309,19 @@ var app = angular.module('NetopeerGUIApp', ['JSONedit', 'ngRoute', 'ngTraverse',
 				templateUrl: 'main/view.html',
 				controller: 'ConfigurationController'
 			})
+			.when('/module/:moduleName/:sectionName', {
+				templateUrl: 'main/view.html',
+				controller: 'ConfigurationController'
+			})
+			.when('/rpc/:moduleName/:rpcName', {
+				templateUrl: 'main/view.html',
+				controller: 'ConfigurationController'
+			})
 			.when('/action/:action', {
 				templateUrl: 'main/view.html',
 				controller: 'ConfigurationController'
 			})
-			.otherwise($("#block--topMenu .nth-0").attr('href').replace('#', ''))
+			.otherwise($("#block--topMenu .nth-0").attr('href').replace('#', '').replace(':', '%3A'))
 		;
 	}])
 ;

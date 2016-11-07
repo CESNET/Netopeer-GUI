@@ -332,7 +332,11 @@ class NetconfFunctionality {
 				 * empty filter returns empty response, not all data
 				 */
 				if ($param !== "filter" || ($param === "filter" && trim($sourceArr[$param]) !== "")) {
-					$targetArr[$param] = trim($sourceArr[$param]);
+					if (!is_array($sourceArr[$param])) {
+						$targetArr[$param] = trim($sourceArr[$param]);
+					} else {
+						$targetArr[$param] = $sourceArr[$param];
+					}
 				}
 			}
 		}
@@ -818,11 +822,10 @@ class NetconfFunctionality {
 	 *
 	 * @param  resource &$sock   socket descriptor
 	 * @param  array    &$params must contain "identifier" of schema, can contain "version" and "format" of schema
-	 * @param  mixed    &$result decoded data from response
 	 *
 	 * @return int                    0 on success, 1 on error
 	 */
-	private function handle_getschema(&$sock, &$params, &$result) {
+	private function handle_getschema(&$sock, &$params) {
 		if ($this->getConnectionFunctionality()->checkLoggedKeys() != 0) {
 			return 1;
 		}
@@ -832,8 +835,9 @@ class NetconfFunctionality {
 		$arguments = array(
 			"type" 		=> self::MSG_GETSCHEMA,
 			"sessions" 	=> array_values($sessionKeys),
-			"identifiers"	=> $params["identifiers"],
+			"identifier"	=> $params["identifier"],
 		);
+
 		$arguments = $this->addOptionalParams($arguments, $params, array('format', 'version'));
 
 		$decoded = $this->execute_operation($sock, $arguments);
@@ -1064,7 +1068,7 @@ class NetconfFunctionality {
 		}
 
 		foreach ($decoded as $sid => $response) {
-			if (($response['type'] != self::REPLY_OK) && ($response['type'] != self::REPLY_DATA)) {
+			if (isset($response['type']) && ($response['type'] != self::REPLY_OK) && ($response['type'] != self::REPLY_DATA)) {
 				$this->getLogger()->addWarning('Error: ', array('errors' => $response['errors']));
 				if (sizeof($response['errors'])) {
 					foreach ($response['errors'] as $error) {

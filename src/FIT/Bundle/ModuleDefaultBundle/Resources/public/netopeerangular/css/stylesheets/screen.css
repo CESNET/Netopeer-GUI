@@ -1286,6 +1286,8 @@
 
 /* JSON VIEW */
 /* striped background */
+.button-left-offset { margin-left: 2em; }
+
 .jsonView { padding: 30px 0 0 5px; }
 .jsonView select.form-control { margin: 0; padding: 0; width: 100px; display: inline; padding-left: 5px; }
 .jsonView input, .jsonView select { position: relative; z-index: 10; }
@@ -1329,7 +1331,7 @@
 .jsonView .jsonItemDesc { color: grey; cursor: default; line-height: 30px; }
 .jsonView .objectDesc { cursor: default; }
 .jsonView > json > .jsonItemDesc { display: block; float: left; position: relative; bottom: 25px; height: 0; width: 0; }
-.jsonView add-item { display: block; min-height: 20px; }
+.jsonView add-item { display: block; min-height: 20px; margin-top: 0.5em; }
 .jsonView add-item .addObjectItemBtn { position: relative; z-index: 10; color: rgba(0, 0, 0, 0.3) !important; }
 .jsonView add-item .addObjectItemBtn:hover { color: #000 !important; }
 .jsonView li { clear: both; min-height: 26px; }
@@ -1355,3 +1357,6 @@
 /* first brace */
 /* array numbering */
 .sortable-placeholder { height: 20px; display: block; }
+
+.schema-cover { width: 100%; max-height: 30vh; overflow: auto; background: #e0e0e0; padding: 1em; color: #333; }
+.schema-cover pre { line-height: 1.5em; font-family: Monospace; font-size: 1.05em; }

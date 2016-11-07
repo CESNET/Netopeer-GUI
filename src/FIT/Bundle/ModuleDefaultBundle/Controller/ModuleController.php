@@ -4,7 +4,6 @@ namespace FIT\Bundle\ModuleDefaultBundle\Controller;
 
 use FIT\NetopeerBundle\Controller\ModuleControllerInterface;
 use FIT\NetopeerBundle\Models\XMLoperations;
-use FIT\NetopeerBundle\Services\Functionality\ConnectionFunctionality;
 use FIT\NetopeerBundle\Services\Functionality\NetconfFunctionality;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -88,13 +87,20 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 			$this->removeAjaxBlock('topMenu');
 			$content = json_decode($this->getTwigArr()->getContent(), true);
 
+			$data = json_decode($resData);
+			if ($data === 0) {
+				$res = $netconfFunc->handle('query', array('connIds' => array($key), 'filters' => array(array('/'.$module))));
+				$resDecoded = json_decode($res);
+				$schemaModuleName = '$@'.$module;
+				$data = array($module => (object)null, $schemaModuleName => $resDecoded->$schemaModuleName);
+			}
+
 			$conn = $connectionFunc->getConnectionSessionForKey($key);
 			$res = array(
 				'variables' => array(
 					'jsonEditable' => true,
-					'datastore' => $conn->getCurrentDatastore(),
 				),
-				'configuration' => json_decode($resData),
+				'configuration' => $data,
 				'snippets' => $content['snippets'],
 			);
 			return new JsonResponse($res);
@@ -157,7 +163,14 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 		$this->assign('rpcName', $rpcName);
 
 		if ($this->getRequest()->get('angular') == "true") {
-			$resData = $this->getRPCXmlForMethod($rpcName, $key, $module);
+			$moduleName = explode(':', $module);
+			$resData = $this->getRPCXmlForMethod($rpcName, $key, $moduleName[0]);
+
+			$data = json_decode($resData);
+//			$schemaRPCName = '$@'.$moduleName[0].':'.$rpcName;
+//			if (isset($data->$schemaRPCName)) {
+////				$data = array($module => (object)null, $schemaRPCName => $data->$schemaRPCName);
+//			}
 
 			// load content of snippets
 			$this->get('session')->set('isAjax', true);
@@ -171,7 +184,7 @@ class ModuleController extends \FIT\NetopeerBundle\Controller\ModuleController i
 					'rpcName' => $rpcName,
 					'datastore' => $conn->getCurrentDatastore(),
 				),
-				'configuration' => json_decode($resData),
+				'configuration' => $data,
 				'snippets' => $content['snippets'],
 			);
 			return new JsonResponse($res);

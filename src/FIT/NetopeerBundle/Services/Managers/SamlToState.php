@@ -72,7 +72,9 @@ class SamlToState implements UserManagerInterface
 	 */
 	public function loadUserBySamlInfo(SamlSpInfo $samlInfo)
 	{
-		$user = $this->loadUserByTargetedID($samlInfo->getAttributes()['eduPersonTargetedID']->getFirstValue());
+		// var_dump($samlInfo->getAttributes()['urn:oid:0.9.2342.19200300.100.1.1']->getFirstValue());
+		// var_dump($samlInfo);exit;
+		$user = $this->loadUserByTargetedID($samlInfo->getNameID()->getValue());
 
 		return $user;
 	}
@@ -103,11 +105,11 @@ class SamlToState implements UserManagerInterface
 		);
 
 		if ($user) {
-			$user->setUsername($samlInfo->getAttributes()['eduPersonPrincipalName']->getFirstValue());
-			$user->setTargetedID($samlInfo->getAttributes()['eduPersonTargetedID']->getFirstValue());
+			$user->setUsername($samlInfo->getAttributes()['urn:oid:0.9.2342.19200300.100.1.1']->getFirstValue());
+			$user->setTargetedID($samlInfo->getNameID()->getValue());
 		} else {
 			$user = new SamlUser();
-			$user->setUsername($samlInfo->getAttributes()['eduPersonPrincipalName']->getFirstValue());
+			$user->setUsername($samlInfo->getAttributes()['urn:oid:0.9.2342.19200300.100.1.1']->getFirstValue());
 			$user->setTargetedID($samlInfo->getAttributes()['eduPersonTargetedID']->getFirstValue());
 
 			$user->setSessionIndex($samlInfo->getAuthnStatement()->getSessionIndex());

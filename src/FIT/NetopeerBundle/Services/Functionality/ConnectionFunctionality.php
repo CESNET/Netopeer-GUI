@@ -457,7 +457,7 @@ class ConnectionFunctionality {
 	public function buildMenuStructure($key, $path = "") {
 
 		// we will build menu structure only if we have not build it before
-		if ( !$this->getModels($key) || !$this->getModelNamespaces($key) ) {
+		if (!$this->getModels($key) || !$this->getModelNamespaces($key) ) {
 			$models = array();
 			$namespaces = array();
 
@@ -480,6 +480,7 @@ class ConnectionFunctionality {
 				foreach ( $identifiers as $ns => $values ) {
 					$i                         = 0;
 					$moduleName                = $values['moduleName'];
+					$moduleNameRoot            = $values['moduleName'] . ':' . $values['rootElementName'];
 
 					if (isset($modifiedJson[$moduleName])) {
 						$configuration = $modifiedJson[$moduleName];
@@ -487,15 +488,15 @@ class ConnectionFunctionality {
 						$configuration = array();
 					}
 					if ($values["rootElementName"] !== "*") {
-						$models[$moduleName] = array(
+						$models[$moduleNameRoot] = array(
 							'path'            => "module",
 							"params"          => array(
 								'key'    => $key,
-								'module' => $moduleName,
+								'module' => $moduleNameRoot,
 							),
 							"title"           => "detail of " . $this->getSectionName($moduleName),
 							"name"            => $this->getSectionName($values["rootElementName"]),
-							"children"        => $this->buildSubmenu($key, $moduleName, $configuration),
+							"children"        => $this->buildSubmenu($key, $moduleNameRoot, $configuration),
 							"namespace"       => $ns,
 							"moduleName"          => $moduleName,
 							"rootElementName" => $values["rootElementName"],
@@ -511,16 +512,16 @@ class ConnectionFunctionality {
 //							$models[$moduleName]['rpcs'] = array();
 //						}
 					}
-					$namespaces[ $moduleName ] = $values;
+					$namespaces[$moduleNameRoot] = $values;
 				}
 				$schema = $netconfFunc->handle('query', array('connIds' => $key, 'filters' => array(array_keys($rootElems))));
 				if ($schema !== 1) {
 					$decoded = json_decode($schema, true);
 					foreach ($rootElems as $moduleName => $val) {
 						if (array_key_exists('rpcs', $decoded['$@@'.$moduleName])) {
-							$models[$moduleName]['rpcs'] = $decoded['$@@'.$moduleName]['rpcs'];
+							$models[$moduleName.":".$val]['rpcs'] = $decoded['$@@'.$moduleName]['rpcs'];
 						} else {
-							$models[$moduleName]['rpcs'] = array();
+							$models[$moduleName.":".$val]['rpcs'] = array();
 						}
 					}
 				}

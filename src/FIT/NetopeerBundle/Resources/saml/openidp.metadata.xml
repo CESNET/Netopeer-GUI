@@ -1,27 +1,37 @@
 <?xml version="1.0"?>
-<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="https://openidp.feide.no">
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" entityID="https://www.liberouter.org/simplesamlphp/saml2/idp/metadata.php">
   <md:IDPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:Extensions>
+      <shibmd:Scope xmlns:shibmd="urn:mace:shibboleth:metadata:1.0" regexp="false">liberouter.org</shibmd:Scope>
+    </md:Extensions>
     <md:KeyDescriptor use="signing">
       <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
         <ds:X509Data>
-          <ds:X509Certificate>MIICizCCAfQCCQCY8tKaMc0BMjANBgkqhkiG9w0BAQUFADCBiTELMAkGA1UEBhMCTk8xEjAQBgNVBAgTCVRyb25kaGVpbTEQMA4GA1UEChMHVU5JTkVUVDEOMAwGA1UECxMFRmVpZGUxGTAXBgNVBAMTEG9wZW5pZHAuZmVpZGUubm8xKTAnBgkqhkiG9w0BCQEWGmFuZHJlYXMuc29sYmVyZ0B1bmluZXR0Lm5vMB4XDTA4MDUwODA5MjI0OFoXDTM1MDkyMzA5MjI0OFowgYkxCzAJBgNVBAYTAk5PMRIwEAYDVQQIEwlUcm9uZGhlaW0xEDAOBgNVBAoTB1VOSU5FVFQxDjAMBgNVBAsTBUZlaWRlMRkwFwYDVQQDExBvcGVuaWRwLmZlaWRlLm5vMSkwJwYJKoZIhvcNAQkBFhphbmRyZWFzLnNvbGJlcmdAdW5pbmV0dC5ubzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAt8jLoqI1VTlxAZ2axiDIThWcAOXdu8KkVUWaN/SooO9O0QQ7KRUjSGKN9JK65AFRDXQkWPAu4HlnO4noYlFSLnYyDxI66LCr71x4lgFJjqLeAvB/GqBqFfIZ3YK/NrhnUqFwZu63nLrZjcUZxNaPjOOSRSDaXpv1kb5k3jOiSGECAwEAATANBgkqhkiG9w0BAQUFAAOBgQBQYj4cAafWaYfjBU2zi1ElwStIaJ5nyp/s/8B8SAPK2T79McMyccP3wSW13LHkmM1jwKe3ACFXBvqGQN0IbcH49hu0FKhYFM/GPDJcIHFBsiyMBXChpye9vBaTNEBCtU3KjjyG0hRT2mAQ9h+bkPmOvlEo/aH0xR68Z9hw4PF13w==</ds:X509Certificate>
+          <ds:X509Certificate>MIIDXjCCAkYCCQC9NpztAQXvOzANBgkqhkiG9w0BAQUFADBxMQswCQYDVQQGEwJDWjEXMBUGA1UECAwOQ3plY2ggUmVwdWJsaWMxDTALBgNVBAcMBEJybm8xDzANBgNVBAoMBkNlc25ldDEMMAoGA1UECwwDVE1DMRswGQYDVQQDDBJ3d3cubGliZXJvdXRlci5vcmcwHhcNMTIxMDE4MTI1OTQzWhcNMjIxMDE2MTI1OTQzWjBxMQswCQYDVQQGEwJDWjEXMBUGA1UECAwOQ3plY2ggUmVwdWJsaWMxDTALBgNVBAcMBEJybm8xDzANBgNVBAoMBkNlc25ldDEMMAoGA1UECwwDVE1DMRswGQYDVQQDDBJ3d3cubGliZXJvdXRlci5vcmcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzu4AGbvWocIqAgNC4aPJj3msxNzBcmW8q3lVSFofeo9FhWaOt7YnrX3ymwQ1a3nHta1Vv4qu5TUEG0AXyy6tydugunn+uqjg0hJvugh/RWzyz+w8MwkCXcdr8UYCEf70pRh5S4ul5UjPVp8F7+D30KatM7UUBytIB4jXxIsiEU6scr81LevrAMmHDnBmesSU+V/+sX6Lbm+A5qws/flPYgOvpGpeuNzxpIHR44wScITvIcPWEdP2711s/olJ6sEUo8dPGqIfhNxZY7Q+pZlulqXUun6KLG2fnHDZO922WqGE+cJNE3wG5mGQbrfQpXdgSpYdjr7VpMr7MCbHWk53zAgMBAAEwDQYJKoZIhvcNAQEFBQADggEBAJ+3fXdSEsS56am+qC0hGh8c0klDtIz3/qXZkeVtafh+v9tc6rxnV/ImdCzj4vE1aGbr50SPEq3E4+y+RxaJTugYr2brrmhYRexswfndecEbBIGjDTiuz4ncjq0IjAmYIzW8JclhOXTqRgkaebYMX7I37gvGO5QmKK0wPCD1NUZ87UcAOqayg73hQH7Cqq+KVaYW7VP78p5GNVNiitTm6ifEVqaYGNQUR+qxhh5t97+bgtBdVytkHL452Z8C2cbBbZP7H/Ih0Y4ri8cN5O3bGswpTiSHdRFpxq9rdVDz2wg11a8BxOLxpUPl3B3NDkoqpm1hILuEGBABxDfR6cPLFCU=</ds:X509Certificate>
         </ds:X509Data>
       </ds:KeyInfo>
     </md:KeyDescriptor>
     <md:KeyDescriptor use="encryption">
       <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
         <ds:X509Data>
-          <ds:X509Certificate>MIICizCCAfQCCQCY8tKaMc0BMjANBgkqhkiG9w0BAQUFADCBiTELMAkGA1UEBhMCTk8xEjAQBgNVBAgTCVRyb25kaGVpbTEQMA4GA1UEChMHVU5JTkVUVDEOMAwGA1UECxMFRmVpZGUxGTAXBgNVBAMTEG9wZW5pZHAuZmVpZGUubm8xKTAnBgkqhkiG9w0BCQEWGmFuZHJlYXMuc29sYmVyZ0B1bmluZXR0Lm5vMB4XDTA4MDUwODA5MjI0OFoXDTM1MDkyMzA5MjI0OFowgYkxCzAJBgNVBAYTAk5PMRIwEAYDVQQIEwlUcm9uZGhlaW0xEDAOBgNVBAoTB1VOSU5FVFQxDjAMBgNVBAsTBUZlaWRlMRkwFwYDVQQDExBvcGVuaWRwLmZlaWRlLm5vMSkwJwYJKoZIhvcNAQkBFhphbmRyZWFzLnNvbGJlcmdAdW5pbmV0dC5ubzCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAt8jLoqI1VTlxAZ2axiDIThWcAOXdu8KkVUWaN/SooO9O0QQ7KRUjSGKN9JK65AFRDXQkWPAu4HlnO4noYlFSLnYyDxI66LCr71x4lgFJjqLeAvB/GqBqFfIZ3YK/NrhnUqFwZu63nLrZjcUZxNaPjOOSRSDaXpv1kb5k3jOiSGECAwEAATANBgkqhkiG9w0BAQUFAAOBgQBQYj4cAafWaYfjBU2zi1ElwStIaJ5nyp/s/8B8SAPK2T79McMyccP3wSW13LHkmM1jwKe3ACFXBvqGQN0IbcH49hu0FKhYFM/GPDJcIHFBsiyMBXChpye9vBaTNEBCtU3KjjyG0hRT2mAQ9h+bkPmOvlEo/aH0xR68Z9hw4PF13w==</ds:X509Certificate>
+          <ds:X509Certificate>MIIDXjCCAkYCCQC9NpztAQXvOzANBgkqhkiG9w0BAQUFADBxMQswCQYDVQQGEwJDWjEXMBUGA1UECAwOQ3plY2ggUmVwdWJsaWMxDTALBgNVBAcMBEJybm8xDzANBgNVBAoMBkNlc25ldDEMMAoGA1UECwwDVE1DMRswGQYDVQQDDBJ3d3cubGliZXJvdXRlci5vcmcwHhcNMTIxMDE4MTI1OTQzWhcNMjIxMDE2MTI1OTQzWjBxMQswCQYDVQQGEwJDWjEXMBUGA1UECAwOQ3plY2ggUmVwdWJsaWMxDTALBgNVBAcMBEJybm8xDzANBgNVBAoMBkNlc25ldDEMMAoGA1UECwwDVE1DMRswGQYDVQQDDBJ3d3cubGliZXJvdXRlci5vcmcwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCzu4AGbvWocIqAgNC4aPJj3msxNzBcmW8q3lVSFofeo9FhWaOt7YnrX3ymwQ1a3nHta1Vv4qu5TUEG0AXyy6tydugunn+uqjg0hJvugh/RWzyz+w8MwkCXcdr8UYCEf70pRh5S4ul5UjPVp8F7+D30KatM7UUBytIB4jXxIsiEU6scr81LevrAMmHDnBmesSU+V/+sX6Lbm+A5qws/flPYgOvpGpeuNzxpIHR44wScITvIcPWEdP2711s/olJ6sEUo8dPGqIfhNxZY7Q+pZlulqXUun6KLG2fnHDZO922WqGE+cJNE3wG5mGQbrfQpXdgSpYdjr7VpMr7MCbHWk53zAgMBAAEwDQYJKoZIhvcNAQEFBQADggEBAJ+3fXdSEsS56am+qC0hGh8c0klDtIz3/qXZkeVtafh+v9tc6rxnV/ImdCzj4vE1aGbr50SPEq3E4+y+RxaJTugYr2brrmhYRexswfndecEbBIGjDTiuz4ncjq0IjAmYIzW8JclhOXTqRgkaebYMX7I37gvGO5QmKK0wPCD1NUZ87UcAOqayg73hQH7Cqq+KVaYW7VP78p5GNVNiitTm6ifEVqaYGNQUR+qxhh5t97+bgtBdVytkHL452Z8C2cbBbZP7H/Ih0Y4ri8cN5O3bGswpTiSHdRFpxq9rdVDz2wg11a8BxOLxpUPl3B3NDkoqpm1hILuEGBABxDfR6cPLFCU=</ds:X509Certificate>
         </ds:X509Data>
       </ds:KeyInfo>
     </md:KeyDescriptor>
-    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://openidp.feide.no/simplesaml/saml2/idp/SingleLogoutService.php"/>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://www.liberouter.org/simplesamlphp/saml2/idp/SingleLogoutService.php"/>
     <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:transient</md:NameIDFormat>
-    <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://openidp.feide.no/simplesaml/saml2/idp/SSOService.php"/>
+    <md:SingleSignOnService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="https://www.liberouter.org/simplesamlphp/saml2/idp/SSOService.php"/>
   </md:IDPSSODescriptor>
+  <md:Organization>
+    <md:OrganizationName xml:lang="en">Liberouter</md:OrganizationName>
+    <md:OrganizationName xml:lang="cs">Liberouter</md:OrganizationName>
+    <md:OrganizationDisplayName xml:lang="en">Liberouter</md:OrganizationDisplayName>
+    <md:OrganizationDisplayName xml:lang="cs">Liberouter</md:OrganizationDisplayName>
+    <md:OrganizationURL xml:lang="en">http://www.liberouter.org</md:OrganizationURL>
+  </md:Organization>
   <md:ContactPerson contactType="technical">
-    <md:GivenName>Feide</md:GivenName>
-    <md:SurName>support</md:SurName>
-    <md:EmailAddress>support@feide.no</md:EmailAddress>
+    <md:GivenName>TMC</md:GivenName>
+    <md:SurName>CESNET support</md:SurName>
+    <md:EmailAddress>tmc@ro.vutbr.cz</md:EmailAddress>
   </md:ContactPerson>
 </md:EntityDescriptor>
