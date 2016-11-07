@@ -1068,7 +1068,7 @@ class NetconfFunctionality {
 		}
 
 		foreach ($decoded as $sid => $response) {
-			if (($response['type'] != self::REPLY_OK) && ($response['type'] != self::REPLY_DATA)) {
+			if (isset($response['type']) && ($response['type'] != self::REPLY_OK) && ($response['type'] != self::REPLY_DATA)) {
 				$this->getLogger()->addWarning('Error: ', array('errors' => $response['errors']));
 				if (sizeof($response['errors'])) {
 					foreach ($response['errors'] as $error) {
