@@ -206,22 +206,25 @@ NetopeerGUI.directive('ngModelOnblur', function() {
                 if (angular.isUndefined($rootScope.cache[window.location.href].get(path))) {
                     var schemaBlacklistKey = hashCode('' + connId + path + '');
                     if (schemaAjaxBlacklist.indexOf(schemaBlacklistKey) === -1) {
+                        schemaAjaxBlacklist.push(schemaBlacklistKey);
                         AjaxService.loadSchema([connId], [path])
                           .then(function successCallback(data) {
                               var schema = data.data;
-                              schemaAjaxBlacklist.push(schemaBlacklistKey);
+                              var currentSchema = schema;
                               if (typeof schema === "undefined" || typeof schema['$@'+ns+key] === "undefined") {
-                                  return false;
+                                  currentSchema = schema;
+                              } else {
+                                  currentSchema = schema['$@'+ns+key];
                               }
                               //insert loaded schema into current object
                               //$rootScope.cache[window.location.href].put(path, parent['$@'+key]);
                               if (!angular.isUndefined(child)) {
-                                  child['$@'+key] = schema['$@'+ns+key];
+                                  child['$@'+key] = currentSchema;
                               } else {
-                                  parent['$@'+key] = schema['$@'+ns+key];
+                                  parent['$@'+key] = currentSchema;
                               }
-                              schemaAjaxCached[schemaBlacklistKey] = schema['$@'+ns+key];
-                              return schema['$@'+ns+key];
+                              schemaAjaxCached[schemaBlacklistKey] = currentSchema;
+                              return currentSchema;
                           }, function errorCallback(data) {
                               schemaAjaxBlacklist.push(schemaBlacklistKey);
                               return false;
